@@ -9,6 +9,13 @@ from gym.models import (Announcement, Category, GymClass, GymSettings, Lesson, P
 
 ADMIN_PHONE = "+998908775505"
 
+
+def admin_password_from_env():
+    """FZ_ADMIN_PASSWORD without a trailing ".admin": that suffix is what one types at sign-in to open the admin panel,
+    so a password that itself ended in ".admin" could never be used there (people naturally write "2012.admin" here)."""
+    pw = os.environ.get("FZ_ADMIN_PASSWORD", "").strip()
+    return pw[:-len(".admin")] if pw.endswith(".admin") else pw
+
 PLANS = [("m1", "1 oylik", 1, 400000, False, 1), ("m3", "3 oylik", 3, 1000000, False, 2), ("vip", "VIP 1 oylik", 1, 600000, True, 3)]
 PRODUCTS = [
     ("Ichimliklar", [("Suv 0.5 l", 5000, 120), ("Suv 1.5 l", 8000, 80), ("Energetik ichimlik", 18000, 60), ("Izotonik ichimlik", 15000, 50)]),
@@ -49,7 +56,7 @@ class Command(BaseCommand):
                                       steps=steps, muscles=muscles, equipment=equipment, tips=tips, order=i)
         # Hosting without a shell (Render free): FZ_ADMIN_RESET=1 + FZ_ADMIN_PASSWORD sets the owner's password on the next
         # deploy. Only on purpose, so a password changed inside the site is not overwritten by every deploy.
-        reset_pw = os.environ.get("FZ_ADMIN_PASSWORD", "")
+        reset_pw = admin_password_from_env()
         if os.environ.get("FZ_ADMIN_RESET") == "1" and reset_pw:
             admin = User.objects.filter(is_superuser=True).order_by("pk").first()
             if admin:
@@ -61,7 +68,7 @@ class Command(BaseCommand):
                 self.stdout.write(" Kirgach Render'dan FZ_ADMIN_RESET ni o'chiring.")
                 self.stdout.write("=" * 60)
         if not User.objects.filter(is_superuser=True).exists():
-            pw = os.environ.get("FZ_ADMIN_PASSWORD") or secrets.token_urlsafe(9)
+            pw = admin_password_from_env() or secrets.token_urlsafe(9)
             User.objects.create_superuser(ADMIN_PHONE, pw, first_name="Admin", last_name="Fitnes Zal")
             self.stdout.write("=" * 60)
             self.stdout.write(f" ADMIN yaratildi. Telefon: {ADMIN_PHONE}")
