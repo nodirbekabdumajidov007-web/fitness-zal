@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Sheyker">
+  <rect width="240" height="240" fill="#e9f0ec"/>
+  <circle cx="120" cy="128" r="86" fill="#d3e3d9"/>
+  <ellipse cx="120" cy="214" rx="44" ry="7" fill="#1c2129" opacity=".14"/>
+  <rect x="104" y="26" width="22" height="16" rx="4" fill="#1c2129"/>
+  <path d="M84 42 h72 q6 0 6 6 v14 h-84 v-14 q0 -6 6 -6z" fill="#1c2129"/>
+  <path d="M80 62 h80 l-8 140 q-1 10 -11 10 h-42 q-10 0 -11 -10z" fill="#ffffff" fill-opacity=".85" stroke="#9fb5a8" stroke-width="3"/>
+  <path d="M84 120 h72 l-4 82 q-1 8 -9 8 h-46 q-8 0 -9 -8z" fill="#8a5a3b"/>
+  <path d="M84 120 q18 -8 36 0 t36 0" fill="none" stroke="#a8724e" stroke-width="4"/>
+  <g stroke="#9fb5a8" stroke-width="2"><path d="M146 80 h8"/><path d="M146 96 h8"/><path d="M146 112 h8"/><path d="M146 128 h8"/><path d="M146 144 h8"/></g>
+  <path d="M92 70 l4 128" stroke="#ffffff" stroke-width="6" stroke-linecap="round" opacity=".6"/>
+</svg>
