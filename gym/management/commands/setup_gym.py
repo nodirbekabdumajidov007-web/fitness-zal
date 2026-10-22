@@ -47,6 +47,19 @@ class Command(BaseCommand):
             for i, (ti, wd, level, mins, vip, title, summary, steps, muscles, equipment, tips) in enumerate(seed_lessons.LESSONS):
                 Lesson.objects.create(workout_type=types[ti], weekday=wd, level=level, duration_min=mins, is_vip=vip, title=title, summary=summary,
                                       steps=steps, muscles=muscles, equipment=equipment, tips=tips, order=i)
+        # Hosting without a shell (Render free): FZ_ADMIN_RESET=1 + FZ_ADMIN_PASSWORD sets the owner's password on the next
+        # deploy. Only on purpose, so a password changed inside the site is not overwritten by every deploy.
+        reset_pw = os.environ.get("FZ_ADMIN_PASSWORD", "")
+        if os.environ.get("FZ_ADMIN_RESET") == "1" and reset_pw:
+            admin = User.objects.filter(is_superuser=True).order_by("pk").first()
+            if admin:
+                admin.set_password(reset_pw)
+                admin.is_active = True
+                admin.save(update_fields=["password", "is_active"])
+                self.stdout.write("=" * 60)
+                self.stdout.write(f" ADMIN paroli FZ_ADMIN_PASSWORD ga almashtirildi. Telefon: {admin.phone}")
+                self.stdout.write(" Kirgach Render'dan FZ_ADMIN_RESET ni o'chiring.")
+                self.stdout.write("=" * 60)
         if not User.objects.filter(is_superuser=True).exists():
             pw = os.environ.get("FZ_ADMIN_PASSWORD") or secrets.token_urlsafe(9)
             User.objects.create_superuser(ADMIN_PHONE, pw, first_name="Admin", last_name="Fitnes Zal")

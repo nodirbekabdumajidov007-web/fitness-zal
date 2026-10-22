@@ -157,6 +157,21 @@ class LoginAndAdminPolishTests(AuditBase):
         self.assertNotContains(r, "Select A")
 
 
+class AdminResetOnDeployTests(AuditBase):
+    def test_reset_only_when_asked(self):
+        from unittest import mock
+        with mock.patch.dict("os.environ", {"FZ_ADMIN_PASSWORD": "Yangi-Parol-2026"}):
+            call_command("setup_gym", verbosity=0)
+        self.admin.refresh_from_db()
+        self.assertTrue(self.admin.check_password("AdminPass1"))  # a normal deploy never touches the password
+        with mock.patch.dict("os.environ", {"FZ_ADMIN_PASSWORD": "Yangi-Parol-2026", "FZ_ADMIN_RESET": "1"}):
+            call_command("setup_gym", verbosity=0)
+        self.admin.refresh_from_db()
+        self.assertTrue(self.admin.check_password("Yangi-Parol-2026"))
+        r = Client().post("/login/", {"phone": "908775505", "password": "Yangi-Parol-2026.admin"})
+        self.assertEqual(r["Location"], "/django-admin/")
+
+
 class ReceiptStatesTests(AuditBase):
     def scan(self, code, lang="uz"):
         self.staff.cookies["fz_lang"] = lang
