@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Protein">
+  <rect width="240" height="240" fill="#efe9e4"/>
+  <circle cx="120" cy="128" r="86" fill="#e4d8ce"/>
+  <ellipse cx="120" cy="212" rx="60" ry="8" fill="#1c2129" opacity=".14"/>
+  <rect x="62" y="52" width="116" height="26" rx="6" fill="#1c2129"/>
+  <rect x="62" y="70" width="116" height="6" fill="#000" opacity=".25"/>
+  <path d="M66 78 h108 l-6 124 q-1 10 -11 10 h-74 q-10 0 -11 -10z" fill="#232831"/>
+  <path d="M70 108 h100 l-2 52 h-96z" fill="#d6301f"/>
+  <rect x="86" y="120" width="68" height="10" rx="3" fill="#ffffff"/>
+  <rect x="96" y="136" width="48" height="6" rx="3" fill="#ffffff" opacity=".7"/>
+  <path d="M120 170 l6 12 h13 l-10 8 4 13 -13 -8 -13 8 4 -13 -10 -8 h13z" fill="#e2b84a"/>
+  <path d="M80 84 l-3 110" stroke="#ffffff" stroke-width="5" stroke-linecap="round" opacity=".12"/>
+</svg>

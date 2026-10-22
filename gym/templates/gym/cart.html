@@ -1,0 +1,53 @@
+{% extends "gym/base.html" %}{% load static gym_tags %}
+{% block title %}{% t 'cart' %}{% endblock %}
+{% block content %}
+<h2>{% t 'cart' %}</h2>
+<div id="cart-page"{% if not items %} hidden{% endif %}>
+  <div class="grid" style="grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:18px;align-items:start" id="cart-layout">
+    <div class="cart-lines">
+      {% for i in items %}
+      <div class="cart-line" data-pid="{{ i.p.pk }}">
+        <a href="{% url 'product' i.p.pk %}" class="cl-img"><img referrerpolicy="no-referrer" data-fallback="{% static i.p.illustration %}" src="{% if i.p.image_src %}{{ i.p.image_src }}{% else %}{% static i.p.illustration %}{% endif %}" alt=""></a>
+        <div class="cl-main"><a href="{% url 'product' i.p.pk %}"><b>{{ i.p.name }}</b></a><span class="muted num">{{ i.p.price|money }} {% t 'price_unit' %}</span></div>
+        {% with p=i.p qty=i.qty %}{% include "gym/_qty.html" %}{% endwith %}
+        <b class="num cl-sub" data-line="{{ i.p.pk }}">{{ i.sub|money }}</b>
+      </div>
+      {% endfor %}
+    </div>
+    <form class="card grid cart-sum" method="post" action="{% url 'checkout' %}">
+      {% csrf_token %}
+      <ol class="co-steps mini" aria-label="{% t 'checkout' %}"><li class="done"><i>✓</i>{% t 'cart' %}</li><li class="now"><i>2</i>{% t 'step_delivery' %}</li><li><i>3</i>{% t 'pay' %}</li></ol>
+      <div class="co-line"><span class="muted">{% t 'subtotal' %}</span><b class="num" id="cart-total">{{ total|money }} {% t 'price_unit' %}</b></div>
+      {% if is_vip %}<div class="note vipnote">★ {% t 'vip_shop_note' pct=gs.vip_shop_discount %}</div>{% endif %}
+      {% if gs.delivery_on %}
+      <fieldset class="dlv" id="dlv" data-fee="{{ gs.delivery_fee }}" data-free="{{ gs.free_delivery_from }}" data-vip="{{ vip_pct }}" data-unit="{% t 'price_unit' %}" data-free-label="{% t 'free' %}">
+        <legend>{% t 'step_delivery' %}</legend>
+        <label class="dlv-opt"><input type="radio" name="delivery" value="pickup" checked><span class="dlv-ico" aria-hidden="true">🏋️</span>
+          <span><b>{% t 'dlv_pickup' %}</b><small>{% t 'dlv_pickup_sub' %}</small></span><em>{% t 'free' %}</em></label>
+        <label class="dlv-opt"><input type="radio" name="delivery" value="courier"><span class="dlv-ico moto" aria-hidden="true">🛵</span>
+          <span><b>{% t 'dlv_courier' %}</b><small>{{ gs.delivery_area }}{% if gs.free_delivery_from %} · {{ gs.free_delivery_from|money }} {% t 'dlv_free_from' %}{% endif %}</small></span><em class="num">{{ gs.delivery_fee|money }}</em></label>
+        <div class="dlv-addr grid" id="dlv-addr" hidden>
+          <label for="dlv-a">{% t 'address' %}<input id="dlv-a" name="address" maxlength="200" autocomplete="street-address" placeholder="{% t 'dlv_address_ph' %}"></label>
+          <label for="dlv-p">{% t 'phone' %}<div class="phone"><span>+998</span><input id="dlv-p" name="delivery_phone" inputmode="numeric" autocomplete="tel-national" maxlength="17" value="{% if user.is_authenticated and user.phone %}{{ user.phone|slice:'4:' }}{% endif %}" data-phone></div></label>
+          <label for="dlv-n">{% t 'dlv_note' %}<input id="dlv-n" name="delivery_note" maxlength="200" placeholder="{% t 'dlv_note_ph' %}"></label>
+        </div>
+      </fieldset>
+      <div class="co-line"><span class="muted">{% t 'dlv_fee' %}</span><b class="num" id="dlv-fee">{% t 'free' %}</b></div>
+      {% endif %}
+      <div class="co-line co-total"><span>{% t 'total' %}</span><b class="num" id="grand-total">{{ total|money }} <small>{% t 'price_unit' %}</small></b></div>
+      <label for="method">{% t 'pay_method' %}<select id="method" name="method">{% for mth in methods %}<option value="{{ mth }}">{% method_label mth %}</option>{% endfor %}</select></label>
+      {% if demo_on %}<div class="note">{% t 'demo_note' %}</div>{% endif %}
+      <button class="btn primary" type="submit">{% t 'checkout' %}</button>
+      <a class="muted" href="{% url 'shop' %}">← {% t 'continue_shopping' %}</a>
+    </form>
+  </div>
+</div>
+<div class="m-empty cart-empty" id="cart-empty"{% if items %} hidden{% endif %}>
+  <span class="cb-ico big" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 8H6"/><circle cx="10" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/></svg></span>
+  <b>{% t 'cart_empty' %}</b><span class="muted">{% t 'cart_empty_help' %}</span>
+  <a class="btn primary" href="{% url 'shop' %}">{% t 'shop' %} →</a>
+</div>
+<div class="cart-toast" id="cart-toast" role="status" hidden></div>
+<div id="cart-i18n" hidden data-added="{% t 'added_to_cart' %}" data-removed="{% t 'removed_from_cart' %}" data-unit="{% t 'price_unit' %}"></div>
+{% endblock %}
+{% block scripts %}<script src="{% vstatic 'js/delivery.js' %}"></script>{% endblock %}

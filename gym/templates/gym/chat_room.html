@@ -1,0 +1,68 @@
+{% extends "gym/base.html" %}{% load static gym_tags %}
+{% block title %}{% if other %}{{ other_name }}{% elif room.vip_only %}{% t 'room_vip' %}{% else %}{% t 'room_general' %}{% endif %} · {% t 'chat' %}{% endblock %}
+{% block content %}
+<section class="messenger{% if room.kind == 'room' %} is-room{% endif %}">
+  <header class="m-head">
+    <a class="m-back" href="{% url 'chat' %}" aria-label="{% t 'chat' %}">←</a>
+    {% if other %}
+      <span class="m-ava big" style="--h:{{ other_hue }}">{{ other_initials }}{% if pres.online %}<i class="m-dot" aria-hidden="true"></i>{% endif %}</span>
+      <div class="m-title"><b>{{ other_name }}</b><span class="m-status{% if pres.online %} on{% endif %}" id="m-status">{% if pres.online %}{% t 'online' %}{% elif pres.seen %}{% t 'last_seen_at' time=pres.seen %}{% else %}{{ other.member_code }}{% endif %}</span></div>
+      <form method="post" action="{% if i_blocked %}{% url 'chat_unblock' other.pk %}{% else %}{% url 'chat_block' other.pk %}{% endif %}" class="m-headact">{% csrf_token %}<input type="hidden" name="back" value="/chat/{{ room.pk }}/">
+        <button class="btn small {% if not i_blocked %}danger{% endif %}" type="submit" {% if not i_blocked %}data-confirm="{% t 'sure' %}"{% endif %}>{% if i_blocked %}{% t 'chat_unblock' %}{% else %}{% t 'chat_block' %}{% endif %}</button></form>
+    {% else %}
+      <span class="m-ava big room{% if room.vip_only %} vip{% endif %}">{% if room.vip_only %}★{% else %}#{% endif %}</span>
+      <div class="m-title"><b>{% if room.vip_only %}{% t 'room_vip' %}{% else %}{% t 'room_general' %}{% endif %}</b><span class="m-status">{% if room.vip_only %}{% t 'room_vip_help' %}{% else %}{% t 'room_general_help' %}{% endif %}</span></div>
+    {% endif %}
+  </header>
+
+  <div class="m-log" id="chat-log" data-poll="{% url 'chat_poll' room.pk %}" data-send="{% url 'chat_send' room.pk %}" data-last="{{ last_id }}"
+       data-kind="{{ room.kind }}" data-delete="/chat/message/0/delete/" data-report="/chat/message/0/report/"
+       data-t-delete="{% t 'chat_delete' %}" data-t-report="{% t 'chat_report' %}" data-t-deleted="{% t 'chat_deleted' %}" data-t-reported="{% t 'chat_report_sent' %}"
+       data-t-today="{% t 'today_cap' %}" data-t-yesterday="{% t 'yesterday' %}" data-t-online="{% t 'online' %}" data-t-seen="{% t 'last_seen_at' time='@' %}"
+       data-t-sure="{% t 'sure' %}" data-t-bad-image="{% t 'chat_bad_image' %}" data-t-typing="{% t 'chat_typing' name='@' %}"
+       data-ws="/ws/chat/{{ room.pk }}/" aria-live="polite">
+    {% for m in msgs %}
+      {% if m.show_day %}<div class="m-day" data-day="{{ m.day }}"><span>{{ m.show_day }}</span></div>{% endif %}
+      <div class="m-row{% if m.mine %} mine{% endif %}{% if m.first %} first{% endif %}" data-id="{{ m.id }}" data-sender="{{ m.sender }}" data-day="{{ m.day }}">
+        {% if room.kind == 'room' and not m.mine %}<span class="m-ava" style="--h:{{ m.hue }}">{% if m.first %}{{ m.initials }}{% endif %}</span>{% endif %}
+        <div class="m-bubble{% if m.image and not m.body %} photo-only{% endif %}">
+          {% if room.kind == 'room' and not m.mine and m.first %}<div class="m-name" style="--h:{{ m.hue }}">{{ m.name }}</div>{% endif %}
+          {% if m.deleted %}<i class="m-del">{% t 'chat_deleted' %}</i>{% else %}
+            {% if m.image %}<a class="m-photo" href="{{ m.image }}" target="_blank" rel="noopener" data-lightbox><img src="{{ m.image }}" alt="{% t 'chat_photo' %}" loading="lazy"></a>{% endif %}
+            {% if m.body %}<div class="m-text">{{ m.body }}</div>{% endif %}
+          {% endif %}
+          <div class="m-meta"><span class="num">{{ m.time }}</span>{% if m.mine and room.kind == 'direct' and not m.deleted %}<span class="m-tick{% if m.read %} read{% endif %}" aria-label="{% if m.read %}{% t 'chat_read' %}{% else %}{% t 'chat_sent' %}{% endif %}">{% if m.read %}✓✓{% else %}✓{% endif %}</span>{% endif %}</div>
+          {% if m.can_delete or m.can_report %}<div class="m-acts">
+            {% if m.can_delete %}<form method="post" action="{% url 'chat_delete' m.id %}">{% csrf_token %}<button class="link" type="submit" data-bin data-confirm="{% t 'sure' %}">{% t 'chat_delete' %}</button></form>{% endif %}
+            {% if m.can_report %}<form method="post" action="{% url 'chat_report' m.id %}">{% csrf_token %}<button class="link" type="submit">{% t 'chat_report' %}</button></form>{% endif %}
+          </div>{% endif %}
+        </div>
+      </div>
+    {% empty %}
+      <div class="m-empty" id="chat-empty"><span class="m-empty-ico" aria-hidden="true">💬</span><b>{% t 'chat_empty_room' %}</b><span class="muted">{% t 'chat_rules_short' %}</span></div>
+    {% endfor %}
+  </div>
+
+  <div class="m-typing" id="chat-typing" aria-live="polite" hidden><span class="m-dots" aria-hidden="true"><i></i><i></i><i></i></span><span id="chat-typing-text"></span></div>
+  <span class="m-live" id="chat-live" title="WebSocket" hidden><i></i>LIVE</span>
+  {% if user.chat_banned %}<div class="note warn m-notice">{% t 'chat_banned_notice' %}</div>
+  {% elif blocked %}<div class="note warn m-notice">{% t 'chat_blocked_notice' %}</div>
+  {% else %}
+  <form class="m-compose" id="chat-form" method="post" action="{% url 'chat_send' room.pk %}" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="m-preview" id="chat-preview" hidden><img alt=""><button type="button" class="m-preview-x" id="chat-preview-x" aria-label="{% t 'chat_remove_photo' %}">×</button></div>
+    <div class="m-bar">
+      <label class="m-attach" title="{% t 'chat_attach' %}"><input type="file" name="image" id="chat-file" accept="image/jpeg,image/png,image/webp">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5l-8.6 8.6a5 5 0 0 1-7.1-7.1l8.6-8.6a3.5 3.5 0 0 1 5 5l-8.6 8.6a2 2 0 0 1-2.8-2.8l7.9-7.9"/></svg><span class="sr">{% t 'chat_attach' %}</span></label>
+      <label for="chat-body" class="sr">{% t 'chat_type' %}</label>
+      <textarea id="chat-body" name="body" maxlength="1000" rows="1" placeholder="{% t 'chat_type' %}"></textarea>
+      <button class="m-send" type="submit" aria-label="{% t 'chat_send' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l18-8-8 18-2-8z"/></svg></button>
+    </div>
+    <span class="field-err" id="chat-err" role="alert"></span>
+    <div class="m-drop" id="chat-drop" hidden>{% t 'chat_drop' %}</div>
+  </form>
+  {% endif %}
+</section>
+<div class="m-lightbox" id="chat-lightbox" hidden><img alt=""><button type="button" aria-label="×">×</button></div>
+<script src="{% vstatic 'js/chat.js' %}"></script>
+{% endblock %}

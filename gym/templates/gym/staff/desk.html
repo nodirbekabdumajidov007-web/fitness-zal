@@ -1,0 +1,131 @@
+{% extends "gym/base.html" %}{% load gym_tags %}
+{% block title %}{% t 'desk' %}{% endblock %}
+{% block content %}
+<section class="dk-hero">
+  <div>
+    <span class="eyebrow">{% now "l, d.m.Y" %} · <b class="num" data-clock>{% now "H:i" %}</b></span>
+    <h1>{% t 'desk' %}</h1>
+    <div class="dk-kpis">
+      <span><b class="num">{{ visits_today }}</b>{% t 'visits_today' %}</span>
+      <span><b class="num">{{ active_members }}</b>{% t 'active_members' %}</span>
+      <span class="{% if pending %}hot{% endif %}"><b class="num">{{ pending|length }}</b>{% t 'desk_pending' %}</span>
+      <span class="{% if new_orders %}hot{% endif %}"><b class="num">{{ new_orders|length }}</b>{% t 'desk_orders' %}</span>
+      <span class="crowd {{ crowd.level }}"><span class="crowd-txt">{% t 'crowd_now' %}: <b>{% t 'crowd_'|add:crowd.level %}</b></span><span class="crowd-bar"><i style="width:{{ crowd.pct }}%"></i></span></span>
+    </div>
+  </div>
+  <a class="dk-scan" href="{% url 'scan' %}"><span class="dk-scan-ico" aria-hidden="true">▣</span>{% t 'scan' %}</a>
+</section>
+
+<form class="dk-search" method="get" role="search">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+  <input id="q" name="q" value="{{ q }}" autofocus autocomplete="off" placeholder="{% t 'desk_find_ph' %}" aria-label="{% t 'desk_find' %}">
+  <button class="btn primary pill" type="submit">{% t 'search' %}</button>
+</form>
+
+{% if guest %}
+<div class="card dk-guest">
+  <span class="dk-ava gold" aria-hidden="true">🎟</span>
+  <div><b>{% t 'guest_invite' %}: {{ guest.guest_name }}</b><br><span class="muted num">{{ guest.code }} · {% t 'date' %} {{ guest.date|dmy }} · {% t 'guest_host' %}: {{ guest.user.full_name }} ({{ guest.user.member_code }})</span></div>
+  {% if guest.used_at %}<span class="pill mute">{% t 'guest_used_tag' %} · {{ guest.used_at|dmyhm }}</span>
+  {% elif guest.date != today %}<span class="pill bad">{% t 'guest_wrong_day' %}</span>
+  {% else %}<form method="post" action="{% url 'desk_guest' guest.code %}">{% csrf_token %}<input type="hidden" name="back" value="{{ request.get_full_path }}"><button class="btn primary pill" type="submit">{% t 'desk_checkin' %}</button></form>{% endif %}
+</div>
+{% endif %}
+
+{% if q %}
+<section class="grid">
+  <h3>{% t 'search' %}: «{{ q }}» <span class="muted">· {{ results|length }}</span></h3>
+  <div class="dk-people">
+  {% for u in results %}
+    <article class="card dk-person{% if not u.is_active %} blocked{% endif %}">
+      <header><span class="dk-ava">{{ u.first_name|first|upper }}{{ u.last_name|first|upper }}</span>
+        <div><b>{{ u.full_name }}</b><small class="muted num">{{ u.member_code }} · {{ u.phone|default:u.email|default:"—" }}</small></div>
+        {% if not u.is_active %}<span class="pill bad">{% t 'err_blocked' %}</span>{% elif u.mem %}<span class="pill good">{% plan_name u.mem.plan %} · {{ u.mem.expires|dmy }}</span>{% else %}<span class="pill mute">{% t 'no_membership' %}</span>{% endif %}
+      </header>
+      <div class="dk-acts">
+        <form method="post" action="{% url 'desk_checkin' u.pk %}">{% csrf_token %}<input type="hidden" name="back" value="{{ request.get_full_path }}"><button class="btn primary pill" type="submit">→ {% t 'desk_checkin' %}</button></form>
+        <form class="dk-sell" method="post" action="{% url 'desk_sell' u.pk %}">{% csrf_token %}<input type="hidden" name="back" value="{{ request.get_full_path }}">
+          <select name="plan" aria-label="{% t 'nav_plans' %}">{% for p in plans %}<option value="{{ p.code }}">{% plan_name p %} · {{ p.price|short_money }}</option>{% endfor %}</select>
+          <button class="btn pill" type="submit" data-confirm="{% t 'confirm' %}">{% t 'desk_sell' %}</button></form>
+        <form method="post" action="{% url 'desk_block' u.pk %}">{% csrf_token %}<input type="hidden" name="back" value="{{ request.get_full_path }}"><button class="btn small danger" type="submit" data-confirm="{% t 'sure' %}">{% if u.is_active %}{% t 'block' %}{% else %}{% t 'unblock' %}{% endif %}</button></form>
+      </div>
+    </article>
+  {% empty %}<div class="card muted">{% t 'no_results' %}</div>{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<nav class="dk-tabs" role="tablist" data-tabs>
+  <button type="button" role="tab" data-tab="pay" aria-selected="true">💳 {% t 'desk_pending' %} <i class="{% if pending %}hot{% endif %}">{{ pending|length }}</i></button>
+  <button type="button" role="tab" data-tab="orders" aria-selected="false">🛒 {% t 'desk_orders' %} <i class="{% if new_orders %}hot{% endif %}">{{ new_orders|length }}</i></button>
+  <button type="button" role="tab" data-tab="pt" aria-selected="false">🤝 {% t 'pt_requests' %} <i class="{% if pt_requests %}hot{% endif %}">{{ pt_requests|length }}</i></button>
+  <button type="button" role="tab" data-tab="guests" aria-selected="false">🎟 {% t 'guests_today' %} <i>{{ guests_today|length }}</i></button>
+  <button type="button" role="tab" data-tab="visits" aria-selected="false">🚪 {% t 'visits_today' %} <i>{{ visits_today }}</i></button>
+</nav>
+
+<section class="dk-panel" data-panel="pay">
+  <div class="dk-cards">
+  {% for p in pending %}
+    <article class="card dk-pay">
+      <header><span class="dk-ava">{% if p.user %}{{ p.user.first_name|first|upper }}{% else %}?{% endif %}</span>
+        <div><b>{{ p.user.full_name|default:"—" }}</b><small class="muted num">{{ p.created|dmyhm }} · {{ p.reference }}</small></div>
+        <b class="dk-amount num">{{ p.amount|money }}</b></header>
+      <div class="chips"><span class="pill mute">{% t 'kind_'|add:p.kind %}{% if p.plan %}: {% plan_name p.plan %}{% endif %}</span><span class="pill info">{% method_label p.method %}</span>
+        {% if p.method == 'card' %}{% if p.proof_at %}<span class="pill good">✓ {% t 'proof_yes' %} ••••{{ p.sender_last4 }}</span>{% else %}<span class="pill warn">{% t 'proof_no' %}</span>{% endif %}{% endif %}</div>
+      {% if p.method == 'card' %}<small class="muted num">→ ••••{{ p.card_last4 }}{% if p.proof_at %} · {{ p.proof_at|dmyhm }}{% endif %}</small>{% endif %}
+      <div class="dk-acts">
+        <form method="post" action="{% url 'desk_confirm' p.pk %}">{% csrf_token %}<button class="btn primary pill" type="submit" data-confirm="{% t 'confirm_money' %}">✓ {% t 'confirm' %}</button></form>
+        <form method="post" action="{% url 'desk_reject' p.pk %}">{% csrf_token %}<button class="btn small danger" type="submit" data-bin data-confirm="{% t 'sure' %}">{% t 'reject' %}</button></form>
+      </div>
+    </article>
+  {% empty %}<div class="card dk-empty">✨ {% t 'desk_all_clear' %}</div>{% endfor %}
+  </div>
+</section>
+
+<section class="dk-panel" data-panel="orders">
+  <div class="dk-cards">
+  {% for o in new_orders %}
+    <article class="card dk-order{% if o.delivery == 'courier' %} courier{% endif %}">
+      <header><span class="dk-ava">{% if o.delivery == 'courier' %}🛵{% else %}🛍{% endif %}</span>
+        <div><b>#{{ o.pk }} · {{ o.user.full_name|default:"—" }}</b><small class="muted num">{{ o.created|dmyhm }}</small></div>
+        <b class="dk-amount num">{{ o.total|money }}</b></header>
+      <ul class="dk-items">{% for it in o.items.all %}<li><span>{{ it.name }}</span><b class="num">× {{ it.qty }}</b></li>{% endfor %}</ul>
+      {% if o.delivery == 'courier' %}<div class="dk-addr">📍 {{ o.address }}<br><a href="tel:{{ o.delivery_phone }}">{{ o.delivery_phone }}</a>{% if o.delivery_note %} · {{ o.delivery_note }}{% endif %}</div>
+        <span class="pill {% if o.status == 'shipping' %}good{% else %}warn{% endif %}">{% if o.status == 'shipping' %}🛵 {% t 'st_shipping' %}{% else %}{% t 'dlv_courier' %}{% endif %}</span>{% endif %}
+      <div class="dk-acts">
+        {% if o.delivery == 'courier' and o.status == 'new' %}<form method="post" action="{% url 'desk_ship' o.pk %}">{% csrf_token %}<button class="btn pill" type="submit">🛵 {% t 'ship_do' %}</button></form>{% endif %}
+        <form method="post" action="{% url 'desk_handover' o.pk %}">{% csrf_token %}<button class="btn primary pill" type="submit">✓ {% if o.delivery == 'courier' %}{% t 'delivered_do' %}{% else %}{% t 'hand_over' %}{% endif %}</button></form>
+      </div>
+    </article>
+  {% empty %}<div class="card dk-empty">✨ {% t 'desk_all_clear' %}</div>{% endfor %}
+  </div>
+</section>
+
+<section class="dk-panel" data-panel="pt">
+  <div class="dk-cards">
+  {% for s in pt_requests %}
+    <article class="card dk-pay">
+      <header><span class="dk-ava">🤝</span><div><b>{{ s.user.full_name }} → {{ s.trainer.name }}</b><small class="muted num">{{ s.starts|dmyhm }}</small></div>{% if s.is_free %}<span class="pill vippill">★ {% t 'vip_free' %}</span>{% endif %}</header>
+      {% if s.note %}<p class="muted" style="margin:0">{{ s.note }}</p>{% endif %}
+      <div class="dk-acts"><form method="post" action="{% url 'desk_pt' s.pk 'confirm' %}">{% csrf_token %}<button class="btn primary pill" type="submit">✓ {% t 'confirm' %}</button></form>
+        <form method="post" action="{% url 'desk_pt' s.pk 'cancel' %}">{% csrf_token %}<button class="btn small danger" type="submit" data-bin data-confirm="{% t 'sure' %}">{% t 'cancel_booking' %}</button></form></div>
+    </article>
+  {% empty %}<div class="card dk-empty">✨ {% t 'desk_all_clear' %}</div>{% endfor %}
+  </div>
+</section>
+
+<section class="dk-panel" data-panel="guests">
+  <div class="dk-cards">
+  {% for g in guests_today %}
+    <article class="card dk-pay"><header><span class="dk-ava gold">🎟</span><div><b>{{ g.guest_name }}</b><small class="muted num">{{ g.code }} · {{ g.user.full_name }}</small></div>
+      {% if g.used_at %}<span class="pill mute">{% t 'guest_used_tag' %}</span>{% else %}<form method="post" action="{% url 'desk_guest' g.code %}">{% csrf_token %}<button class="btn primary pill" type="submit">→ {% t 'desk_checkin' %}</button></form>{% endif %}</header></article>
+  {% empty %}<div class="card dk-empty">{% t 'none_yet' %}</div>{% endfor %}
+  </div>
+</section>
+
+<section class="dk-panel" data-panel="visits">
+  <ul class="card dk-visits">{% for v in recent_visits %}<li><span class="dk-ava sm">{{ v.user.first_name|first|upper }}</span><b>{{ v.user.full_name }}</b><span class="muted num">{{ v.user.member_code }}</span><time class="num">{{ v.ts|time:"H:i" }}</time></li>
+    {% empty %}<li class="muted">{% t 'none_yet' %}</li>{% endfor %}</ul>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{% vstatic 'js/desk.js' %}"></script>{% endblock %}

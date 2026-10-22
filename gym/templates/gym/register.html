@@ -1,0 +1,37 @@
+{% extends "gym/base.html" %}{% load gym_tags %}
+{% block title %}{% t 'register' %}{% endblock %}
+{% block bodyclass %}auth-page{% endblock %}
+{% block outer %}
+{% include "gym/_auth_scene.html" %}
+<main class="wrap auth2"><div class="tilt" data-tilt>
+  <form class="card grid glass" method="post" novalidate data-warp>
+    {% csrf_token %}
+    <i class="glare" aria-hidden="true"></i>
+    <div class="auth-head"><img class="auth-logo" src="{% vstatic 'img/logo.png' %}" alt="" width="219" height="320"><span class="eyebrow">Fitnes Zal</span><h1>{% t 'join_us' %}</h1></div>
+    <div class="seg"><a href="{% url 'login' %}">{% t 'login' %}</a><a href="{% url 'register' %}" aria-current="page">{% t 'register' %}</a></div>
+    {% if referrer %}<div class="note info">{% t 'invited_by' name=referrer.first_name bonus='' %}</div>{% endif %}
+    {% if google_only %}
+    <div class="note info">{% t 'google_only_register' %}</div>
+    <div id="gbtn" data-client="{{ google_client_id }}"></div><span class="field-err" id="gerr"></span>
+    {% else %}
+    <div class="grid g2">
+      <label for="id_first_name">{% t 'first_name' %}<input id="id_first_name" name="first_name" maxlength="40" autocomplete="given-name" value="{{ form.first_name.value|default:'' }}"></label>
+      <label for="id_last_name">{% t 'last_name' %}<input id="id_last_name" name="last_name" maxlength="40" autocomplete="family-name" value="{{ form.last_name.value|default:'' }}"></label>
+    </div>
+    {% for e in form.first_name.errors %}<span class="field-err">{% t e %}</span>{% endfor %}{% for e in form.last_name.errors %}<span class="field-err">{% t e %}</span>{% endfor %}
+    <label for="id_phone">{% t 'phone' %}<div class="phone"><span>+998</span><input id="id_phone" name="phone" inputmode="numeric" autocomplete="tel-national" placeholder="XX XXX XX XX" maxlength="17" value="{{ form.phone.value|default:'' }}" data-phone></div></label>
+    {% for e in form.phone.errors %}<span class="field-err">{% t e %}</span>{% endfor %}
+    <label for="id_password">{% t 'password' %}<div class="pw"><input id="id_password" name="password" type="password" autocomplete="new-password" maxlength="128" data-strength data-caps="{% t 'caps_on' %}"><button type="button" data-toggle-pw="id_password" data-show="{% t 'show' %}" data-hide="{% t 'hide' %}">{% t 'show' %}</button></div></label>
+    <div class="pw-meter" aria-hidden="true"><i></i></div>
+    {% for e in form.password.errors %}<span class="field-err">{% t e %}</span>{% endfor %}
+    <button class="btn primary portal" type="submit"><span>{% t 'register' %}</span></button>
+    {% if sms_on %}<span class="muted">📱 {% t 'sms_login_note' %}</span>{% endif %}
+    <div class="sep">{% t 'or_continue' %}</div>
+    {% include "gym/_social.html" %}
+    {% endif %}
+    <span class="muted" style="text-align:center">{% t 'have_account' %} <a href="{% url 'login' %}">{% t 'login' %}</a></span>
+    <p class="auth-trust"><span>🔒 {% t 'trust_encrypted' %}</span><span>🎁 {% t 'trust_free' %}</span></p>
+  </form>
+</div></main>
+{% endblock %}
+{% block scripts %}<script src="{% vstatic 'js/scene.js' %}"></script>{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "gym/base.html" %}{% load gym_tags %}
+{% block title %}{% t 'guest_invite' %}{% endblock %}
+{% block content %}
+<div class="receipt grid" style="text-align:center;justify-items:center">
+  <div class="vip-eyebrow" style="color:#8a6a1c">FITNES.ZAL · ★ VIP</div>
+  <h3 style="color:#111">{% t 'guest_invite' %}</h3>
+  <div class="qr">{{ qr }}</div>
+  <b class="num" style="font-size:1.5rem;letter-spacing:.12em">{{ gp.code }}</b>
+  <span style="font-size:1.15rem"><b>{{ gp.guest_name }}</b></span>
+  <span class="num">{% t 'date' %}: <b>{{ gp.date|dmy }}</b></span>
+  <span>{% t 'guest_host' %}: {{ gp.user.first_name }} {{ gp.user.last_name|slice:":1" }}. ({{ gp.user.member_code }})</span>
+  {% if gp.used_at %}<span class="pill mute">{% t 'guest_used_tag' %} · {{ gp.used_at|dmyhm }}</span>
+  {% elif gp.date < today %}<span class="pill bad">{% t 'expired' %}</span>
+  {% else %}<span class="pill good">{% t 'guest_valid' %}</span>{% endif %}
+  <span class="muted" style="font-size:.85rem">{% t 'guest_rules' %}</span>
+  <button class="btn noprint" type="button" data-print>{% t 'print' %}</button>
+</div>
+<div class="noprint"><a class="btn" href="{% url 'vip' %}#guest">← VIP</a></div>
+{% endblock %}

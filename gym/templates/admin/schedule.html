@@ -1,0 +1,25 @@
+{% extends "admin/base_site.html" %}{% load gym_tags %}
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url 'admin:index' %}">Bosh sahifa</a> › Jadval</div>{% endblock %}
+{% block content %}
+<div class="fz-wrap">
+  <section class="fz-hero fz-hero-slim">
+    <div><span class="fz-eyebrow">{{ monday|date:"d.m" }} – {{ sunday|date:"d.m.Y" }}</span><h2>Haftalik jadval</h2>
+      <p>Shu haftada jami <b>{{ total }}</b> ta bron</p>
+      <div class="fz-actions"><a href="?w={{ shift|add:'-1' }}">← Oldingi hafta</a>{% if shift %}<a class="red" href="?w=0">Shu hafta</a>{% endif %}<a href="?w={{ shift|add:'1' }}">Keyingi hafta →</a><a href="{% url 'admin:gym_gymclass_add' %}">＋ Mashg'ulot</a></div></div>
+  </section>
+  <div class="sched">
+    {% for col in cols %}
+    <section class="nb sched-day{% if col.today %} today{% endif %}">
+      <header><b>{{ col.name }}</b><small>{{ col.d|date:"d.m" }}</small></header>
+      {% for x in col.items %}
+      <a class="sched-item{% if x.w >= 100 %} full{% elif x.w >= 75 %} hot{% endif %}" href="{% url 'admin:gym_booking_changelist' %}?gym_class__id__exact={{ x.c.pk }}&date__exact={{ col.d|date:'Y-m-d' }}">
+        <span class="num t">{{ x.c.start_time|time:"H:i" }}</span><b>{{ x.c.name }}</b>
+        {% if x.c.trainer %}<small>{{ x.c.trainer.name }}</small>{% endif %}
+        <span class="track"><i style="width:{{ x.w }}%"></i></span><small class="num">{{ x.n }}/{{ x.c.capacity }} joy</small>
+      </a>
+      {% empty %}<p class="fz-empty">Mashg'ulot yo'q</p>{% endfor %}
+    </section>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

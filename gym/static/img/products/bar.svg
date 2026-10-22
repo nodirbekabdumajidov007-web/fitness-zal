@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Batonchik">
+  <rect width="240" height="240" fill="#f2ece4"/>
+  <circle cx="120" cy="124" r="86" fill="#e7dccd"/>
+  <ellipse cx="124" cy="182" rx="88" ry="8" fill="#1c2129" opacity=".12"/>
+  <g transform="rotate(-14 120 124)">
+    <path d="M30 100 l10 6 -10 6 10 6 -10 6 10 6 -10 6 h12 v-36z" fill="#b0262f"/>
+    <path d="M210 100 l-10 6 10 6 -10 6 10 6 -10 6 10 6 h-12 v-36z" fill="#b0262f"/>
+    <rect x="40" y="96" width="160" height="44" rx="6" fill="#d6301f"/>
+    <rect x="40" y="96" width="160" height="10" rx="5" fill="#ffffff" opacity=".18"/>
+    <rect x="92" y="108" width="56" height="20" rx="4" fill="#ffffff"/>
+    <rect x="100" y="114" width="40" height="8" rx="3" fill="#1c2129"/>
+    <rect x="58" y="112" width="22" height="12" rx="3" fill="#e2b84a"/>
+    <rect x="160" y="112" width="22" height="12" rx="3" fill="#e2b84a"/>
+  </g>
+</svg>

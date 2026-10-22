@@ -1,0 +1,64 @@
+{% extends "admin/base_site.html" %}{% load gym_tags %}
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url 'admin:index' %}">Bosh sahifa</a> › Shaxsiy xabar</div>{% endblock %}
+{% block content %}
+<div class="fz-wrap">
+  <section class="fz-hero fz-hero-slim">
+    <div><span class="fz-eyebrow">Sayt · Telegram · SMS</span><h2>Shaxsiy xabar</h2>
+      <p>Har bir odamga alohida yoziladi: xabar uning saytdagi «Xabarlar» qutisiga tushadi va qo'ng'iroqcha qizaradi. Matnda <code>{ism}</code> yozsangiz, har kimning o'z ismi qo'yiladi.</p>
+      <div class="fz-actions"><a href="{% url 'admin:broadcast' %}">📣 Hammaga e'lon</a><a href="{% url 'admin:gym_notification_changelist' %}">Barcha xabarlar</a></div></div>
+  </section>
+
+  <div class="bc-grid">
+    <form class="nb bc-form fz-form" method="post" action="{% url 'admin:message' %}" data-broadcast data-name="{% if people %}{{ people.0.first_name }}{% endif %}">{% csrf_token %}
+      {% if error %}<p class="errornote">{{ error }}</p>{% endif %}
+      <fieldset><legend>Kimga · {{ people|length }} kishi{% if people %} <small class="msg-meta">Telegram: {{ tg_count }} · telefon: {{ phone_count }}</small>{% endif %}</legend>
+        <div class="msg-to">
+          {% for u in people %}<span class="msg-chip"><input type="hidden" name="ids" value="{{ u.pk }}"><span class="fz-ava">{{ u.first_name|first|upper }}{{ u.last_name|first|upper }}</span>
+            <a href="{% url 'admin:member' u.pk %}">{{ u.first_name }} {{ u.last_name }}</a><small>{{ u.member_code }}{% if u.telegram_chat_id %} · ✈{% endif %}</small>
+            <button type="button" class="msg-x" aria-label="Olib tashlash" data-drop>×</button></span>
+          {% empty %}<p class="fz-empty">Hali hech kim tanlanmagan. O'ng tomondan qidiring yoki guruhni qo'shing.</p>{% endfor %}
+        </div>
+      </fieldset>
+      <div class="bc-presets" aria-label="Tayyor shablonlar">
+        <button type="button" data-t="Salom, {ism}!" data-b="Sizni anchadan beri zalda ko'rmadik. Hammasi joyidami? Sizni kutamiz 💪">👋 Sog'indik</button>
+        <button type="button" data-t="🎫 {ism}, abonementingiz tugayapti" data-b="Abonementingiz tugashiga oz qoldi. Qabulxonada yoki saytda uzaytiring — mashg'ulotlarni to'xtatmang!">🎫 Uzaytirish</button>
+        <button type="button" data-t="🎂 Tug'ilgan kuningiz bilan, {ism}!" data-b="Fitnes Zal jamoasi sizni tabriklaydi! Bugun zalga kelsangiz, qabulxonada kichik sovg'a bor 🎁">🎂 Tabrik</button>
+        <button type="button" data-t="💳 To'lov eslatmasi" data-b="Hurmatli {ism}, to'lovingiz hali tasdiqlanmagan. Chekni saytga yuklang yoki qabulxonaga murojaat qiling.">💳 To'lov</button>
+        <button type="button" data-t="🛍 Buyurtmangiz tayyor" data-b="{ism}, buyurtmangiz qabulxonada tayyor turibdi. Kelganingizda olib keting!">🛍 Buyurtma</button>
+      </div>
+      <label>Sarlavha <small class="bc-count" data-for="title"></small><input name="title" maxlength="120" value="{{ form.title }}" placeholder="Masalan: Salom, {ism}!" required></label>
+      <label>Matn <small class="bc-count" data-for="body"></small><textarea name="body" rows="6" maxlength="2000" placeholder="Xabar matni…">{{ form.body }}</textarea></label>
+      <fieldset><legend>Qayerga</legend>
+        <div class="bc-switches">
+          <label class="bc-switch"><input type="checkbox" checked disabled><span></span><b>🔔 Saytdagi xabarlar</b><small>har doim boradi</small></label>
+          <label class="bc-switch{% if not tg_on %} off{% endif %}"><input type="checkbox" name="tg"{% if form.tg and tg_on %} checked{% endif %}{% if not tg_on %} disabled{% endif %}><span></span><b>✈ Telegram</b><small>{% if tg_on %}ulanganlarga{% else %}bot ulanmagan{% endif %}</small></label>
+          <label class="bc-switch"><input type="checkbox" name="sms"{% if form.sms %} checked{% endif %}><span></span><b>✉ SMS</b><small>{% if sms_backend == 'eskiz' %}Eskiz orqali{% else %}test rejimi (konsolga){% endif %}</small></label>
+        </div>
+      </fieldset>
+      <button class="bc-send" type="submit"{% if not people %} disabled{% endif %}><span>Yuborish{% if people|length > 1 %} ({{ people|length }}){% endif %}</span><i aria-hidden="true">➤</i></button>
+    </form>
+
+    <aside class="bc-side">
+      <section class="nb"><header><small>Odam qo'shish</small></header>
+        <form class="msg-find" method="get" action="{% url 'admin:message' %}">
+          <input type="hidden" name="ids" value="{{ ids_csv }}">
+          <input name="q" value="{{ q }}" placeholder="Ism, telefon yoki FZ-0001" autocomplete="off"><button type="submit">🔍</button>
+        </form>
+        {% if q %}<ul class="fz-list">{% for u in found %}<li><span>{{ u.first_name }} {{ u.last_name }} <small>{{ u.member_code }}</small></span>
+          <a class="fz-pill green" href="?ids={% if ids_csv %}{{ ids_csv }},{% endif %}{{ u.pk }}">+ qo'shish</a></li>{% empty %}<li class="fz-empty">Topilmadi</li>{% endfor %}</ul>{% endif %}
+        <div class="msg-groups">{% for k, name in audiences %}<a href="?ids={{ ids_csv }}&amp;aud={{ k }}">+ {{ name }}</a>{% endfor %}</div>
+        {% if people %}<a class="msg-clear" href="{% url 'admin:message' %}">Ro'yxatni tozalash</a>{% endif %}
+      </section>
+      <section class="nb bc-preview"><header><small>Jonli ko'rinish</small></header>
+        <div class="bc-site"><span class="fz-eyebrow">🔔 Saytda</span><b data-pv="title">Sarlavha</b><p data-pv="body">Xabar matni shu yerda ko'rinadi…</p></div>
+        <div class="bc-phone"><div class="bc-tg-head"><span class="bc-tg-ava">FZ</span><div><b>Fitnes Zal</b><small>bot</small></div></div>
+          <div class="bc-bubble"><b data-pv="title">Sarlavha</b><p data-pv="body">Xabar matni shu yerda ko'rinadi…</p><time>{% now "H:i" %} ✓✓</time></div></div>
+      </section>
+      <section class="nb"><header><small>Oxirgi shaxsiy xabarlar</small></header>
+        <ul class="fz-list">{% for n in recent %}<li><span><a href="{% url 'admin:member' n.user_id %}">{{ n.user.first_name }} {{ n.user.last_name }}</a> · {{ n.title|truncatechars:34 }}</span>
+          <span>{{ n.created|date:"d.m H:i" }} {% if n.read_at %}<span class="fz-pill green">o'qildi</span>{% else %}<span class="fz-pill">yetkazildi</span>{% endif %}</span></li>{% empty %}<li class="fz-empty">Hali yo'q</li>{% endfor %}</ul>
+      </section>
+    </aside>
+  </div>
+</div>
+{% endblock %}

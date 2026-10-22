@@ -1,0 +1,43 @@
+{% load gym_tags %}<article class="tk {% if entered %}ok{% else %}no{% endif %}" aria-label="{% t 'tk_title' %}">
+  <header class="tk-head">
+    <b class="tk-brand">FITNES<i>.</i>ZAL</b>
+    {% if gs.address %}<small>{{ gs.address }}</small>{% endif %}
+    <small>+998 {{ gs.phone }}</small>
+  </header>
+  <div class="tk-title"><span>{% t 'tk_title' %}</span>{% if no %}<b class="num"># {{ no }}</b>{% endif %}</div>
+  <dl class="tk-rows">
+    <div><dt>{% t 'tk_date' %}</dt><dd class="num">{{ now|date:"d.m.Y" }} · {{ now|date:"H:i:s" }}</dd></div>
+  </dl>
+  <hr>
+  {% if guest %}
+  <dl class="tk-rows">
+    <div><dt>{% t 'guest' %}</dt><dd><b>{{ guest.guest_name }}</b></dd></div>
+    <div><dt>{% t 'tk_host' %}</dt><dd>{{ guest.user.full_name }} · <span class="num">{{ guest.user.member_code }}</span></dd></div>
+    <div><dt>{% t 'tk_plan' %}</dt><dd>★ VIP · {% t 'tk_guest_pass' %}</dd></div>
+    <div><dt>{% t 'tk_valid' %}</dt><dd class="num">{{ guest.date|date:"d.m.Y" }}</dd></div>
+  </dl>
+  {% else %}
+  <dl class="tk-rows">
+    <div><dt>{% t 'tk_member' %}</dt><dd><b>{{ member.full_name }}</b>{% if vip %} <span class="tk-vip">★ VIP</span>{% endif %}</dd></div>
+    <div><dt>ID</dt><dd class="num">{{ member.member_code }}</dd></div>
+    <div><dt>{% t 'tk_plan' %}</dt><dd>{% if m %}{% plan_name m.plan %}{% else %}—{% endif %}</dd></div>
+    {% if m %}<div><dt>{% t 'tk_valid' %}</dt><dd class="num">{{ m.expires|date:"d.m.Y" }} · {{ days_left }} {% t 'tk_days_left' %}</dd></div>{% endif %}
+    <div><dt>{% t 'tk_month_visits' %}</dt><dd class="num">{{ month_visits }}</dd></div>
+    <div><dt>{% t 'tk_total_visits' %}</dt><dd class="num">{{ total_visits }}</dd></div>
+  </dl>
+  {% endif %}
+  <hr>
+  <div class="tk-status">
+    <div>
+      <b>{% if entered %}✓ {% t 'tk_allowed' %}{% else %}✕ {% t 'tk_denied' %}{% endif %}</b>
+      {% if not entered and reason %}<small>{% t reason %}</small>{% endif %}
+      {% if repeat_at %}<small>{% t 'tk_again' %} <span class="num">{{ repeat_at|date:"H:i" }}</span></small>{% endif %}
+    </div>
+    <span class="tk-stamp" aria-hidden="true">{% if entered %}{% t 'tk_stamp_ok' %}{% else %}{% t 'tk_stamp_no' %}{% endif %}</span>
+  </div>
+  {% if no %}<div class="tk-bar" aria-hidden="true">{% for w in bars %}<i style="flex-grow:{{ w }}"></i>{% endfor %}</div><div class="tk-code num">{{ no }}</div>{% endif %}
+  <footer class="tk-foot">
+    {% if entered %}<p>{% t 'tk_wish' %}</p>{% elif reason == 'err_blocked' %}<p>{% t 'tk_help_blocked' %}</p>{% else %}<p>{% t 'tk_help' %}</p>{% endif %}
+    <small>{% t 'tk_staff' %}: {{ staff.first_name|default:"Admin" }}</small>
+  </footer>
+</article>

@@ -1,0 +1,43 @@
+{% extends "gym/base.html" %}{% load gym_tags %}
+{% block title %}{{ m.full_name }}{% endblock %}
+{% block content %}
+<div class="eyebrow"><a href="{% url 'coach' %}">← {% t 'coach_panel' %}</a></div>
+<section class="co-hero slim">
+  <span class="co-ava xl">{{ m.first_name|first|upper }}{{ m.last_name|first|upper }}</span>
+  <div class="co-who">
+    <span class="eyebrow">{{ m.member_code }}</span>
+    <h1>{{ m.full_name }}</h1>
+    <div class="co-kpis">
+      <span><b class="num">{{ visits_30 }}</b>{% t 'coach_visits_28' %}</span>
+      <span><b class="num">{{ stats.streak }}</b>{% t 'streak' %}</span>
+      <span><b class="num">{{ stats.total }}</b>{% t 'coach_visits_total' %}</span>
+      <span>{% if mem %}<b>✓</b>{% plan_name mem.plan %} · {{ mem.expires|dmy }}{% else %}<b>—</b>{% t 'no_membership' %}{% endif %}</span>
+    </div>
+  </div>
+  <div class="co-hero-acts"><a class="btn primary pill" href="{% url 'coach_plan' m.pk %}">📈 {% if plan %}{% t 'coach_edit_plan' %}{% else %}{% t 'coach_make_plan' %}{% endif %}</a>
+    <form method="post" action="{% url 'chat_start' m.pk %}">{% csrf_token %}<button class="btn pill frost-dark" type="submit">💬 {% t 'chat' %}</button></form></div>
+</section>
+
+<div class="co-grid">
+  <section class="card">
+    <div class="db-head"><h3>🚪 {% t 'coach_visits_28' %}</h3></div>
+    <div class="co-month">{% for x in month %}<i class="{% if x.on %}on{% endif %}" title="{{ x.d|date:'d.m' }}"></i>{% endfor %}</div>
+  </section>
+  <section class="card">
+    <div class="db-head"><h3>📈 {% t 'workouts' %}</h3></div>
+    {% if plan %}<b>{{ plan.title }}</b><span class="muted">{% if plan.trainer %}{{ plan.trainer.name }}{% else %}{% t 'own_plan' %}{% endif %}</span>
+      <ul class="co-ex">{% for e in plan.exercises.all|slice:":8" %}<li><span class="pill mute">{% with wd=e.weekday|stringformat:"s" %}{% t 'wd_short_'|add:wd %}{% endwith %}</span>{{ e.name }} <b class="num">{{ e.sets }}×{{ e.reps }}</b></li>{% endfor %}</ul>
+    {% else %}<p class="muted">{% t 'coach_no_plan' %}</p>{% endif %}
+  </section>
+  <section class="card">
+    <div class="db-head"><h3>🏆 {% t 'records' %}</h3></div>
+    {% for r in records %}<div class="co-row slim"><span>{{ r.get_lift_display }}</span><b class="num">{{ r.weight }} kg × {{ r.reps }}</b><span class="pill good num">1RM ≈ {{ r.one_rm }}</span></div>
+    {% empty %}<p class="muted">{% t 'none_yet' %}</p>{% endfor %}
+  </section>
+  <section class="card">
+    <div class="db-head"><h3>⚖ {% t 'weight' %}</h3></div>
+    {% for l in logs %}<div class="co-row slim"><span class="num">{{ l.date|dmy }}</span><b class="num">{{ l.weight }} kg</b>{% if l.bmi %}<span class="muted num">BMI {{ l.bmi }}</span>{% endif %}</div>
+    {% empty %}<p class="muted">{% t 'none_yet' %}</p>{% endfor %}
+  </section>
+</div>
+{% endblock %}
