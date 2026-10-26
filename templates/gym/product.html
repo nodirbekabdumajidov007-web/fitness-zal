@@ -1,0 +1,36 @@
+{% extends "gym/base.html" %}{% load static gym_tags %}
+{% block title %}{{ p.name }}{% endblock %}
+{% block content %}
+<div class="eyebrow"><a href="{% url 'shop' %}">{% t 'shop' %}</a>{% if p.category %} · <a href="{% url 'shop' %}?cat={{ p.category_id }}">{{ p.category.name }}</a>{% endif %}</div>
+<div class="grid g2" style="align-items:start">
+  <div class="card prod-hero">
+    {% if p.image_src %}<img referrerpolicy="no-referrer" data-fallback="{% static p.illustration %}" src="{{ p.image_src }}" alt="{{ p.name }}" class="cover">{% else %}<img src="{% static p.illustration %}" alt="{{ p.name }}">{% endif %}
+  </div>
+  <div class="card buybox">
+    <div class="chips">{% if p.pk in popular %}<span class="pill tag-hot">🔥 {% t 'popular' %}</span>{% endif %}
+      {% if p.stock > 0 %}<span class="pill {% if p.stock <= 5 %}tag-low{% else %}good{% endif %}">{% if p.stock <= 5 %}{% t 'low_stock' %} · {% endif %}{% t 'in_stock' %}: {{ p.stock }}</span>{% else %}<span class="pill bad">{% t 'sold_out' %}</span>{% endif %}</div>
+    <h1 class="buybox-title">{{ p.name }}</h1>
+    <div class="buybox-price">
+      <b class="num">{{ p.price|money }}</b><small>{% t 'price_unit' %}</small>
+    </div>
+    {% if p.description %}<p class="buybox-desc">{{ p.description }}</p>{% endif %}
+    <div class="buybox-row">{% with qty=in_cart|get_item:p.pk big=True %}{% include "gym/_qty.html" %}{% endwith %}
+      <a class="buybox-cart" href="{% url 'cart' %}">🛒 {% t 'cart' %} →</a></div>
+    <ul class="buybox-perks">
+      <li><i>🏋️</i>{% t 'dlv_pickup_sub' %}</li>
+      {% if gs.delivery_on %}<li><i>🛵</i>{% t 'dlv_courier' %} · {{ gs.delivery_area }}</li>{% endif %}
+      <li><i>💳</i>{% t 'perk_pay' %}</li>
+    </ul>
+  </div>
+</div>
+{% if related %}
+<section class="grid"><h3>{% t 'related_products' %}</h3>
+  <div class="grid g4">{% for r in related %}
+    <a class="card lift prod" href="{% url 'product' r.pk %}" style="text-decoration:none">
+      <span class="prod-img">{% if r.image_src %}<img referrerpolicy="no-referrer" data-fallback="{% static r.illustration %}" src="{{ r.image_src }}" alt="{{ r.name }}" loading="lazy" class="cover">{% else %}<img src="{% static r.illustration %}" alt="{{ r.name }}" loading="lazy">{% endif %}</span>
+      <b>{{ r.name }}</b><span class="num">{{ r.price|money }} {% t 'price_unit' %}</span></a>
+  {% endfor %}</div>
+</section>
+{% endif %}
+{% include "gym/_cartbar.html" %}
+{% endblock %}

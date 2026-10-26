@@ -1,0 +1,45 @@
+{% extends "admin/base_site.html" %}{% load gym_tags %}
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url 'admin:index' %}">Bosh sahifa</a> › Hisobotlar</div>{% endblock %}
+{% block content %}
+<div class="fz-wrap">
+  <div class="fz-actions"><a class="red" href="{% url 'admin:reports_csv' %}">⬇ CSV ga yuklab olish</a><a href="{% url 'admin:index' %}">← Boshqaruv paneli</a></div>
+
+  <div class="fz-kpis">
+    <div class="fz-kpi"><small>Shu oy tushum</small><b>{{ kpi.rev_this|money }} <small>so'm</small></b>
+      {% if kpi.rev_change is not None %}<span class="fz-delta{% if kpi.rev_change < 0 %} down{% endif %}">{% if kpi.rev_change >= 0 %}▲ +{% else %}▼ {% endif %}{{ kpi.rev_change }}% o'tgan oyga nisbatan</span>{% endif %}</div>
+    <div class="fz-kpi dark"><small>O'tgan oy tushum</small><b>{{ kpi.rev_prev|money }} <small>so'm</small></b></div>
+    <div class="fz-kpi gold"><small>12 oylik jami tushum</small><b>{{ kpi.year_total|short_money }}</b></div>
+    <div class="fz-kpi green"><small>Shu oy yangi a'zolar</small><b>{{ kpi.new_this }}</b></div>
+    <div class="fz-kpi dark"><small>Eng gavjum kun / soat</small><b>{{ kpi.busiest_day }} · {{ kpi.busiest_hour }}</b></div>
+  </div>
+
+  <div class="fz-grid2">
+    <div class="fz-panel"><h3>Oylik tushum</h3><p class="sub">Oxirgi 12 oy, to'langan to'lovlar (so'm)</p>
+      <div class="fz-chart">{% for r in revenue %}<div class="fz-col{% if not r.v %} zero{% endif %}{% if forloop.last %} peak{% endif %}" title="{{ r.label }}: {{ r.v|money }} so'm">
+        <span class="val">{% if r.v %}{{ r.v|short_money }}{% else %}0{% endif %}</span><span class="barwrap"><i class="bar" style="height:{{ r.h }}%"></i></span><span class="lab">{{ r.label }}</span></div>{% endfor %}</div></div>
+    <div class="fz-panel"><h3>Yangi a'zolar</h3><p class="sub">Oxirgi 12 oyda ro'yxatdan o'tganlar</p>
+      <div class="fz-chart">{% for r in members %}<div class="fz-col gold{% if not r.v %} zero{% endif %}" title="{{ r.label }}: {{ r.v }}">
+        <span class="val">{{ r.v }}</span><span class="barwrap"><i class="bar" style="height:{{ r.h }}%"></i></span><span class="lab">{{ r.label }}</span></div>{% endfor %}</div></div>
+    <div class="fz-panel"><h3>Qaysi kunlari gavjum</h3><p class="sub">Oxirgi 90 kundagi tashriflar, hafta kunlari bo'yicha</p>
+      <div class="fz-chart">{% for r in by_weekday %}<div class="fz-col dark{% if not r.v %} zero{% endif %}" title="{{ r.label }}: {{ r.v }} tashrif">
+        <span class="val">{{ r.v }}</span><span class="barwrap"><i class="bar" style="height:{{ r.h }}%"></i></span><span class="lab">{{ r.label }}</span></div>{% endfor %}</div></div>
+    <div class="fz-panel"><h3>Qaysi soatlarda gavjum</h3><p class="sub">Oxirgi 90 kun, kirish vaqti bo'yicha</p>
+      <div class="fz-chart">{% for r in by_hour %}<div class="fz-col dark{% if not r.v %} zero{% endif %}" title="{{ r.label }}:00 — {{ r.v }} tashrif">
+        <span class="val">{% if r.v %}{{ r.v }}{% endif %}</span><span class="barwrap"><i class="bar" style="height:{{ r.h }}%"></i></span><span class="lab">{{ r.label }}</span></div>{% endfor %}</div></div>
+  </div>
+
+  <div class="fz-grid2">
+    <div class="fz-panel"><h3>Eng ko'p sotilgan mahsulotlar</h3><p class="sub">Oxirgi 90 kun</p>
+      {% if products %}<div class="fz-hbars">{% for p in products %}<div class="fz-hrow"><span>{{ p.name }} <span class="fz-pill">{{ p.sold }} dona</span></span><b>{{ p.total|money }} so'm</b><span class="track"><i style="width:{{ p.w }}%"></i></span></div>{% endfor %}</div>
+      {% else %}<div class="fz-empty">Hali sotuv yo'q.</div>{% endif %}</div>
+    <div class="fz-panel"><h3>Abonement turlari bo'yicha sotuv</h3><p class="sub">Barcha vaqt, to'langanlar</p>
+      {% if plans %}<div class="fz-hbars">{% for p in plans %}<div class="fz-hrow gold"><span>{{ p.plan__name|default:"—" }} <span class="fz-pill gold">{{ p.c }} ta</span></span><b>{{ p.total|money }} so'm</b><span class="track"><i style="width:{{ p.w }}%"></i></span></div>{% endfor %}</div>
+      {% else %}<div class="fz-empty">Hali abonement sotilmagan.</div>{% endif %}</div>
+    <div class="fz-panel"><h3>Qayta obuna</h3><p class="sub">So'nggi 60 kunda abonementi tugaganlar</p>
+      <div class="fz-ring" style="--p:{{ renewal_rate|default:0 }}"><span>{% if renewal_rate is None %}—{% else %}{{ renewal_rate }}%{% endif %}</span></div>
+      <ul class="fz-list"><li>Tugagan <b>{{ ended }}</b></li><li>Uzaytirgan <span class="fz-pill green">{{ renewed }}</span></li><li>Qaytmagan <span class="fz-pill red">{{ lapsed|length }}</span></li></ul>
+      {% if lapsed %}<p class="sub" style="margin-top:12px">Qaytmaganlar — qo'ng'iroq qiling:</p><ul class="fz-list">{% for u in lapsed %}<li><a href="{% url 'admin:gym_user_change' u.pk %}">{{ u.first_name }} {{ u.last_name }}</a><span>{{ u.phone|default:"" }}</span></li>{% endfor %}</ul>{% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

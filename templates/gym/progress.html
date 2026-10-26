@@ -1,0 +1,41 @@
+{% extends "gym/base.html" %}{% load gym_tags %}
+{% block title %}{% t 'progress' %}{% endblock %}
+{% block content %}
+<div><h2>{% t 'progress' %}</h2><p class="muted" style="margin:8px 0 0">{% t 'progress_help' %}</p></div>
+
+<form class="card grid" method="post">
+  {% csrf_token %}
+  <div class="grid g4">
+    <label for="id_date">{% t 'date' %}<input id="id_date" name="date" type="date" value="{{ form.date.value|default:''|stringformat:'s' }}"></label>
+    <label for="id_weight">{% t 'weight' %}<input id="id_weight" name="weight" inputmode="decimal" value="{{ form.weight.value|default:'' }}"></label>
+    <label for="id_height_cm">{% t 'height' %}<input id="id_height_cm" name="height_cm" inputmode="numeric" value="{{ form.height_cm.value|default:'' }}"></label>
+    <label for="id_note">{% t 'note' %}<input id="id_note" name="note" maxlength="120" value="{{ form.note.value|default:'' }}"></label>
+  </div>
+  {% for f in form %}{% for e in f.errors %}<span class="field-err">{% t e %}</span>{% endfor %}{% endfor %}
+  <div><button class="btn primary" type="submit">{% t 'save' %}</button></div>
+</form>
+
+{% if chart %}
+<div class="card">
+  <div class="inline" style="align-items:center"><h3>{% t 'weight' %}</h3><span class="pill {% if chart.delta <= 0 %}good{% else %}warn{% endif %}" style="flex:none">{% t 'change' %}: {% if chart.delta > 0 %}+{% endif %}{{ chart.delta }} kg</span></div>
+  <svg class="chart" viewBox="0 0 {{ chart.w }} {{ chart.h }}" role="img" aria-label="{% t 'weight' %}">
+    <line class="grid-l" x1="34" x2="{{ chart.w|add:'-34' }}" y1="{{ chart.y_hi }}" y2="{{ chart.y_hi }}"/>
+    <line class="grid-l" x1="34" x2="{{ chart.w|add:'-34' }}" y1="{{ chart.y_lo }}" y2="{{ chart.y_lo }}"/>
+    <text x="4" y="{{ chart.y_hi|add:'4' }}">{{ chart.hi }}</text><text x="4" y="{{ chart.y_lo|add:'4' }}">{{ chart.lo }}</text>
+    <polyline points="{{ chart.points }}"/>
+    {% for x, y, l in chart.dots %}<circle cx="{{ x }}" cy="{{ y }}" r="4"><title>{{ l.date|dmy }}: {{ l.weight }} kg</title></circle>{% endfor %}
+  </svg>
+</div>
+{% endif %}
+
+{% if rows %}
+<div class="tbl"><table>
+  <thead><tr><th>{% t 'date' %}</th><th>{% t 'weight' %}</th><th>{% t 'height' %}</th><th>{% t 'bmi' %}</th><th>{% t 'note' %}</th><th></th></tr></thead>
+  <tbody>{% for r in rows %}
+    <tr><td class="num">{{ r.l.date|dmy }}</td><td class="num">{{ r.l.weight }}</td><td class="num">{{ r.l.height_cm|default:"—" }}</td>
+      <td>{% if r.bmi %}<span class="num">{{ r.bmi }}</span> <span class="muted">{% t r.label %}</span>{% else %}—{% endif %}</td><td>{{ r.l.note }}</td>
+      <td><form method="post" action="{% url 'progress_delete' r.l.pk %}">{% csrf_token %}<button class="btn small danger" type="submit" data-bin data-confirm="{% t 'sure' %}">{% t 'delete' %}</button></form></td></tr>
+  {% endfor %}</tbody>
+</table></div>
+{% endif %}
+{% endblock %}

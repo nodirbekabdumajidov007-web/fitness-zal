@@ -1,0 +1,26 @@
+{% extends "admin/base_site.html" %}{% load gym_tags %}
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url 'admin:index' %}">Bosh sahifa</a> › Kassa</div>{% endblock %}
+{% block content %}
+<div class="fz-wrap">
+  <section class="fz-hero fz-hero-slim">
+    <div><span class="fz-eyebrow">{{ day|date:"l, d.m.Y" }}</span><h2>Kassa hisoboti</h2>
+      <div class="fz-actions"><a href="?d={{ prev|date:'Y-m-d' }}">← {{ prev|date:"d.m" }}</a>{% if not is_today %}<a class="red" href="?">Bugun</a><a href="?d={{ next|date:'Y-m-d' }}">{{ next|date:"d.m" }} →</a>{% endif %}
+        <form method="get" class="fz-date"><input type="date" name="d" value="{{ day|date:'Y-m-d' }}" aria-label="Sana"><button class="button" type="submit">Ko'rish</button></form></div></div>
+    <div class="fz-goal"><div class="fz-cash"><small>Kunlik tushum</small><b class="num" data-count="{{ total }}" data-money>{{ total|money }}</b><small>so'm · {{ count }} ta to'lov</small></div></div>
+  </section>
+  <div class="bento">
+    <section class="nb" style="grid-column:span 2"><header><small>To'lov usullari bo'yicha</small></header>
+      <div class="fz-hbars">{% for r in by_method %}<div class="fz-hrow"><span>{{ r.m }} <span class="fz-muted">· {{ r.n }} ta</span></span><b>{{ r.s|money }}</b><span class="track"><i style="width:{{ r.w }}%"></i></span></div>{% empty %}<p class="fz-empty">Bu kunda to'lov yo'q</p>{% endfor %}</div></section>
+    <section class="nb"><header><small>Nima uchun</small></header>
+      <ul class="fz-list">{% for k in kinds %}<li><span>{{ k.k }}</span><b>{{ k.s|money }}</b></li>{% empty %}<li class="fz-empty">—</li>{% endfor %}</ul></section>
+    <section class="nb"><header><small>Holat</small></header>
+      <ul class="fz-list"><li><a href="{% url 'admin:gym_payment_changelist' %}?status__exact=pending">Tasdiq kutayotganlar</a><span class="fz-pill {% if pending %}gold{% endif %}">{{ pending }}</span></li>
+        <li><span>Shu kuni berilgan buyurtmalar</span><span class="fz-pill green">{{ handed }}</span></li></ul></section>
+    <section class="nb" style="grid-column:1/-1"><header><small>To'lovlar ro'yxati</small><a href="{% url 'admin:reports_csv' %}" class="fz-muted">CSV hisobot →</a></header>
+      <table class="fz-table"><thead><tr><th>#</th><th>Vaqt</th><th>A'zo</th><th>Nima</th><th>Usul</th><th class="r">Summa</th></tr></thead><tbody>
+        {% for p in payments %}<tr><td><a href="{% url 'admin:gym_payment_change' p.pk %}">#{{ p.pk }}</a></td><td class="num">{{ p.created|time:"H:i" }}</td><td>{% if p.user %}<a href="{% url 'admin:member' p.user.pk %}">{{ p.user.first_name }} {{ p.user.last_name }}</a>{% else %}—{% endif %}</td>
+          <td>{% if p.plan %}{{ p.plan.name }}{% else %}{{ p.kind }}{% endif %}</td><td>{{ p.method }}</td><td class="r num"><b>{{ p.amount|money }}</b></td></tr>
+        {% empty %}<tr><td colspan="6" class="fz-empty">Bu kunda to'lov yo'q</td></tr>{% endfor %}</tbody></table></section>
+  </div>
+</div>
+{% endblock %}

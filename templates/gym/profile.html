@@ -1,0 +1,97 @@
+{% extends "gym/base.html" %}{% load gym_tags %}
+{% block title %}{% t 'profile' %}{% endblock %}
+{% block content %}
+<section class="pf-hero">
+  <span class="pf-ava" aria-hidden="true">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
+  <div class="pf-who">
+    <span class="eyebrow">{% t 'member_id' %}: {{ user.member_code }}</span>
+    <h1>{{ user.first_name }} {{ user.last_name }}</h1>
+    <div class="pf-chips">
+      <span>{% if m %}🎫 {% plan_name m.plan %} · {{ m.expires|dmy }}{% else %}🎫 {% t 'no_membership' %}{% endif %}</span>
+      <span>🔥 {{ stats.streak }} {% t 'streak' %}</span>
+      <span>🏅 {{ points }} {% t 'points' %}</span>
+      <span>📅 {{ since_days }} {% t 'days_with_us' %}</span>
+      {% if age %}<span>🎂 {{ age }} {% t 'years_old' %}</span>{% endif %}
+    </div>
+  </div>
+  {% if user.target_weight and last %}
+  <div class="pf-goal" title="{% t 'to_goal' %}">
+    <small>{% t 'to_goal' %}</small><b class="num">{% if to_goal > 0 %}−{{ to_goal }}{% elif to_goal < 0 %}+{{ to_goal|stringformat:"s"|cut:"-" }}{% else %}✓{% endif %}</b><small class="num">{{ last.weight }} → {{ user.target_weight }} kg</small>
+  </div>
+  {% endif %}
+</section>
+
+<nav class="pf-tabs" role="tablist" data-ptabs>
+  <a href="#me" role="tab">👤 {% t 'pf_tab_me' %}</a>
+  <a href="#goals" role="tab">🎯 {% t 'pf_tab_goals' %}</a>
+  <a href="#security" role="tab">🔒 {% t 'pf_tab_security' %}</a>
+  <a href="#connect" role="tab">🔗 {% t 'pf_tab_connect' %}</a>
+</nav>
+
+<div class="pf-grid">
+  <form id="me" class="card grid pf-panel" method="post" novalidate>
+    {% csrf_token %}<input type="hidden" name="form" value="profile">
+    <h3>👤 {% t 'pf_tab_me' %}</h3>
+    <div class="grid g2">
+      <label for="pf_first">{% t 'first_name' %}<input id="pf_first" name="first_name" maxlength="40" value="{{ pform.first_name.value|default:'' }}"></label>
+      <label for="pf_last">{% t 'last_name' %}<input id="pf_last" name="last_name" maxlength="40" value="{{ pform.last_name.value|default:'' }}"></label>
+    </div>
+    <label for="pf_phone">{% t 'phone' %}<div class="phone"><span>+998</span><input id="pf_phone" name="phone" inputmode="numeric" maxlength="17" value="{% if pform.phone.value %}{{ pform.phone.value|cut:'+998' }}{% endif %}" data-phone></div></label>
+    {% if user.phone %}<div>{% if user.phone_verified %}<span class="pill good">✓ {% t 'verified' %}</span>{% else %}<a class="btn small" href="{% url 'verify' %}">{% t 'verify_phone' %}</a>{% endif %}</div>{% endif %}
+    {% if user.email %}<label>Google<input value="{{ user.email }}" disabled></label>{% endif %}
+    <div class="pf-switches">
+      <label class="pf-switch"><input type="checkbox" name="show_in_leaderboard" {% if user.show_in_leaderboard %}checked{% endif %}><span></span>{% t 'show_board' %}</label>
+      <label class="pf-switch"><input type="checkbox" name="chat_visible" {% if user.chat_visible %}checked{% endif %}><span></span>{% t 'chat_visible_label' %}</label>
+    </div>
+    {% for f in pform %}{% for e in f.errors %}<span class="field-err">{% t e %}</span>{% endfor %}{% endfor %}
+    <div><button class="btn primary pill" type="submit">💾 {% t 'save' %}</button></div>
+  </form>
+
+  <form id="goals" class="card grid pf-panel" method="post" novalidate>
+    {% csrf_token %}<input type="hidden" name="form" value="goals">
+    <h3>🎯 {% t 'pf_tab_goals' %}</h3>
+    <div class="pf-goalpick" role="radiogroup" aria-label="{% t 'pf_goal' %}">
+      {% for k, label in goals %}<label><input type="radio" name="goal" value="{{ k }}"{% if user.goal == k %} checked{% endif %}><span>{% if k == 'lose' %}🔥{% elif k == 'keep' %}⚖{% elif k == 'gain' %}💪{% elif k == 'strength' %}🏋{% else %}❤️{% endif %} {{ label }}</span></label>{% endfor %}
+    </div>
+    <div class="grid g2">
+      <label>{% t 'pf_target' %} (kg)<input name="target_weight" type="number" min="30" max="250" step="0.1" value="{{ user.target_weight|default:'' }}"></label>
+      <label>{% t 'pf_birth' %}<input name="birth_date" type="date" value="{{ user.birth_date|date:'Y-m-d' }}"></label>
+    </div>
+    <small class="muted">{% t 'pf_birth_help' %}</small>
+    <div class="inline"><button class="btn primary pill" type="submit">💾 {% t 'save' %}</button><a class="btn pill" href="{% url 'tools' %}">🧮 {% t 'tools' %}</a></div>
+  </form>
+
+  <section id="security" class="card grid pf-panel">
+    <h3>🔒 {% t 'pf_tab_security' %}</h3>
+    <form class="grid" method="post" novalidate>
+      {% csrf_token %}<input type="hidden" name="form" value="password">
+      {% if user.has_usable_password %}<label for="pw_cur">{% t 'cur_pass' %}<input id="pw_cur" name="current" type="password" maxlength="128" autocomplete="current-password"></label>{% endif %}
+      <label for="pw_new">{% t 'new_pass' %}<div class="pw"><input id="pw_new" name="new" type="password" maxlength="128" autocomplete="new-password" data-strength><button type="button" data-toggle-pw="pw_new" data-show="{% t 'show' %}" data-hide="{% t 'hide' %}">{% t 'show' %}</button></div></label>
+      <div class="pw-meter" aria-hidden="true"><i></i></div>
+      {% for f in wform %}{% for e in f.errors %}<span class="field-err">{% t e %}</span>{% endfor %}{% endfor %}
+      <div><button class="btn pill" type="submit">{% t 'change_pass' %}</button></div>
+    </form>
+    <hr class="co-hr">
+    <form method="post" action="{% url 'logout_others' %}" class="pf-row">{% csrf_token %}
+      <span><b>{% t 'sessions_title' %}</b><small class="muted">{% t 'sessions_help' %}</small></span>
+      <button class="btn small" type="submit" data-confirm="{% t 'sure' %}">{% t 'sessions_btn' %}</button></form>
+    <div class="pf-row"><span><b>{% t 'export_title' %}</b><small class="muted">{% t 'export_help' %}</small></span>
+      <a class="btn small" href="{% url 'export_data' %}">⬇ JSON</a></div>
+  </section>
+
+  <section id="connect" class="card grid pf-panel">
+    <h3>🔗 {% t 'pf_tab_connect' %}</h3>
+    <div class="pf-row"><span><b>✈ Telegram</b><small class="muted">{% if tg_linked %}{% t 'tg_connected' %}{% else %}{% t 'tg_help_profile' %}{% endif %}</small></span>
+      {% if tg_linked %}<form method="post">{% csrf_token %}<input type="hidden" name="form" value="telegram_unlink"><button class="btn small danger" type="submit">{% t 'tg_disconnect' %}</button></form>
+      {% elif tg_url %}<a class="btn small primary" href="{{ tg_url }}" target="_blank" rel="noopener">{% t 'tg_connect' %}</a>{% else %}<span class="pill mute">{% t 'soon' %}</span>{% endif %}</div>
+    <div class="pf-row"><span><b>🎁 {% t 'invite' %}</b><small class="muted">{% t 'invite_short' %}</small></span>
+      <button class="btn small" type="button" data-copy="pf-ref" data-done="{% t 'copied' %}">{% t 'copy' %}</button></div>
+    <input id="pf-ref" value="{{ referral_url }}" readonly aria-label="{% t 'invite' %}">
+    <div class="pf-links">
+      <a href="{% url 'payments' %}">💳 {% t 'payments' %}</a><a href="{% url 'orders' %}">🛒 {% t 'orders' %}</a>
+      <a href="{% url 'records' %}">🏆 {% t 'records' %}</a><a href="{% url 'card' %}">▣ {% t 'member_card' %}</a><a href="{% url 'inbox' %}">🔔 {% t 'inbox' %}</a>
+    </div>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{% vstatic 'js/profile.js' %}"></script>{% endblock %}

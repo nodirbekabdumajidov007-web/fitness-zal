@@ -1,0 +1,70 @@
+{% extends "gym/base.html" %}{% load static gym_tags %}
+{% block title %}{% t 'coach_panel' %}{% endblock %}
+{% block content %}
+<section class="co-hero">
+  <span class="co-photo">{% if t.image_src %}<img src="{{ t.image_src }}" alt="" referrerpolicy="no-referrer" data-fallback="{% static 'img/trainer.svg' %}">{% else %}<img src="{% static 'img/trainer.svg' %}" alt="">{% endif %}</span>
+  <div class="co-who">
+    <span class="eyebrow">{% t 'coach_panel' %} · {% now "d.m.Y" %}</span>
+    <h1>{{ t.name }}</h1>
+    <span class="co-spec">{{ t.specialty }} · {{ t.experience_years }} {% t 'years_exp' %}</span>
+    <div class="co-kpis">
+      <span><b class="num">{{ stats.clients }}</b>{% t 'coach_clients' %}</span>
+      <span class="{% if stats.attention %}hot{% endif %}"><b class="num">{{ stats.attention }}</b>{% t 'coach_attention' %}</span>
+      <span class="{% if stats.pending %}hot{% endif %}"><b class="num">{{ stats.pending }}</b>{% t 'pt_requests' %}</span>
+      <span><b class="num">{{ stats.week_bookings }}</b>{% t 'coach_week_bookings' %}</span>
+      <span><b class="num">{{ stats.month_done }}</b>{% t 'coach_month_pt' %}</span>
+    </div>
+  </div>
+  <form class="co-add" method="post" action="{% url 'coach_add' %}">{% csrf_token %}
+    <label for="co-q">{% t 'coach_add_client' %}</label>
+    <div><input id="co-q" name="q" placeholder="FZ-0012 · 90 123 45 67" autocomplete="off" required><button class="btn primary pill" type="submit">＋</button></div>
+    <small>{% t 'coach_add_help' %}</small>
+  </form>
+</section>
+
+<div class="co-grid">
+  <section class="card co-today">
+    <div class="db-head"><h3>📅 {% t 'coach_today' %}</h3><span class="muted">{% now "l" %}</span></div>
+    {% for x in today_items %}
+      <article class="co-class">
+        <header><b class="num">{{ x.c.start_time|hm }}</b><span><b>{{ x.c.name }}</b><small class="muted">{{ x.c.duration_min }} {% t 'min' %}</small></span><span class="pill {% if x.w >= 90 %}warn{% else %}good{% endif %} num">{{ x.n }}/{{ x.c.capacity }}</span></header>
+        <div class="co-bar"><i style="width:{{ x.w }}%"></i></div>
+        {% if x.people %}<div class="co-people">{% for u in x.people %}<span title="{{ u.full_name }}">{{ u.first_name|first|upper }}{{ u.last_name|first|upper }}</span>{% endfor %}</div>{% endif %}
+      </article>
+    {% empty %}<p class="muted">{% t 'coach_no_class_today' %}</p>{% endfor %}
+  </section>
+
+  <section class="card co-pt">
+    <div class="db-head"><h3>🤝 {% t 'pt_requests' %}</h3></div>
+    {% for s in pending %}
+      <div class="co-row"><span class="co-ava">{{ s.user.first_name|first|upper }}</span>
+        <span><b>{{ s.user.full_name }}</b><small class="muted num">{{ s.starts|dmyhm }}{% if s.note %} · {{ s.note }}{% endif %}</small></span>
+        <span class="co-acts"><form method="post" action="{% url 'coach_pt' s.pk 'confirm' %}">{% csrf_token %}<button class="btn small primary" type="submit">✓</button></form>
+          <form method="post" action="{% url 'coach_pt' s.pk 'cancel' %}">{% csrf_token %}<button class="btn small danger" type="submit" data-bin data-confirm="{% t 'sure' %}">✕</button></form></span></div>
+    {% empty %}<p class="muted">✨ {% t 'desk_all_clear' %}</p>{% endfor %}
+    {% if upcoming %}<h4 class="co-sub">{% t 'coach_upcoming' %}</h4>
+      {% for s in upcoming %}<div class="co-row slim"><span class="co-ava sm">{{ s.user.first_name|first|upper }}</span><span><b>{{ s.user.full_name }}</b></span><b class="num">{{ s.starts|dmyhm }}</b></div>{% endfor %}{% endif %}
+  </section>
+
+  <section class="card co-clients">
+    <div class="db-head"><h3>👥 {% t 'coach_clients' %}</h3><span class="muted">{% t 'coach_attention_first' %}</span></div>
+    <div class="co-client-list">
+    {% for c in clients %}
+      <a class="co-client{% if c.attention %} attn{% endif %}" href="{% url 'coach_client' c.u.pk %}">
+        <span class="co-ava">{{ c.u.first_name|first|upper }}{{ c.u.last_name|first|upper }}</span>
+        <span><b>{{ c.u.full_name }}</b><small class="muted">{% if c.plan %}📈 {{ c.plan.title }}{% if not c.mine %} · {% t 'coach_other_plan' %}{% endif %}{% else %}{% t 'coach_no_plan' %}{% endif %}</small></span>
+        <span class="co-tag {{ c.why }}">{% if c.why == 'no_visit' %}{% t 'coach_never' %}{% elif c.why == 'away' %}{{ c.days }} {% t 'coach_days_away' %}{% elif c.why == 'no_plan' %}{% t 'coach_needs_plan' %}{% elif c.days == 0 %}{% t 'coach_today_in' %}{% else %}{{ c.days }} {% t 'coach_days_ago' %}{% endif %}</span>
+      </a>
+    {% empty %}<p class="muted">{% t 'coach_no_clients' %}</p>{% endfor %}
+    </div>
+  </section>
+
+  <section class="card co-week">
+    <div class="db-head"><h3>🗓 {% t 'coach_week' %}</h3></div>
+    <div class="co-week-grid">
+      {% for d in week %}<div class="co-day{% if d.today %} today{% endif %}"><b>{% t 'wd_short_'|add:d.wd %}</b><small class="num">{{ d.d|date:"d.m" }}</small>
+        {% for x in d.items %}<span class="co-slot{% if x.w >= 90 %} full{% endif %}" title="{{ x.c.name }} · {{ x.n }}/{{ x.c.capacity }}"><i class="num">{{ x.c.start_time|hm }}</i>{{ x.c.name }}<em class="num">{{ x.n }}</em></span>{% empty %}<span class="co-rest">—</span>{% endfor %}</div>{% endfor %}
+    </div>
+  </section>
+</div>
+{% endblock %}

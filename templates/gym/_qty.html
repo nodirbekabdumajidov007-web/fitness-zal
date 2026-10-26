@@ -1,0 +1,13 @@
+{% load gym_tags %}{# "Add" button that turns into − n +. Works as plain forms without JavaScript; cart.js makes it instant. #}
+<div class="qty-ctl{% if big %} big{% endif %}" data-pid="{{ p.pk }}" data-qty="{{ qty|default:0 }}" data-max="{{ p.stock }}">
+  <form method="post" action="{% url 'cart_add' p.pk %}" class="qc-add"{% if qty %} hidden{% endif %}>{% csrf_token %}<input type="hidden" name="back" value="{{ request.get_full_path }}">
+    <button class="btn primary qc-addbtn{% if not big %} small{% endif %}" type="submit" {% if p.stock < 1 %}disabled{% endif %}>{% if p.stock < 1 %}{% t 'sold_out' %}{% else %}<span aria-hidden="true">+</span> {% t 'add' %}{% endif %}</button>
+  </form>
+  <div class="qc-step"{% if not qty %} hidden{% endif %}>
+    <form method="post" action="{% url 'cart_update' p.pk %}">{% csrf_token %}<input type="hidden" name="back" value="{{ request.get_full_path }}"><input type="hidden" name="qty" value="{{ qty|default:0|add:'-1' }}" class="qc-minus-val">
+      <button class="qc-btn qc-minus" type="submit" aria-label="{% t 'cart_less' %}">−</button></form>
+    <span class="qc-n num" aria-live="polite">{{ qty|default:0 }}</span>
+    <form method="post" action="{% url 'cart_update' p.pk %}">{% csrf_token %}<input type="hidden" name="back" value="{{ request.get_full_path }}"><input type="hidden" name="qty" value="{{ qty|default:0|add:'1' }}" class="qc-plus-val">
+      <button class="qc-btn qc-plus" type="submit" aria-label="{% t 'cart_more' %}" {% if qty >= p.stock %}disabled{% endif %}>+</button></form>
+  </div>
+</div>

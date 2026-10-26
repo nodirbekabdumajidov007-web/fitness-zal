@@ -1,0 +1,51 @@
+{% extends "gym/base.html" %}{% load gym_tags %}
+{% block title %}{% t 'ai_coach' %}{% endblock %}
+{% block content %}
+<section class="ai-hero">
+  <span class="eyebrow">✦ AI · Claude</span>
+  <h1>{% t 'ai_coach' %}</h1>
+  <p class="muted">{% t 'ai_sub' %}</p>
+  {% if not ai_on %}<div class="note">{% t 'ai_off' %}</div>{% endif %}
+</section>
+
+{% if not user.is_authenticated %}
+<div class="card ai-guest"><p>{% t 'ai_login' %}</p><a class="btn primary pill" href="{% url 'login' %}?next=/ai/">{% t 'login' %} →</a></div>
+{% else %}
+<div class="ai-grid">
+  <section class="card ai-chat" id="chat">
+    <header class="ai-chat-head"><b>💬 {% t 'ai_chat_title' %}</b>
+      <span class="muted num" data-ai-used>{{ used }} / {{ limit }} {% t 'ai_today' %}</span>
+      {% if chat %}<form method="post" action="{% url 'ai_clear' %}">{% csrf_token %}<button class="btn small ghost" type="submit" data-confirm="{% t 'sure' %}">{% t 'ai_clear' %}</button></form>{% endif %}
+    </header>
+    <div class="ai-log" data-ai-log aria-live="polite">
+      {% for m in chat %}<div class="ai-msg {{ m.role }}"><p>{{ m.content|linebreaksbr }}</p></div>
+      {% empty %}<div class="ai-empty" data-ai-empty><b>{% t 'ai_try_title' %}</b>
+        <div class="ai-chips">{% for k in "123" %}{% with key='ai_q'|add:k %}<button type="button" class="chip" data-ai-chip>{% t key %}</button>{% endwith %}{% endfor %}</div></div>{% endfor %}
+    </div>
+    <form class="ai-form" method="post" action="{% url 'ai_ask' %}" data-ai-form data-thinking="{% t 'ai_thinking' %}" data-err="{% t 'ai_error' %}">
+      {% csrf_token %}
+      <textarea name="q" rows="2" maxlength="1500" placeholder="{% t 'ai_placeholder' %}" required{% if not ai_on %} disabled{% endif %}></textarea>
+      <button class="btn primary" type="submit"{% if not ai_on %} disabled{% endif %}>{% t 'ai_send' %} ➤</button>
+    </form>
+    <small class="muted">{% t 'ai_disclaimer' %}</small>
+  </section>
+
+  <section class="card ai-plan" id="plan">
+    <h3>📋 {% t 'ai_plan_title' %}</h3>
+    <p class="muted">{% t 'ai_plan_sub' %}</p>
+    {% if has_trainer_plan %}<div class="note">{% t 'program_trainer' %}</div>{% endif %}
+    <form class="grid" method="post" action="{% url 'ai_plan' %}" data-ai-plan>
+      {% csrf_token %}
+      <label>{% t 'ai_level' %}<select name="level">{% for v, key in levels %}<option value="{{ v }}">{% t key %}</option>{% endfor %}</select></label>
+      <div class="grid g2">
+        <label>{% t 'ai_days' %}<input name="days" type="number" min="2" max="6" value="3"></label>
+        <label>{% t 'ai_minutes' %}<input name="minutes" type="number" min="20" max="120" step="5" value="60"></label>
+      </div>
+      <label>{% t 'ai_notes' %}<textarea name="notes" rows="2" maxlength="300" placeholder="{% t 'ai_notes_ph' %}"></textarea></label>
+      <button class="btn primary" type="submit"{% if not ai_on or has_trainer_plan %} disabled{% endif %} data-busy="{% t 'ai_plan_busy' %}">✦ {% t 'ai_plan_btn' %}</button>
+    </form>
+  </section>
+</div>
+{% endif %}
+{% endblock %}
+{% block scripts %}<script src="{% vstatic 'js/ai.js' %}"></script>{% endblock %}
