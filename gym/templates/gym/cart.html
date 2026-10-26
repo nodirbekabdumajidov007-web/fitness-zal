@@ -18,9 +18,8 @@
       {% csrf_token %}
       <ol class="co-steps mini" aria-label="{% t 'checkout' %}"><li class="done"><i>✓</i>{% t 'cart' %}</li><li class="now"><i>2</i>{% t 'step_delivery' %}</li><li><i>3</i>{% t 'pay' %}</li></ol>
       <div class="co-line"><span class="muted">{% t 'subtotal' %}</span><b class="num" id="cart-total">{{ total|money }} {% t 'price_unit' %}</b></div>
-      {% if is_vip %}<div class="note vipnote">★ {% t 'vip_shop_note' pct=gs.vip_shop_discount %}</div>{% endif %}
       {% if gs.delivery_on %}
-      <fieldset class="dlv" id="dlv" data-fee="{{ gs.delivery_fee }}" data-free="{{ gs.free_delivery_from }}" data-vip="{{ vip_pct }}" data-unit="{% t 'price_unit' %}" data-free-label="{% t 'free' %}">
+      <fieldset class="dlv" id="dlv" data-fee="{{ gs.delivery_fee }}" data-free="{{ gs.free_delivery_from }}" data-unit="{% t 'price_unit' %}" data-free-label="{% t 'free' %}">
         <legend>{% t 'step_delivery' %}</legend>
         <label class="dlv-opt"><input type="radio" name="delivery" value="pickup" checked><span class="dlv-ico" aria-hidden="true">🏋️</span>
           <span><b>{% t 'dlv_pickup' %}</b><small>{% t 'dlv_pickup_sub' %}</small></span><em>{% t 'free' %}</em></label>

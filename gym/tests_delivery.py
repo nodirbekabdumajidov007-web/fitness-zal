@@ -12,7 +12,7 @@ from django.core.management import call_command
 from django.test import Client, TestCase
 
 from . import apple, services
-from .models import GymSettings, Order, Payment, Product, User, VipPass, Visit
+from .models import GymSettings, Order, Payment, Product, User, Visit
 
 PW = "Kuchli-Parol-77"
 
@@ -55,15 +55,12 @@ class DeliveryTests(Base):
         self.assertEqual(o.delivery_phone, "+998935554433")
         self.assertEqual(Payment.objects.get(order=o).amount, o.total)
 
-    def test_free_delivery_above_threshold_after_vip_discount(self):
+    def test_free_delivery_above_threshold(self):
         GymSettings.objects.filter(pk=1).update(free_delivery_from=self.p.price * 3)
         self.add(3)
         self.c.post("/checkout/", {"method": "cash", "delivery": "courier", "address": "Yunusobod 4, 17-uy"})
         self.assertEqual(Order.objects.get(user=self.m).delivery_fee, 0)
-        # a VIP's discounted subtotal can fall below the threshold, then the fee applies
-        now = timezone_now()
-        VipPass.objects.create(user=self.m, starts=now - timedelta(days=1), expires=now + timedelta(days=20))
-        self.add(3)
+        self.add(2)  # below the threshold: the fee applies
         self.c.post("/checkout/", {"method": "cash", "delivery": "courier", "address": "Yunusobod 4, 17-uy"})
         self.assertEqual(Order.objects.filter(user=self.m).latest("id").delivery_fee, GymSettings.load().delivery_fee)
 

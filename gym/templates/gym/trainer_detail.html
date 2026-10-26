@@ -16,7 +16,6 @@
     <form class="card grid" method="post" action="{% url 'pt_request' tr.pk %}">
       {% csrf_token %}<input type="hidden" name="back" value="{{ request.path }}">
       <h3>{% t 'pt' %}</h3>
-      {% if free_pt %}<div class="note vipnote">★ {% t 'free_pt_note' n=free_pt %}</div>{% endif %}
       <label for="pt-starts">{% t 'pt_time' %}<input id="pt-starts" name="starts" type="datetime-local" required></label>
       <label for="pt-note">{% t 'note' %}<input id="pt-note" name="note" maxlength="200"></label>
       <button class="btn primary" type="submit">{% t 'pt_request' %}</button>

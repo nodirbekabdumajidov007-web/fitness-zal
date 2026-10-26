@@ -22,15 +22,6 @@
   <button class="btn primary pill" type="submit">{% t 'search' %}</button>
 </form>
 
-{% if guest %}
-<div class="card dk-guest">
-  <span class="dk-ava gold" aria-hidden="true">🎟</span>
-  <div><b>{% t 'guest_invite' %}: {{ guest.guest_name }}</b><br><span class="muted num">{{ guest.code }} · {% t 'date' %} {{ guest.date|dmy }} · {% t 'guest_host' %}: {{ guest.user.full_name }} ({{ guest.user.member_code }})</span></div>
-  {% if guest.used_at %}<span class="pill mute">{% t 'guest_used_tag' %} · {{ guest.used_at|dmyhm }}</span>
-  {% elif guest.date != today %}<span class="pill bad">{% t 'guest_wrong_day' %}</span>
-  {% else %}<form method="post" action="{% url 'desk_guest' guest.code %}">{% csrf_token %}<input type="hidden" name="back" value="{{ request.get_full_path }}"><button class="btn primary pill" type="submit">{% t 'desk_checkin' %}</button></form>{% endif %}
-</div>
-{% endif %}
 
 {% if q %}
 <section class="grid">
@@ -59,7 +50,6 @@
   <button type="button" role="tab" data-tab="pay" aria-selected="true">💳 {% t 'desk_pending' %} <i class="{% if pending %}hot{% endif %}">{{ pending|length }}</i></button>
   <button type="button" role="tab" data-tab="orders" aria-selected="false">🛒 {% t 'desk_orders' %} <i class="{% if new_orders %}hot{% endif %}">{{ new_orders|length }}</i></button>
   <button type="button" role="tab" data-tab="pt" aria-selected="false">🤝 {% t 'pt_requests' %} <i class="{% if pt_requests %}hot{% endif %}">{{ pt_requests|length }}</i></button>
-  <button type="button" role="tab" data-tab="guests" aria-selected="false">🎟 {% t 'guests_today' %} <i>{{ guests_today|length }}</i></button>
   <button type="button" role="tab" data-tab="visits" aria-selected="false">🚪 {% t 'visits_today' %} <i>{{ visits_today }}</i></button>
 </nav>
 
@@ -105,7 +95,7 @@
   <div class="dk-cards">
   {% for s in pt_requests %}
     <article class="card dk-pay">
-      <header><span class="dk-ava">🤝</span><div><b>{{ s.user.full_name }} → {{ s.trainer.name }}</b><small class="muted num">{{ s.starts|dmyhm }}</small></div>{% if s.is_free %}<span class="pill vippill">★ {% t 'vip_free' %}</span>{% endif %}</header>
+      <header><span class="dk-ava">🤝</span><div><b>{{ s.user.full_name }} → {{ s.trainer.name }}</b><small class="muted num">{{ s.starts|dmyhm }}</small></div></header>
       {% if s.note %}<p class="muted" style="margin:0">{{ s.note }}</p>{% endif %}
       <div class="dk-acts"><form method="post" action="{% url 'desk_pt' s.pk 'confirm' %}">{% csrf_token %}<button class="btn primary pill" type="submit">✓ {% t 'confirm' %}</button></form>
         <form method="post" action="{% url 'desk_pt' s.pk 'cancel' %}">{% csrf_token %}<button class="btn small danger" type="submit" data-bin data-confirm="{% t 'sure' %}">{% t 'cancel_booking' %}</button></form></div>
@@ -114,14 +104,6 @@
   </div>
 </section>
 
-<section class="dk-panel" data-panel="guests">
-  <div class="dk-cards">
-  {% for g in guests_today %}
-    <article class="card dk-pay"><header><span class="dk-ava gold">🎟</span><div><b>{{ g.guest_name }}</b><small class="muted num">{{ g.code }} · {{ g.user.full_name }}</small></div>
-      {% if g.used_at %}<span class="pill mute">{% t 'guest_used_tag' %}</span>{% else %}<form method="post" action="{% url 'desk_guest' g.code %}">{% csrf_token %}<button class="btn primary pill" type="submit">→ {% t 'desk_checkin' %}</button></form>{% endif %}</header></article>
-  {% empty %}<div class="card dk-empty">{% t 'none_yet' %}</div>{% endfor %}
-  </div>
-</section>
 
 <section class="dk-panel" data-panel="visits">
   <ul class="card dk-visits">{% for v in recent_visits %}<li><span class="dk-ava sm">{{ v.user.first_name|first|upper }}</span><b>{{ v.user.full_name }}</b><span class="muted num">{{ v.user.member_code }}</span><time class="num">{{ v.ts|time:"H:i" }}</time></li>

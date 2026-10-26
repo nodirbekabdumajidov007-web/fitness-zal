@@ -2,10 +2,10 @@
 {% block title %}{% t 'profile' %}{% endblock %}
 {% block content %}
 <section class="pf-hero">
-  <span class="pf-ava{% if is_vip %} vip{% endif %}" aria-hidden="true">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
+  <span class="pf-ava" aria-hidden="true">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
   <div class="pf-who">
     <span class="eyebrow">{% t 'member_id' %}: {{ user.member_code }}</span>
-    <h1>{{ user.first_name }} {{ user.last_name }}{% if is_vip %} <span class="pill vippill">★ VIP</span>{% endif %}</h1>
+    <h1>{{ user.first_name }} {{ user.last_name }}</h1>
     <div class="pf-chips">
       <span>{% if m %}🎫 {% plan_name m.plan %} · {{ m.expires|dmy }}{% else %}🎫 {% t 'no_membership' %}{% endif %}</span>
       <span>🔥 {{ stats.streak }} {% t 'streak' %}</span>

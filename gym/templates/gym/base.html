@@ -46,7 +46,6 @@
     {% if user.is_authenticated %}<a href="{% url 'dashboard' %}"{% if '/dashboard' in p %} aria-current="page"{% endif %}>{% t 'nav_dash' %}</a>{% endif %}
     <a href="{% url 'plans' %}"{% if '/plans' in p %} aria-current="page"{% endif %}>{% t 'nav_plans' %}</a>
     <a href="{% url 'training' %}"{% if '/training' in p %} aria-current="page"{% endif %}>{% t 'nav_training' %}</a>
-    <a href="{% url 'vip' %}"{% if '/vip' in p %} aria-current="page"{% endif %}>★ VIP</a>
     <a href="{% url 'shop' %}"{% if '/shop' in p or '/cart' in p %} aria-current="page"{% endif %}>{% t 'nav_shop' %}<span class="badge" id="cart-badge"{% if not cart_count %} hidden{% endif %}>{{ cart_count }}</span></a>
     <a href="{% url 'classes' %}"{% if '/classes' in p %} aria-current="page"{% endif %}>{% t 'nav_classes' %}</a>
     <a href="{% url 'trainers' %}"{% if '/trainers' in p %} aria-current="page"{% endif %}>{% t 'nav_trainers' %}</a>
@@ -56,6 +55,7 @@
     <a href="{% url 'achievements' %}"{% if '/achievements' in p %} aria-current="page"{% endif %}>{% t 'achievements' %}</a>
     <a href="{% url 'card' %}"{% if '/card' in p %} aria-current="page"{% endif %}>{% t 'member_card' %}</a>{% endif %}
     {% if user.is_authenticated %}<a href="{% url 'chat' %}"{% if '/chat' in p %} aria-current="page"{% endif %}>{% t 'chat' %}{% if chat_unread %}<span class="badge">{{ chat_unread }}</span>{% endif %}</a>{% endif %}
+    <a href="{% url 'ai' %}"{% if '/ai/' in p %} aria-current="page"{% endif %}>✦ {% t 'ai_coach' %}</a>
     <a href="{% url 'tools' %}"{% if '/tools' in p %} aria-current="page"{% endif %}>🧮 {% t 'tools' %}</a>
     <a href="{% url 'reviews' %}"{% if '/reviews' in p %} aria-current="page"{% endif %}>{% t 'nav_reviews' %}</a>
     {% if is_trainer %}<a class="nav-coach" href="{% url 'coach' %}"{% if '/coach' in p %} aria-current="page"{% endif %}>🏋 {% t 'coach_panel' %}</a>{% endif %}
@@ -88,7 +88,6 @@
     <nav class="ft-col" aria-label="{% t 'ft_gym' %}">
       <h3>{% t 'ft_gym' %}</h3>
       <a href="{% url 'plans' %}">{% t 'nav_plans' %}</a>
-      <a href="{% url 'vip' %}">★ VIP</a>
       <a href="{% url 'classes' %}">{% t 'nav_classes' %}</a>
       <a href="{% url 'trainers' %}">{% t 'nav_trainers' %}</a>
       <a href="{% url 'shop' %}">{% t 'nav_shop' %}</a>
@@ -98,6 +97,7 @@
       {% if user.is_authenticated %}<a href="{% url 'dashboard' %}">{% t 'nav_dash' %}</a><a href="{% url 'card' %}">{% t 'member_card' %}</a><a href="{% url 'records' %}">{% t 'records' %}</a>
       {% else %}<a href="{% url 'login' %}">{% t 'login' %}</a><a href="{% url 'register' %}">{% t 'register' %}</a>{% endif %}
       <a href="{% url 'training' %}">{% t 'nav_training' %}</a>
+      <a href="{% url 'ai' %}">{% t 'ai_coach' %}</a>
       <a href="{% url 'tools' %}">{% t 'tools' %}</a>
       <a href="{% url 'reviews' %}">{% t 'nav_reviews' %}</a>
     </nav>

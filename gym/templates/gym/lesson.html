@@ -4,17 +4,9 @@
 <div>
   <div class="eyebrow"><a href="{% url 'training' %}">{% t 'training' %}</a>{% if l.workout_type %} · {{ l.workout_type.name }}{% endif %}{% if wd != None %} · {% t 'weekday_'|add:wd %}{% else %} · {% t 'every_day' %}{% endif %}</div>
   <h2 style="margin-top:6px">{{ l.title }}</h2>
-  <div class="chips" style="margin-top:10px"><span class="pill mute">{% t 'level_'|add:l.level %}</span><span class="pill mute num">{{ l.duration_min }} {% t 'min_short' %}</span>{% if l.is_vip %}<span class="pill warn">★ VIP</span>{% endif %}</div>
+  <div class="chips" style="margin-top:10px"><span class="pill mute">{% t 'level_'|add:l.level %}</span><span class="pill mute num">{{ l.duration_min }} {% t 'min_short' %}</span></div>
 </div>
 
-{% if locked %}
-<div class="card grid" style="justify-items:start">
-  <h3>{% t 'vip_locked' %}</h3>
-  <p class="muted" style="margin:0">{{ l.summary }}</p>
-  <p style="margin:0">{% t 'vip_unlock_text' %}</p>
-  <a class="btn primary" href="{% url 'vip' %}">★ {% t 'vip_get' %}</a>
-</div>
-{% else %}
   {% if video %}
   <div class="video">
     {% if video.kind == 'iframe' %}<iframe src="{{ video.src }}" title="{{ l.title }}" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"
@@ -37,12 +29,11 @@
       {% if l.tip_list %}<div class="card grid"><h3>{% t 'tips' %}</h3><ul class="perks" style="color:var(--ink)">{% for s in l.tip_list %}<li>{{ s }}</li>{% endfor %}</ul></div>{% endif %}
     </div>
   </div>
-{% endif %}
 <div class="note">{% t 'safety_note' %}</div>
 
 {% if related %}
 <section class="grid"><h3>{% t 'related' %}</h3>
-  <div class="grid g3">{% for r in related %}<a class="card lift" href="{% url 'lesson' r.pk %}" style="text-decoration:none"><b>{{ r.title }}</b>{% if r.is_vip %} <span class="pill warn">★</span>{% endif %}<br><span class="muted">{% t 'level_'|add:r.level %} · {{ r.duration_min }} {% t 'min_short' %}</span></a>{% endfor %}</div>
+  <div class="grid g3">{% for r in related %}<a class="card lift" href="{% url 'lesson' r.pk %}" style="text-decoration:none"><b>{{ r.title }}</b><br><span class="muted">{% t 'level_'|add:r.level %} · {{ r.duration_min }} {% t 'min_short' %}</span></a>{% endfor %}</div>
 </section>
 {% endif %}
 {% endblock %}

@@ -8,8 +8,8 @@ from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
 
 from . import services, telegram
-from .models import (Announcement, BodyLog, Booking, Category, ChatMessage, ChatReport, Exercise, GuestPass, GymClass, GymSettings, Membership, Order, OrderItem, Payment, PaymentCard, Plan,
-                     Lesson, Notification, PersonalRecord, Product, PromoCode, PTSession, Review, Trainer, User, VipPass, Visit, WorkoutPlan,
+from .models import (Announcement, BodyLog, Booking, Category, ChatMessage, ChatReport, Exercise, GymClass, GymSettings, Membership, Order, OrderItem, Payment, PaymentCard, Plan,
+                     AIMessage, Lesson, Notification, PersonalRecord, Product, PromoCode, PTSession, Review, Trainer, User, Visit, WorkoutPlan,
                      WorkoutType)
 
 
@@ -48,13 +48,13 @@ class BodyLogInline(admin.TabularInline):
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ("code", "first_name", "last_name", "phone", "email", "state", "until", "created", "card")
+    list_display = ("code", "username", "first_name", "last_name", "phone", "email", "state", "until", "created", "card")
     list_filter = ("is_active", "is_staff", "phone_verified", "goal", "created")
-    search_fields = ("phone", "email", "first_name", "last_name", "referral_code")
+    search_fields = ("username", "phone", "email", "first_name", "last_name", "referral_code")
     readonly_fields = ("last_login", "created", "referral_code", "referred_by", "referral_rewarded", "telegram_chat_id")
     # the password hash is never shown: it is useless to read and members change passwords on the site
     fieldsets = (
-        ("Shaxsiy ma'lumotlar", {"fields": (("first_name", "last_name"), ("phone", "phone_verified"), "email")}),
+        ("Shaxsiy ma'lumotlar", {"fields": ("username", ("first_name", "last_name"), ("phone", "phone_verified"), "email")}),
         ("Holat", {"fields": ("is_active", ("chat_banned", "chat_visible"), "show_in_leaderboard", "staff_note")}),
         ("Maqsad", {"fields": (("goal", "target_weight"), "birth_date")}),
         ("Huquqlar", {"fields": (("is_staff", "is_superuser"),)}),
@@ -299,7 +299,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(Plan)
 class PlanAdmin(admin.ModelAdmin):
-    list_display = ("name", "code", "months", "price", "is_vip", "active", "order")
+    list_display = ("name", "code", "months", "price", "active", "order")
     list_editable = ("price", "active", "order")
 
 
@@ -378,7 +378,6 @@ class GymSettingsAdmin(admin.ModelAdmin):
         ("Ombor ogohlantirishi (SMS)", {"fields": ("low_stock_threshold", "alert_phone"),
                                         "description": "Mahsulot shu sondan kam qolsa, adminga SMS, Telegram va saytdagi xabar boradi: nima tugagani va nechta olib kelish kerakligi. "
                                                        "Har mahsulot uchun kuniga bir marta."}),
-        ("VIP", {"fields": ("vip_price", "vip_days", "vip_shop_discount", "vip_reserved_seats", "vip_guest_passes", "vip_free_pt")}),
         ("Sinov", {"fields": ("demo_payments",), "classes": ("collapse",)}),
     )
 
@@ -405,8 +404,8 @@ class WorkoutPlanAdmin(admin.ModelAdmin):
 
 @admin.register(PTSession)
 class PTSessionAdmin(admin.ModelAdmin):
-    list_display = ("user", "trainer", "starts", "state", "is_free", "note")
-    list_filter = ("status", "trainer", "is_free")
+    list_display = ("user", "trainer", "starts", "state", "note")
+    list_filter = ("status", "trainer")
     date_hierarchy = "starts"
     actions = ["confirm", "cancel"]
     readonly_fields = ("user", "trainer", "starts", "note", "created")
@@ -528,38 +527,20 @@ class WorkoutTypeAdmin(admin.ModelAdmin):
 
 @admin.register(Lesson)
 class LessonAdmin(admin.ModelAdmin):
-    list_display = ("title", "workout_type", "weekday", "level", "duration_min", "is_vip", "has_video_flag", "active")
-    list_filter = ("workout_type", "weekday", "level", "is_vip", "active")
-    list_editable = ("is_vip", "active")
+    list_display = ("title", "workout_type", "weekday", "level", "duration_min", "has_video_flag", "active")
+    list_filter = ("workout_type", "weekday", "level", "active")
+    list_editable = ("active",)
     search_fields = ("title", "summary", "muscles")
     fieldsets = (
-        (None, {"fields": ("title", "workout_type", "weekday", "level", "duration_min", "summary", "is_vip", "active", "order")}),
+        (None, {"fields": ("title", "workout_type", "weekday", "level", "duration_min", "summary", "active", "order")}),
         ("Video", {"fields": ("video_file", "video_url"),
-                   "description": "Videoni saytga yuklang (mp4/webm) yoki YouTube/Vimeo/.mp4 havolasini yopishtiring (https). Yuklangan fayl havoladan ustun turadi. "
-                                  "VIP darsning yuklangan videosini faqat VIP a'zolar ko'radi."}),
+                   "description": "Videoni saytga yuklang (mp4/webm) yoki YouTube/Vimeo/.mp4 havolasini yopishtiring (https). Yuklangan fayl havoladan ustun turadi."}),
         ("Tushuntirish", {"fields": ("steps", "muscles", "equipment", "tips")}),
     )
 
     @admin.display(description="Video", boolean=True)
     def has_video_flag(self, o):
         return o.has_video
-
-
-@admin.register(VipPass)
-class VipPassAdmin(admin.ModelAdmin):
-    """Read-only: a VIP pass exists only because a payment was confirmed. To give VIP, confirm a VIP payment (Payments / Front desk)."""
-    list_display = ("user", "starts", "expires", "state", "payment")
-    search_fields = ("user__phone", "user__first_name", "user__last_name")
-
-    def has_add_permission(self, request):
-        return False
-
-    def has_change_permission(self, request, obj=None):
-        return False
-
-    @admin.display(description="Holat")
-    def state(self, o):
-        return badge("Faol", "#1d9a52") if o.is_active_now else badge("Tugagan", "#888")
 
 
 @admin.register(PaymentCard)
@@ -574,6 +555,25 @@ class PaymentCardAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False  # old payments point to their card; switch cards by adding a new one and making it primary
+
+
+@admin.register(AIMessage)
+class AIMessageAdmin(admin.ModelAdmin):
+    """Read-only log of AI coach conversations (useful to see what members ask and to check the answers)."""
+    list_display = ("user", "role", "short", "created")
+    list_filter = ("role", "created")
+    search_fields = ("content", "user__username", "user__first_name", "user__phone")
+    date_hierarchy = "created"
+
+    @admin.display(description="Matn")
+    def short(self, o):
+        return o.content[:90]
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
 
 
 @admin.register(Notification)
@@ -625,15 +625,6 @@ class TrainerAdmin(admin.ModelAdmin):
     @admin.display(description="Ko'rinishi")
     def preview(self, o):
         return thumb_html(o.image_src, 160) if o.pk else "—"
-
-
-@admin.register(GuestPass)
-class GuestPassAdmin(admin.ModelAdmin):
-    list_display = ("guest_name", "date", "user", "code", "used_at")
-    list_filter = ("date",)
-    search_fields = ("guest_name", "code", "user__first_name", "user__last_name", "user__phone")
-    readonly_fields = ("user", "code", "created")
-    date_hierarchy = "date"
 
 
 admin.site.register([Category, Announcement, Membership, BodyLog])

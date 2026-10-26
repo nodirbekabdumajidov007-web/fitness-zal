@@ -114,3 +114,15 @@ def ranged_file_response(request, path, content_type="video/mp4"):
 def validate_video_url(value):
     if value and not str(value).startswith("https://"):
         raise ValidationError("Video havolasi https:// bilan boshlanishi kerak.")
+
+
+def video_storage():
+    """Lesson and hero videos: the local disk, or Cloudinary's video storage when CLOUDINARY_URL is set (see settings.STORAGES)."""
+    from django.core.files.storage import storages
+    return storages["videos"]
+
+
+def is_local(field_file):
+    """True when the file sits on this server's disk; False for Cloudinary, whose files are served from their own URL."""
+    from django.core.files.storage import FileSystemStorage
+    return isinstance(field_file.storage, FileSystemStorage)

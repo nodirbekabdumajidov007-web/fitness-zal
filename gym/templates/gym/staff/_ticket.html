@@ -9,23 +9,14 @@
     <div><dt>{% t 'tk_date' %}</dt><dd class="num">{{ now|date:"d.m.Y" }} · {{ now|date:"H:i:s" }}</dd></div>
   </dl>
   <hr>
-  {% if guest %}
   <dl class="tk-rows">
-    <div><dt>{% t 'guest' %}</dt><dd><b>{{ guest.guest_name }}</b></dd></div>
-    <div><dt>{% t 'tk_host' %}</dt><dd>{{ guest.user.full_name }} · <span class="num">{{ guest.user.member_code }}</span></dd></div>
-    <div><dt>{% t 'tk_plan' %}</dt><dd>★ VIP · {% t 'tk_guest_pass' %}</dd></div>
-    <div><dt>{% t 'tk_valid' %}</dt><dd class="num">{{ guest.date|date:"d.m.Y" }}</dd></div>
-  </dl>
-  {% else %}
-  <dl class="tk-rows">
-    <div><dt>{% t 'tk_member' %}</dt><dd><b>{{ member.full_name }}</b>{% if vip %} <span class="tk-vip">★ VIP</span>{% endif %}</dd></div>
+    <div><dt>{% t 'tk_member' %}</dt><dd><b>{{ member.full_name }}</b></dd></div>
     <div><dt>ID</dt><dd class="num">{{ member.member_code }}</dd></div>
     <div><dt>{% t 'tk_plan' %}</dt><dd>{% if m %}{% plan_name m.plan %}{% else %}—{% endif %}</dd></div>
     {% if m %}<div><dt>{% t 'tk_valid' %}</dt><dd class="num">{{ m.expires|date:"d.m.Y" }} · {{ days_left }} {% t 'tk_days_left' %}</dd></div>{% endif %}
     <div><dt>{% t 'tk_month_visits' %}</dt><dd class="num">{{ month_visits }}</dd></div>
     <div><dt>{% t 'tk_total_visits' %}</dt><dd class="num">{{ total_visits }}</dd></div>
   </dl>
-  {% endif %}
   <hr>
   <div class="tk-status">
     <div>

@@ -742,6 +742,61 @@ trust_2fa||SMS bilan 2 bosqichli himoya||Двухэтапная защита п�
 trust_attempts||Ko'p xato urinish bloklanadi||Подбор пароля блокируется||Repeated wrong attempts are blocked
 trust_free||Ro'yxatdan o'tish bepul||Регистрация бесплатна||Signing up is free
 last_seen||Oldingi kirish: {when}. Bu siz bo'lmasangiz, parolni almashtiring.||Предыдущий вход: {when}. Если это были не вы, смените пароль.||Previous sign-in: {when}. If that wasn't you, change your password.
+ai_coach||AI murabbiy||AI-тренер||AI coach
+ai_coach_sub||Mashq va ovqatlanish bo'yicha savol bering||Спросите о тренировках и питании||Ask about training and nutrition
+ai_sub||Maqsadingiz, vazningiz va mashq rejangizni biladigan shaxsiy yordamchi. Savol bering yoki haftalik reja tuzdiring.||Личный помощник, который знает вашу цель, вес и план тренировок. Задайте вопрос или составьте недельный план.||A personal assistant that knows your goal, weight and workout plan. Ask a question or get a weekly plan.
+ai_home_title||AI murabbiy doim yoningizda||AI-тренер всегда рядом||An AI coach always at hand
+ai_home_1||Texnika va mashq bo'yicha savollarga javob||Ответы о технике и упражнениях||Answers on technique and exercises
+ai_home_2||Maqsadingizga mos haftalik reja||Недельный план под вашу цель||A weekly plan built for your goal
+ai_home_3||Kun-u tun, o'zbek, rus va ingliz tilida||Круглосуточно, на узбекском, русском и английском||Day and night, in Uzbek, Russian and English
+ai_try||Sinab ko'rish||Попробовать||Try it
+ai_off||AI hali ulanmagan: administrator ANTHROPIC_API_KEY ni sozlashi kerak.||AI ещё не подключён: администратору нужно указать ANTHROPIC_API_KEY.||AI is not connected yet: the admin needs to set ANTHROPIC_API_KEY.
+ai_login||AI murabbiy sizning ma'lumotlaringizga qarab javob beradi, shuning uchun avval kiring.||AI-тренер отвечает с учётом ваших данных, поэтому сначала войдите.||The AI coach answers using your own data, so please sign in first.
+ai_chat_title||AI murabbiy bilan suhbat||Чат с AI-тренером||Chat with the AI coach
+ai_today||bugun||сегодня||today
+ai_clear||Suhbatni tozalash||Очистить чат||Clear chat
+ai_try_title||Masalan, shunday so'rang:||Например, спросите:||For example, ask:
+ai_q1||Qorin uchun eng yaxshi 5 ta mashq qaysi?||Какие 5 лучших упражнений для пресса?||What are the 5 best ab exercises?
+ai_q2||Mashqdan keyin nima yeyish kerak?||Что есть после тренировки?||What should I eat after training?
+ai_q3||Skvatni qanday to'g'ri bajaraman?||Как правильно делать присед?||How do I squat with good form?
+ai_thinking||O'ylayapman…||Думаю…||Thinking…
+ai_placeholder||Savolingizni yozing… (Enter — yuborish)||Напишите вопрос… (Enter — отправить)||Type your question… (Enter to send)
+ai_send||Yuborish||Отправить||Send
+ai_disclaimer||AI shifokor emas: og'riq yoki kasallikda shifokor va murabbiyga murojaat qiling.||AI не врач: при боли или болезни обратитесь к врачу и тренеру.||The AI is not a doctor: for pain or illness, see a doctor and a trainer.
+ai_plan_title||AI mashq rejasi||AI-план тренировок||AI workout plan
+ai_plan_sub||Darajangiz va vaqtingizni kiriting — AI sizga haftalik reja tuzib, «Mashq rejam» bo'limiga saqlaydi.||Укажите уровень и время — AI составит недельный план и сохранит его в «Мой план».||Enter your level and time — the AI builds a weekly plan and saves it to «My plan».
+ai_level||Darajangiz||Ваш уровень||Your level
+ai_days||Haftasiga necha kun||Дней в неделю||Days per week
+ai_minutes||Bir mashg'ulot (daqiqa)||Одна тренировка (мин)||One session (min)
+ai_notes||Qo'shimcha (ixtiyoriy)||Дополнительно (необязательно)||Extra (optional)
+ai_notes_ph||Masalan: tizzam og'riydi, faqat gantel bor, qo'llarga urg'u…||Например: болит колено, только гантели, акцент на руки…||e.g. sore knee, dumbbells only, focus on arms…
+ai_plan_btn||Reja tuzish||Составить план||Build my plan
+ai_plan_busy||Tuzilmoqda… (1 daqiqagacha)||Составляю… (до 1 минуты)||Building… (up to a minute)
+ai_plan_ok||✦ AI rejangiz tayyor! Pastda kunlar bo'yicha mashqlar.||✦ AI-план готов! Ниже упражнения по дням.||✦ Your AI plan is ready! The exercises by day are below.
+ai_limit||Bugungi AI so'rovlar limiti tugadi. Ertaga yana urinib ko'ring.||Дневной лимит запросов к AI исчерпан. Попробуйте завтра.||Today's AI request limit is used up. Try again tomorrow.
+ai_busy||AI hozir band. Bir daqiqadan keyin qayta urinib ko'ring.||AI сейчас занят. Попробуйте через минуту.||The AI is busy right now. Try again in a minute.
+ai_error||AI javob bera olmadi. Qayta urinib ko'ring.||AI не смог ответить. Попробуйте ещё раз.||The AI could not answer. Please try again.
+ai_refused||Bu savolga AI javob bera olmaydi. Boshqacha so'rab ko'ring yoki murabbiyga murojaat qiling.||На этот вопрос AI ответить не может. Переформулируйте или обратитесь к тренеру.||The AI can't answer this. Rephrase it or ask a trainer.
+ai_empty||Savolni yozing||Напишите вопрос||Type a question
+login_field||Login, email yoki telefon||Логин, email или телефон||Username, e-mail or phone
+login_field_ph||masalan: aziz_karimov||например: aziz_karimov||e.g. aziz_karimov
+username||Login (username)||Логин (username)||Username
+username_help||3–30 belgi: lotin harflari, raqamlar, _ va . Kirishda shu yoki email ishlatiladi.||3–30 символов: латиница, цифры, _ и . Для входа подойдёт он или email.||3–30 characters: Latin letters, digits, _ and . You sign in with it or your e-mail.
+password2||Parolni takrorlang||Повторите пароль||Repeat the password
+reg_more||Ism va telefon (ixtiyoriy)||Имя и телефон (необязательно)||Name and phone (optional)
+err_username||Login 3–30 belgi bo'lsin: lotin harflari, raqam, _ yoki .||Логин 3–30 символов: латиница, цифры, _ или .||Username: 3–30 characters, Latin letters, digits, _ or .
+err_username_taken||Bu login band, boshqasini tanlang||Этот логин занят, выберите другой||This username is taken, pick another
+err_email||Email manzil noto'g'ri||Неверный email||Invalid e-mail address
+err_email_taken||Bu email bilan akkaunt bor. Kiring yoki parolni tiklang.||Аккаунт с этим email уже есть. Войдите или восстановите пароль.||An account with this e-mail exists. Sign in or reset the password.
+err_pass_match||Parollar bir xil emas||Пароли не совпадают||The passwords do not match
+pw_email_title||Parolni email orqali tiklash||Восстановление пароля по email||Reset the password by e-mail
+pw_email_help||Ro'yxatdan o'tgan email manzilingizni yozing — yangi parol o'rnatish havolasini yuboramiz.||Введите email, указанный при регистрации — пришлём ссылку для нового пароля.||Enter the e-mail you signed up with and we'll send a link to set a new password.
+pw_email_send||Havola yuborish||Отправить ссылку||Send the link
+pw_email_sent||Agar bu email bilan akkaunt bo'lsa, xat yuborildi. Pochtangizni (va «Spam» papkasini) tekshiring.||Если аккаунт с таким email есть, письмо отправлено. Проверьте почту (и папку «Спам»).||If an account uses this e-mail, a message is on its way. Check your inbox (and the spam folder).
+pw_link_bad||Havola eskirgan yoki allaqachon ishlatilgan.||Ссылка устарела или уже использована.||The link has expired or was already used.
+pw_email_again||Yangi havola so'rash||Запросить новую ссылку||Request a new link
+pw_by_sms||Telefon orqali (SMS) tiklash||Восстановить по SMS||Reset by SMS instead
+pw_by_email||Email orqali tiklash||Восстановить по email||Reset by e-mail instead
 scan_session||Sessiya tugagan: sahifani yangilab, admin sifatida qayta kiring||Сессия истекла: обновите страницу и войдите снова как администратор||Session ended: reload the page and sign in again as admin
 """
 

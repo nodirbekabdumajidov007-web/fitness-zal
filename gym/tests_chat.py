@@ -1,4 +1,4 @@
-"""Member chat (private conversations, general and VIP rooms), its privacy rules and moderation, plus uploaded VIP lesson videos."""
+"""Member chat (private conversations and the general room), its privacy rules and moderation, plus uploaded lesson videos."""
 import json
 import shutil
 import tempfile
@@ -28,7 +28,7 @@ class ChatBase(TestCase):
 
     def member(self, phone, first, last):
         c = Client()
-        c.post("/register/", {"first_name": first, "last_name": last, "phone": phone[4:], "password": "secret12"})
+        c.post("/register/", {"first_name": first, "last_name": last, "phone": phone[4:], "password": "secret12", "username": "u" + "".join(ch for ch in str(phone[4:]) if ch.isdigit()), "email": "u" + "".join(ch for ch in str(phone[4:]) if ch.isdigit()) + "@test.uz", "password2": "secret12"})
         return c, User.objects.get(phone=phone)
 
     def staff(self):
@@ -177,20 +177,6 @@ class RoomTests(ChatBase):
         self.assertEqual(Client().get(f"/chat/{general.pk}/").status_code, 302)
         self.assertEqual(chat.unread_total(self.b), 0)  # public rooms never produce unread badges
 
-    def test_vip_room_needs_vip(self):
-        chat.ensure_rooms()
-        vip_room = ChatRoom.objects.get(slug="vip")
-        r = self.ca.get(f"/chat/{vip_room.pk}/")
-        self.assertEqual(r["Location"], "/vip/")
-        self.assertEqual(self.send(self.ca, vip_room, "kirib oldim").status_code, 404)
-        self.assertEqual(self.ca.get(f"/chat/{vip_room.pk}/poll/?after=0").status_code, 404)  # polling cannot leak it either
-        services.add_vip(self.a)
-        self.assertEqual(self.send(self.ca, vip_room, "VIP salom").status_code, 200)
-        self.assertEqual(self.cb.get(f"/chat/{vip_room.pk}/").status_code, 302)
-        self.assertContains(self.ca.get("/chat/"), "VIP xona")
-        self.assertContains(self.ca.get(f"/chat/{vip_room.pk}/"), "VIP salom")
-
-
 class ModerationTests(ChatBase):
     def test_report_and_admin_actions(self):
         chat.ensure_rooms()
@@ -241,11 +227,11 @@ class UploadedVideoTests(TestCase):
         self.addCleanup(lambda: (self.override.disable(), shutil.rmtree(self.media, ignore_errors=True)))
         self.data = bytes(range(256)) * 40  # 10 240 bytes
         self.free = Lesson.objects.get(title__startswith="Skvat")
-        self.vip = Lesson.objects.get(is_vip=True, title__contains="ovqatlanish")
-        for lesson in (self.free, self.vip):
+        self.other_video = Lesson.objects.get(title__contains="ovqatlanish")
+        for lesson in (self.free, self.other_video):
             lesson.video_file.save("clip.mp4", SimpleUploadedFile("clip.mp4", self.data), save=True)
         c = Client()
-        c.post("/register/", {"first_name": "Aziz", "last_name": "K", "phone": "90 111 22 33", "password": "secret12"})
+        c.post("/register/", {"first_name": "Aziz", "last_name": "K", "phone": "90 111 22 33", "password": "secret12", "username": "u" + "".join(ch for ch in str("90 111 22 33") if ch.isdigit()), "email": "u" + "".join(ch for ch in str("90 111 22 33") if ch.isdigit()) + "@test.uz", "password2": "secret12"})
         self.c, self.u = c, User.objects.get(phone="+998901112233")
 
     def test_free_video_streams_with_range_support(self):
@@ -262,15 +248,9 @@ class UploadedVideoTests(TestCase):
         for bad in ("bytes=99999-", "bytes=5-2", "lines=1-2", "bytes=-"):
             self.assertEqual(Client().get(f"/training/{self.free.pk}/video/", HTTP_RANGE=bad).status_code, 416, bad)
 
-    def test_vip_video_is_not_reachable_without_vip(self):
-        for client in (Client(), self.c):
-            self.assertEqual(client.get(f"/training/{self.vip.pk}/video/").status_code, 403)
-            self.assertEqual(client.get(f"/training/{self.vip.pk}/video/", HTTP_RANGE="bytes=0-9").status_code, 403)  # ranges do not bypass the check
-        page = self.c.get(f"/training/{self.vip.pk}/").content.decode()
-        self.assertNotIn(f"/training/{self.vip.pk}/video/", page)  # the locked page does not even reveal the URL
-        services.add_vip(self.u)
-        self.assertEqual(self.c.get(f"/training/{self.vip.pk}/video/").status_code, 200)
-        self.assertIn(f'src="/training/{self.vip.pk}/video/"', self.c.get(f"/training/{self.vip.pk}/").content.decode())
+    def test_lesson_page_shows_the_uploaded_video(self):
+        self.assertIn(f'src="/training/{self.other_video.pk}/video/"', self.c.get(f"/training/{self.other_video.pk}/").content.decode())
+        self.assertEqual(Client().get(f"/training/{self.other_video.pk}/video/").status_code, 200)
 
     def test_missing_or_inactive_files(self):
         self.free.active = False
@@ -278,9 +258,8 @@ class UploadedVideoTests(TestCase):
         self.assertEqual(Client().get(f"/training/{self.free.pk}/video/").status_code, 404)
         other = Lesson.objects.get(title__startswith="Lanj")
         self.assertEqual(Client().get(f"/training/{other.pk}/video/").status_code, 404)  # no video attached
-        Path(self.vip.video_file.path).unlink()
-        services.add_vip(self.u)
-        self.assertEqual(self.c.get(f"/training/{self.vip.pk}/video/").status_code, 404)  # file vanished from disk
+        Path(self.other_video.video_file.path).unlink()
+        self.assertEqual(self.c.get(f"/training/{self.other_video.pk}/video/").status_code, 404)  # file vanished from disk
 
     def test_upload_rules(self):
         from django.core.exceptions import ValidationError

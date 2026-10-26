@@ -29,13 +29,36 @@ class PhoneField(forms.CharField):
 
 
 class RegisterForm(forms.Form):
-    first_name = forms.CharField(max_length=40, strip=True, error_messages=REQUIRED)
-    last_name = forms.CharField(max_length=40, strip=True, error_messages=REQUIRED)
-    phone = PhoneField(error_messages=REQUIRED)
+    """Django's usual sign-up: username, e-mail, password twice. Name and phone are optional (the phone enables SMS and the desk search)."""
+    username = forms.CharField(max_length=30, strip=True, error_messages=REQUIRED)
+    email = forms.EmailField(max_length=254, error_messages={"required": "err_fields", "invalid": "err_email"})
     password = forms.CharField(max_length=128, strip=False, error_messages={**REQUIRED, "max_length": "err_pass"})
+    password2 = forms.CharField(max_length=128, strip=False, error_messages=REQUIRED)
+    first_name = forms.CharField(max_length=40, strip=True, required=False)
+    last_name = forms.CharField(max_length=40, strip=True, required=False)
+    phone = forms.CharField(max_length=20, required=False)
+
+    def clean_username(self):
+        u = self.cleaned_data["username"]
+        if not re.fullmatch(r"[A-Za-z0-9_.]{3,30}", u):
+            raise ValidationError("err_username")
+        if User.objects.filter(username__iexact=u).exists():
+            raise ValidationError("err_username_taken")
+        return u
+
+    def clean_email(self):
+        e = self.cleaned_data["email"].strip().lower()
+        if User.objects.filter(email__iexact=e).exists():
+            raise ValidationError("err_email_taken")
+        return e
 
     def clean_phone(self):
-        p = self.cleaned_data["phone"]
+        raw = (self.cleaned_data.get("phone") or "").strip()
+        if not raw:
+            return None
+        p = normalize_phone(raw)
+        if not p:
+            raise ValidationError("err_phone")
         if User.objects.filter(phone=p).exists():
             raise ValidationError("err_exists")
         return p
@@ -46,10 +69,30 @@ class RegisterForm(forms.Form):
             raise ValidationError("err_pass")
         return pw
 
+    def clean(self):
+        d = super().clean()
+        if d.get("password") and d.get("password2") is not None and d["password"] != d["password2"]:
+            self.add_error("password2", "err_pass_match")
+        return d
+
 
 class LoginForm(forms.Form):
-    phone = PhoneField(error_messages=REQUIRED)
+    """One box for the username, the e-mail or the phone number."""
+    login = forms.CharField(max_length=254, strip=True, error_messages=REQUIRED)
     password = forms.CharField(max_length=140, strip=False, error_messages=REQUIRED)
+
+
+def find_user(login):
+    """The account a sign-in box refers to: a phone number, an e-mail or a username (case does not matter)."""
+    login = (login or "").strip()
+    if not login:
+        return None
+    phone = normalize_phone(login) if not re.search(r"[A-Za-z@]", login) else None
+    if phone:
+        return User.objects.filter(phone=phone).first()
+    if "@" in login:
+        return User.objects.filter(email__iexact=login).first()
+    return User.objects.filter(username__iexact=login).first()
 
 
 class ProfileForm(forms.ModelForm):

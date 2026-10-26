@@ -27,7 +27,7 @@ class CardBase(TestCase):
 
     def member(self, phone="+998901112233", first="Aziz"):
         c = Client()
-        c.post("/register/", {"first_name": first, "last_name": "Karimov", "phone": phone[4:], "password": "secret12"})
+        c.post("/register/", {"first_name": first, "last_name": "Karimov", "phone": phone[4:], "password": "secret12", "username": "u" + "".join(ch for ch in str(phone[4:]) if ch.isdigit()), "email": "u" + "".join(ch for ch in str(phone[4:]) if ch.isdigit()) + "@test.uz", "password2": "secret12"})
         return c, User.objects.get(phone=phone)
 
     def staff(self):

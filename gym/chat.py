@@ -9,7 +9,6 @@ from django.db.models import Count, F, OuterRef, Q, Subquery
 from django.db.models.functions import Coalesce
 from django.utils import timezone
 
-from . import services
 from .media import validate_image
 from .models import ChatBlock, ChatMessage, ChatRead, ChatRoom, User
 
@@ -17,34 +16,30 @@ MAX_LEN = 1000
 RATE_LIMIT = 15  # messages per minute per member
 PAGE = 50
 ONLINE_SECONDS = 70  # the page polls every 3 s, so a minute of silence means the member left
-PUBLIC_ROOMS = [("general", "Umumiy xona", False), ("vip", "VIP xona", True)]
+PUBLIC_ROOMS = [("general", "Umumiy xona")]
 
 
 def ensure_rooms():
-    for slug, title, vip in PUBLIC_ROOMS:
-        ChatRoom.objects.get_or_create(slug=slug, defaults={"kind": "room", "title": title, "vip_only": vip})
+    for slug, title in PUBLIC_ROOMS:
+        ChatRoom.objects.get_or_create(slug=slug, defaults={"kind": "room", "title": title})
 
 
 def display_name(u):
-    return f"{u.first_name} {u.last_name[:1]}.".strip()
+    return f"{u.first_name} {u.last_name[:1]}.".strip() if u.first_name else u.username
 
 
 def initials(u):
-    return ((u.first_name[:1] or "?") + (u.last_name[:1] or "")).upper()
+    return ((u.first_name[:1] or u.username[:1] or "?") + (u.last_name[:1] or "")).upper()
 
 
 def hue(u):
     return (u.pk * 47) % 360  # a stable colour per member for the avatar
 
 
-def is_vip_or_staff(user):
-    return user.is_staff or services.is_vip(user)
-
-
 def can_access(user, room):
     if room.kind == "direct":
         return user.pk in (room.user_a_id, room.user_b_id)
-    return is_vip_or_staff(user) if room.vip_only else True
+    return True
 
 
 def blocked_between(a, b):

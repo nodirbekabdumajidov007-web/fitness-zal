@@ -1,3 +1,4 @@
+from django.contrib.auth import views as auth_views
 from django.urls import path
 
 from . import chat_views as c
@@ -19,6 +20,16 @@ urlpatterns = [
     path("logout/", v.logout_view, name="logout"),
     path("forgot/", v.forgot_view, name="forgot"),
     path("reset/", v.reset_view, name="reset"),
+    # password reset by e-mail: Django's built-in views with the site's own page
+    path("password/email/", auth_views.PasswordResetView.as_view(
+        template_name="gym/pw_email.html", extra_context={"step": "ask"}, email_template_name="gym/email/reset.txt",
+        subject_template_name="gym/email/reset_subject.txt", success_url="/password/email/sent/"), name="pw_email"),
+    path("password/email/sent/", auth_views.PasswordResetDoneView.as_view(
+        template_name="gym/pw_email.html", extra_context={"step": "sent"}), name="pw_email_sent"),
+    path("password/email/<uidb64>/<token>/", auth_views.PasswordResetConfirmView.as_view(
+        template_name="gym/pw_email.html", extra_context={"step": "new"}, success_url="/password/email/done/"), name="pw_confirm"),
+    path("password/email/done/", auth_views.PasswordResetCompleteView.as_view(
+        template_name="gym/pw_email.html", extra_context={"step": "done"}), name="pw_done"),
     path("verify/", v.verify_view, name="verify"),
     path("auth/google/", v.google_login, name="google_login"),
     path("dashboard/", v.dashboard, name="dashboard"),
@@ -30,6 +41,10 @@ urlpatterns = [
     path("workouts/program/<slug:key>/", v.start_program, name="start_program"),
     path("workouts/stop/", v.stop_plan, name="stop_plan"),
     path("water/", v.water, name="water"),
+    path("ai/", v.ai_view, name="ai"),
+    path("ai/ask/", v.ai_ask, name="ai_ask"),
+    path("ai/plan/", v.ai_plan, name="ai_plan"),
+    path("ai/clear/", v.ai_clear, name="ai_clear"),
     path("tools/", v.tools_view, name="tools"),
     path("inbox/", v.notifications_view, name="inbox"),
     path("profile/sessions/", v.logout_others, name="logout_others"),
@@ -54,10 +69,6 @@ urlpatterns = [
     path("training/<int:pk>/video/", v.lesson_video, name="lesson_video"),
     path("training/", v.training_view, name="training"),
     path("training/<int:pk>/", v.lesson_view, name="lesson"),
-    path("vip/", v.vip_view, name="vip"),
-    path("vip/buy/", v.buy_vip_view, name="buy_vip"),
-    path("vip/guest/", v.guest_create, name="guest_create"),
-    path("vip/guest/<str:code>/", v.guest_pass_view, name="guest_pass"),
     path("img/<str:kind>/<int:pk>/", v.image_view, name="image"),
     path("shop/<int:pk>/", v.product_detail, name="product"),
     path("trainers/<int:pk>/", v.trainer_detail, name="trainer"),
@@ -92,7 +103,6 @@ urlpatterns = [
     path("staff/sell/<int:uid>/", v.desk_sell, name="desk_sell"),
     path("staff/confirm/<int:pid>/", v.desk_confirm, name="desk_confirm"),
     path("staff/reject/<int:pid>/", v.desk_reject, name="desk_reject"),
-    path("staff/guest/<str:code>/", v.desk_guest, name="desk_guest"),
     path("staff/handover/<int:oid>/", v.desk_handover, name="desk_handover"),
     path("staff/ship/<int:oid>/", v.desk_ship, name="desk_ship"),
     path("auth/apple/", v.apple_login, name="apple_login"),

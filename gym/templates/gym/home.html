@@ -25,16 +25,15 @@
       </div>
     </div>
 
-    <aside class="paper" aria-label="VIP">
-      <div class="paper-top"><span>★ VIP</span><span class="num">{{ gs.vip_days }} {% t 'days_short' %}</span></div>
-      <h3>{% t 'home_vip_title' %}</h3>
+    <aside class="paper ai-paper" aria-label="AI">
+      <div class="paper-top"><span>✦ AI</span><span>24/7</span></div>
+      <h3>{% t 'ai_home_title' %}</h3>
       <ul>
-        <li>{% t 'vip_perk_discount' pct=gs.vip_shop_discount %}</li>
-        <li>{% t 'vip_perk_pt' n=gs.vip_free_pt %}</li>
-        <li>{% t 'vip_perk_chat' %}</li>
+        <li>{% t 'ai_home_1' %}</li>
+        <li>{% t 'ai_home_2' %}</li>
+        <li>{% t 'ai_home_3' %}</li>
       </ul>
-      <div class="paper-price"><small>{% t 'from_price' %}</small><b class="num">{{ gs.vip_price|money }}</b> <small>{% t 'price_unit' %}</small></div>
-      <a class="paper-btn" href="{% url 'vip' %}">{% t 'vip_get' %} →</a>
+      <a class="paper-btn" href="{% url 'ai' %}">{% t 'ai_try' %} →</a>
     </aside>
   </div>
 
@@ -78,7 +77,7 @@
     <div class="sec-head reveal"><span class="eyebrow">01 · {% t 'nav_plans' %}</span><h2>{% t 'home_plans_title' %}</h2></div>
     <div class="grid g3">
       {% for p in plans %}
-      <div class="card plan lift reveal {% if p.is_vip %}vip{% endif %}">
+      <div class="card plan lift reveal">
         <div class="eyebrow">{% t 'months_n' n=p.months %}</div>
         <h3>{% plan_name p %}</h3>
         <div class="price num">{{ p.price|money }} <small>{% t 'price_unit' %}</small></div>

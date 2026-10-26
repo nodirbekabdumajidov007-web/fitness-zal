@@ -9,7 +9,7 @@ from django.db.models import Count, F
 from django.utils import timezone
 
 from . import telegram
-from .models import (BodyLog, Booking, GymSettings, Membership, Order, Payment, PaymentCard, Plan, Product, PromoCode, Review, User, VipPass, Visit)
+from .models import (BodyLog, Booking, GymSettings, Membership, Order, Payment, PaymentCard, Plan, Product, PromoCode, Review, User, Visit)
 
 OFFLINE_METHODS = ("cash", "click", "card")  # not marked paid on the spot: cash and card transfers wait for staff, click for the gateway callback
 CARD_HOLD_HOURS = 24  # an unpaid card transfer is cancelled after this long, which also releases the reserved stock
@@ -67,129 +67,13 @@ def add_membership(user, plan):
     return m
 
 
-# ---------------------------------------------------------------- VIP add-on
-def active_vip_pass(user):
-    now = timezone.now()
-    return user.vip_passes.filter(starts__lte=now, expires__gt=now).order_by("-expires").first()
-
-
-def vip_until(user):
-    v = user.vip_passes.order_by("-expires").first()
-    return v.expires if v else None
-
-
-def is_vip(user):
-    """VIP perks come from a paid VIP pass, or from an active membership on a VIP plan."""
-    if not getattr(user, "is_authenticated", False):
-        return False
-    if active_vip_pass(user):
-        return True
-    m = active_membership(user)
-    return bool(m and m.plan.is_vip)
-
-
-def add_vip(user, days=None, payment=None):
-    """Creates the pass. On the site it is only called from confirm_payment, i.e. after the money is confirmed."""
-    gs = GymSettings.load()
-    now = timezone.now()
-    last = user.vip_passes.order_by("-expires").first()
-    start = max(now, last.expires) if last else now
-    return VipPass.objects.create(user=user, starts=start, expires=start + timedelta(days=days or gs.vip_days), payment=payment)
-
-
-@transaction.atomic
-def buy_vip(user, method, promo_code=""):
-    """Same money rules as a plan purchase; the price comes from the settings, never from the browser."""
-    gs = GymSettings.load()
-    if method not in OFFLINE_METHODS:  # VIP never starts on the spot: only after cash/card is confirmed by staff or Click confirms
-        return None, "err_method"
-    card = current_card() if method == "card" else None
-    if method == "card" and not card:
-        return None, "err_method"
-    promo, discount, err = check_promo(promo_code, gs.vip_price)
-    if err:
-        return None, err
-    if promo:
-        updated = PromoCode.objects.filter(pk=promo.pk).exclude(max_uses__isnull=False, used__gte=F("max_uses")).update(used=F("used") + 1)
-        if not updated:
-            return None, "promo_bad"
-    pay = Payment.objects.create(user=user, kind="vip", amount=gs.vip_price - discount, discount=discount, promo=promo.code if promo else "",
-                                 method=method, pay_card=card, card_last4=card.last4 if card else "", status=Payment.Status.PENDING)
-    return pay, None
-
-
 def month_start():
     now = timezone.localtime()
     return now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
 
 
-def reserved_seats(gym_class, gs=None):
-    """Seats held back for VIP in a group class; never more than half the class."""
-    gs = gs or GymSettings.load()
-    return min(gs.vip_reserved_seats, gym_class.capacity // 2)
-
-
-def seats_left(gym_class, date, vip, gs=None):
-    taken = gym_class.bookings.filter(date=date).count()
-    limit = gym_class.capacity if vip else gym_class.capacity - reserved_seats(gym_class, gs)
-    return max(0, limit - taken)
-
-
-def free_pt_left(user):
-    if not is_vip(user):
-        return 0
-    used = user.pt_sessions.filter(is_free=True, created__gte=month_start()).exclude(status="cancelled").count()
-    return max(0, GymSettings.load().vip_free_pt - used)
-
-
-def guest_passes_left(user):
-    if not is_vip(user):
-        return 0
-    return max(0, GymSettings.load().vip_guest_passes - user.guest_passes.filter(created__gte=month_start()).count())
-
-
-def create_guest_pass(user, guest_name, date):
-    """Returns (pass, error_key)."""
-    import secrets
-    from .models import GuestPass
-    if not is_vip(user):
-        return None, "vip_only_action"
-    guest_name = (guest_name or "").strip()
-    if not 2 <= len(guest_name) <= 60:
-        return None, "guest_name_bad"
-    today = timezone.localdate()
-    if date is None or not today <= date <= today + timedelta(days=30):
-        return None, "guest_date_bad"
-    if guest_passes_left(user) < 1:
-        return None, "guest_limit"
-    for _ in range(10):
-        code = secrets.token_hex(4).upper()
-        if not GuestPass.objects.filter(code=code).exists():
-            return GuestPass.objects.create(user=user, guest_name=guest_name, date=date, code=code), None
-    return None, "guest_name_bad"
-
-
-def parse_guest_code(text):
-    text = (text or "").strip().upper()
-    if text.startswith("FZG:"):
-        text = text[4:]
-    return text if len(text) == 8 and all(c in "0123456789ABCDEF" for c in text) else ""
-
-
-def use_guest_pass(text):
-    """Front desk: lets the guest in once, on the pass date. Returns (pass or None, error_key)."""
-    from .models import GuestPass
-    code = parse_guest_code(text)
-    gp = GuestPass.objects.select_related("user").filter(code=code).first() if code else None
-    if not gp:
-        return None, "scan_bad"
-    if gp.used_at:
-        return gp, "guest_used"
-    if gp.date != timezone.localdate():
-        return gp, "guest_wrong_day"
-    updated = GuestPass.objects.filter(pk=gp.pk, used_at__isnull=True).update(used_at=timezone.now())  # one use, even under a double scan
-    gp.refresh_from_db()
-    return gp, None if updated else "guest_used"
+def seats_left(gym_class, date):
+    return max(0, gym_class.capacity - gym_class.bookings.filter(date=date).count())
 
 
 def reward_referral(user):
@@ -302,7 +186,7 @@ def achievements(user):
 def points(user):
     base = (len(visit_days(user)) * 10 + Booking.objects.filter(user=user).count() * 5 + user.orders.count() * 2
             + user.referrals.filter(referral_rewarded=True).count() * 50)
-    return base * 2 if is_vip(user) else base  # VIP earns double points
+    return base
 
 
 def leaderboard(limit=10):
@@ -314,16 +198,41 @@ def leaderboard(limit=10):
 
 
 # ---------------------------------------------------------------- personal messages & stock alerts
-def notify(user, title, body="", sender=None, telegram_too=True, sms_too=False):
-    """A message in the member's inbox on the site, optionally also by Telegram and SMS. Returns which channels went out."""
+def send_email(user, subject, body):
+    """One plain-text e-mail through SMTP (settings.EMAIL_*). Returns True when it went out; a mail failure never breaks the page."""
+    import logging
+    from django.core.mail import send_mail
+    if not user.email:
+        return False
+    try:
+        return bool(send_mail(subject[:150], body, None, [user.email], fail_silently=False))
+    except Exception:
+        logging.getLogger(__name__).exception("e-mail to user %s failed", user.pk)
+        return False
+
+
+def send_welcome_email(user, request=None):
+    site = request.build_absolute_uri("/") if request else ""
+    body = (f"Assalomu alaykum, {user.full_name}!\n\n"
+            f"Fitnes Zal saytida ro'yxatdan o'tdingiz. Login: {user.username}\n"
+            f"Kabinetingiz: {site}dashboard/\n\n"
+            "Abonement oling, mashq rejangizni tuzing yoki AI murabbiydan savol so'rang.\n\n"
+            "Agar bu siz bo'lmasangiz, bu xatga e'tibor bermang.\n— Fitnes Zal")
+    return send_email(user, "Fitnes Zal'ga xush kelibsiz!", body)
+
+
+def notify(user, title, body="", sender=None, telegram_too=True, sms_too=False, email_too=False):
+    """A message in the member's inbox on the site, optionally also by Telegram, SMS and e-mail. Returns which channels went out."""
     from . import sms
     from .models import Notification
     Notification.objects.create(user=user, sender=sender, title=title[:120], body=body[:2000])
-    sent = {"site": True, "tg": False, "sms": False}
+    sent = {"site": True, "tg": False, "sms": False, "email": False}
     if telegram_too and user.telegram_chat_id and telegram.enabled():
         sent["tg"] = bool(telegram.send(user.telegram_chat_id, f"{title}\n\n{body}".strip()))
     if sms_too and user.phone:
         sent["sms"] = sms.send_sms(user.phone, f"Fitnes Zal: {title}. {body}"[:320])
+    if email_too:
+        sent["email"] = send_email(user, f"Fitnes Zal: {title}", f"{body}\n\n— Fitnes Zal" if body else title)
     return sent
 
 
@@ -430,8 +339,6 @@ def check_promo(code, price):
 @transaction.atomic
 def buy_plan(user, plan, method, promo_code=""):
     """Cash waits for staff, Click for its callback; demo gateways are marked paid straight away (no real gateway behind them)."""
-    if plan.is_vip and method not in OFFLINE_METHODS:  # a VIP plan unlocks VIP perks, so it also needs real, confirmed money
-        return None, "err_method"
     card = current_card() if method == "card" else None
     if method == "card" and not card:
         return None, "err_method"
@@ -460,8 +367,6 @@ def confirm_payment(payment):
     payment.save(update_fields=["status"])
     if payment.kind == "plan" and payment.user and payment.plan:
         add_membership(payment.user, payment.plan)
-    elif payment.kind == "vip" and payment.user:
-        add_vip(payment.user, payment=payment)
     if payment.user:
         telegram.notify_user(payment.user, "tg_payment_ok", amount=f"{payment.amount:,}".replace(",", " "), ref=payment.reference)
     return True
@@ -480,7 +385,7 @@ def cancel_payment(payment, notify=False):
             Product.objects.filter(pk=it.product_id).update(stock=F("stock") + it.qty)
         order.status = Order.Status.CANCELLED
         order.save(update_fields=["status"])
-    if payment.promo and payment.kind in ("plan", "vip"):  # shop payments carry the label "VIP", which is not a promo code
+    if payment.promo and payment.kind == "plan":
         PromoCode.objects.filter(code=payment.promo, used__gt=0).update(used=F("used") - 1)
     if notify and payment.user:
         telegram.notify_user(payment.user, "tg_payment_rejected", ref=payment.reference)
@@ -525,8 +430,6 @@ def place_order(user, cart, method, delivery=None):
             return None, "err_stock"  # atomic check-and-decrement; the whole order rolls back
         items.append((p, qty))
         total += p.price * qty
-    discount = total * gs.vip_shop_discount // 100 if is_vip(user) else 0
-    total -= discount
     fee = gs.delivery_cost(total) if delivery is not None else 0
     total += fee
     extra = {}
@@ -536,7 +439,7 @@ def place_order(user, cart, method, delivery=None):
     order = Order.objects.create(user=user, total=total, method=method, **extra)
     for p, qty in items:
         order.items.create(product=p, name=p.name, price=p.price, qty=qty)
-    Payment.objects.create(user=user, kind="shop", order=order, amount=total, discount=discount, promo="VIP" if discount else "", method=method,
+    Payment.objects.create(user=user, kind="shop", order=order, amount=total, method=method,
                            pay_card=card, card_last4=card.last4 if card else "",
                            status=Payment.Status.PENDING if method in OFFLINE_METHODS else Payment.Status.PAID)
     return order, None

@@ -10,12 +10,6 @@ def gym(request):
     o, c = s.open_time, s.close_time
     is_open = (o <= now < c) if o <= c else (now >= o or now < c)
     cart = request.session.get("cart", {}) if hasattr(request, "session") else {}
-    def vip():  # evaluated only if a template actually asks; cached for the request
-        if not hasattr(request, "_is_vip"):
-            from . import services
-            request._is_vip = services.is_vip(request.user)
-        return request._is_vip
-
     def chat_unread():
         if not hasattr(request, "_chat_unread"):
             from . import chat
@@ -35,7 +29,7 @@ def gym(request):
                                      if request.user.is_authenticated else 0)
         return request._inbox_unread
 
-    return {"lang": getattr(request, "lang", "uz"), "is_trainer": is_trainer, "inbox_unread": inbox_unread, "gs": s, "is_open": is_open, "cart_count": sum(cart.values()), "is_vip": vip, "chat_unread": chat_unread,
+    return {"lang": getattr(request, "lang", "uz"), "is_trainer": is_trainer, "inbox_unread": inbox_unread, "gs": s, "is_open": is_open, "cart_count": sum(cart.values()), "chat_unread": chat_unread,
             "demo_on": bool(s.demo_payments and dj.ALLOW_DEMO_PAYMENTS),
             "admin_mode": bool(request.user.is_authenticated and request.user.is_staff and request.session.get("admin_mode")),
             "google_client_id": s.google_id(), "apple_client_id": s.apple_id(),

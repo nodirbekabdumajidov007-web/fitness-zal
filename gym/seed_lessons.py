@@ -7,7 +7,7 @@ TYPES = [
     ("Ovqatlanish", "Nima va qachon yeyish"),
 ]
 
-# (type index, weekday or None, level, minutes, vip, title, summary, steps, muscles, equipment, tips)
+# (type index, weekday or None, level, minutes, (unused), title, summary, steps, muscles, equipment, tips)
 LESSONS = [
     (3, None, "beginner", 8, False, "Qizdirish: har mashg'ulot oldidan",
      "Mashqdan oldin 8 daqiqa: bo'g'imlar va mushaklarni tayyorlash.",
@@ -69,22 +69,22 @@ LESSONS = [
      "Har cho'zilishni 30 soniya ushlang, sakramang.\nSon oldi: bir oyoqda turib, boshqa oyoqni orqaga bukib ushlang.\nSon orqasi: o'tirib, oyoqni oldinga uzatib, uchiga cho'zilib boring.\nYelka: bir qo'lni ko'krak oldidan qarama-qarshi yelkaga tortib turing.\nOrqa: bola holatida qo'llarni oldinga uzating.",
      "Butun tana", "Mat",
      "Mushaklar iliq bo'lganda cho'zing.\nOg'riq paydo bo'lsa, kuchaytirmang."),
-    (0, 0, "advanced", 45, True, "VIP: haftalik massa yig'ish dasturi",
+    (0, 0, "advanced", 45, True, "haftalik massa yig'ish dasturi",
      "4 kunlik bo'linma: ko'krak-tritseps, orqa-bitseps, oyoq, yelka-qorin.",
      "1-kun: ko'krak va tritseps. Yotib siqish 4x8, qiya siqish 3x10, tritseps 3x12.\n2-kun: orqa va bitseps. Tortilish 4x8, eshkak 4x10, bitseps 3x12.\n3-kun: oyoq. Skvat 4x8, rumin tortish 3x10, lanj 3x12, boldir 4x15.\n4-kun: yelka va qorin. Yelka siqish 4x8, yon ko'tarish 3x15, plank 3x45 soniya.\nHar kun 5 daqiqa qizdirish va 5 daqiqa cho'zilish.\nHar 2 haftada og'irlikni 2-5% oshiring.",
      "Butun tana", "Zal jihozlari",
      "Kuniga 7-9 soat uxlang: mushak uyqu paytida o'sadi.\nTexnika buzilsa og'irlikni kamaytiring.\nIlg'or darajada murabbiy nazorati foydali."),
-    (4, None, "beginner", 15, True, "VIP: ovqatlanish asoslari",
+    (4, None, "beginner", 15, True, "ovqatlanish asoslari",
      "Oqsil, uglevod va yog'ni qanday muvozanatlash kerak.",
      "Oqsil: tana vazningizning har kilogrammiga kuniga taxminan 1.6-2.2 g (mushak o'stirsangiz). Go'sht, tuxum, tvorog, dukkaklilar.\nUglevod: kuch manbai. Guruch, grechka, suli, meva. Mashqdan oldin ko'proq iste'mol qiling.\nYog': kunlik kaloriyaning 20-30%. Yong'oq, zaytun moyi, baliq.\nSuv: kuniga kamida 30-35 ml har kg vazningizga.\nMashqdan 1-2 soat oldin yengil taom, keyin oqsilli ovqat.",
      "", "",
      "Keskin dietalardan saqlaning.\nMaxsus kasallik bo'lsa, shifokor yoki dietolog bilan maslahatlashing.\nOvqat miqdorini 2 hafta kuzatib, natijaga qarab o'zgartiring."),
-    (1, 2, "intermediate", 20, True, "VIP: yog' yoqish HIIT",
+    (1, 2, "intermediate", 20, True, "yog' yoqish HIIT",
      "Qisqa va kuchli interval mashq.",
      "Qizdirish: 5 daqiqa.\n40 soniya burpee, 20 soniya dam.\n40 soniya tog' chiqish (mountain climber), 20 soniya dam.\n40 soniya sakrab skvat, 20 soniya dam.\n40 soniya yuqori tizza bilan yugurish, 20 soniya dam.\nBu 4 mashqni 4 aylana takrorlang, aylanalar orasida 1 daqiqa dam.\nOxirida 5 daqiqa cho'zilish.",
      "Butun tana, yurak", "Mat",
      "Haftada 2 martadan ko'p qilmang, orada dam bering.\nYurak yoki bo'g'im muammosi bo'lsa murabbiy bilan maslahatlashing."),
-    (3, 6, "intermediate", 15, True, "VIP: 15 daqiqalik mobillik",
+    (3, 6, "intermediate", 15, True, "15 daqiqalik mobillik",
      "Bo'g'imlar harakatchanligi uchun kunlik tartib.",
      "Mushuk-sigir: 10 nafas.\nDunyo eng katta cho'zilishi (lanj + burilish): har tomonga 5 nafas.\nKestirib bo'g'imi aylanishi (90/90): har tomonga 8 marta.\nYelka aylanishi devor yonida: 10 marta.\nChuqur skvatda 1 daqiqa turish, tirsaklar bilan tizzalarni itarib.",
      "Bo'g'imlar, son, yelka", "Mat",

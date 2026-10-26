@@ -35,12 +35,11 @@ class SmokeTests(TestCase):
         self.admin.save()
         PaymentCard.objects.create(bank="Uzcard", number="4111111111111111", holder="TEST", is_primary=True)
         self.member = Client()
-        self.member.post("/register/", {"first_name": "Aziz", "last_name": "Karimov", "phone": "90 111 22 33", "password": "secret12"})
+        self.member.post("/register/", {"first_name": "Aziz", "last_name": "Karimov", "phone": "90 111 22 33", "password": "secret12", "username": "u" + "".join(ch for ch in str("90 111 22 33") if ch.isdigit()), "email": "u" + "".join(ch for ch in str("90 111 22 33") if ch.isdigit()) + "@test.uz", "password2": "secret12"})
         self.u = User.objects.get(phone="+998901112233")
         other = User.objects.create_user(phone="+998935556677", password="secret12", first_name="Bek", last_name="Z")
         now = timezone.now()
         Membership.objects.create(user=self.u, plan=Plan.objects.get(code="m1"), starts=now - timedelta(days=2), expires=now + timedelta(days=3))
-        services.add_vip(self.u)
         self.cls = GymClass.objects.first()
         self.booking = Booking.objects.create(user=self.u, gym_class=self.cls, date=self.cls.next_date())
         self.member.post("/plans/m1/buy/", {"method": "card"})
@@ -60,7 +59,6 @@ class SmokeTests(TestCase):
         self.room = chat.direct_room(self.u, other)
         self.msg = ChatMessage.objects.create(room=self.room, sender=other, body="salom")
         self.lesson = Lesson.objects.first()
-        self.gp, _ = services.create_guest_pass(self.u, "Mehmon", timezone.localdate())
         self.staff = Client()
         self.staff.post("/login/", {"phone": "908775505", "password": "AdminPass1.admin"})
         self.other = other
@@ -76,9 +74,10 @@ class SmokeTests(TestCase):
             "desk_pt": {"pk": self.pt.pk, "action": "confirm"}, "desk_confirm": {"pid": self.card_pay.pk}, "desk_reject": {"pid": self.card_pay.pk},
             "desk_handover": {"oid": self.order.pk},
             "image": {"kind": "product", "pk": Product.objects.first().pk}, "product": {"pk": Product.objects.first().pk},
-            "trainer": {"pk": self.trainer.pk}, "guest_pass": {"code": self.gp.code}, "desk_guest": {"code": self.gp.code},
+            "trainer": {"pk": self.trainer.pk},
             "start_program": {"key": "beginner"}, "coach_pt": {"pk": self.pt.pk, "action": "confirm"},
             "coach_client": {"uid": self.other.pk}, "coach_plan": {"uid": self.other.pk},
+            "pw_confirm": {"uidb64": "MQ", "token": "set-password"},
         }
         if name in objs:
             return objs[name]
@@ -102,7 +101,7 @@ class SmokeTests(TestCase):
                 self.check(client, url, who)
             seen += 1
         self.assertGreater(seen, 50)
-        for extra in ("/training/?day=3&level=advanced", "/training/?vip=1", "/shop/?q=suv", "/chat/?q=bek", f"/staff/?q={self.u.member_code}",
+        for extra in ("/training/?day=3&level=advanced", "/shop/?q=suv", "/chat/?q=bek", f"/staff/?q={self.u.member_code}",
                       "/staff/?q=FZ", "/plans/", "/dashboard/"):
             for who, client in clients.items():
                 self.check(client, extra, who)

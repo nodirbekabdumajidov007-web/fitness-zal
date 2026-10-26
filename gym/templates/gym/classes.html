@@ -2,13 +2,12 @@
 {% block title %}{% t 'classes' %}{% endblock %}
 {% block content %}
 <h2>{% t 'classes' %}</h2>
-{% if vip %}<div class="note vipnote">★ {% t 'vip_seats_note' %}</div>{% else %}<a class="note" href="{% url 'vip' %}" style="text-decoration:none">{% t 'vip_seats_hint' %}</a>{% endif %}
 {% for wd, rows in by_day %}
 <section class="day">
   <div class="eyebrow">{% t 'weekday_'|add:wd %}</div>
   {% for r in rows %}
   <div class="card cls">
-    <span><b>{{ r.c.name }}</b> <span class="muted num">· {{ r.c.start_time|hm }} · {{ r.c.duration_min }} {% t 'min_short' %}</span>{% if r.reserved %} <span class="pill vippill">★ VIP {{ r.reserved }}</span>{% endif %}<br>
+    <span><b>{{ r.c.name }}</b> <span class="muted num">· {{ r.c.start_time|hm }} · {{ r.c.duration_min }} {% t 'min_short' %}</span><br>
       <span class="muted">{% if r.c.trainer %}{% t 'trainer' %}: {{ r.c.trainer.name }} · {% endif %}{% t 'next_session' %} <span class="num">{{ r.date|dmy }}</span></span></span>
     <span class="inline" style="flex:none;align-items:center">
       <span class="pill {% if r.left %}good{% else %}bad{% endif %}">{% if r.left %}{% t 'seats_left' n=r.left %}{% else %}{% t 'full' %}{% endif %}</span>

@@ -1,5 +1,5 @@
 {% extends "gym/base.html" %}{% load static gym_tags %}
-{% block title %}{% if other %}{{ other_name }}{% elif room.vip_only %}{% t 'room_vip' %}{% else %}{% t 'room_general' %}{% endif %} · {% t 'chat' %}{% endblock %}
+{% block title %}{% if other %}{{ other_name }}{% else %}{% t 'room_general' %}{% endif %} · {% t 'chat' %}{% endblock %}
 {% block content %}
 <section class="messenger{% if room.kind == 'room' %} is-room{% endif %}">
   <header class="m-head">
@@ -10,8 +10,8 @@
       <form method="post" action="{% if i_blocked %}{% url 'chat_unblock' other.pk %}{% else %}{% url 'chat_block' other.pk %}{% endif %}" class="m-headact">{% csrf_token %}<input type="hidden" name="back" value="/chat/{{ room.pk }}/">
         <button class="btn small {% if not i_blocked %}danger{% endif %}" type="submit" {% if not i_blocked %}data-confirm="{% t 'sure' %}"{% endif %}>{% if i_blocked %}{% t 'chat_unblock' %}{% else %}{% t 'chat_block' %}{% endif %}</button></form>
     {% else %}
-      <span class="m-ava big room{% if room.vip_only %} vip{% endif %}">{% if room.vip_only %}★{% else %}#{% endif %}</span>
-      <div class="m-title"><b>{% if room.vip_only %}{% t 'room_vip' %}{% else %}{% t 'room_general' %}{% endif %}</b><span class="m-status">{% if room.vip_only %}{% t 'room_vip_help' %}{% else %}{% t 'room_general_help' %}{% endif %}</span></div>
+      <span class="m-ava big room">#</span>
+      <div class="m-title"><b>{% t 'room_general' %}</b><span class="m-status">{% t 'room_general_help' %}</span></div>
     {% endif %}
   </header>
 

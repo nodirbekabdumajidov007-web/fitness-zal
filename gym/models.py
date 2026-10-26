@@ -7,7 +7,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator, RegexVa
 from django.db import models
 from django.utils import timezone
 
-from .media import validate_image, validate_video_file, validate_video_url
+from .media import validate_image, validate_video_file, validate_video_url, video_storage
 
 PHONE_VALIDATOR = RegexValidator(r"^\+998\d{9}$", "+998 bilan boshlanib, 9 ta raqam bo'lishi kerak")
 
@@ -22,24 +22,47 @@ def image_url(kind, obj):
 class UserManager(BaseUserManager):
     use_in_migrations = True
 
-    def create_user(self, phone=None, password=None, **extra):
-        user = self.model(phone=phone, **extra)
+    def create_user(self, username=None, password=None, **extra):
+        user = self.model(username=username or unique_username(extra.get("email"), extra.get("phone"), extra.get("first_name")), **extra)
         user.set_password(password) if password else user.set_unusable_password()
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, phone, password=None, **extra):
+    def create_superuser(self, username, password=None, **extra):
         extra.setdefault("is_staff", True)
         extra.setdefault("is_superuser", True)
-        return self.create_user(phone, password, **extra)
+        return self.create_user(username, password, **extra)
+
+    def get_by_natural_key(self, username):
+        return self.get(username__iexact=username)
+
+
+USERNAME_VALIDATOR = RegexValidator(r"^[A-Za-z0-9_.]{3,30}$", "err_username")
+
+
+def unique_username(email=None, phone=None, first_name=None):
+    """A login for accounts made without one (Google, Apple, or created by staff): from the e-mail, the name or the phone."""
+    import re
+    import secrets
+    base = (email or "").split("@")[0] or (first_name or "") or ("u" + (phone or "")[-4:])
+    base = re.sub(r"[^A-Za-z0-9_.]", "", base.lower())[:20] or "user"
+    if len(base) < 3:
+        base = (base + "user")[:20]
+    name = base
+    while User.objects.filter(username__iexact=name).exists():
+        name = f"{base}{secrets.randbelow(9000) + 1000}"
+    return name
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    """Member or staff. Members log in with a +998 phone number; Google users start with an email and no phone."""
+    """Member or staff. Signs up with a username, e-mail and password (Django's usual shape); can sign in with the username,
+    the e-mail or the phone number."""
+    username = models.CharField("Login", max_length=30, unique=True, validators=[USERNAME_VALIDATOR],
+                                help_text="3-30 belgi: lotin harflari, raqamlar, _ va .")
     phone = models.CharField("Telefon", max_length=13, unique=True, null=True, blank=True, validators=[PHONE_VALIDATOR])
-    email = models.EmailField("Gmail", unique=True, null=True, blank=True)
-    first_name = models.CharField("Ism", max_length=40)
-    last_name = models.CharField("Familiya", max_length=40)
+    email = models.EmailField("Email", unique=True, null=True, blank=True)
+    first_name = models.CharField("Ism", max_length=40, blank=True)
+    last_name = models.CharField("Familiya", max_length=40, blank=True)
     is_active = models.BooleanField("Faol (bloklanmagan)", default=True)
     is_staff = models.BooleanField("Xodim", default=False)
     staff_note = models.TextField("Xodim izohi", blank=True)
@@ -61,7 +84,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     target_weight = models.DecimalField("Maqsad vazni (kg)", max_digits=5, decimal_places=1, null=True, blank=True,
                                         validators=[MinValueValidator(Decimal("30")), MaxValueValidator(250)])
 
-    USERNAME_FIELD = "phone"
+    USERNAME_FIELD = "username"
+    REQUIRED_FIELDS = ["email"]
     objects = UserManager()
 
     class Meta:
@@ -78,7 +102,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name} (FZ-{self.pk:04d})" if self.pk else self.first_name
+        return f"{self.full_name} (FZ-{self.pk:04d})" if self.pk else self.full_name
 
     @property
     def member_code(self):
@@ -86,11 +110,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     @property
     def full_name(self):
-        return f"{self.first_name} {self.last_name}"
+        return f"{self.first_name} {self.last_name}".strip() or self.username
 
     def get_short_name(self):
-        # the admin header greets with this; without it Django falls back to the username, i.e. the phone number
-        return self.first_name or "Admin"
+        return self.first_name or self.username
 
     def get_full_name(self):
         return self.full_name.strip()
@@ -113,14 +136,6 @@ class GymSettings(models.Model):
     require_phone_verify = models.BooleanField("Xarid va bron uchun telefon tasdig'i shart", default=False,
                                                help_text="Faqat SMS xizmati ulangandan keyin yoqing.")
     reminder_days = models.PositiveSmallIntegerField("Abonement tugashidan necha kun oldin eslatish", default=3)
-    vip_price = models.BigIntegerField("VIP obuna narxi (so'm)", default=50000)
-    vip_days = models.PositiveSmallIntegerField("VIP obuna muddati (kun)", default=30)
-    vip_shop_discount = models.PositiveSmallIntegerField("VIP uchun do'kon chegirmasi (%)", default=10,
-                                                         validators=[MaxValueValidator(100)])
-    vip_reserved_seats = models.PositiveSmallIntegerField("Har guruh mashg'ulotida VIP uchun ajratilgan joylar", default=2,
-                                                          help_text="Joylar sonining yarmidan oshmaydi.")
-    vip_guest_passes = models.PositiveSmallIntegerField("VIP: oyiga mehmon taklifnomalari", default=1)
-    vip_free_pt = models.PositiveSmallIntegerField("VIP: oyiga bepul shaxsiy konsultatsiya", default=1)
     login_sms_code = models.BooleanField("Kirishda telefonga SMS kod yuborilsin", default=False,
                                          help_text="Parol (yoki Google) to'g'ri bo'lsa ham, telefonga kelgan 6 xonali kodsiz kirib bo'lmaydi. SMS xizmati ulanishi kerak.")
     require_google = models.BooleanField("Faqat Google akkaunt orqali kirish va ro'yxatdan o'tish", default=False,
@@ -129,7 +144,7 @@ class GymSettings(models.Model):
                                         validators=[RegexValidator(r"^[\w.-]+\.apps\.googleusercontent\.com$", "Client ID ...apps.googleusercontent.com bilan tugaydi")],
                                         help_text="Bu ochiq identifikator (sahifada baribir ko'rinadi), maxfiy kalit emas. Serverdagi GOOGLE_CLIENT_ID bo'lsa, o'shanisi ishlatiladi.")
     revenue_goal = models.BigIntegerField("Oylik tushum maqsadi (so'm)", default=20_000_000, validators=[MinValueValidator(0)])
-    hero_video = models.FileField("Bosh sahifa videosi (mp4 yoki webm)", upload_to="hero/", blank=True, validators=[validate_video_file],
+    hero_video = models.FileField("Bosh sahifa videosi (mp4 yoki webm)", upload_to="hero/", blank=True, validators=[validate_video_file], storage=video_storage,
                                   help_text="Bir marta o'ynaydi va oxirgi kadrda to'xtab qoladi. 5–10 soniyali, 1920px gacha, ovozsiz video eng yaxshi. "
                                             "Bo'sh bo'lsa, zal surati animatsiya bilan ko'rsatiladi.")
     yandex_map_url = models.URLField("Yandex xaritadagi zal havolasi", max_length=300, blank=True,
@@ -223,7 +238,6 @@ class Plan(models.Model):
     name = models.CharField("Nomi", max_length=60)
     months = models.PositiveSmallIntegerField("Oylar soni", default=1)
     price = models.BigIntegerField("Narx (so'm)")
-    is_vip = models.BooleanField("VIP", default=False)
     perks = models.TextField("Imkoniyatlar (har qatorda bittadan)", blank=True)
     active = models.BooleanField("Sotuvda", default=True)
     order = models.PositiveSmallIntegerField("Tartib", default=0)
@@ -650,7 +664,6 @@ class PTSession(models.Model):
     starts = models.DateTimeField("Vaqt")
     note = models.CharField("Izoh", max_length=200, blank=True)
     status = models.CharField("Holat", max_length=10, choices=Status.choices, default=Status.REQUESTED)
-    is_free = models.BooleanField("VIP bepul konsultatsiya", default=False)
     reminded = models.BooleanField(default=False, editable=False)
     created = models.DateTimeField(auto_now_add=True)
 
@@ -685,13 +698,12 @@ class Lesson(models.Model):
     duration_min = models.PositiveSmallIntegerField("Davomiyligi (daqiqa)", default=20)
     summary = models.CharField("Qisqacha", max_length=200, blank=True)
     video_url = models.URLField("Video havolasi (YouTube, Vimeo yoki .mp4, https)", blank=True, validators=[validate_video_url])
-    video_file = models.FileField("Video fayl (mp4 yoki webm)", upload_to="lessons/", blank=True, validators=[validate_video_file],
+    video_file = models.FileField("Video fayl (mp4 yoki webm)", upload_to="lessons/", blank=True, validators=[validate_video_file], storage=video_storage,
                                   help_text="Saytga yuklanadi va faqat ruxsati borlarga ko'rsatiladi. Katta fayl uchun YouTube havolasi qulayroq.")
     steps = models.TextField("Qanday bajariladi (har qatorda bitta qadam)", blank=True)
     muscles = models.CharField("Ishlaydigan mushaklar", max_length=120, blank=True)
     equipment = models.CharField("Jihoz", max_length=120, blank=True)
     tips = models.TextField("Xatolar va maslahatlar (har qatorda bittadan)", blank=True)
-    is_vip = models.BooleanField("Faqat VIP uchun", default=False)
     active = models.BooleanField("Ko'rinadi", default=True)
     order = models.PositiveSmallIntegerField("Tartib", default=0)
     created = models.DateTimeField(auto_now_add=True)
@@ -764,28 +776,8 @@ class WaterLog(models.Model):
         verbose_name, verbose_name_plural = "Suv hisobi", "Suv hisoblari"
 
 
-class VipPass(models.Model):
-    """The paid VIP add-on (separate from the gym membership). Passes stack: buying early never wastes days."""
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="vip_passes")
-    payment = models.ForeignKey("Payment", null=True, blank=True, on_delete=models.SET_NULL, related_name="+", verbose_name="To'lov")
-    starts = models.DateTimeField("Boshlanishi")
-    expires = models.DateTimeField("Tugashi")
-    created = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ["-expires"]
-        verbose_name, verbose_name_plural = "VIP obuna", "VIP obunalar"
-
-    @property
-    def is_active_now(self):
-        return self.starts <= timezone.now() < self.expires
-
-    def __str__(self):
-        return f"VIP · {self.user} · {timezone.localtime(self.expires):%d.%m.%Y}"
-
-
 class ChatRoom(models.Model):
-    """A public room (general, VIP) or a private conversation between two members (user_a.pk < user_b.pk)."""
+    """A public room or a private conversation between two members (user_a.pk < user_b.pk)."""
     class Kind(models.TextChoices):
         ROOM = "room", "Xona"
         DIRECT = "direct", "Shaxsiy"
@@ -793,7 +785,6 @@ class ChatRoom(models.Model):
     kind = models.CharField(max_length=8, choices=Kind.choices)
     slug = models.SlugField(null=True, blank=True, unique=True)
     title = models.CharField(max_length=60, blank=True)
-    vip_only = models.BooleanField(default=False)
     user_a = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE, related_name="+")
     user_b = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE, related_name="+")
     created = models.DateTimeField(auto_now_add=True)
@@ -856,18 +847,13 @@ class ChatReport(models.Model):
         verbose_name, verbose_name_plural = "Chat shikoyati", "Chat shikoyatlari"
 
 
-class GuestPass(models.Model):
-    """A VIP member brings a guest for one day. The guest shows the code or QR at the front desk; it works once, on that date."""
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="guest_passes")
-    guest_name = models.CharField("Mehmon ismi", max_length=60)
-    date = models.DateField("Sana")
-    code = models.CharField(max_length=12, unique=True)
-    used_at = models.DateTimeField("Ishlatilgan", null=True, blank=True)
+class AIMessage(models.Model):
+    """One turn of a member's conversation with the AI coach (kept so the coach remembers earlier questions)."""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="ai_messages")
+    role = models.CharField(max_length=10, choices=[("user", "A'zo"), ("assistant", "AI")])
+    content = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ["-date", "-id"]
-        verbose_name, verbose_name_plural = "Mehmon taklifnomasi", "Mehmon taklifnomalari"
-
-    def __str__(self):
-        return f"{self.guest_name} · {self.date:%d.%m.%Y} · {self.user}"
+        ordering = ["id"]
+        verbose_name, verbose_name_plural = "AI xabar", "AI xabarlar"

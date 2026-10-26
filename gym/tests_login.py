@@ -126,7 +126,7 @@ class SmsLoginTests(Base):
     def test_register_confirms_the_new_number(self):
         self.switch(login_sms_code=True)
         c = Client()
-        r = c.post("/register/", {"first_name": "Vali", "last_name": "Aliyev", "phone": "935554433", "password": PW})
+        r = c.post("/register/", {"first_name": "Vali", "last_name": "Aliyev", "phone": "935554433", "password": PW, "username": "u" + "".join(ch for ch in str("935554433") if ch.isdigit()), "email": "u" + "".join(ch for ch in str("935554433") if ch.isdigit()) + "@test.uz", "password2": PW})
         self.assertRedirects(r, "/login/code/", fetch_redirect_response=False)
         self.assertFalse(self.logged_in(c))
         c.post("/login/code/", {"code": self.last_code("+998935554433")})
@@ -166,7 +166,7 @@ class GoogleOnlyTests(Base):
         page = c.get("/register/")
         self.assertContains(page, escape(T["uz"]["google_only_register"]))
         self.assertNotContains(page, 'name="password"')
-        c.post("/register/", {"first_name": "Vali", "last_name": "Aliyev", "phone": "935554433", "password": PW})
+        c.post("/register/", {"first_name": "Vali", "last_name": "Aliyev", "phone": "935554433", "password": PW, "username": "u" + "".join(ch for ch in str("935554433") if ch.isdigit()), "email": "u" + "".join(ch for ch in str("935554433") if ch.isdigit()) + "@test.uz", "password2": PW})
         self.assertFalse(User.objects.filter(phone="+998935554433").exists())
 
     def test_google_then_phone_then_code(self):

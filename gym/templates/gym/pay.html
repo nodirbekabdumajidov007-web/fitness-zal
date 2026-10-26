@@ -39,7 +39,7 @@
 
     <section class="card co-summary">
       <div class="eyebrow">{% t 'transfer_what' %}</div>
-      <b>{% if p.plan %}{% plan_name p.plan %}{% elif p.kind == 'vip' %}{% t 'kind_vip' %}{% else %}{% for it in items %}{{ it.name }} × {{ it.qty }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}</b>
+      <b>{% if p.plan %}{% plan_name p.plan %}{% else %}{% for it in items %}{{ it.name }} × {{ it.qty }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}</b>
       {% if p.discount %}<div class="co-line"><span class="muted">{% t 'discount' %} {{ p.promo }}</span><span class="num good">−{{ p.discount|money }}</span></div>{% endif %}
       <div class="co-line co-total"><span>{% t 'total' %}</span><b class="num">{{ p.amount|money }} <small>{% t 'price_unit' %}</small></b></div>
     </section>

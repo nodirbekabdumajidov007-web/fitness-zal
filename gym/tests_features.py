@@ -30,7 +30,7 @@ class Base(TestCase):
     def member(self, phone="+998901112233", first="Aziz", ref=None):
         c = Client()
         url = "/register/" + (f"?ref={ref}" if ref else "")
-        r = c.post(url, {"first_name": first, "last_name": "Karimov", "phone": phone[4:], "password": PW})
+        r = c.post(url, {"first_name": first, "last_name": "Karimov", "phone": phone[4:], "password": PW, "username": "u" + phone[4:], "email": "u" + phone[4:] + "@test.uz", "password2": PW})
         self.assertEqual(r.status_code, 302, r.content[:200])
         return c, User.objects.get(phone=phone)
 

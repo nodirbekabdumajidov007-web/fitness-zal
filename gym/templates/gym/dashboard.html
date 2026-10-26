@@ -2,10 +2,10 @@
 {% block title %}{% t 'nav_dash' %}{% endblock %}
 {% block content %}
 <section class="db-hero">
-  <span class="db-ava{% if is_vip %} vip{% endif %}" aria-hidden="true">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
+  <span class="db-ava" aria-hidden="true">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
   <div class="db-who">
     <span class="eyebrow">{% t 'hello' %} · {% now "d.m.Y" %}</span>
-    <h1>{{ user.first_name }} {{ user.last_name }}{% if is_vip %} <span class="pill vippill db-vip">★ VIP</span>{% endif %}</h1>
+    <h1>{{ user.first_name }} {{ user.last_name }}</h1>
     <div class="db-quick">
       <a href="{% url 'card' %}"><i>▣</i>{% t 'member_card' %}</a>
       <a href="{% url 'classes' %}"><i>🗓</i>{% t 'nav_classes' %}</a>
@@ -113,7 +113,7 @@
 
   <nav class="db-links">
     <a class="card lift" href="{% url 'training' %}"><i>▶</i><b>{% t 'training' %}</b><span class="muted">{% t 'training_help' %}</span></a>
-    <a class="card lift" href="{% url 'vip' %}"><i>★</i><b>VIP</b><span class="muted">{% if is_vip %}{% t 'vip_active' %}{% else %}{% t 'vip_get' %}{% endif %}</span></a>
+    <a class="card lift" href="{% url 'ai' %}"><i>✦</i><b>{% t 'ai_coach' %}</b><span class="muted">{% t 'ai_coach_sub' %}</span></a>
     <a class="card lift" href="{% url 'orders' %}"><i>🛒</i><b>{% t 'orders' %}</b><span class="muted">{% t 'nav_shop' %}</span></a>
     <a class="card lift" href="{% url 'payments' %}"><i>💳</i><b>{% t 'payments' %}</b><span class="muted">{% t 'receipt' %}</span></a>
   </nav>

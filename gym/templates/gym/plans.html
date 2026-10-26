@@ -4,7 +4,7 @@
 <h2>{% t 'nav_plans' %}</h2>
 <div class="grid g3">
   {% for p in plans %}
-  <form class="card plan lift {% if p.is_vip %}vip{% endif %}" method="post" action="{% url 'buy_plan' p.code %}">
+  <form class="card plan lift" method="post" action="{% url 'buy_plan' p.code %}">
     {% csrf_token %}
     <div class="eyebrow">{% t 'months_n' n=p.months %}</div>
     <h3>{% plan_name p %}</h3>

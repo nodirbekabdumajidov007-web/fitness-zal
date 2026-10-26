@@ -2,7 +2,6 @@
 {% block title %}{% t 'shop' %}{% endblock %}
 {% block content %}
 <div class="inline" style="align-items:center;justify-content:space-between"><h2>{% t 'shop' %}</h2><a class="btn primary" href="{% url 'cart' %}" style="flex:none">{% t 'cart' %}{% if cart_count %} ({{ cart_count }}){% endif %}</a></div>
-{% if vip %}<div class="note vipnote">★ {% t 'vip_shop_note' pct=vip_pct %}</div>{% endif %}
 <div class="chips">
   <a href="{% url 'shop' %}"{% if not cat %} aria-current="true"{% endif %}>{% t 'all' %}</a>
   {% for c in categories %}<a href="?cat={{ c.pk }}"{% if cat == c.pk|stringformat:"s" %} aria-current="true"{% endif %}>{{ c.name }}</a>{% endfor %}
@@ -18,7 +17,7 @@
     <a href="{% url 'product' p.pk %}" class="prod-name"><b>{{ p.name }}</b></a>
     <span class="muted num" style="font-size:.85rem">{% if p.stock > 0 %}{% t 'in_stock' %}: {{ p.stock }}{% else %}{% t 'sold_out' %}{% endif %}</span>
     <div class="prod-foot">
-      <span class="num"><span class="price prod-price">{{ p.price|money }}</span>{% if vip %}<br><span class="vipprice">VIP: {{ p.price|vipprice:vip_pct|money }}</span>{% endif %}</span>
+      <span class="num"><span class="price prod-price">{{ p.price|money }}</span></span>
       {% with qty=in_cart|get_item:p.pk %}{% include "gym/_qty.html" %}{% endwith %}
     </div>
   </div>

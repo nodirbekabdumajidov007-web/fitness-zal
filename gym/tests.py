@@ -30,7 +30,7 @@ class Base(TestCase):
 
     def member(self, phone="+998901112233", first="Aziz"):
         c = Client()
-        r = c.post("/register/", {"first_name": first, "last_name": "Karimov", "phone": phone[4:], "password": PW})
+        r = c.post("/register/", {"first_name": first, "last_name": "Karimov", "phone": phone[4:], "password": PW, "username": "u" + "".join(ch for ch in str(phone[4:]) if ch.isdigit()), "email": "u" + "".join(ch for ch in str(phone[4:]) if ch.isdigit()) + "@test.uz", "password2": PW})
         self.assertEqual(r.status_code, 302, r.content[:300])
         return c, User.objects.get(phone=phone)
 
@@ -45,9 +45,9 @@ class AuthTests(Base):
     def test_register_login_and_validation(self):
         c, u = self.member()
         self.assertTrue(c.get("/dashboard/").status_code == 200)
-        bad = Client().post("/register/", {"first_name": "X", "last_name": "Y", "phone": "901112233", "password": PW})
+        bad = Client().post("/register/", {"first_name": "X", "last_name": "Y", "phone": "901112233", "password": PW, "username": "u" + "".join(ch for ch in str("901112233") if ch.isdigit()), "email": "u" + "".join(ch for ch in str("901112233") if ch.isdigit()) + "@test.uz", "password2": PW})
         self.assertContains(bad, "field-err")  # duplicate phone
-        self.assertContains(Client().post("/register/", {"first_name": "X", "last_name": "Y", "phone": "123", "password": PW}), "field-err")
+        self.assertContains(Client().post("/register/", {"first_name": "X", "last_name": "Y", "phone": "123", "password": PW, "username": "u" + "".join(ch for ch in str("123") if ch.isdigit()), "email": "u" + "".join(ch for ch in str("123") if ch.isdigit()) + "@test.uz", "password2": PW}), "field-err")
         self.assertContains(Client().post("/login/", {"phone": "901112233", "password": "wrong"}), "field-err")
         self.assertEqual(Client().post("/login/", {"phone": "+998 90 111 22 33", "password": PW}).status_code, 302)
 
@@ -102,7 +102,7 @@ class MembershipTests(Base):
         first_end = services.paid_until(u)
         c.post("/plans/m1/buy/", {"method": "Click"})
         self.assertEqual(services.paid_until(u), first_end + timedelta(days=30))  # stacked, no days lost
-        c.post("/plans/vip/buy/", {"method": "cash"})
+        c.post("/plans/m3/buy/", {"method": "cash"})
         pay = Payment.objects.filter(status="pending").get()
         self.assertEqual(Membership.objects.filter(user=u).count(), 2)  # cash waits for confirmation
         self.assertTrue(services.confirm_payment(pay))
@@ -197,7 +197,7 @@ class ShopTests(Base):
 class StaffAndAdminTests(Base):
     def test_desk_flow(self):
         c, u = self.member()
-        c.post("/plans/vip/buy/", {"method": "cash"})
+        c.post("/plans/m3/buy/", {"method": "cash"})
         a = self.staff()
         self.assertContains(a.get("/staff/?q=" + u.member_code), u.first_name)
         pid = Payment.objects.get().pk

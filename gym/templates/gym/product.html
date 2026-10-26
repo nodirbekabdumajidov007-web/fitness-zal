@@ -11,14 +11,8 @@
       {% if p.stock > 0 %}<span class="pill {% if p.stock <= 5 %}tag-low{% else %}good{% endif %}">{% if p.stock <= 5 %}{% t 'low_stock' %} · {% endif %}{% t 'in_stock' %}: {{ p.stock }}</span>{% else %}<span class="pill bad">{% t 'sold_out' %}</span>{% endif %}</div>
     <h1 class="buybox-title">{{ p.name }}</h1>
     <div class="buybox-price">
-      {% if vip %}
-        <b class="num">{{ vip_price|money }}</b><small>{% t 'price_unit' %}</small>
-        <s class="num muted">{{ p.price|money }}</s><span class="vip-chip">★ VIP −{{ vip_pct }}%</span>
-      {% else %}
-        <b class="num">{{ p.price|money }}</b><small>{% t 'price_unit' %}</small>
-      {% endif %}
+      <b class="num">{{ p.price|money }}</b><small>{% t 'price_unit' %}</small>
     </div>
-    {% if not vip %}<a class="vip-hint" href="{% url 'vip' %}">★ {% t 'vip_price_hint' pct=vip_pct %}</a>{% endif %}
     {% if p.description %}<p class="buybox-desc">{{ p.description }}</p>{% endif %}
     <div class="buybox-row">{% with qty=in_cart|get_item:p.pk big=True %}{% include "gym/_qty.html" %}{% endwith %}
       <a class="buybox-cart" href="{% url 'cart' %}">🛒 {% t 'cart' %} →</a></div>

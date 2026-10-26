@@ -14,16 +14,24 @@
     <div class="note info">{% t 'google_only_register' %}</div>
     <div id="gbtn" data-client="{{ google_client_id }}"></div><span class="field-err" id="gerr"></span>
     {% else %}
-    <div class="grid g2">
-      <label for="id_first_name">{% t 'first_name' %}<input id="id_first_name" name="first_name" maxlength="40" autocomplete="given-name" value="{{ form.first_name.value|default:'' }}"></label>
-      <label for="id_last_name">{% t 'last_name' %}<input id="id_last_name" name="last_name" maxlength="40" autocomplete="family-name" value="{{ form.last_name.value|default:'' }}"></label>
-    </div>
-    {% for e in form.first_name.errors %}<span class="field-err">{% t e %}</span>{% endfor %}{% for e in form.last_name.errors %}<span class="field-err">{% t e %}</span>{% endfor %}
-    <label for="id_phone">{% t 'phone' %}<div class="phone"><span>+998</span><input id="id_phone" name="phone" inputmode="numeric" autocomplete="tel-national" placeholder="XX XXX XX XX" maxlength="17" value="{{ form.phone.value|default:'' }}" data-phone></div></label>
-    {% for e in form.phone.errors %}<span class="field-err">{% t e %}</span>{% endfor %}
+    <label for="id_username">{% t 'username' %}<input id="id_username" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="30" placeholder="masalan: aziz_karimov" value="{{ form.username.value|default:'' }}" autofocus></label>
+    <small class="muted field-help">{% t 'username_help' %}</small>
+    {% for e in form.username.errors %}<span class="field-err">{% t e %}</span>{% endfor %}
+    <label for="id_email">Email<input id="id_email" name="email" type="email" autocomplete="email" maxlength="254" placeholder="siz@gmail.com" value="{{ form.email.value|default:'' }}"></label>
+    {% for e in form.email.errors %}<span class="field-err">{% t e %}</span>{% endfor %}
     <label for="id_password">{% t 'password' %}<div class="pw"><input id="id_password" name="password" type="password" autocomplete="new-password" maxlength="128" data-strength data-caps="{% t 'caps_on' %}"><button type="button" data-toggle-pw="id_password" data-show="{% t 'show' %}" data-hide="{% t 'hide' %}">{% t 'show' %}</button></div></label>
     <div class="pw-meter" aria-hidden="true"><i></i></div>
     {% for e in form.password.errors %}<span class="field-err">{% t e %}</span>{% endfor %}
+    <label for="id_password2">{% t 'password2' %}<input id="id_password2" name="password2" type="password" autocomplete="new-password" maxlength="128" data-caps="{% t 'caps_on' %}"></label>
+    {% for e in form.password2.errors %}<span class="field-err">{% t e %}</span>{% endfor %}
+    <details class="reg-more"{% if form.phone.errors %} open{% endif %}><summary>{% t 'reg_more' %}</summary><div class="grid">
+      <div class="grid g2">
+        <label for="id_first_name">{% t 'first_name' %}<input id="id_first_name" name="first_name" maxlength="40" autocomplete="given-name" value="{{ form.first_name.value|default:'' }}"></label>
+        <label for="id_last_name">{% t 'last_name' %}<input id="id_last_name" name="last_name" maxlength="40" autocomplete="family-name" value="{{ form.last_name.value|default:'' }}"></label>
+      </div>
+      <label for="id_phone">{% t 'phone' %}<div class="phone"><span>+998</span><input id="id_phone" name="phone" inputmode="numeric" autocomplete="tel-national" placeholder="XX XXX XX XX" maxlength="17" value="{{ form.phone.value|default:'' }}" data-phone></div></label>
+      {% for e in form.phone.errors %}<span class="field-err">{% t e %}</span>{% endfor %}
+    </div></details>
     <button class="btn primary portal" type="submit"><span>{% t 'register' %}</span></button>
     {% if sms_on %}<span class="muted">📱 {% t 'sms_login_note' %}</span>{% endif %}
     <div class="sep">{% t 'or_continue' %}</div>

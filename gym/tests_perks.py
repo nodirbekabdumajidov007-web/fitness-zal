@@ -1,6 +1,4 @@
-"""Pictures for products and trainers, product and trainer pages, and the new VIP perks: reserved class spots, a free monthly
-consultation and guest passes."""
-import json
+"""Pictures for products and trainers, product and trainer pages, and class capacity."""
 import shutil
 import tempfile
 from datetime import timedelta
@@ -14,7 +12,7 @@ from django.utils import timezone
 
 from . import services
 from .media import validate_image
-from .models import Booking, GuestPass, GymClass, Membership, Plan, Product, PTSession, Trainer, User
+from .models import Booking, GymClass, Membership, Plan, Product, Trainer, User
 
 PNG = b"\x89PNG\r\n\x1a\n" + b"\x00" * 64
 JPG = b"\xff\xd8\xff\xe0" + b"\x00" * 64
@@ -35,7 +33,7 @@ class Base(TestCase):
 
     def member(self, phone="+998901112233", first="Aziz", membership=True):
         c = Client()
-        c.post("/register/", {"first_name": first, "last_name": "Karimov", "phone": phone[4:], "password": "secret12"})
+        c.post("/register/", {"first_name": first, "last_name": "Karimov", "phone": phone[4:], "password": "secret12", "username": "u" + "".join(ch for ch in str(phone[4:]) if ch.isdigit()), "email": "u" + "".join(ch for ch in str(phone[4:]) if ch.isdigit()) + "@test.uz", "password2": "secret12"})
         u = User.objects.get(phone=phone)
         if membership:
             now = timezone.now()
@@ -115,15 +113,11 @@ class ImageTests(Base):
 
 
 class ShopPageTests(Base):
-    def test_product_page_badges_and_vip_price(self):
+    def test_product_page_badges_and_price(self):
         p = Product.objects.get(name="Whey protein 900 g")
         r = Client().get(f"/shop/{p.pk}/")
         self.assertContains(r, "450 000")
-        self.assertContains(r, "/vip/")  # non-VIP sees the VIP hint
-        c, u = self.member()
-        services.add_vip(u)
-        self.assertContains(c.get(f"/shop/{p.pk}/"), "405 000")  # 10% off for VIP
-        self.assertContains(c.get("/shop/"), "VIP: 405 000")
+        self.assertNotContains(r, "/vip/")
         Product.objects.filter(pk=p.pk).update(stock=3)
         self.assertContains(Client().get("/shop/"), "Kam qoldi")
         self.assertEqual(Client().get("/shop/99999/").status_code, 404)
@@ -152,119 +146,13 @@ class TrainerPageTests(Base):
         self.assertEqual(Client().get(f"/trainers/{tr.pk}/").status_code, 404)
 
 
-class ReservedSeatsTests(Base):
-    def test_vip_spots_are_held_back(self):
+class ClassCapacityTests(Base):
+    def test_every_seat_is_bookable(self):
         cls = GymClass.objects.filter(capacity__gte=8).first()
-        cls.capacity = 6
+        cls.capacity = 3
         cls.save()
-        self.assertEqual(services.reserved_seats(cls), 2)
-        regulars = [self.member(f"+99890000{i:04d}", f"A{i}") for i in range(5)]
-        for c, u in regulars:
+        for i in range(4):
+            c, u = self.member(f"+99890000{i:04d}", f"A{i}")
             c.post(f"/classes/{cls.pk}/book/")
-        self.assertEqual(Booking.objects.filter(gym_class=cls).count(), 4)  # 6 seats - 2 held for VIP
-        self.assertEqual(services.seats_left(cls, cls.next_date(), vip=False), 0)
-        self.assertEqual(services.seats_left(cls, cls.next_date(), vip=True), 2)
-        vc, vu = self.member("+998977777777", "Vip")
-        services.add_vip(vu)
-        self.assertContains(vc.get("/classes/"), "★ VIP")
-        vc.post(f"/classes/{cls.pk}/book/")
-        self.assertEqual(Booking.objects.filter(gym_class=cls).count(), 5)
-
-    def test_small_classes_keep_at_least_half_public(self):
-        cls = GymClass.objects.first()
-        for cap, held in ((1, 0), (2, 1), (3, 1), (20, 2)):
-            cls.capacity = cap
-            self.assertEqual(services.reserved_seats(cls), held, cap)
-
-
-class FreeConsultationTests(Base):
-    def slot(self, days):
-        return (timezone.localtime() + timedelta(days=days)).replace(hour=12, minute=0).strftime("%Y-%m-%dT%H:%M")
-
-    def test_one_free_per_month_for_vip_only(self):
-        tr = Trainer.objects.first()
-        c, u = self.member()
-        c.post(f"/trainers/{tr.pk}/pt/", {"starts": self.slot(2)})
-        self.assertFalse(PTSession.objects.get().is_free)  # not VIP: paid as usual
-        PTSession.objects.all().delete()
-        services.add_vip(u)
-        self.assertEqual(services.free_pt_left(u), 1)
-        self.assertContains(c.get("/trainers/"), "bepul")
-        c.post(f"/trainers/{tr.pk}/pt/", {"starts": self.slot(2)})
-        c.post(f"/trainers/{tr.pk}/pt/", {"starts": self.slot(3)})
-        self.assertEqual(list(PTSession.objects.order_by("pk").values_list("is_free", flat=True)), [True, False])
-        first = PTSession.objects.order_by("pk").first()
-        c.post(f"/pt/{first.pk}/cancel/")
-        self.assertEqual(services.free_pt_left(u), 1)  # a cancelled free session gives the perk back
-        self.assertContains(self.staff().get("/staff/"), "VIP")
-
-
-class GuestPassTests(Base):
-    def test_create_limits_and_page(self):
-        c, u = self.member()
-        self.assertEqual(c.post("/vip/guest/", {"guest_name": "Do'st", "date": timezone.localdate().isoformat()})["Location"], "/vip/#guest")
-        self.assertFalse(GuestPass.objects.exists())  # not VIP
-        services.add_vip(u)
-        for bad in ({"guest_name": "", "date": timezone.localdate().isoformat()},
-                    {"guest_name": "Do'st", "date": (timezone.localdate() - timedelta(days=1)).isoformat()},
-                    {"guest_name": "Do'st", "date": (timezone.localdate() + timedelta(days=40)).isoformat()},
-                    {"guest_name": "Do'st", "date": "garbage"}):
-            c.post("/vip/guest/", bad)
-        self.assertFalse(GuestPass.objects.exists())
-        r = c.post("/vip/guest/", {"guest_name": "Sardor", "date": timezone.localdate().isoformat()})
-        gp = GuestPass.objects.get()
-        self.assertEqual(r["Location"], f"/vip/guest/{gp.code}/")
-        page = c.get(r["Location"])
-        self.assertContains(page, "<svg")
-        self.assertContains(page, gp.code)
-        c.post("/vip/guest/", {"guest_name": "Ikkinchi", "date": timezone.localdate().isoformat()})
-        self.assertEqual(GuestPass.objects.count(), 1)  # one per month
-        other, _ = self.member("+998935556677", "Bek")
-        self.assertEqual(other.get(f"/vip/guest/{gp.code}/").status_code, 404)
-        self.assertEqual(self.staff().get(f"/vip/guest/{gp.code}/").status_code, 200)
-        self.assertContains(c.get("/vip/"), "Sardor")
-
-    def test_desk_and_scanner(self):
-        c, u = self.member()
-        services.add_vip(u)
-        today = timezone.localdate()
-        gp, _ = services.create_guest_pass(u, "Sardor", today)
-        a = self.staff()
-        self.assertContains(a.get(f"/staff/?q={gp.code.lower()}"), "Sardor")
-        self.assertContains(a.get("/staff/"), "Sardor")  # listed among today's guests
-        scan = lambda code: a.post("/staff/scan/", json.dumps({"code": code}), content_type="application/json")
-        r = scan(f"FZG:{gp.code}")
-        self.assertEqual((r.status_code, r.json()["entered"]), (200, True))
-        r = scan(f"FZG:{gp.code}")
-        self.assertFalse(r.json()["entered"])  # works once
-        self.assertEqual(scan("FZG:00000000").status_code, 404)
-        self.assertEqual(c.post("/staff/scan/", json.dumps({"code": f"FZG:{gp.code}"}), content_type="application/json").status_code, 404)  # members cannot scan
-        later, err = services.create_guest_pass(u, "Ertaga", today + timedelta(days=1))
-        self.assertEqual((later, err), (None, "guest_limit"))  # the used pass still counts for this month
-
-    def test_wrong_day_and_desk_button(self):
-        c, u = self.member()
-        services.add_vip(u)
-        gp = GuestPass.objects.create(user=u, guest_name="Ertangi", date=timezone.localdate() + timedelta(days=1), code="ABCDEF12")
-        gp2, err = services.use_guest_pass("abcdef12")
-        self.assertEqual(err, "guest_wrong_day")
-        GuestPass.objects.filter(pk=gp.pk).update(date=timezone.localdate())
-        a = self.staff()
-        a.post(f"/staff/guest/{gp.code}/")
-        gp.refresh_from_db()
-        self.assertIsNotNone(gp.used_at)
-        self.assertEqual(services.use_guest_pass(gp.code)[1], "guest_used")
-
-
-class VipPageTests(Base):
-    def test_page_for_everyone_and_for_vip(self):
-        r = Client().get("/vip/")
-        for needle in ("VIP", "50 000", 'id="perks"', 'id="buy"'):
-            self.assertContains(r, needle)
-        self.assertNotContains(r, 'id="guest"')
-        c, u = self.member()
-        services.add_vip(u)
-        r = c.get("/vip/")
-        self.assertContains(r, 'id="guest"')
-        self.assertContains(r, "1 / 1")  # guest passes and free consultations left this month
-        self.assertContains(r, u.member_code)
+        self.assertEqual(Booking.objects.filter(gym_class=cls).count(), 3)  # the whole class, nothing held back
+        self.assertEqual(services.seats_left(cls, cls.next_date()), 0)

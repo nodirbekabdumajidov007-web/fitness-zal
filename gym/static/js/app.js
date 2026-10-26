@@ -53,6 +53,19 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
+  // press ripple on buttons: a soft circle grows from the point that was pressed (CSS: .btn .rip)
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.addEventListener('pointerdown', function (e) {
+      var b = e.target.closest && e.target.closest('.btn');
+      if (!b || b.disabled || b.classList.contains('loading')) return;
+      var r = b.getBoundingClientRect(), size = Math.max(r.width, r.height) * 2.2, s = document.createElement('span');
+      s.className = 'rip';
+      s.style.cssText = 'left:' + (e.clientX - r.left) + 'px;top:' + (e.clientY - r.top) + 'px;width:' + size + 'px;height:' + size + 'px';
+      b.appendChild(s);
+      s.addEventListener('animationend', function () { s.remove(); });
+    }, { passive: true });
+  }
+
   // Caps Lock warning on password fields (the most common reason a correct password "does not work")
   document.querySelectorAll('input[data-caps]').forEach(function (el) {
     var hint = document.createElement('small');

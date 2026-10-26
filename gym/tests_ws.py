@@ -52,7 +52,7 @@ class WsTests(TestCase):
         chat.ensure_rooms()
         self.a = User.objects.create_user(phone="+998901112233", password=PW, first_name="Aziz", last_name="K")
         self.b = User.objects.create_user(phone="+998935554433", password=PW, first_name="Vali", last_name="A")
-        self.room = ChatRoom.objects.filter(kind="room", vip_only=False).first()
+        self.room = ChatRoom.objects.filter(kind="room").first()
         self.ca, self.cb = Client(), Client()
         self.ca.post("/login/", {"phone": "901112233", "password": PW})
         self.cb.post("/login/", {"phone": "935554433", "password": PW})

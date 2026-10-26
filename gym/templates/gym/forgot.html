@@ -9,6 +9,7 @@
   {% for e in form.phone.errors %}<span class="field-err">{% t e %}</span>{% endfor %}
   {% if error %}<span class="field-err" role="alert">{% t error %}</span>{% endif %}
   <button class="btn primary" type="submit">{% t 'send_code' %}</button>
+  <a class="btn pill ghost" href="{% url 'pw_email' %}">📧 {% t 'pw_by_email' %}</a>
   <a href="{% url 'login' %}">{% t 'login' %}</a>
 </form>
 {% endblock %}

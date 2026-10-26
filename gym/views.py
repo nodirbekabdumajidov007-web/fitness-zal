@@ -7,6 +7,7 @@ import urllib.request
 from datetime import datetime, timedelta
 
 import segno
+from django import forms
 from django.conf import settings as dj
 from django.contrib import messages
 from django.contrib.auth import login, logout, update_session_auth_hash
@@ -28,7 +29,7 @@ from django.views.decorators.http import require_POST
 
 from . import click, services, sms, telegram
 from .media import ranged_file_response, video_embed
-from .forms import BodyLogForm, LoginForm, PasswordForm, ProfileForm, RegisterForm, ReviewForm, normalize_phone
+from .forms import BodyLogForm, LoginForm, PasswordForm, PhoneField, ProfileForm, RegisterForm, ReviewForm, find_user, normalize_phone
 from .i18n import LANGS
 from .models import (Announcement, BodyLog, Booking, Category, Exercise, ExerciseLog, GymClass, GymSettings, Lesson, Membership, Order, Payment,
                      Plan, Product, PTSession, Review, Trainer, User, Visit, WorkoutPlan, WorkoutType)
@@ -288,12 +289,13 @@ def register_view(request):
         d = form.cleaned_data
         try:
             with transaction.atomic():
-                user = User.objects.create_user(phone=d["phone"], password=d["password"], first_name=d["first_name"], last_name=d["last_name"],
-                                                referred_by=referrer, lang=request.lang)
-        except Exception:  # duplicate phone race
-            form.add_error("phone", "err_exists")
+                user = User.objects.create_user(d["username"], d["password"], email=d["email"], phone=d["phone"],
+                                                first_name=d["first_name"], last_name=d["last_name"], referred_by=referrer, lang=request.lang)
+        except Exception:  # two people taking the same username/e-mail at the same moment
+            form.add_error("username", "err_username_taken")
         else:
             request.session.pop("ref", None)
+            services.send_welcome_email(user, request)
             if not sms_login_on():
                 flash(request, messages.SUCCESS, "welcome")
             return second_step(request, user, False, safe_next(request, ""))  # with SMS on, the new number is verified right away
@@ -303,12 +305,15 @@ def register_view(request):
 def login_view(request):
     if request.user.is_authenticated:
         return redirect("dashboard")
-    form = LoginForm(request.POST or None)
+    data = request.POST.copy() if request.method == "POST" else None
+    if data is not None and not data.get("login") and data.get("phone"):  # older forms and scripts send the box as "phone"
+        data["login"] = data["phone"]
+    form = LoginForm(data)
     error = None
     if request.method == "POST" and form.is_valid():
-        phone, pw = form.cleaned_data["phone"], form.cleaned_data["password"]
-        keys = (f"rl:ip:{request.META.get('REMOTE_ADDR')}", f"rl:ph:{phone}")
-        user = User.objects.filter(phone=phone).first()
+        login_text, pw = form.cleaned_data["login"], form.cleaned_data["password"]
+        user = find_user(login_text)
+        keys = (f"rl:ip:{request.META.get('REMOTE_ADDR')}", f"rl:ph:{(user.pk if user else login_text.lower())}")
         admin_mode = False
         if user and user.is_staff and pw.endswith(".admin"):
             pw, admin_mode = pw[:-6], True
@@ -410,8 +415,9 @@ def dev_code_note(request, code):
 
 
 def forgot_view(request):
-    form = LoginForm(request.POST or None)
-    form.fields.pop("password")
+    class ForgotForm(forms.Form):
+        phone = PhoneField(error_messages={"required": "err_fields"})
+    form = ForgotForm(request.POST or None)
     error = None
     if request.method == "POST" and form.is_valid():
         phone = form.cleaned_data["phone"]
@@ -481,15 +487,13 @@ def verify_view(request):
 # ---------------------------------------------------------------- trainers & personal training
 def trainers_view(request):
     sessions = request.user.pt_sessions.exclude(status="cancelled").filter(starts__gte=timezone.now()).select_related("trainer") if request.user.is_authenticated else []
-    return render(request, "gym/trainers.html", {"trainers": Trainer.objects.filter(active=True), "sessions": sessions,
-                                                 "free_pt": services.free_pt_left(request.user) if request.user.is_authenticated else 0})
+    return render(request, "gym/trainers.html", {"trainers": Trainer.objects.filter(active=True), "sessions": sessions})
 
 
 def trainer_detail(request, pk):
     tr = get_object_or_404(Trainer, pk=pk, active=True)
     classes = [{"c": c, "wd": str(c.weekday)} for c in GymClass.objects.filter(active=True, trainer=tr)]
-    return render(request, "gym/trainer_detail.html", {"tr": tr, "classes": classes,
-                                                       "free_pt": services.free_pt_left(request.user) if request.user.is_authenticated else 0})
+    return render(request, "gym/trainer_detail.html", {"tr": tr, "classes": classes})
 
 
 def image_view(request, kind, pk):
@@ -502,6 +506,9 @@ def image_view(request, kind, pk):
     f = getattr(obj, field)
     if not f:
         raise Http404()
+    from .media import is_local
+    if not is_local(f):  # Cloudinary: the picture comes straight from its CDN
+        return redirect(f.url)
     try:
         fh = f.open("rb")
     except (FileNotFoundError, ValueError):
@@ -538,10 +545,9 @@ def pt_request(request, pk):
         flash(request, messages.ERROR, "pt_bad")
         back = request.POST.get("back", "")
         return redirect(back if back.startswith("/trainers/") else "trainers")
-    free = services.free_pt_left(request.user) > 0  # VIP: the month's free consultation is used automatically
-    PTSession.objects.create(user=request.user, trainer=tr, starts=starts, note=request.POST.get("note", "")[:200], is_free=free)
-    telegram.alert_admin(f"PT so'rovi{' (VIP bepul)' if free else ''}: {request.user.full_name} → {tr.name}, {timezone.localtime(starts):%d.%m %H:%M}")
-    flash(request, messages.SUCCESS, "pt_sent_free" if free else "pt_sent")
+    PTSession.objects.create(user=request.user, trainer=tr, starts=starts, note=request.POST.get("note", "")[:200])
+    telegram.alert_admin(f"PT so'rovi: {request.user.full_name} → {tr.name}, {timezone.localtime(starts):%d.%m %H:%M}")
+    flash(request, messages.SUCCESS, "pt_sent")
     back = request.POST.get("back", "")
     return redirect(back if back.startswith("/trainers/") else "trainers")
 
@@ -820,7 +826,7 @@ def buy_plan(request, code):
 
 
 def training_view(request):
-    """Daily lessons: pick a weekday, optionally filter by type or level. VIP lessons show as locked for everyone else."""
+    """Daily lessons: pick a weekday, optionally filter by type or level."""
     today = timezone.localdate().weekday()
     try:
         day = int(request.GET.get("day", today))
@@ -834,36 +840,29 @@ def training_view(request):
         qs = qs.filter(workout_type_id=int(wtype))
     if level in dict(Lesson.LEVELS):
         qs = qs.filter(level=level)
-    only_vip = request.GET.get("vip") == "1"
-    if only_vip:
-        qs = qs.filter(is_vip=True)
-    vip = services.is_vip(request.user)
     return render(request, "gym/training.html", {
         "lessons": qs.order_by("order", "id"), "day": day, "today": today, "days": [str(i) for i in range(7)],
-        "types": WorkoutType.objects.filter(active=True), "wtype": wtype, "level": level, "levels": Lesson.LEVELS, "vip": vip, "only_vip": only_vip,
+        "types": WorkoutType.objects.filter(active=True), "wtype": wtype, "level": level, "levels": Lesson.LEVELS,
     })
 
 
 def lesson_view(request, pk):
     lesson = get_object_or_404(Lesson.objects.select_related("workout_type"), pk=pk, active=True)
-    vip = services.is_vip(request.user)
-    locked = lesson.is_vip and not vip
-    video = None
-    if not locked:  # an uploaded file wins over a pasted link; it is streamed by lesson_video, which checks access again
-        video = {"kind": "video", "src": reverse("lesson_video", args=[lesson.pk])} if lesson.video_file else video_embed(lesson.video_url)
+    # an uploaded file wins over a pasted link
+    video = {"kind": "video", "src": reverse("lesson_video", args=[lesson.pk])} if lesson.video_file else video_embed(lesson.video_url)
     related = Lesson.objects.filter(active=True, workout_type=lesson.workout_type).exclude(pk=lesson.pk)[:4] if lesson.workout_type_id else []
-    return render(request, "gym/lesson.html", {"l": lesson, "locked": locked, "video": video,
-                                               "wd": None if lesson.weekday is None else str(lesson.weekday),
-                                               "related": related, "vip": vip})
+    return render(request, "gym/lesson.html", {"l": lesson, "video": video,
+                                               "wd": None if lesson.weekday is None else str(lesson.weekday), "related": related})
 
 
 def lesson_video(request, pk):
-    """Streams an uploaded lesson video (with Range support for seeking). VIP lessons need VIP; the file is never reachable by URL otherwise."""
+    """Streams an uploaded lesson video (with Range support for seeking)."""
     lesson = get_object_or_404(Lesson, pk=pk, active=True)
     if not lesson.video_file:
         raise Http404()
-    if lesson.is_vip and not services.is_vip(request.user):
-        return HttpResponse(status=403)
+    from .media import is_local
+    if not is_local(lesson.video_file):  # Cloudinary streams it (with seeking) from its CDN
+        return redirect(lesson.video_file.url)
     try:
         path = lesson.video_file.path
     except ValueError:
@@ -880,6 +879,9 @@ def lesson_video(request, pk):
 def hero_video(request):
     """The home-page background clip uploaded in the settings (public, with Range support so it starts fast)."""
     gs = GymSettings.load()
+    from .media import is_local
+    if gs.hero_video and not is_local(gs.hero_video):
+        return redirect(gs.hero_video.url)
     try:
         path = gs.hero_video.path if gs.hero_video else ""
     except ValueError:
@@ -891,70 +893,6 @@ def hero_video(request):
     resp["Cache-Control"] = "public, max-age=86400"  # the URL carries the file name, so a new upload gets a new URL
     resp["X-Content-Type-Options"] = "nosniff"
     return resp
-
-
-def vip_view(request):
-    gs = GymSettings.load()
-    u = request.user
-    return render(request, "gym/vip.html", {
-        "price": gs.vip_price, "days": gs.vip_days, "discount": gs.vip_shop_discount,
-        "methods": [m for m in allowed_methods(gs) if m in services.OFFLINE_METHODS],  # no demo buttons for VIP
-        "until": services.vip_until(u) if u.is_authenticated else None, "active": services.is_vip(u),
-        "via_plan": u.is_authenticated and not services.active_vip_pass(u) and services.is_vip(u),
-        "lessons_vip": Lesson.objects.filter(active=True, is_vip=True).count(),
-        "vip_lessons": Lesson.objects.filter(active=True, is_vip=True).select_related("workout_type"),
-        "reserved": gs.vip_reserved_seats, "guests_per_month": gs.vip_guest_passes, "free_pt_per_month": gs.vip_free_pt,
-        "guest_left": services.guest_passes_left(u) if u.is_authenticated else 0,
-        "free_pt_left": services.free_pt_left(u) if u.is_authenticated else 0,
-        "passes": u.guest_passes.filter(date__gte=timezone.localdate() - timedelta(days=7))[:6] if u.is_authenticated else [],
-        "today": timezone.localdate(), "max_day": timezone.localdate() + timedelta(days=30),
-    })
-
-
-@require_POST
-@login_required
-def guest_create(request):
-    gp, err = services.create_guest_pass(request.user, request.POST.get("guest_name"), safe_date(request.POST.get("date")))
-    if err:
-        flash(request, messages.ERROR, err)
-        return redirect("/vip/#guest")
-    return redirect("guest_pass", code=gp.code)
-
-
-@login_required
-def guest_pass_view(request, code):
-    from .models import GuestPass
-    gp = get_object_or_404(GuestPass, code=code)
-    if gp.user_id != request.user.pk and not (request.user.is_staff and request.session.get("admin_mode")):
-        raise Http404()
-    svg = segno.make(f"FZG:{gp.code}", error="m").svg_inline(scale=7, border=2, dark="#111111", light="#ffffff")
-    return render(request, "gym/guest_pass.html", {"gp": gp, "qr": mark_safe(svg), "today": timezone.localdate()})
-
-
-@require_POST
-def buy_vip_view(request):
-    if not request.user.is_authenticated:
-        flash(request, messages.INFO, "login_first")
-        return redirect("/login/?next=/vip/")
-    gate = verify_gate(request)
-    if gate:
-        return gate
-    method = request.POST.get("method")
-    if method not in allowed_methods(GymSettings.load()) or method not in services.OFFLINE_METHODS:
-        flash(request, messages.ERROR, "err_method")
-        return redirect("vip")
-    pay, err = services.buy_vip(request.user, method, request.POST.get("promo", ""))
-    if err:
-        flash(request, messages.ERROR, err)
-        return redirect("vip")
-    if method == "click":
-        return redirect(click.pay_url(pay, abs_url(request, "vip")))
-    if method == "card":
-        return redirect("pay", pk=pay.pk)
-    if pay.status == Payment.Status.PENDING:
-        telegram.alert_admin(f"VIP to'lovi (tasdiq kutadi): {request.user.full_name} · {pay.amount} so'm")
-    flash(request, messages.SUCCESS, "vip_pending" if pay.status == Payment.Status.PENDING else "vip_ok")
-    return redirect("vip")
 
 
 @csrf_exempt
@@ -985,8 +923,7 @@ def shop(request):
     if q:
         qs = qs.filter(name__icontains=q)
     return render(request, "gym/shop.html", {"products": qs, "categories": Category.objects.all(), "cat": cat or "", "q": q,
-                                             "popular": popular_ids(), "vip": services.is_vip(request.user),
-                                             "vip_pct": GymSettings.load().vip_shop_discount, **cart_context(request)})
+                                             "popular": popular_ids(), **cart_context(request)})
 
 
 def cart_context(request):
@@ -1014,12 +951,8 @@ def popular_ids(days=60, top=3):
 
 def product_detail(request, pk):
     p = get_object_or_404(Product.objects.select_related("category"), pk=pk, active=True)
-    gs = GymSettings.load()
-    vip = services.is_vip(request.user)
     related = Product.objects.filter(active=True, category=p.category).exclude(pk=p.pk)[:4] if p.category_id else []
-    return render(request, "gym/product.html", {"p": p, "related": related, "vip": vip, "vip_pct": gs.vip_shop_discount,
-                                                "vip_price": p.price - p.price * gs.vip_shop_discount // 100, "popular": popular_ids(),
-                                                **cart_context(request)})
+    return render(request, "gym/product.html", {"p": p, "related": related, "popular": popular_ids(), **cart_context(request)})
 
 
 def cart_items(request):
@@ -1036,8 +969,7 @@ def cart_view(request):
     items, total = cart_items(request)
     gs = GymSettings.load()
     return render(request, "gym/cart.html", {"items": items, "total": total, "methods": allowed_methods(gs),
-                                             "in_cart": {i["p"].pk: i["qty"] for i in items},
-                                             "vip_pct": gs.vip_shop_discount if services.is_vip(request.user) else 0})
+                                             "in_cart": {i["p"].pk: i["qty"] for i in items}})
 
 
 CART_MAX = 50
@@ -1202,13 +1134,11 @@ def classes_view(request):
     mine = set()
     if request.user.is_authenticated:
         mine = set(request.user.bookings.filter(date__gte=timezone.localdate()).values_list("gym_class_id", "date"))
-    gs, vip = GymSettings.load(), services.is_vip(request.user)
     for c in GymClass.objects.filter(active=True).select_related("trainer"):
         d = c.next_date()
-        rows.append({"c": c, "date": d, "left": services.seats_left(c, d, vip, gs), "booked": (c.id, d) in mine,
-                     "reserved": services.reserved_seats(c, gs)})
+        rows.append({"c": c, "date": d, "left": services.seats_left(c, d), "booked": (c.id, d) in mine})
     by_day = [(str(i), [r for r in rows if r["c"].weekday == i]) for i in range(7)]
-    return render(request, "gym/classes.html", {"by_day": [(i, rs) for i, rs in by_day if rs], "vip": vip})
+    return render(request, "gym/classes.html", {"by_day": [(i, rs) for i, rs in by_day if rs]})
 
 
 @require_POST
@@ -1223,7 +1153,7 @@ def book_class(request, pk):
         return redirect("classes")
     d = c.next_date()
     with transaction.atomic():
-        full = services.seats_left(c, d, services.is_vip(request.user)) < 1  # non-VIP cannot take the seats held for VIP
+        full = services.seats_left(c, d) < 1
         if full or Booking.objects.filter(user=request.user, gym_class=c, date=d).exists():
             flash(request, messages.ERROR, "book_fail")
         else:
@@ -1399,18 +1329,14 @@ def export_my_data(request):
 # ---------------------------------------------------------------- staff front desk
 @staff_required
 def desk(request):
-    from .models import GuestPass
     q = request.GET.get("q", "").strip()
     results = []
-    guest = None
-    if services.parse_guest_code(q):
-        guest = GuestPass.objects.select_related("user").filter(code=services.parse_guest_code(q)).first()
     if q:
         card = services.user_from_card(q)
         if card and not card.is_superuser:  # the desk manages members; the owner's card is handled by the scanner page
             results = [card]
         else:
-            cond = Q(first_name__icontains=q) | Q(last_name__icontains=q) | Q(email__icontains=q)
+            cond = Q(first_name__icontains=q) | Q(last_name__icontains=q) | Q(email__icontains=q) | Q(username__icontains=q)
             digits = re.sub(r"\D", "", q)
             if digits:
                 cond |= Q(phone__contains=digits)
@@ -1422,8 +1348,7 @@ def desk(request):
             u.mem = services.active_membership(u)
     now = timezone.now()
     return render(request, "gym/staff/desk.html", {
-        "q": q, "results": results, "plans": Plan.objects.filter(active=True), "guest": guest, "today": timezone.localdate(),
-        "guests_today": GuestPass.objects.filter(date=timezone.localdate()).select_related("user"),
+        "q": q, "results": results, "plans": Plan.objects.filter(active=True), "today": timezone.localdate(),
         "pending": Payment.objects.filter(status=Payment.Status.PENDING).select_related("user", "plan")[:50],
         "new_orders": Order.objects.filter(status__in=(Order.Status.NEW, Order.Status.SHIPPING)).select_related("user").prefetch_related("items")[:50],
         "pt_requests": PTSession.objects.filter(status="requested", starts__gte=now).select_related("user", "trainer")[:30],
@@ -1454,16 +1379,6 @@ def scan_view(request):
     if request.method == "POST":
         code = json_field(request, "code")
         today = timezone.localdate()
-        if services.parse_guest_code(code) and not services.user_from_card(code):
-            gp, err = services.use_guest_pass(code)
-            if not gp:
-                return JsonResponse({"ok": False, "error": translate(request.lang, "scan_bad")}, status=404)
-            entered = err is None
-            ticket = entry_ticket(request, entered=entered, guest=gp, no=f"G-{gp.code}" if entered else "", reason=err or "")
-            return JsonResponse({"ok": True, "entered": entered, "name": f"{gp.guest_name} ({translate(request.lang, 'guest')})",
-                                 "code": f"{gp.user.full_name} · {gp.user.member_code}", "plan": "VIP", "until": gp.date.strftime("%d.%m.%Y"),
-                                 "message": translate(request.lang, err or "guest_ok"), "ticket": ticket,
-                                 "today": Visit.objects.filter(ts__date=today).count()})
         u = services.user_from_card(code)
         if not u:
             return JsonResponse({"ok": False, "error": translate(request.lang, "scan_bad")}, status=404)
@@ -1475,7 +1390,7 @@ def scan_view(request):
         reason = "" if entered else ("err_blocked" if not u.is_active else "err_frozen" if m else "err_member")
         now = timezone.localtime()
         ticket = entry_ticket(
-            request, entered=entered, member=u, m=m, vip=services.is_vip(u), reason=reason,
+            request, entered=entered, member=u, m=m, reason=reason,
             no=f"V-{visit.pk:06d}" if visit else "", repeat_at=timezone.localtime(earlier.ts) if earlier and entered else None,
             # calendar days, so a membership ending tomorrow says "1 day left", not "0"
             days_left=max(0, (timezone.localtime(m.expires).date() - today).days) if m else None,
@@ -1518,14 +1433,6 @@ def desk_sell(request, uid):
 def desk_confirm(request, pid):
     services.confirm_payment(get_object_or_404(Payment, pk=pid))
     flash(request, messages.SUCCESS, "done_ok")
-    return desk_back(request)
-
-
-@require_POST
-@staff_required
-def desk_guest(request, code):
-    gp, err = services.use_guest_pass(code)
-    flash(request, messages.SUCCESS if gp and not err else messages.ERROR, err or "guest_ok")
     return desk_back(request)
 
 
@@ -1575,3 +1482,56 @@ def desk_pt(request, pk, action):
     s.save(update_fields=["status"])
     flash(request, messages.SUCCESS, "done_ok")
     return desk_back(request)
+
+
+# ---------------------------------------------------------------- AI coach and AI workout plans
+def ai_view(request):
+    """The AI coach page: the conversation, a question box and the plan generator. Guests see what it does and a sign-in button."""
+    from . import ai
+    ctx = {"ai_on": ai.enabled(), "limit": ai.daily_limit(), "levels": [("beginner", "level_beginner"), ("intermediate", "level_intermediate"),
+                                                                          ("advanced", "level_advanced")]}
+    if request.user.is_authenticated:
+        ctx.update({"chat": request.user.ai_messages.order_by("-id")[:40][::-1], "used": ai.used_today(request.user),
+                    "has_trainer_plan": request.user.workout_plans.filter(active=True, trainer__isnull=False).exists()})
+    return render(request, "gym/ai.html", ctx)
+
+
+@require_POST
+@login_required
+def ai_ask(request):
+    from . import ai
+    try:
+        msg = ai.ask(request.user, request.POST.get("q", ""), request.lang)
+    except ai.AIError as e:
+        if wants_json(request):
+            return JsonResponse({"ok": False, "error": translate(request.lang, e.key)}, status=400)
+        flash(request, messages.ERROR, e.key)
+        return redirect("/ai/#chat")
+    if wants_json(request):
+        return JsonResponse({"ok": True, "answer": msg.content, "used": ai.used_today(request.user), "limit": ai.daily_limit()})
+    return redirect("/ai/#chat")
+
+
+@require_POST
+@login_required
+def ai_plan(request):
+    from . import ai
+    try:
+        days = max(2, min(6, int(request.POST.get("days", 3))))
+        minutes = max(20, min(120, int(request.POST.get("minutes", 60))))
+    except ValueError:
+        days, minutes = 3, 60
+    try:
+        ai.make_plan(request.user, request.POST.get("level", "beginner"), days, minutes, request.POST.get("notes", ""), request.lang)
+    except ai.AIError as e:
+        flash(request, messages.ERROR, e.key)
+        return redirect("/ai/#plan")
+    flash(request, messages.SUCCESS, "ai_plan_ok")
+    return redirect("workouts")
+
+
+@require_POST
+@login_required
+def ai_clear(request):
+    request.user.ai_messages.all().delete()
+    return redirect("/ai/#chat")

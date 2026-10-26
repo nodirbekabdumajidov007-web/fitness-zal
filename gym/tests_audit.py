@@ -14,7 +14,7 @@ from django.utils import timezone
 
 from . import services
 from .i18n import T
-from .models import GuestPass, Membership, Notification, Plan, Product, Trainer, User, Visit
+from .models import Membership, Notification, Plan, Product, Trainer, User, Visit
 from .urls import urlpatterns
 
 INVALID = "@@INVALID[%s]@@"
@@ -125,7 +125,7 @@ class LoginAndAdminPolishTests(AuditBase):
         self.assertFalse(Visit.objects.filter(user=self.m).exists())
 
     def test_no_real_phone_in_placeholders(self):
-        for url in ("/login/", "/register/", "/forgot/"):
+        for url in ("/register/", "/forgot/"):
             html = Client().get(url).content.decode()
             phone_input = re.search(r'<input id="id_phone"[^>]*>', html).group(0)  # the gym's number in the footer is public on purpose
             self.assertNotIn("877", phone_input, url)
@@ -236,24 +236,6 @@ class ReceiptStatesTests(AuditBase):
         self.assertIn(f"{days} {T['uz']['tk_days_left']}", d["ticket"])
         self.assertGreaterEqual(days, 1)
 
-    def test_guest_states(self):
-        today = timezone.localdate()
-        gp = GuestPass.objects.create(user=self.m, guest_name="Mehmon", date=today, code="ABCD1234")
-        r, d = self.scan("FZG:ABCD1234")
-        html = self.ticket_clean(d, "guest ok")
-        self.assertTrue(d["entered"])
-        self.assertIn("G-ABCD1234", html)
-        self.assertIn("Aziz Karimov", html)
-        self.assertIn("today", d)
-        r, d = self.scan("FZG:ABCD1234 ")
-        html = self.ticket_clean(d, "guest used")
-        self.assertFalse(d["entered"])
-        self.assertIn(T["uz"]["guest_used"], html)
-        GuestPass.objects.create(user=self.m, guest_name="Ertaga", date=today + timedelta(days=1), code="BEEF9876")
-        r, d = self.scan("FZG:BEEF9876")
-        html = self.ticket_clean(d, "guest wrong day")
-        self.assertIn(T["uz"]["guest_wrong_day"], html)
-
     def test_impossible_dates_are_ignored_not_crashing(self):
         member = Client()
         member.post("/login/", {"phone": "901112233", "password": PW})
@@ -261,8 +243,6 @@ class ReceiptStatesTests(AuditBase):
         self.assertEqual(r.status_code, 302)
         self.m.refresh_from_db()
         self.assertIsNone(self.m.birth_date)
-        services.add_vip(self.m)
-        self.assertLess(member.post("/vip/guest/", {"guest_name": "Ali", "date": "2026-13-45"}).status_code, 500)
         self.assertEqual(self.staff.get("/django-admin/cash/?d=2026-02-30").status_code, 200)
 
     def test_chat_send_with_odd_json(self):

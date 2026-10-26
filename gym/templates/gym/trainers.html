@@ -2,10 +2,9 @@
 {% block title %}{% t 'trainers' %}{% endblock %}
 {% block content %}
 <h2>{% t 'trainers' %}</h2>
-{% if free_pt %}<div class="note vipnote">★ {% t 'free_pt_note' n=free_pt %}</div>{% endif %}
 {% if sessions %}
 <div class="card grid"><h3>{% t 'pt_mine' %}</h3>
-  {% for s in sessions %}<div class="cls"><span><b>{{ s.trainer.name }}</b> <span class="muted num">· {{ s.starts|dmyhm }}</span>{% if s.is_free %} <span class="pill vippill">★ {% t 'vip_free' %}</span>{% endif %}</span>
+  {% for s in sessions %}<div class="cls"><span><b>{{ s.trainer.name }}</b> <span class="muted num">· {{ s.starts|dmyhm }}</span></span>
     <span class="inline" style="flex:none;align-items:center"><span class="pill {% if s.status == 'confirmed' %}good{% else %}warn{% endif %}">{% t 'pt_'|add:s.status %}</span>
     <form method="post" action="{% url 'pt_cancel' s.pk %}">{% csrf_token %}<button class="btn small danger" type="submit" data-bin data-confirm="{% t 'sure' %}">{% t 'cancel_booking' %}</button></form></span></div>{% endfor %}
 </div>

@@ -8,15 +8,10 @@
   <h3>{% t 'chat_rooms' %}</h3>
   <div class="chat-list">
     {% for r in rooms %}
-    {% if r.room.vip_only and not vip_ok %}
-    <a class="chat-item" href="{% url 'vip' %}"><span class="m-ava big room vip">★</span>
-      <span class="ci-main"><b>{% t 'room_vip' %}</b><span class="ci-last">{% t 'chat_vip_only' %}</span></span><span class="ci-side"><span class="pill vippill">VIP</span></span></a>
-    {% else %}
-    <a class="chat-item" href="{% url 'chat_room' r.room.pk %}"><span class="m-ava big room{% if r.room.vip_only %} vip{% endif %}">{% if r.room.vip_only %}★{% else %}#{% endif %}</span>
-      <span class="ci-main"><b>{% if r.room.vip_only %}{% t 'room_vip' %}{% else %}{% t 'room_general' %}{% endif %}</b>
-        <span class="ci-last">{% if r.last %}{{ r.last_name }}: {% if r.last.body %}{{ r.last.body|truncatechars:60 }}{% else %}{% t 'chat_photo' %}{% endif %}{% elif r.room.vip_only %}{% t 'room_vip_help' %}{% else %}{% t 'room_general_help' %}{% endif %}</span></span>
+    <a class="chat-item" href="{% url 'chat_room' r.room.pk %}"><span class="m-ava big room">#</span>
+      <span class="ci-main"><b>{% t 'room_general' %}</b>
+        <span class="ci-last">{% if r.last %}{{ r.last_name }}: {% if r.last.body %}{{ r.last.body|truncatechars:60 }}{% else %}{% t 'chat_photo' %}{% endif %}{% else %}{% t 'room_general_help' %}{% endif %}</span></span>
       <span class="ci-side">{% if r.last %}{{ r.last.created|date:"H:i" }}{% endif %}</span></a>
-    {% endif %}
     {% endfor %}
   </div>
 </section>

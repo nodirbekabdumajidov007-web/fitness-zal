@@ -1,6 +1,7 @@
 import csv
 from datetime import timedelta
 
+from django.conf import settings
 from django.contrib import admin
 from django.db.models import Count, ExpressionWrapper, F, Max, Sum
 from django.db.models.fields import BigIntegerField
@@ -12,7 +13,7 @@ from django.utils import timezone
 
 
 def dashboard_stats():
-    from .models import ChatReport, Membership, Order, Payment, Product, PTSession, User, VipPass, Visit
+    from .models import ChatReport, Membership, Order, Payment, Product, PTSession, User, Visit
     now, today = timezone.now(), timezone.localdate()
     paid = Payment.objects.filter(status="paid")
     by_day = {r["d"]: r["s"] for r in paid.filter(created__date__gte=today - timedelta(days=13))
@@ -43,7 +44,6 @@ def dashboard_stats():
         "pending_payments": Payment.objects.filter(status="pending").count(),
         "new_orders": Order.objects.filter(status="new").count(),
         "pt_requests": PTSession.objects.filter(status="requested", starts__gte=now).count(),
-        "vip_active": VipPass.objects.filter(starts__lte=now, expires__gt=now).values("user").distinct().count(),
         "chat_reports": ChatReport.objects.filter(resolved=False).count(),
         "low_stock": low_stock_rows(),
         "expiring": soon, "days": days,
@@ -83,7 +83,7 @@ def kpi_data(now, revenue_month):
          "note": "me'yor: haftasiga 1,5–3",
          "help": "Faol a'zo haftasiga o'rtacha necha marta keladi (oxirgi 4 hafta). Bu ko'rsatkich tushsa, odamlar tez orada ketishi mumkin."},
         {"name": "A'zo boshiga daromad", "value": money(arpu), "unit": "so'm", "tone": "", "note": "shu oy, faol a'zoga",
-         "help": "Shu oydagi barcha tushum (abonement, do'kon, VIP) faol a'zolar soniga bo'lingan."},
+         "help": "Shu oydagi barcha tushum (abonement va do'kon) faol a'zolar soniga bo'lingan."},
         {"name": "Mehmondan a'zoga", "value": conv, "unit": "%", "tone": "good" if conv >= 20 else "warn" if conv >= 10 else "bad" if new_n else "",
          "note": f"30 kunda {new_n} yangi, {bought} tasi xarid qildi",
          "help": "Saytda ro'yxatdan o'tganlarning qanchasi abonement sotib olgani. 20–35% yaxshi deb hisoblanadi; qolganlarga taklif yuboring."},
@@ -174,11 +174,10 @@ def extra_stats(now, today, revenue_month):
 def member_data(user):
     from django.db.models import Sum as S
     from . import services
-    from .models import Booking, Membership, Order, Payment, PTSession, VipPass, Visit
+    from .models import Booking, Membership, Order, Payment, PTSession, Visit
     now = timezone.now()
     ms = Membership.objects.filter(user=user).select_related("plan")
     active = ms.filter(starts__lte=now, expires__gt=now).first()
-    vip = VipPass.objects.filter(user=user, starts__lte=now, expires__gt=now).order_by("-expires").first()
     visits = Visit.objects.filter(user=user)
     month_ago = now - timedelta(days=30)
     weeks = []  # visits per week for the last 12 weeks, oldest first
@@ -190,7 +189,7 @@ def member_data(user):
     for i in range(12):
         weeks.append({"label": f"{start + timedelta(days=i * 7):%d.%m}", "v": counts.get(i, 0)})
     return {
-        "m": user, "active": active, "vip": vip, "is_vip": services.is_vip(user),
+        "m": user, "active": active,
         "days_left": (active.expires - now).days if active else 0,
         "memberships": ms[:10], "payments": Payment.objects.filter(user=user).select_related("plan")[:10],
         "orders": Order.objects.filter(user=user).prefetch_related("items")[:8],
@@ -203,7 +202,7 @@ def member_data(user):
     }
 
 
-AUDIENCES = [("all", "Barcha a'zolar"), ("active", "Faol abonementi borlar"), ("vip", "VIP a'zolar"),
+AUDIENCES = [("all", "Barcha a'zolar"), ("active", "Faol abonementi borlar"),
              ("expiring", "Abonementi 7 kunda tugaydiganlar"), ("lapsed", "Abonementi tugaganlar (60 kun ichida)")]
 
 
@@ -213,8 +212,6 @@ def audience_qs(key):
     qs = User.objects.filter(is_superuser=False, is_active=True)
     if key == "active":
         return qs.filter(memberships__starts__lte=now, memberships__expires__gt=now).distinct()
-    if key == "vip":
-        return qs.filter(vip_passes__starts__lte=now, vip_passes__expires__gt=now).distinct()
     annotated = qs.annotate(until=Max("memberships__expires"))
     if key == "expiring":
         return annotated.filter(until__gt=now, until__lte=now + timedelta(days=7))
@@ -230,7 +227,7 @@ def global_search(q):
     if len(q) < 2:
         return {}
     digits = "".join(ch for ch in q if ch.isdigit())
-    uq = Q(first_name__icontains=q) | Q(last_name__icontains=q) | Q(email__icontains=q)
+    uq = Q(first_name__icontains=q) | Q(last_name__icontains=q) | Q(email__icontains=q) | Q(username__icontains=q)
     parts = q.split()
     if len(parts) >= 2:
         uq |= Q(first_name__icontains=parts[0], last_name__icontains=parts[1]) | Q(first_name__icontains=parts[1], last_name__icontains=parts[0])
@@ -307,11 +304,11 @@ def report_data():
 
 
 SECTIONS = [  # the sidebar groups the gym's many tables by job instead of one long alphabetical list
-    ("A'zolar", ["user", "membership", "vippass", "guestpass", "visit", "bodylog", "personalrecord"]),
+    ("A'zolar", ["user", "membership", "visit", "bodylog", "personalrecord"]),
     ("Moliya", ["payment", "paymentcard", "plan", "promocode"]),
     ("Do'kon", ["order", "product", "category"]),
     ("Mashg'ulotlar", ["gymclass", "booking", "trainer", "ptsession", "workoutplan", "workouttype", "lesson"]),
-    ("Muloqot", ["notification", "chatmessage", "chatreport", "announcement", "review"]),
+    ("Muloqot", ["aimessage", "notification", "chatmessage", "chatreport", "announcement", "review"]),
     ("Sozlamalar", ["gymsettings"]),
 ]
 
@@ -393,7 +390,7 @@ class GymAdminSite(admin.AdminSite):
         kinds = {r["kind"]: r["s"] for r in paid.values("kind").annotate(s=Sum("amount"))}
         ctx = {**self.each_context(request), "title": "Kassa hisoboti", "day": day, "prev": day - timedelta(days=1), "next": day + timedelta(days=1),
                "is_today": day == timezone.localdate(), "total": sum(r["s"] for r in by_method), "count": paid.count(), "by_method": by_method,
-               "kinds": [{"k": {"plan": "Abonementlar", "shop": "Do'kon", "vip": "VIP"}.get(k, k), "s": s} for k, s in kinds.items()],
+               "kinds": [{"k": {"plan": "Abonementlar", "shop": "Do'kon", "vip": "VIP (eski)"}.get(k, k), "s": s} for k, s in kinds.items()],
                "payments": paid.order_by("-created")[:100], "pending": Payment.objects.filter(status="pending").count(),
                "handed": Order.objects.filter(status="done", done_at__date=day).count()}
         top = max([r["s"] for r in by_method] + [1])
@@ -488,22 +485,22 @@ class GymAdminSite(admin.AdminSite):
         ids = [u.pk for u in people]
         q = request.GET.get("q", "")
         found = [u for u in global_search(q).get("users", []) if u.pk not in ids and u.is_active][:12]
-        form = {"title": "", "body": "", "tg": telegram.enabled(), "sms": False}
+        form = {"title": "", "body": "", "tg": telegram.enabled(), "sms": False, "email": False}
         error = None
         if request.method == "POST":
             form = {"title": request.POST.get("title", "").strip()[:120], "body": request.POST.get("body", "").strip()[:2000],
-                    "tg": bool(request.POST.get("tg")), "sms": bool(request.POST.get("sms"))}
+                    "tg": bool(request.POST.get("tg")), "sms": bool(request.POST.get("sms")), "email": bool(request.POST.get("email"))}
             if not people:
                 error = "Kamida bitta qabul qiluvchini tanlang."
             elif not form["title"]:
                 error = "Sarlavhani yozing."
             else:
-                n = {"site": 0, "tg": 0, "sms": 0}
+                n = {"site": 0, "tg": 0, "sms": 0, "email": 0}
                 for u in people:
                     def fill(s):
-                        return s.replace("{ism}", u.first_name or "")
+                        return s.replace("{ism}", u.first_name or u.username)
                     sent = services.notify(u, fill(form["title"]), fill(form["body"]), sender=request.user,
-                                           telegram_too=form["tg"], sms_too=form["sms"])
+                                           telegram_too=form["tg"], sms_too=form["sms"], email_too=form["email"])
                     for k in n:
                         n[k] += bool(sent.get(k))
                 parts = [f"{n['site']} kishining xabarlar qutisiga tushdi"]
@@ -511,6 +508,8 @@ class GymAdminSite(admin.AdminSite):
                     parts.append(f"Telegramda {n['tg']} ta")
                 if form["sms"]:
                     parts.append(f"SMS {n['sms']} ta")
+                if form["email"]:
+                    parts.append(f"Email {n['email']} ta")
                 messages.success(request, "Yuborildi: " + ", ".join(parts) + ".")
                 if len(people) == 1:
                     return redirect("admin:member", people[0].pk)
@@ -519,7 +518,7 @@ class GymAdminSite(admin.AdminSite):
         ctx = {**self.each_context(request), "title": "Shaxsiy xabar", "people": people, "ids": ids, "ids_csv": ",".join(map(str, ids)),
                "q": q, "found": found, "form": form, "error": error, "tg_on": telegram.enabled(), "sms_backend": sms.backend(),
                "audiences": AUDIENCES, "recent": recent,
-               "tg_count": sum(1 for u in people if u.telegram_chat_id), "phone_count": sum(1 for u in people if u.phone)}
+               "tg_count": sum(1 for u in people if u.telegram_chat_id), "email_count": sum(1 for u in people if u.email), "smtp_on": bool(settings.EMAIL_HOST), "phone_count": sum(1 for u in people if u.phone)}
         return TemplateResponse(request, "admin/message.html", ctx)
 
     def reports_view(self, request):

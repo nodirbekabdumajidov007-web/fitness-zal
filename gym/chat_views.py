@@ -57,7 +57,7 @@ def inbox(request):
         last = r.messages.filter(deleted=False).select_related("sender").order_by("-id").first()
         rooms.append({"room": r, "last": last, "last_name": chat.display_name(last.sender) if last else ""})
     return render(request, "gym/chat_inbox.html", {
-        "directs": directs, "rooms": rooms, "vip_ok": chat.is_vip_or_staff(u), "q": q,
+        "directs": directs, "rooms": rooms, "q": q,
         "results": [{"u": p, "name": chat.display_name(p), "initials": chat.initials(p), "hue": chat.hue(p)} for p in chat.search_people(u, q)],
         "short_q": bool(q) and len(q) < 2,
         "blocks": [(b.blocked, chat.display_name(b.blocked)) for b in u.chat_blocks.select_related("blocked")],
@@ -68,9 +68,6 @@ def inbox(request):
 def room_view(request, pk):
     room = get_object_or_404(ChatRoom, pk=pk)
     if not chat.can_access(request.user, room):
-        if room.kind == "room" and room.vip_only:
-            flash(request, messages.INFO, "chat_vip_only")
-            return redirect("vip")
         raise Http404()
     u = request.user
     chat.touch(u)

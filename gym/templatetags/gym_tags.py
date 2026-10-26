@@ -7,7 +7,6 @@ register = template.Library()
 DEFAULT_PERKS = {
     "m1": ["perk_all"],
     "m3": ["perk_all", "perk_save", "perk_consult"],
-    "vip": ["perk_all", "perk_locker", "perk_sauna", "perk_consult", "perk_vip"],
 }
 
 
@@ -72,16 +71,6 @@ def vstatic(path):
     url = static(path)
     found = finders.find(path)
     return f"{url}?v={int(os.path.getmtime(found))}" if found else url
-
-
-@register.filter
-def vipprice(price, pct):
-    """Price after the VIP shop discount, rounded the same way the checkout rounds it."""
-    try:
-        price, pct = int(price), int(pct)
-    except (TypeError, ValueError):
-        return price
-    return price - price * pct // 100
 
 
 @register.filter

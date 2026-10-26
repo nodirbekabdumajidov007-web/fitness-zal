@@ -16,7 +16,7 @@ def admin_password_from_env():
     pw = os.environ.get("FZ_ADMIN_PASSWORD", "").strip()
     return pw[:-len(".admin")] if pw.endswith(".admin") else pw
 
-PLANS = [("m1", "1 oylik", 1, 400000, False, 1), ("m3", "3 oylik", 3, 1000000, False, 2), ("vip", "VIP 1 oylik", 1, 600000, True, 3)]
+PLANS = [("m1", "1 oylik", 1, 400000, 1), ("m3", "3 oylik", 3, 1000000, 2)]
 PRODUCTS = [
     ("Ichimliklar", [("Suv 0.5 l", 5000, 120), ("Suv 1.5 l", 8000, 80), ("Energetik ichimlik", 18000, 60), ("Izotonik ichimlik", 15000, 50)]),
     ("Protein", [("Protein kokteyl", 25000, 40), ("Whey protein 900 g", 450000, 12), ("Proteinli batonchik", 20000, 70)]),
@@ -32,8 +32,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **opts):
         GymSettings.load()
-        for code, name, months, price, vip, order in PLANS:
-            Plan.objects.get_or_create(code=code, defaults=dict(name=name, months=months, price=price, is_vip=vip, order=order))
+        for code, name, months, price, order in PLANS:
+            Plan.objects.get_or_create(code=code, defaults=dict(name=name, months=months, price=price, order=order))
         if not Product.objects.exists():
             for i, (cat, items) in enumerate(PRODUCTS):
                 c = Category.objects.create(name=cat, order=i)
@@ -51,8 +51,8 @@ class Command(BaseCommand):
             PromoCode.objects.get_or_create(code="YANGI10", defaults={"percent": 10})
         if opts["demo"] and not WorkoutType.objects.exists():
             types = [WorkoutType.objects.create(name=n, description=d, order=i) for i, (n, d) in enumerate(seed_lessons.TYPES)]
-            for i, (ti, wd, level, mins, vip, title, summary, steps, muscles, equipment, tips) in enumerate(seed_lessons.LESSONS):
-                Lesson.objects.create(workout_type=types[ti], weekday=wd, level=level, duration_min=mins, is_vip=vip, title=title, summary=summary,
+            for i, (ti, wd, level, mins, _vip, title, summary, steps, muscles, equipment, tips) in enumerate(seed_lessons.LESSONS):
+                Lesson.objects.create(workout_type=types[ti], weekday=wd, level=level, duration_min=mins, title=title, summary=summary,
                                       steps=steps, muscles=muscles, equipment=equipment, tips=tips, order=i)
         # Hosting without a shell (Render free): FZ_ADMIN_RESET=1 + FZ_ADMIN_PASSWORD sets the owner's password on the next
         # deploy. Only on purpose, so a password changed inside the site is not overwritten by every deploy.
@@ -69,9 +69,9 @@ class Command(BaseCommand):
                 self.stdout.write("=" * 60)
         if not User.objects.filter(is_superuser=True).exists():
             pw = admin_password_from_env() or secrets.token_urlsafe(9)
-            User.objects.create_superuser(ADMIN_PHONE, pw, first_name="Admin", last_name="Fitnes Zal")
+            User.objects.create_superuser("admin", pw, phone=ADMIN_PHONE, first_name="Admin", last_name="Fitnes Zal")
             self.stdout.write("=" * 60)
-            self.stdout.write(f" ADMIN yaratildi. Telefon: {ADMIN_PHONE}")
+            self.stdout.write(f" ADMIN yaratildi. Login: admin  (yoki telefon: {ADMIN_PHONE})")
             self.stdout.write(f" Parol: {pw}   (admin panel uchun parol oxiriga .admin qo'shing)")
             self.stdout.write(" Bu parol faqat bir marta ko'rsatiladi. Kirgach o'zgartiring.")
             self.stdout.write("=" * 60)

@@ -23,8 +23,8 @@
     {% if sms_on %}<span class="muted">📱 {% t 'sms_login_note' %}</span>{% endif %}
     <details class="admin-door"{% if error and error != 'google_required' %} open{% endif %}><summary>{% t 'admin_login' %}</summary><div class="grid">
     {% endif %}
-    <label for="id_phone">{% t 'phone' %}<div class="phone"><span>+998</span><input id="id_phone" name="phone" inputmode="numeric" autocomplete="tel-national" placeholder="XX XXX XX XX" maxlength="17" value="{{ form.phone.value|default:'' }}" data-phone></div></label>
-    {% for e in form.phone.errors %}<span class="field-err">{% t e %}</span>{% endfor %}
+    <label for="id_login">{% t 'login_field' %}<input id="id_login" class="login-box" name="login" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="254" placeholder="{% t 'login_field_ph' %}" value="{{ form.login.value|default:'' }}" autofocus></label>
+    {% for e in form.login.errors %}<span class="field-err">{% t e %}</span>{% endfor %}
     <label for="id_password">{% t 'password' %}<div class="pw"><input id="id_password" name="password" type="password" autocomplete="current-password" maxlength="140" data-caps="{% t 'caps_on' %}"><button type="button" data-toggle-pw="id_password" data-show="{% t 'show' %}" data-hide="{% t 'hide' %}">{% t 'show' %}</button></div></label>
     {% for e in form.password.errors %}<span class="field-err">{% t e %}</span>{% endfor %}
     {% if error and not google_only %}<span class="field-err" role="alert">{% t error %}</span>{% endif %}

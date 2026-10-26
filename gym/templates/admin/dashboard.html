@@ -55,12 +55,6 @@
       <p class="nb-sub">7 kunda <b>+{{ signups_week }}</b> yangi · faol abonement: <b>{{ active_members }}</b></p>
     </section>
 
-    <section class="nb b-vip">
-      <header><small>Faol VIP</small><span class="fz-pill gold">★</span></header>
-      <b class="nb-big" data-count="{{ vip_active }}">{{ vip_active }}</b>
-      <p class="nb-sub"><a href="{% url 'admin:gym_vippass_changelist' %}">VIP obunalar →</a></p>
-    </section>
-
     <nav class="nb b-todo" aria-label="Kutayotgan ishlar">
       <a class="{% if pending_payments %}hot{% endif %}" href="{% url 'admin:gym_payment_changelist' %}?status__exact=pending"><b data-live="pending_payments">{{ pending_payments }}</b>to'lov tasdig'i</a>
       <a class="{% if new_orders %}hot{% endif %}" href="{% url 'admin:gym_order_changelist' %}?status__exact=new"><b data-live="new_orders">{{ new_orders }}</b>yangi buyurtma</a>
