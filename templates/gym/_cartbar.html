@@ -1,7 +1,0 @@
-{% load gym_tags %}<a class="cart-bar" id="cart-bar" href="{% url 'cart' %}"{% if not cart_count %} hidden{% endif %} data-t-items="{% t 'cart_bar_items' n='@' %}" data-unit="{% t 'price_unit' %}">
-  <span class="cb-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 8H6"/><circle cx="10" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/></svg></span>
-  <span class="cb-text"><b id="cb-items">{% t 'cart_bar_items' n=cart_count %}</b><span class="num" id="cb-total">{{ cart_total|money }} {% t 'price_unit' %}</span></span>
-  <span class="cb-go">{% t 'go_to_cart' %} →</span>
-</a>
-<div class="cart-toast" id="cart-toast" role="status" hidden></div>
-<div id="cart-i18n" hidden data-added="{% t 'added_to_cart' %}" data-removed="{% t 'removed_from_cart' %}" data-unit="{% t 'price_unit' %}"></div>
