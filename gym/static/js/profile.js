@@ -11,4 +11,17 @@
     }, { rootMargin: '-40% 0px -55% 0px' });
     links.forEach(function (a) { var s = document.querySelector(a.getAttribute('href')); if (s) io.observe(s); });
   }
+  // profile picture: choosing a file uploads it straight away (the picture shows at once as a preview)
+  var af = document.querySelector('[data-avatar-form]');
+  if (af) {
+    var inp = af.querySelector('input[type=file]');
+    inp.addEventListener('change', function () {
+      if (!inp.files.length) return;
+      var lab = af.querySelector('.pf-ava'), img = lab.querySelector('img') || document.createElement('img');
+      img.src = URL.createObjectURL(inp.files[0]); lab.classList.add('has-img', 'busy');
+      var s = lab.querySelector('span'); if (s) s.remove();
+      if (!img.parentNode) lab.prepend(img);
+      af.submit();
+    });
+  }
 })();

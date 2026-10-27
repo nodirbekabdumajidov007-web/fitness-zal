@@ -8,7 +8,7 @@ from .i18n import LANGS
 
 CSP = ("default-src 'self'; script-src 'self' https://accounts.google.com https://appleid.cdn-apple.com; "
        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com; "
-       "font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://accounts.google.com https://appleid.apple.com; "
+       "font-src https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://accounts.google.com https://appleid.apple.com; "
        "frame-src https://accounts.google.com https://appleid.apple.com https://www.youtube-nocookie.com https://player.vimeo.com https://yandex.uz https://yandex.ru; media-src 'self' https:; "
        "frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
 

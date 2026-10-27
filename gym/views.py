@@ -15,6 +15,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
 from django.contrib.staticfiles import finders
 from django.core.cache import cache
+from django.core.exceptions import ValidationError
 from django.db import connection, transaction
 from django.db.models import Avg, Count, Q
 from django.http import Http404, HttpResponse, JsonResponse
@@ -499,7 +500,7 @@ def trainer_detail(request, pk):
 def image_view(request, kind, pk):
     """Serves an uploaded product/trainer picture. The type is read from the file's bytes, and the response can never run as a page."""
     from .media import image_type
-    model, field = {"product": (Product, "image"), "trainer": (Trainer, "photo")}.get(kind, (None, None))
+    model, field = {"product": (Product, "image"), "trainer": (Trainer, "photo"), "avatar": (User, "avatar")}.get(kind, (None, None))
     if not model:
         raise Http404()
     obj = get_object_or_404(model, pk=pk)
@@ -1226,6 +1227,37 @@ def profile_view(request):
                 u.save()
                 flash(request, messages.SUCCESS, "saved")
                 return redirect("profile")
+        elif kind == "avatar":
+            u = request.user
+            if request.POST.get("remove"):
+                if u.avatar:
+                    try:
+                        u.avatar.delete(save=False)
+                    except OSError:  # e.g. the file is busy on Windows; the account no longer points to it either way
+                        pass
+                u.avatar = None
+                u.save(update_fields=["avatar"])
+                flash(request, messages.SUCCESS, "avatar_removed")
+                return redirect("profile")
+            f = request.FILES.get("avatar")
+            from .media import validate_image
+            try:
+                if not f:
+                    raise ValidationError("err_avatar")
+                validate_image(f)
+            except ValidationError:
+                flash(request, messages.ERROR, "err_avatar")
+                return redirect("profile")
+            old = u.avatar.name if u.avatar else ""
+            u.avatar = f
+            u.save(update_fields=["avatar"])
+            if old and old != u.avatar.name:
+                try:
+                    u.avatar.storage.delete(old)  # the previous picture is not kept around
+                except OSError:
+                    pass
+            flash(request, messages.SUCCESS, "avatar_saved")
+            return redirect("profile")
         elif kind == "telegram_unlink":
             User.objects.filter(pk=request.user.pk).update(telegram_chat_id=None)
             return redirect("profile")

@@ -15,7 +15,8 @@ PHONE_VALIDATOR = RegexValidator(r"^\+998\d{9}$", "+998 bilan boshlanib, 9 ta ra
 def image_url(kind, obj):
     """URL of an uploaded picture, with a version so browsers refetch it after a change."""
     import zlib
-    f = obj.image if kind == "product" else obj.photo
+    f = {"product": "image", "trainer": "photo", "avatar": "avatar"}[kind]
+    f = getattr(obj, f)
     return f"/img/{kind}/{obj.pk}/?v={zlib.crc32(f.name.encode())}" if f else ""
 
 
@@ -79,6 +80,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     chat_banned = models.BooleanField("Chatda yozishdan chetlatilgan", default=False)
     last_seen = models.DateTimeField("Oxirgi faollik (chat)", null=True, blank=True, editable=False)
     GOALS = [("lose", "Ozish"), ("keep", "Formani saqlash"), ("gain", "Massa olish"), ("strength", "Kuch"), ("health", "Sog'liq")]
+    avatar = models.FileField("Profil rasmi (jpg, png, webp)", upload_to="avatars/", blank=True, validators=[validate_image])
     birth_date = models.DateField("Tug'ilgan kun", null=True, blank=True)
     goal = models.CharField("Maqsad", max_length=10, choices=GOALS, blank=True)
     target_weight = models.DecimalField("Maqsad vazni (kg)", max_digits=5, decimal_places=1, null=True, blank=True,
@@ -111,6 +113,16 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}".strip() or self.username
+
+    @property
+    def avatar_src(self):
+        return image_url("avatar", self)
+
+    @property
+    def initials(self):
+        if self.first_name:
+            return (self.first_name[:1] + self.last_name[:1]).upper()
+        return self.username[:2].upper()
 
     def get_short_name(self):
         return self.first_name or self.username

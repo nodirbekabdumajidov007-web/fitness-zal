@@ -1480,14 +1480,19 @@ a.db-tile{text-decoration:none;transition:transform .2s,border-color .2s}a.db-ti
 .rep-acts{display:flex;justify-content:flex-end;gap:8px}
 /* ---------- account menu (avatar + username, top right) ---------- */
 .usermenu{position:relative}
-.usermenu summary{list-style:none;display:inline-flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;border:1.5px solid #5fd3c0;border-radius:99px;
-  background:var(--surface);cursor:pointer;font-weight:700;font-size:.9rem;transition:box-shadow .2s,border-color .2s}
+/* like the reference: no pill frame, a thin divider on the left, a round picture with a softly breathing ring, the name and a small caret */
+.usermenu{padding-left:12px;margin-left:2px;border-left:1px solid var(--line)}
+.usermenu summary{list-style:none;display:inline-flex;align-items:center;gap:10px;padding:3px 6px 3px 3px;border:0;border-radius:99px;
+  background:none;cursor:pointer;font-weight:800;font-size:.92rem;transition:background .2s}
 .usermenu summary::-webkit-details-marker{display:none}
-.usermenu summary:hover,.usermenu[open] summary{box-shadow:0 0 0 3px rgba(95,211,192,.2)}
+.usermenu summary:hover,.usermenu[open] summary{background:color-mix(in srgb,var(--ink) 6%,transparent)}
 .usermenu summary:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
-.um-ava{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-size:.8rem;font-weight:800;letter-spacing:.02em;
-  color:var(--ink);background:var(--bg);border:1px solid var(--line)}
-.um-name{max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.um-ava{position:relative;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;overflow:hidden;font-size:.82rem;font-weight:800;
+  letter-spacing:.02em;color:#cfe0ff;background:radial-gradient(circle at 30% 25%,#1d2740,#05070c 70%);
+  box-shadow:0 0 0 2px rgba(120,160,255,.28),0 0 12px rgba(80,130,255,.25);animation:avaGlow 3.2s ease-in-out infinite}
+.um-ava img{width:100%;height:100%;object-fit:cover;display:block}
+@keyframes avaGlow{50%{box-shadow:0 0 0 2px rgba(120,160,255,.5),0 0 18px rgba(80,130,255,.45)}}
+.um-name{max-width:140px;letter-spacing:.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .usermenu[open] .lp-caret{transform:rotate(-135deg) translateY(-1px)}
 .um-menu{position:absolute;right:0;top:calc(100% + 8px);z-index:60;min-width:230px;padding:6px;border-radius:14px;background:var(--surface);
   border:1px solid var(--line);box-shadow:0 18px 40px rgba(0,0,0,.22);display:grid;animation:lpIn .18s cubic-bezier(.2,.8,.1,1)}
@@ -1499,4 +1504,17 @@ a.db-tile{text-decoration:none;transition:transform .2s,border-color .2s}a.db-ti
 .um-out{color:var(--bad);border-top:1px solid var(--line);border-radius:0 0 10px 10px;margin-top:4px}
 .um-badge{margin-left:auto;min-width:20px;height:20px;padding:0 6px;border-radius:99px;background:var(--accent);color:#fff;font-size:.72rem;display:grid;place-items:center}
 @media (max-width:600px){.um-name{display:none}.usermenu summary{padding:4px 8px 4px 4px}}
+/* ---------- profile picture upload ---------- */
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.pf-ava-form{position:relative;flex:none;margin:0}
+.pf-ava-form .pf-ava{position:relative;cursor:pointer;overflow:hidden;box-shadow:0 0 0 3px rgba(120,160,255,.3),0 0 22px rgba(80,130,255,.3)}
+.pf-ava img{width:100%;height:100%;object-fit:cover;display:block}
+.pf-ava-cam{position:absolute;inset:auto 0 0 0;height:34%;display:grid;place-items:center;font-style:normal;font-size:.95rem;
+  background:rgba(0,0,0,.55);opacity:0;transform:translateY(40%);transition:opacity .2s,transform .2s}
+.pf-ava:hover .pf-ava-cam,.pf-ava:focus-within .pf-ava-cam{opacity:1;transform:none}
+.pf-ava:focus-within{outline:3px solid var(--focus);outline-offset:3px}
+.pf-ava.busy{opacity:.6}
+.pf-ava-del{position:absolute;top:-4px;right:-4px;width:26px;height:26px;border-radius:50%;border:2px solid var(--surface);background:var(--bad);color:#fff;
+  font-size:1rem;line-height:1;cursor:pointer;display:grid;place-items:center;padding:0}
+.pf-ava-del:hover{filter:brightness(1.1)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}

@@ -2,7 +2,15 @@
 {% block title %}{% t 'profile' %}{% endblock %}
 {% block content %}
 <section class="pf-hero">
-  <span class="pf-ava" aria-hidden="true">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
+  <form class="pf-ava-form" method="post" enctype="multipart/form-data" data-avatar-form>{% csrf_token %}<input type="hidden" name="form" value="avatar">
+    <label class="pf-ava{% if user.avatar %} has-img{% endif %}" title="{% t 'avatar_change' %}">
+      {% if user.avatar %}<img src="{{ user.avatar_src }}" alt="{{ user.full_name }}">{% else %}<span>{{ user.initials }}</span>{% endif %}
+      <i class="pf-ava-cam" aria-hidden="true">📷</i>
+      <input type="file" name="avatar" accept="image/jpeg,image/png,image/webp" class="sr-only" aria-label="{% t 'avatar_change' %}">
+    </label>
+    <noscript><button class="btn small" type="submit">{% t 'save' %}</button></noscript>
+    {% if user.avatar %}<button class="pf-ava-del" type="submit" name="remove" value="1" title="{% t 'avatar_remove' %}" aria-label="{% t 'avatar_remove' %}">×</button>{% endif %}
+  </form>
   <div class="pf-who">
     <span class="eyebrow">{% t 'member_id' %}: {{ user.member_code }}</span>
     <h1>{{ user.first_name }} {{ user.last_name }}</h1>

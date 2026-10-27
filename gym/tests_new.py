@@ -222,3 +222,35 @@ class StorageAndVipTests(Base):
         self.assertFalse(Plan.objects.filter(code="vip", active=True).exists())
         self.assertNotIn("VIP", Client().get("/").content.decode().replace("aria-label", ""))
         self.assertFalse(hasattr(services, "is_vip"))
+
+
+class AvatarTests(Base):
+    def setUp(self):
+        super().setUp()
+        import shutil
+        import tempfile
+        self.media = tempfile.mkdtemp()
+        self.ov = override_settings(MEDIA_ROOT=self.media)
+        self.ov.enable()
+        self.addCleanup(lambda: (self.ov.disable(), shutil.rmtree(self.media, ignore_errors=True)))
+        self.register()
+        self.c = Client()
+        self.c.post("/login/", {"login": "aziz_k", "password": PW})
+
+    def test_upload_show_and_remove(self):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        png = b"\x89PNG\r\n\x1a\n" + b"\x00" * 64
+        self.assertContains(self.c.get("/profile/"), "data-avatar-form")
+        self.c.post("/profile/", {"form": "avatar", "avatar": SimpleUploadedFile("me.html", b"<script>")})
+        self.assertFalse(User.objects.get(username="aziz_k").avatar)  # not a picture: refused
+        self.c.post("/profile/", {"form": "avatar", "avatar": SimpleUploadedFile("me.png", png)})
+        u = User.objects.get(username="aziz_k")
+        self.assertTrue(u.avatar)
+        page = self.c.get("/dashboard/").content.decode()
+        self.assertIn(f'<img src="{u.avatar_src}"', page)  # in the account menu
+        r = Client().get(u.avatar_src)
+        self.assertEqual((r.status_code, r["Content-Type"]), (200, "image/png"))
+        r.close()  # Windows keeps a file locked while a response still holds it open
+        self.c.post("/profile/", {"form": "avatar", "remove": "1"})
+        self.assertFalse(User.objects.get(username="aziz_k").avatar)
+        self.assertIn('class="um-ava"', self.c.get("/dashboard/").content.decode())
