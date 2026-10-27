@@ -104,3 +104,9 @@ def hm(value):
 def stars(n):
     n = int(n or 0)
     return "★" * n + "☆" * (5 - n)
+
+
+@register.filter
+def split(value, sep=None):
+    """"a b c"|split -> ["a", "b", "c"] (for short fixed lists written in a template)."""
+    return str(value).split(sep)

@@ -40,7 +40,6 @@ urlpatterns = [
     path("workouts/<int:pk>/toggle/", v.workout_toggle, name="workout_toggle"),
     path("workouts/program/<slug:key>/", v.start_program, name="start_program"),
     path("workouts/stop/", v.stop_plan, name="stop_plan"),
-    path("water/", v.water, name="water"),
     path("ai/", v.ai_view, name="ai"),
     path("ai/ask/", v.ai_ask, name="ai_ask"),
     path("ai/plan/", v.ai_plan, name="ai_plan"),

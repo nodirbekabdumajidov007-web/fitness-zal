@@ -25,15 +25,9 @@ class Base(TestCase):
 
 
 class DashboardTests(Base):
-    def test_water_tracker(self):
-        r = self.c.post("/water/", {"delta": "1"}, HTTP_X_REQUESTED_WITH="fetch")
-        self.assertEqual(r.json()["glasses"], 1)
-        self.c.post("/water/", {"delta": "5"}, HTTP_X_REQUESTED_WITH="fetch")  # clamped to +1
-        self.assertEqual(WaterLog.objects.get(user=self.m).glasses, 2)
-        for _ in range(4):
-            self.c.post("/water/", {"delta": "-1"}, HTTP_X_REQUESTED_WITH="fetch")
-        self.assertEqual(WaterLog.objects.get(user=self.m).glasses, 0)  # never below zero
-        self.assertEqual(Client().post("/water/").status_code, 302)  # visitors are sent to log in
+    def test_water_tracker_is_gone(self):
+        self.assertEqual(self.c.post("/water/").status_code, 404)
+        self.assertNotContains(self.c.get("/dashboard/"), "data-water")
 
     def test_dashboard_parts(self):
         Visit.objects.create(user=self.m)
@@ -48,7 +42,7 @@ class DashboardTests(Base):
         self.assertTrue(any(c["on"] for w in r.context["heat"] for c in w))
         self.assertEqual(r.context["w_change"], -1.5)
         self.assertTrue(r.context["next_at"])
-        for part in ("db-heat", "data-water", "data-countdown", "spark"):
+        for part in ("db-heat", "data-countdown", "spark"):
             self.assertContains(r, part)
 
 

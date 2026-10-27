@@ -130,12 +130,11 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  // close the language menu when clicking elsewhere or pressing Esc
-  var lp = document.querySelector('.langpick');
-  if (lp) {
+  // close the language and account menus when clicking elsewhere or pressing Esc
+  document.querySelectorAll('.langpick, .usermenu').forEach(function (lp) {
     document.addEventListener('click', function (e) { if (lp.open && !lp.contains(e.target)) lp.open = false; });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && lp.open) { lp.open = false; lp.querySelector('summary').focus(); } });
-  }
+  });
 
   // live character counter for textareas that ask for one
   document.querySelectorAll('textarea[data-count-to]').forEach(function (t) {

@@ -195,13 +195,29 @@ def delete_message(request, pk):
     return redirect("chat_room", pk=msg.room_id)
 
 
+# why a message is reported (key -> the text the admin sees); the member picks one, "other" needs a few words
+REPORT_REASONS = {"insult": "Haqorat / so'kinish", "spam": "Spam / reklama", "scam": "Firibgarlik / pul so'rash",
+                  "photo": "Noo'rin rasm", "threat": "Tahdid / bezovta qilish", "other": "Boshqa"}
+
+
 @require_POST
 @login_required
 def report_message(request, pk):
     msg = message_for(request, pk)
     if msg.sender_id == request.user.pk or msg.deleted:
         raise Http404()
-    ChatReport.objects.get_or_create(message=msg, reporter=request.user, defaults={"reason": request.POST.get("reason", "")[:200]})
+    if request.content_type == "application/json":
+        kind, detail = json_field(request, "kind"), json_field(request, "detail")
+    else:
+        kind, detail = request.POST.get("kind", ""), request.POST.get("detail", "")
+    detail = " ".join(detail.split())[:150]
+    if kind not in REPORT_REASONS or (kind == "other" and not detail):  # a report always says why, so the admin can judge it
+        if wants_json(request):
+            return JsonResponse({"ok": False, "error": translate(request.lang, "chat_report_reason")}, status=400)
+        flash(request, messages.ERROR, "chat_report_reason")
+        return redirect("chat_room", pk=msg.room_id)
+    reason = REPORT_REASONS[kind] + (f": {detail}" if detail else "")
+    ChatReport.objects.get_or_create(message=msg, reporter=request.user, defaults={"reason": reason[:200]})
     if wants_json(request):
         return JsonResponse({"ok": True, "text": translate(request.lang, "chat_report_sent")})
     flash(request, messages.SUCCESS, "chat_report_sent")

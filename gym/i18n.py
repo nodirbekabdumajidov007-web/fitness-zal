@@ -797,6 +797,19 @@ pw_link_bad||Havola eskirgan yoki allaqachon ishlatilgan.||Ссылка уста
 pw_email_again||Yangi havola so'rash||Запросить новую ссылку||Request a new link
 pw_by_sms||Telefon orqali (SMS) tiklash||Восстановить по SMS||Reset by SMS instead
 pw_by_email||Email orqali tiklash||Восстановить по email||Reset by e-mail instead
+cancel||Bekor qilish||Отмена||Cancel
+rep_title||Nima uchun shikoyat qilyapsiz?||Почему вы жалуетесь?||Why are you reporting this?
+rep_help||Sababni tanlang — administrator xabarni ko'rib chiqadi. Yozuvchi kim shikoyat qilganini bilmaydi.||Выберите причину — администратор проверит сообщение. Автор не узнает, кто пожаловался.||Pick a reason and the admin will review the message. The sender won't know who reported it.
+rep_insult||Haqorat yoki so'kinish||Оскорбление или мат||Insults or swearing
+rep_spam||Spam yoki reklama||Спам или реклама||Spam or advertising
+rep_scam||Firibgarlik, pul so'rash||Мошенничество, просьба денег||Scam or asking for money
+rep_photo||Noo'rin rasm||Неприемлемое фото||Inappropriate photo
+rep_threat||Tahdid yoki bezovta qilish||Угрозы или преследование||Threats or harassment
+rep_other||Boshqa sabab||Другая причина||Something else
+rep_detail||Izoh («Boshqa» uchun majburiy)||Комментарий (обязателен для «Другое»)||Details (required for «Something else»)
+rep_detail_ph||Qisqacha nima bo'lganini yozing||Коротко опишите, что случилось||Briefly say what happened
+rep_send||Shikoyat yuborish||Отправить жалобу||Send report
+chat_report_reason||Shikoyat sababini tanlang («Boshqa» bo'lsa, izoh yozing)||Выберите причину жалобы (для «Другое» напишите комментарий)||Pick a reason (for «Something else», add a few words)
 scan_session||Sessiya tugagan: sahifani yangilab, admin sifatida qayta kiring||Сессия истекла: обновите страницу и войдите снова как администратор||Session ended: reload the page and sign in again as admin
 """
 

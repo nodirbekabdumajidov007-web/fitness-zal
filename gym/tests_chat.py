@@ -183,12 +183,17 @@ class ModerationTests(ChatBase):
         general = ChatRoom.objects.get(slug="general")
         mid = self.send(self.cb, general, "yomon so'z").json()["message"]["id"]
         self.assertEqual(self.cb.post(f"/chat/message/{mid}/report/").status_code, 404)  # not your own message
-        r = self.ca.post(f"/chat/message/{mid}/report/", {"reason": "haqorat"}, **FETCH)
+        for bad in ({}, {"kind": "nonsense"}, {"kind": "other"}, {"kind": "other", "detail": "   "}):  # a reason is required
+            self.assertEqual(self.ca.post(f"/chat/message/{mid}/report/", bad, **FETCH).status_code, 400, bad)
+        self.assertFalse(ChatReport.objects.exists())
+        r = self.ca.post(f"/chat/message/{mid}/report/", {"kind": "insult"}, **FETCH)
         self.assertTrue(r.json()["ok"])
-        self.ca.post(f"/chat/message/{mid}/report/")  # twice: still one report
+        self.assertEqual(ChatReport.objects.get().reason, "Haqorat / so'kinish")
+        self.ca.post(f"/chat/message/{mid}/report/", {"kind": "spam"})  # twice: still one report
         self.assertEqual(ChatReport.objects.count(), 1)
         a = self.staff()
         self.assertContains(a.get("/django-admin/gym/chatreport/"), "yomon so")
+        self.assertContains(a.get("/django-admin/gym/chatreport/"), "Haqorat")  # the admin sees why
         report = ChatReport.objects.get()
         page = a.get(f"/django-admin/gym/chatreport/{report.pk}/change/")
         self.assertContains(page, "yomon so")
@@ -213,7 +218,7 @@ class ModerationTests(ChatBase):
         self.assertNotIn("juda shaxsiy gap", listing)
         mid = ChatMessage.objects.get(body="juda shaxsiy gap").pk
         self.assertEqual(a.get(f"/django-admin/gym/chatmessage/{mid}/change/").status_code, 302)  # not found in the restricted queryset
-        self.cb.post(f"/chat/message/{mid}/report/")  # once reported, moderators can see it
+        self.cb.post(f"/chat/message/{mid}/report/", {"kind": "spam"})  # once reported, moderators can see it
         self.assertIn("juda shaxsiy gap", a.get("/django-admin/gym/chatmessage/").content.decode())
 
 

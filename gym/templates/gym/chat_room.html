@@ -17,7 +17,7 @@
 
   <div class="m-log" id="chat-log" data-poll="{% url 'chat_poll' room.pk %}" data-send="{% url 'chat_send' room.pk %}" data-last="{{ last_id }}"
        data-kind="{{ room.kind }}" data-delete="/chat/message/0/delete/" data-report="/chat/message/0/report/"
-       data-t-delete="{% t 'chat_delete' %}" data-t-report="{% t 'chat_report' %}" data-t-deleted="{% t 'chat_deleted' %}" data-t-reported="{% t 'chat_report_sent' %}"
+       data-t-delete="{% t 'chat_delete' %}" data-t-report="{% t 'chat_report' %}" data-t-report-reason="{% t 'chat_report_reason' %}" data-t-deleted="{% t 'chat_deleted' %}" data-t-reported="{% t 'chat_report_sent' %}"
        data-t-today="{% t 'today_cap' %}" data-t-yesterday="{% t 'yesterday' %}" data-t-online="{% t 'online' %}" data-t-seen="{% t 'last_seen_at' time='@' %}"
        data-t-sure="{% t 'sure' %}" data-t-bad-image="{% t 'chat_bad_image' %}" data-t-typing="{% t 'chat_typing' name='@' %}"
        data-ws="/ws/chat/{{ room.pk }}/" aria-live="polite">
@@ -34,7 +34,7 @@
           <div class="m-meta"><span class="num">{{ m.time }}</span>{% if m.mine and room.kind == 'direct' and not m.deleted %}<span class="m-tick{% if m.read %} read{% endif %}" aria-label="{% if m.read %}{% t 'chat_read' %}{% else %}{% t 'chat_sent' %}{% endif %}">{% if m.read %}✓✓{% else %}✓{% endif %}</span>{% endif %}</div>
           {% if m.can_delete or m.can_report %}<div class="m-acts">
             {% if m.can_delete %}<form method="post" action="{% url 'chat_delete' m.id %}">{% csrf_token %}<button class="link" type="submit" data-bin data-confirm="{% t 'sure' %}">{% t 'chat_delete' %}</button></form>{% endif %}
-            {% if m.can_report %}<form method="post" action="{% url 'chat_report' m.id %}">{% csrf_token %}<button class="link" type="submit">{% t 'chat_report' %}</button></form>{% endif %}
+            {% if m.can_report %}<button class="link" type="button" data-report-open="{% url 'chat_report' m.id %}">{% t 'chat_report' %}</button>{% endif %}
           </div>{% endif %}
         </div>
       </div>
@@ -63,6 +63,18 @@
   </form>
   {% endif %}
 </section>
+<dialog class="rep-dlg" id="report-dlg" aria-labelledby="rep-title">
+  <form method="post" class="grid" data-report-form novalidate>{% csrf_token %}
+    <h3 id="rep-title">⚑ {% t 'rep_title' %}</h3>
+    <p class="muted">{% t 'rep_help' %}</p>
+    <div class="rep-opts" role="radiogroup" aria-labelledby="rep-title">
+      {% for k in "insult spam scam photo threat other"|split %}<label><input type="radio" name="kind" value="{{ k }}"><span>{% with key='rep_'|add:k %}{% t key %}{% endwith %}</span></label>{% endfor %}
+    </div>
+    <label class="rep-detail">{% t 'rep_detail' %}<textarea name="detail" rows="2" maxlength="150" placeholder="{% t 'rep_detail_ph' %}"></textarea></label>
+    <span class="field-err" data-report-err hidden></span>
+    <div class="rep-acts"><button class="btn" type="button" data-report-cancel>{% t 'cancel' %}</button><button class="btn primary" type="submit">{% t 'rep_send' %}</button></div>
+  </form>
+</dialog>
 <div class="m-lightbox" id="chat-lightbox" hidden><img alt=""><button type="button" aria-label="×">×</button></div>
 <script src="{% vstatic 'js/chat.js' %}"></script>
 {% endblock %}

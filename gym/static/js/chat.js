@@ -17,6 +17,32 @@
     else { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(data || {}); }
     return fetch(url, opts).then(function (r) { return r.json().then(function (j) { j._ok = r.ok; return j; }, function () { return { _ok: false }; }); });
   }
+  // report a message: a small dialog asks why (required), then the report is sent without leaving the chat
+  var dlg = document.getElementById('report-dlg'), repForm = dlg && dlg.querySelector('[data-report-form]');
+  var repErr = dlg && dlg.querySelector('[data-report-err]'), repUrl = '', repBtn = null;
+  function openReport(url, btn) {
+    if (!dlg) return;
+    repUrl = url; repBtn = btn; repForm.reset(); repErr.hidden = true;
+    if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
+  }
+  if (dlg) {
+    dlg.querySelector('[data-report-cancel]').addEventListener('click', function () { dlg.close(); });
+    dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });  // a click on the backdrop closes it
+    repForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var kind = (repForm.querySelector('input[name=kind]:checked') || {}).value || '', detail = repForm.elements.detail.value.trim();
+      if (!kind || (kind === 'other' && !detail)) { repErr.textContent = d.tReportReason; repErr.hidden = false; return; }
+      post(repUrl, { kind: kind, detail: detail }).then(function (j) {
+        if (j._ok) { dlg.close(); if (repBtn) { repBtn.textContent = d.tReported; repBtn.disabled = true; } }
+        else { repErr.textContent = j.error || d.tReportReason; repErr.hidden = false; }
+      });
+    });
+    document.addEventListener('click', function (e) {  // buttons on messages that came with the page
+      var b = e.target.closest && e.target.closest('[data-report-open]');
+      if (b) openReport(b.getAttribute('data-report-open'), b);
+    });
+  }
+
   function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
   function nearBottom() { return log.scrollHeight - log.scrollTop - log.clientHeight < 120; }
   function toBottom() { log.scrollTop = log.scrollHeight; }
@@ -66,7 +92,7 @@
         post(d.delete.replace('/0/', '/' + m.id + '/')).then(function (j) { if (j._ok) markDeleted(row); });
       }));
       if (m.can_report) acts.appendChild(act(d.tReport, function (e) {
-        post(d.report.replace('/0/', '/' + m.id + '/')).then(function (j) { if (j._ok) e.target.textContent = d.tReported; });
+        openReport(d.report.replace('/0/', '/' + m.id + '/'), e.target);
       }));
       b.appendChild(acts);
     }

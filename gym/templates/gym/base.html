@@ -33,7 +33,20 @@
       </button>
       {% if user.is_authenticated %}
         <a class="bell{% if inbox_unread %} ring{% endif %}" href="{% url 'inbox' %}" aria-label="{% t 'inbox' %}" title="{% t 'inbox' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 1 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>{% if inbox_unread %}<b class="num">{{ inbox_unread }}</b>{% endif %}</a>
-        <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="btn small" type="submit">{% t 'logout' %}</button></form>
+        <details class="usermenu">
+          <summary aria-label="{% t 'nav_profile' %}"><span class="um-ava" aria-hidden="true">{% if user.first_name %}{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}{% else %}{{ user.username|slice:":2"|upper }}{% endif %}</span><span class="um-name">{{ user.username }}</span><i class="lp-caret" aria-hidden="true"></i></summary>
+          <div class="um-menu" role="menu">
+            <div class="um-head"><b>{{ user.full_name }}</b><small class="muted">{{ user.email|default:user.member_code }}</small></div>
+            <a role="menuitem" href="{% url 'profile' %}">👤 {% t 'nav_profile' %}</a>
+            <a role="menuitem" href="{% url 'dashboard' %}">🏠 {% t 'nav_dash' %}</a>
+            <a role="menuitem" href="{% url 'inbox' %}">🔔 {% t 'inbox' %}{% if inbox_unread %} <b class="um-badge num">{{ inbox_unread }}</b>{% endif %}</a>
+            <a role="menuitem" href="{% url 'card' %}">▣ {% t 'member_card' %}</a>
+            <a role="menuitem" href="{% url 'payments' %}">💳 {% t 'payments' %}</a>
+            <a role="menuitem" href="{% url 'orders' %}">🛒 {% t 'orders' %}</a>
+            {% if admin_mode %}<a role="menuitem" href="/django-admin/">⚙ {% t 'nav_admin' %}</a>{% endif %}
+            <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="um-out" type="submit" role="menuitem">⎋ {% t 'logout' %}</button></form>
+          </div>
+        </details>
       {% else %}
         <a class="btn small" href="{% url 'login' %}">{% t 'login' %}</a>
         <a class="btn small primary" href="{% url 'register' %}">{% t 'register' %}</a>
@@ -59,7 +72,6 @@
     <a href="{% url 'tools' %}"{% if '/tools' in p %} aria-current="page"{% endif %}>🧮 {% t 'tools' %}</a>
     <a href="{% url 'reviews' %}"{% if '/reviews' in p %} aria-current="page"{% endif %}>{% t 'nav_reviews' %}</a>
     {% if is_trainer %}<a class="nav-coach" href="{% url 'coach' %}"{% if '/coach' in p %} aria-current="page"{% endif %}>🏋 {% t 'coach_panel' %}</a>{% endif %}
-    {% if user.is_authenticated %}<a href="{% url 'profile' %}"{% if '/profile' in p %} aria-current="page"{% endif %}>{% t 'nav_profile' %}</a>{% endif %}
     {% if admin_mode %}<a href="{% url 'desk' %}"{% if '/staff' in p %} aria-current="page"{% endif %}>{% t 'nav_desk' %}</a><a href="/django-admin/">{% t 'nav_admin' %}</a>{% endif %}
   </nav>
   {% endwith %}
@@ -110,7 +122,6 @@
       {% include "gym/_route.html" with variant="up small" %}
     </section>
   </div>
-  <div class="ft-word" aria-hidden="true">FITNES ZAL</div>
   <div class="ft-bottom"><div class="wrap">
     <span>© {% now "Y" %} Fitnes Zal · {% t 'ft_rights' %}</span>
     <span class="ft-made">{% t 'ft_made' %}</span>

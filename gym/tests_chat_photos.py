@@ -72,7 +72,7 @@ class PhotoChatTests(TestCase):
         staff.post("/login/", {"phone": "908775505", "password": "AdminPass1.admin"})
         m = self.send_photo(self.ca, self.room).json()["message"]
         self.assertEqual(staff.get(m["image"]).status_code, 404)
-        self.cb.post(f"/chat/message/{m['id']}/report/")
+        self.cb.post(f"/chat/message/{m['id']}/report/", {"kind": "photo"})
         self.assertEqual(staff.get(m["image"]).status_code, 200)
 
     def test_group_room_photos_and_rate_limit_shared(self):

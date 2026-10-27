@@ -602,8 +602,6 @@ def dashboard(request):
         span = (hi - lo) or 1
         spark = " ".join(f"{round(i / (len(ws) - 1) * 100, 1)},{round(90 - (w - lo) / span * 80, 1)}" for i, w in enumerate(ws))
         w_change = round(ws[-1] - ws[0], 1)
-    from .models import WaterLog
-    water_log = WaterLog.objects.filter(user=u, date=today).first()
     nxt = u.bookings.filter(date__gte=today).select_related("gym_class").order_by("date", "gym_class__start_time").first()
     next_at = None
     if nxt:
@@ -612,7 +610,7 @@ def dashboard(request):
             next_at = None
     return render(request, "gym/dashboard.html", {
         "heat": heat, "spark": spark, "w_change": w_change, "w_last": logs[-1].weight if logs else None,
-        "water": water_log.glasses if water_log else 0, "water_goal": 8, "next_booking": nxt if next_at else None,
+        "next_booking": nxt if next_at else None,
         "next_at": next_at.isoformat() if next_at else "", "crowd": crowd_level(), "stats_total": stats["total"],
         "m": m, "last": last, "upcoming": upcoming, "days_left": days_left, "pct": pct, "stats": stats, "notes": notes,
         "announcements": Announcement.objects.filter(active=True)[:3],
@@ -770,23 +768,6 @@ def record_delete(request, pk):
     from .models import PersonalRecord
     get_object_or_404(PersonalRecord, pk=pk, user=request.user).delete()
     return redirect("records")
-
-
-@require_POST
-@login_required
-def water(request):
-    """Dashboard water tracker: +1 / -1 glass for today, 0..20."""
-    from .models import WaterLog
-    try:
-        delta = max(-1, min(1, int(request.POST.get("delta", 1))))
-    except ValueError:
-        delta = 1
-    log, _ = WaterLog.objects.get_or_create(user=request.user, date=timezone.localdate())
-    log.glasses = max(0, min(20, log.glasses + delta))
-    log.save(update_fields=["glasses"])
-    if wants_json(request):
-        return JsonResponse({"ok": True, "glasses": log.glasses})
-    return redirect("dashboard")
 
 
 def plans_view(request):

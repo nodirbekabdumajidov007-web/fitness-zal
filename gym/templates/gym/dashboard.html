@@ -57,15 +57,6 @@
     <div class="heat-legend muted"><span>{% t 'less' %}</span><i></i><i class="on"></i><span>{% t 'more' %}</span></div>
   </section>
 
-  <!-- water tracker -->
-  <section class="card db-tile db-water" data-water data-url="{% url 'water' %}" data-goal="{{ water_goal }}">
-    <div class="db-head"><h3>💧 {% t 'water' %}</h3><span class="muted num"><b data-water-n>{{ water }}</b> / {{ water_goal }}</span></div>
-    <div class="water-glass" aria-hidden="true"><i style="--w:{% widthratio water water_goal 100 %}"></i><span class="bubbles"></span></div>
-    <div class="db-water-acts">
-      <form method="post" action="{% url 'water' %}">{% csrf_token %}<input type="hidden" name="delta" value="-1"><button class="btn small" type="submit" aria-label="−1">−</button></form>
-      <form method="post" action="{% url 'water' %}">{% csrf_token %}<input type="hidden" name="delta" value="1"><button class="btn small primary" type="submit">+ {% t 'glass' %}</button></form>
-    </div>
-  </section>
 
   <!-- next class countdown -->
   <section class="card db-tile db-next">

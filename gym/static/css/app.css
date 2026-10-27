@@ -1466,4 +1466,37 @@ a.db-tile{text-decoration:none;transition:transform .2s,border-color .2s}a.db-ti
   background-repeat:no-repeat;background-position:13px 50%;background-size:17px}
 @media (max-width:820px){.ai-grid{grid-template-columns:1fr}.ai-plan{position:static}}
 
+/* ---------- chat report dialog ---------- */
+.rep-dlg{width:min(440px,calc(100vw - 32px));padding:0;border:1px solid var(--line);border-radius:18px;background:var(--surface);color:var(--ink);box-shadow:0 24px 60px rgba(0,0,0,.35)}
+.rep-dlg::backdrop{background:rgba(8,10,14,.55);backdrop-filter:blur(3px)}
+.rep-dlg[open]{animation:rise .2s ease-out}
+.rep-dlg form{padding:20px;gap:12px}
+.rep-dlg h3,.rep-dlg p{margin:0}
+.rep-opts{display:grid;gap:6px}
+.rep-opts label{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid var(--line);border-radius:12px;cursor:pointer;transition:border-color .15s,background .15s}
+.rep-opts label:has(input:checked){border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,var(--surface))}
+.rep-opts input{accent-color:var(--accent);margin:0;width:18px;height:18px;flex:none;padding:0}
+.rep-opts span{flex:1;text-align:left;font-weight:600}
+.rep-acts{display:flex;justify-content:flex-end;gap:8px}
+/* ---------- account menu (avatar + username, top right) ---------- */
+.usermenu{position:relative}
+.usermenu summary{list-style:none;display:inline-flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;border:1.5px solid #5fd3c0;border-radius:99px;
+  background:var(--surface);cursor:pointer;font-weight:700;font-size:.9rem;transition:box-shadow .2s,border-color .2s}
+.usermenu summary::-webkit-details-marker{display:none}
+.usermenu summary:hover,.usermenu[open] summary{box-shadow:0 0 0 3px rgba(95,211,192,.2)}
+.usermenu summary:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.um-ava{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-size:.8rem;font-weight:800;letter-spacing:.02em;
+  color:var(--ink);background:var(--bg);border:1px solid var(--line)}
+.um-name{max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.usermenu[open] .lp-caret{transform:rotate(-135deg) translateY(-1px)}
+.um-menu{position:absolute;right:0;top:calc(100% + 8px);z-index:60;min-width:230px;padding:6px;border-radius:14px;background:var(--surface);
+  border:1px solid var(--line);box-shadow:0 18px 40px rgba(0,0,0,.22);display:grid;animation:lpIn .18s cubic-bezier(.2,.8,.1,1)}
+.um-head{display:grid;gap:2px;padding:8px 10px 10px;border-bottom:1px solid var(--line);margin-bottom:4px}
+.um-head small{overflow:hidden;text-overflow:ellipsis}
+.um-menu a,.um-out{display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border-radius:10px;text-decoration:none;font:inherit;font-size:.9rem;
+  font-weight:600;color:var(--ink);background:none;border:0;cursor:pointer;text-align:left}
+.um-menu a:hover,.um-out:hover{background:var(--bg)}
+.um-out{color:var(--bad);border-top:1px solid var(--line);border-radius:0 0 10px 10px;margin-top:4px}
+.um-badge{margin-left:auto;min-width:20px;height:20px;padding:0 6px;border-radius:99px;background:var(--accent);color:#fff;font-size:.72rem;display:grid;place-items:center}
+@media (max-width:600px){.um-name{display:none}.usermenu summary{padding:4px 8px 4px 4px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
