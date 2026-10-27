@@ -1,0 +1,20 @@
+{% extends "admin/base_site.html" %}{% load gym_tags %}
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url 'admin:index' %}">Bosh sahifa</a> › Qidiruv</div>{% endblock %}
+{% block content %}
+<div class="fz-wrap">
+  <form class="fz-bigsearch" method="get"><input name="q" type="search" value="{{ q }}" placeholder="Ism, familiya, telefon (XX XXX…), Gmail, FZ-0001, #to'lov raqami" autofocus><button class="button" type="submit">Qidirish</button></form>
+  {% if q and not res.total %}<div class="fz-panel"><p class="fz-empty">«{{ q }}» bo'yicha hech narsa topilmadi. Telefonning kamida 3 raqamini yoki ismni yozib ko'ring.</p></div>{% endif %}
+  {% if res.users %}
+  <div class="fz-panel"><h3>A'zolar · {{ res.users|length }}</h3><p class="sub">Kartochkani ochish uchun bosing</p>
+    <div class="fz-people">{% for u in res.users %}
+      <a class="fz-person" href="{% url 'admin:member' u.pk %}">
+        <span class="fz-ava">{{ u.first_name|first|upper }}{{ u.last_name|first|upper }}</span>
+        <span><b>{{ u.first_name }} {{ u.last_name }}</b><small>{{ u.member_code }} · {{ u.phone|default:u.email|default:"—" }}</small></span>
+        {% if not u.is_active %}<span class="fz-pill red">Bloklangan</span>{% elif u.until and u.until > now %}<span class="fz-pill green">{{ u.until|date:"d.m" }} gacha</span>{% else %}<span class="fz-pill">Abonementsiz</span>{% endif %}
+      </a>{% endfor %}</div></div>
+  {% endif %}
+  {% if res.payments %}<div class="fz-panel"><h3>To'lovlar</h3><ul class="fz-list">{% for p in res.payments %}<li><a href="{% url 'admin:gym_payment_change' p.pk %}">#{{ p.pk }} · {{ p.user|default:"—" }}</a><span><b>{{ p.amount|money }}</b> <span class="fz-pill">{{ p.get_status_display }}</span></span></li>{% endfor %}</ul></div>{% endif %}
+  {% if res.orders %}<div class="fz-panel"><h3>Buyurtmalar</h3><ul class="fz-list">{% for o in res.orders %}<li><a href="{% url 'admin:gym_order_change' o.pk %}">#{{ o.pk }} · {{ o.user|default:"—" }}</a><span><b>{{ o.total|money }}</b> <span class="fz-pill">{{ o.get_status_display }}</span></span></li>{% endfor %}</ul></div>{% endif %}
+  {% if res.products %}<div class="fz-panel"><h3>Mahsulotlar</h3><ul class="fz-list">{% for p in res.products %}<li><a href="{% url 'admin:gym_product_change' p.pk %}">{{ p.name }}</a><span>{{ p.price|money }} so'm · <span class="fz-pill{% if p.stock <= 5 %} red{% endif %}">{{ p.stock }} ta</span></span></li>{% endfor %}</ul></div>{% endif %}
+</div>
+{% endblock %}

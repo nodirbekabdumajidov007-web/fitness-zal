@@ -1,0 +1,25 @@
+{% extends "gym/base.html" %}{% load static gym_tags %}
+{% block title %}{% t 'trainers' %}{% endblock %}
+{% block content %}
+<h2>{% t 'trainers' %}</h2>
+{% if sessions %}
+<div class="card grid"><h3>{% t 'pt_mine' %}</h3>
+  {% for s in sessions %}<div class="cls"><span><b>{{ s.trainer.name }}</b> <span class="muted num">· {{ s.starts|dmyhm }}</span></span>
+    <span class="inline" style="flex:none;align-items:center"><span class="pill {% if s.status == 'confirmed' %}good{% else %}warn{% endif %}">{% t 'pt_'|add:s.status %}</span>
+    <form method="post" action="{% url 'pt_cancel' s.pk %}">{% csrf_token %}<button class="btn small danger" type="submit" data-bin data-confirm="{% t 'sure' %}">{% t 'cancel_booking' %}</button></form></span></div>{% endfor %}
+</div>
+{% endif %}
+<div class="grid g3">
+  {% for tr in trainers %}
+  <a class="card lift trainer-card" href="{% url 'trainer' tr.pk %}" style="text-decoration:none">
+    <span class="trainer-img" data-px="14">{% if tr.image_src %}<img data-fallback="{% static 'img/trainer.svg' %}" src="{{ tr.image_src }}" alt="{{ tr.name }}" loading="lazy" referrerpolicy="no-referrer">{% else %}<img src="{% static 'img/trainer.svg' %}" alt="">{% endif %}</span>
+    <span class="tc-body">
+      <h3>{{ tr.name }}</h3>
+      <span class="eyebrow">{{ tr.specialty }} · {{ tr.experience_years }} {% t 'years_exp' %}</span>
+      {% if tr.bio %}<span class="muted tc-bio">{{ tr.bio|truncatechars:110 }}</span>{% endif %}
+      <span class="tc-foot">{% if tr.pt_price %}<span class="num"><b>{{ tr.pt_price|money }}</b> {% t 'price_unit' %}</span>{% endif %}<span class="btn small primary">{% t 'trainer_open' %} →</span></span>
+    </span>
+  </a>
+  {% empty %}<div class="card muted">{% t 'none_yet' %}</div>{% endfor %}
+</div>
+{% endblock %}

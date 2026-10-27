@@ -1,0 +1,33 @@
+{% extends "gym/base.html" %}{% load gym_tags %}
+{% block title %}{% t 'nav_plans' %}{% endblock %}
+{% block content %}
+<h2>{% t 'nav_plans' %}</h2>
+<div class="grid g3">
+  {% for p in plans %}
+  <form class="card plan lift" method="post" action="{% url 'buy_plan' p.code %}">
+    {% csrf_token %}
+    <div class="eyebrow">{% t 'months_n' n=p.months %}</div>
+    <h3>{% plan_name p %}</h3>
+    <div class="price num">{{ p.price|money }} <small>{% t 'price_unit' %}</small></div>
+    <ul class="perks">{% plan_perks p as perks %}{% for x in perks %}<li>{{ x }}</li>{% endfor %}</ul>
+    <label for="m_{{ p.code }}">{% t 'pay_method' %}
+      <select id="m_{{ p.code }}" name="method">{% for mth in methods %}<option value="{{ mth }}">{% method_label mth %}</option>{% endfor %}</select></label>
+    <label for="p_{{ p.code }}">{% t 'promo' %}<input id="p_{{ p.code }}" name="promo" maxlength="20" autocomplete="off"></label>
+    <button class="btn primary" type="submit">{% t 'buy' %}</button>
+  </form>
+  {% endfor %}
+</div>
+{% if demo_on %}<div class="note">{% t 'demo_note' %}</div>{% endif %}
+
+{% if user.is_authenticated and m and not m.freeze_used and not m.is_frozen and freeze_options %}
+<form class="card grid" method="post" action="{% url 'freeze' %}">
+  {% csrf_token %}
+  <h3>{% t 'freeze' %}</h3>
+  <p class="muted" style="margin:0">{% t 'freeze_help' max=max_freeze %}</p>
+  <div class="inline">
+    <label for="fd">{% t 'freeze_days' %}<select id="fd" name="days">{% for d in freeze_options %}<option value="{{ d }}">{{ d }}</option>{% endfor %}</select></label>
+    <button class="btn" type="submit" data-confirm="{% t 'confirm' %}">{% t 'freeze_do' %}</button>
+  </div>
+</form>
+{% endif %}
+{% endblock %}

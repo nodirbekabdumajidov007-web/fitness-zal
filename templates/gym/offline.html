@@ -1,0 +1,5 @@
+{% extends "gym/base.html" %}{% load gym_tags %}
+{% block title %}Offline{% endblock %}
+{% block content %}
+<div class="card grid" style="max-width:460px;margin-inline:auto"><h2>{% t 'offline_title' %}</h2><p class="muted" style="margin:0">{% t 'offline_text' %}</p><a class="btn primary" href="/">{% t 'retry' %}</a></div>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "admin/base_site.html" %}{% load gym_tags %}
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url 'admin:index' %}">Bosh sahifa</a> › <a href="{% url 'admin:gym_user_changelist' %}">A'zolar</a> › {{ m.first_name }} {{ m.last_name }}</div>{% endblock %}
+{% block content %}
+<div class="fz-wrap">
+  <section class="fz-hero fz-member">
+    <div class="fz-who">
+      <span class="fz-ava xl">{{ m.first_name|first|upper }}{{ m.last_name|first|upper }}</span>
+      <div>
+        <span class="fz-eyebrow">{{ m.member_code }} · a'zo {{ m.created|date:"d.m.Y" }} dan</span>
+        <h2>{{ m.first_name }} {{ m.last_name }} {% if not m.is_active %} <span class="fz-pill red">Bloklangan</span>{% endif %}</h2>
+        <p>{% if m.phone %}<a href="tel:{{ m.phone }}">{{ m.phone }}</a>{% if m.phone_verified %} ✓{% endif %}{% endif %}{% if m.email %} · {{ m.email }}{% endif %}{% if m.telegram_chat_id %} · Telegram ulangan{% endif %}{% if referrals %} · {{ referrals }} ta do'st taklif qilgan{% endif %}</p>
+        <div class="fz-actions"><a class="red" href="/staff/?q={{ m.phone|default:m.member_code|urlencode }}">Qabulxonada ochish</a><a href="{% url 'admin:gym_user_change' m.pk %}">Tahrirlash / +30 kun</a><a href="{% url 'admin:gym_payment_changelist' %}?q={{ m.phone|default:''|urlencode }}">To'lovlari</a><a href="{% url 'admin:message' %}?ids={{ m.pk }}">✉ Xabar yozish</a></div>
+        {% if m.staff_note %}<p class="fz-note">📝 {{ m.staff_note }}</p>{% endif %}
+      </div>
+    </div>
+    <div class="fz-goal">
+      {% if active %}<div class="fz-ring big" style="--p:{% widthratio days_left 30 100 %}"><span><b>{{ days_left }}</b><small>kun qoldi</small></span></div>
+      <p>{{ active.plan.name }}<br><small>{{ active.expires|date:"d.m.Y" }} gacha</small></p>
+      {% else %}<div class="fz-ring big" style="--p:0"><span><b>0</b><small>abonement yo'q</small></span></div><p><small>Qabulxonada abonement soting</small></p>{% endif %}
+    </div>
+  </section>
+
+  <div class="fz-kpis">
+    <div class="fz-kpi green"><small>Jami to'lagan</small><b>{{ spent|money }} <small>so'm</small></b></div>
+    <div class="fz-kpi dark"><small>Tashriflar (jami)</small><b data-count="{{ visits_total }}">{{ visits_total }}</b></div>
+    <div class="fz-kpi"><small>Oxirgi 30 kun</small><b data-count="{{ visits_30 }}">{{ visits_30 }}</b></div>
+  </div>
+
+  <div class="fz-grid2">
+    <div class="fz-panel"><h3>✉ Shaxsan yozish</h3><p class="sub">{{ m.first_name }}ning saytdagi «Xabarlar» qutisiga tushadi{% if m.telegram_chat_id %}, Telegramga ham{% endif %}</p>
+      <form class="fz-quickmsg" method="post" action="{% url 'admin:message' %}">{% csrf_token %}<input type="hidden" name="ids" value="{{ m.pk }}">
+        <input name="title" maxlength="120" placeholder="Sarlavha, masalan: Salom, {{ m.first_name }}!" required>
+        <textarea name="body" rows="3" maxlength="2000" placeholder="Xabar matni…"></textarea>
+        <div class="row"><label><input type="checkbox" name="tg"{% if m.telegram_chat_id %} checked{% else %} disabled{% endif %}> ✈ Telegram</label>
+          <label><input type="checkbox" name="sms"{% if not m.phone %} disabled{% endif %}> ✉ SMS</label>
+          <label><input type="checkbox" name="email"{% if not m.email %} disabled{% endif %}> 📧 Email</label><button type="submit">Yuborish ➤</button></div>
+      </form>
+      <ul class="fz-list">{% for n in notes %}<li><span>{{ n.title|truncatechars:40 }}</span><span>{{ n.created|date:"d.m H:i" }} {% if n.read_at %}<span class="fz-pill green">o'qildi</span>{% else %}<span class="fz-pill">yetkazildi</span>{% endif %}</span></li>{% endfor %}</ul></div>
+    <div class="fz-panel"><h3>Maqsad va rekordlar</h3><p class="sub">{% if m.goal %}{{ m.get_goal_display }}{% else %}Maqsad kiritilmagan{% endif %}{% if m.target_weight %} · maqsad vazn {{ m.target_weight }} kg{% endif %}{% if m.birth_date %} · 🎂 {{ m.birth_date|date:"d.m.Y" }}{% endif %}</p>
+      <ul class="fz-list">{% for r in records %}<li><span>{{ r.get_lift_display }}</span><span><b>{{ r.weight }} kg × {{ r.reps }}</b> · 1RM ≈ {{ r.one_rm }} · {{ r.date|date:"d.m.y" }}</span></li>{% empty %}<li class="fz-empty">Rekord yozilmagan</li>{% endfor %}</ul></div>
+    <div class="fz-panel"><h3>Haftalik tashriflar</h3><p class="sub">Oxirgi 12 hafta: kelishi kamaysa, qo'ng'iroq qiling</p>
+      <div class="fz-chart">{% for x in weeks %}<div class="fz-col dark{% if not x.v %} zero{% endif %}{% if forloop.last %} peak{% endif %}" title="{{ x.label }}: {{ x.v }}"><span class="val">{{ x.v }}</span><span class="barwrap"><i class="bar" style="height:{{ x.h }}%"></i></span><span class="lab">{{ x.label }}</span></div>{% endfor %}</div></div>
+    <div class="fz-panel"><h3>To'lovlar</h3><p class="sub">Eng yangilari</p>
+      <ul class="fz-list">{% for p in payments %}<li><a href="{% url 'admin:gym_payment_change' p.pk %}">#{{ p.pk }} · {% if p.plan %}{{ p.plan.name }}{% else %}{{ p.kind }}{% endif %} · {{ p.created|date:"d.m.y" }}</a><span><b>{{ p.amount|money }}</b> <span class="fz-pill {% if p.status == 'paid' %}green{% elif p.status == 'pending' %}gold{% endif %}">{{ p.get_status_display }}</span></span></li>{% empty %}<li class="fz-empty">Yo'q</li>{% endfor %}</ul></div>
+    <div class="fz-panel"><h3>Abonementlar tarixi</h3><p class="sub">&nbsp;</p>
+      <ul class="fz-list">{% for x in memberships %}<li><span>{{ x.plan.name }}</span><span>{{ x.starts|date:"d.m.y" }} → <b>{{ x.expires|date:"d.m.y" }}</b>{% if x.freeze_used %} <span class="fz-pill">muzlatilgan</span>{% endif %}</span></li>{% empty %}<li class="fz-empty">Yo'q</li>{% endfor %}</ul></div>
+    <div class="fz-panel"><h3>Oxirgi tashriflar</h3><p class="sub">&nbsp;</p>
+      <ul class="fz-list">{% for v in visits %}<li><span>{{ v.ts|date:"l" }}</span><b>{{ v.ts|date:"d.m.Y H:i" }}</b></li>{% empty %}<li class="fz-empty">Hali kelmagan</li>{% endfor %}</ul></div>
+    <div class="fz-panel"><h3>Buyurtmalar</h3><p class="sub">Do'kon</p>
+      <ul class="fz-list">{% for o in orders %}<li><a href="{% url 'admin:gym_order_change' o.pk %}">#{{ o.pk }} · {% for it in o.items.all %}{{ it.name }}×{{ it.qty }}{% if not forloop.last %}, {% endif %}{% endfor %}</a><span><b>{{ o.total|money }}</b> <span class="fz-pill">{{ o.get_status_display }}</span></span></li>{% empty %}<li class="fz-empty">Yo'q</li>{% endfor %}</ul></div>
+    <div class="fz-panel"><h3>Bronlar va shaxsiy mashg'ulotlar</h3><p class="sub">&nbsp;</p>
+      <ul class="fz-list">{% for b in bookings %}<li><span>{{ b.gym_class.name }}</span><b>{{ b.date|date:"d.m" }} {{ b.gym_class.start_time|time:"H:i" }}</b></li>{% endfor %}
+        {% for s in pts %}<li><span>PT · {{ s.trainer.name }}</span><span><b>{{ s.starts|date:"d.m H:i" }}</b> <span class="fz-pill">{{ s.get_status_display }}</span></span></li>{% endfor %}
+        {% if not bookings and not pts %}<li class="fz-empty">Yo'q</li>{% endif %}</ul></div>
+  </div>
+</div>
+{% endblock %}

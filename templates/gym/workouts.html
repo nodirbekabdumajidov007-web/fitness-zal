@@ -1,0 +1,72 @@
+{% extends "gym/base.html" %}{% load gym_tags %}
+{% block title %}{% t 'workouts' %}{% endblock %}
+{% block content %}
+<div class="wo-head">
+  <div><span class="eyebrow">{% t 'workouts' %}</span><h1>{% if plan %}{{ plan.title }}{% else %}{% t 'workouts' %}{% endif %}</h1>
+    {% if plan %}<p class="muted" style="margin:6px 0 0">{% if from_trainer %}🏋 {% t 'trainer' %}: <b>{{ plan.trainer.name }}</b>{% else %}{% t 'own_plan' %}{% endif %}</p>{% endif %}</div>
+  {% if plan %}<div class="wo-week-ring" style="--p:{{ week_pct }}" title="{% t 'week_progress' %}"><span><b class="num">{{ week_pct }}%</b><small>{% t 'this_week' %}</small></span></div>{% endif %}
+</div>
+
+{% if plan %}
+  {% if plan.notes %}<div class="note info">{{ plan.notes|linebreaksbr }}</div>{% endif %}
+
+  <ol class="wo-strip" aria-label="{% t 'this_week' %}">
+    {% for s in strip %}<li class="{% if s.today %}today{% endif %}{% if not s.total %} rest{% elif s.done >= s.total %} full{% elif s.past %} missed{% endif %}" style="--p:{{ s.pct }}">
+      <span>{% t 'wd_short_'|add:s.wd %}</span><i>{% if not s.total %}·{% elif s.done >= s.total %}✓{% else %}{{ s.done }}/{{ s.total }}{% endif %}</i></li>{% endfor %}
+  </ol>
+
+  <div class="wo-layout">
+    <div class="wo-days">
+      {% for d in days %}
+      <section class="wo-day{% if d.today %} today{% endif %}">
+        <h3>{% t 'weekday_'|add:d.wd %}{% if d.today %} <span class="pill good">{% t 'today' %}</span>{% endif %}</h3>
+        {% for x in d.ex %}
+        <form class="card wo-ex{% if x.done %} done{% endif %}" method="post" action="{% url 'workout_toggle' x.e.pk %}">
+          {% csrf_token %}
+          <span class="wo-n num">{{ forloop.counter }}</span>
+          <span class="wo-info"><b>{{ x.e.name }}</b><span class="muted num">{{ x.e.sets }} × {{ x.e.reps }}{% if x.e.note %} · {{ x.e.note }}{% endif %}</span>
+            <span class="wo-sets" aria-hidden="true">{% for i in "x"|ljust:x.e.sets %}<i></i>{% endfor %}</span></span>
+          {% if d.today %}<button class="wo-check" type="submit" aria-label="{% if x.done %}{% t 'done_mark' %}{% else %}{% t 'mark_done' %}{% endif %}">{% if x.done %}✓{% endif %}</button>{% endif %}
+        </form>
+        {% endfor %}
+      </section>
+      {% endfor %}
+    </div>
+
+    <aside class="card wo-timer" data-timer>
+      <h3>⏱ {% t 'rest_timer' %}</h3>
+      <div class="tm-ring"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44"/><circle class="tm-prog" cx="50" cy="50" r="44" pathLength="100"/></svg><b class="num" data-tm-left>1:30</b></div>
+      <div class="tm-presets">
+        <button type="button" data-sec="30">30 s</button><button type="button" data-sec="60">1:00</button><button type="button" data-sec="90" aria-pressed="true">1:30</button><button type="button" data-sec="120">2:00</button></div>
+      <div class="tm-acts"><button class="btn primary pill" type="button" data-tm-start>▶ {% t 'start' %}</button><button class="btn pill" type="button" data-tm-reset>↺</button></div>
+      <small class="muted">{% t 'rest_timer_help' %}</small>
+    </aside>
+  </div>
+
+  {% if not from_trainer %}<form method="post" action="{% url 'stop_plan' %}" class="wo-stop">{% csrf_token %}<button class="btn small danger" type="submit" data-bin data-confirm="{% t 'sure' %}">{% t 'plan_stop' %}</button></form>{% endif %}
+{% else %}
+  <section class="wo-empty card">
+    <span class="wo-empty-ico" aria-hidden="true">🏋️</span>
+    <h2>{% t 'no_plan_title' %}</h2>
+    <p class="muted">{% t 'no_plan' %} {% t 'no_plan_or' %}</p>
+  </section>
+{% endif %}
+
+{% if not from_trainer %}
+<section class="grid">
+  <div class="sec-head"><span class="eyebrow" style="color:var(--accent)">{% t 'programs' %}</span><h2>{% t 'programs_title' %}</h2></div>
+  <div class="prog-grid">
+    {% for p in programs %}
+    <article class="card prog lift lvl-{{ p.level }}">
+      <span class="prog-emoji" aria-hidden="true">{{ p.emoji }}</span>
+      <h3>{{ p.title }}</h3>
+      <div class="chips"><span class="pill mute">{{ p.days }}</span><span class="pill mute">{{ p.count }} {% t 'exercises_n' %}</span><span class="pill mute">{% t 'level_'|add:p.level %}</span></div>
+      <p class="muted">{{ p.about }}</p>
+      <form method="post" action="{% url 'start_program' p.key %}">{% csrf_token %}<button class="btn primary pill" type="submit"{% if plan %} data-confirm="{% t 'program_replace' %}"{% endif %}>{% t 'program_start' %} →</button></form>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}
+{% block scripts %}<script src="{% vstatic 'js/workouts.js' %}"></script>{% endblock %}

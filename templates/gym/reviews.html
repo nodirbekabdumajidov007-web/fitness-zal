@@ -1,0 +1,41 @@
+{% extends "gym/base.html" %}{% load gym_tags %}
+{% block title %}{% t 'reviews' %}{% endblock %}
+{% block content %}
+<div class="rv-head">
+  <div><span class="eyebrow">Fitnes Zal</span><h1>{% t 'reviews' %}</h1><p class="muted">{% t 'reviews_sub' %}</p></div>
+</div>
+
+<div class="rv-top">
+  <section class="card rv-score">
+    <div class="rv-big"><b class="num">{% if agg.n %}{{ agg.a|floatformat:1 }}{% else %}—{% endif %}</b>
+      <span class="stars lg">{% if agg.n %}{{ agg.a|floatformat:0|add:0|stars }}{% else %}☆☆☆☆☆{% endif %}</span>
+      <small class="muted">{% t 'reviews_count' n=agg.n %}</small></div>
+    <ul class="rv-dist">{% for d in dist %}<li><span class="num">{{ d.stars }} ★</span><span class="bar"><i style="width:{{ d.pct }}%"></i></span><span class="num muted">{{ d.n }}</span></li>{% endfor %}</ul>
+  </section>
+
+  <form class="card grid rv-form" method="post">
+    {% csrf_token %}
+    <h3>{% if mine %}{% t 'review_edit' %}{% else %}{% t 'review_write' %}{% endif %}</h3>
+    <fieldset class="star-pick" aria-label="{% t 'rating' %}">
+      {% for i in "54321" %}<input type="radio" id="st{{ i }}" name="rating" value="{{ i }}"{% if my_rating|stringformat:"s" == i %} checked{% endif %}><label for="st{{ i }}" title="{{ i }} ★">★</label>{% endfor %}
+    </fieldset>
+    <label for="id_comment" class="rv-text">{% t 'comment' %}<textarea id="id_comment" name="comment" maxlength="500" rows="4" placeholder="{% t 'review_ph' %}" data-count-to="rv-count">{{ mine.comment|default:'' }}</textarea><small class="muted num" id="rv-count"></small></label>
+    {% for f in form %}{% for e in f.errors %}<span class="field-err">{% t e %}</span>{% endfor %}{% endfor %}
+    <div class="inline" style="align-items:center;justify-content:space-between">
+      <span class="muted" style="font-size:.85rem">{% if user.is_authenticated %}{% t 'review_help' %}{% else %}{% t 'review_login' %}{% endif %}</span>
+      <button class="btn primary pill" type="submit" style="flex:none">{% t 'send' %} →</button>
+    </div>
+  </form>
+</div>
+
+<div class="rv-grid">
+  {% for r in reviews %}
+  <article class="card rv-card">
+    <header><span class="rv-ava">{{ r.user.first_name|first|upper }}</span><span><b>{{ r.user.first_name }}</b><small class="muted">{{ r.created|dmy }}</small></span><span class="stars">{{ r.rating|stars }}</span></header>
+    {% if r.comment %}<p>{{ r.comment }}</p>{% endif %}
+  </article>
+  {% empty %}
+  <div class="card rv-empty"><span>💬</span><b>{% t 'none_yet' %}</b><small class="muted">{% t 'review_first' %}</small></div>
+  {% endfor %}
+</div>
+{% endblock %}
