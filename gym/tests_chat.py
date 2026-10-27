@@ -223,6 +223,7 @@ class ModerationTests(ChatBase):
 
 
 class UploadedVideoTests(TestCase):
+    """The home-page video upload: streamed with Range support so it starts fast and can seek."""
     def setUp(self):
         cache.clear()
         call_command("setup_gym", demo=True, verbosity=0)
@@ -231,40 +232,32 @@ class UploadedVideoTests(TestCase):
         self.override.enable()
         self.addCleanup(lambda: (self.override.disable(), shutil.rmtree(self.media, ignore_errors=True)))
         self.data = bytes(range(256)) * 40  # 10 240 bytes
-        self.free = Lesson.objects.get(title__startswith="Skvat")
-        self.other_video = Lesson.objects.get(title__contains="ovqatlanish")
-        for lesson in (self.free, self.other_video):
-            lesson.video_file.save("clip.mp4", SimpleUploadedFile("clip.mp4", self.data), save=True)
-        c = Client()
-        c.post("/register/", {"first_name": "Aziz", "last_name": "K", "phone": "90 111 22 33", "password": "secret12", "username": "u" + "".join(ch for ch in str("90 111 22 33") if ch.isdigit()), "email": "u" + "".join(ch for ch in str("90 111 22 33") if ch.isdigit()) + "@test.uz", "password2": "secret12"})
-        self.c, self.u = c, User.objects.get(phone="+998901112233")
+        from .models import GymSettings
+        gs = GymSettings.load()
+        gs.hero_video.save("clip.mp4", SimpleUploadedFile("clip.mp4", self.data), save=True)
+        self.gs = gs
 
-    def test_free_video_streams_with_range_support(self):
-        r = Client().get(f"/training/{self.free.pk}/video/")
+    def get(self, **headers):
+        r = Client().get("/hero/video/", **headers)
+        self.addCleanup(r.close)  # Windows keeps the file locked while a response holds it
+        return r
+
+    def test_video_streams_with_range_support(self):
+        r = self.get()
         self.assertEqual((r.status_code, r["Accept-Ranges"], r["Content-Type"]), (200, "bytes", "video/mp4"))
         self.assertEqual(b"".join(r.streaming_content), self.data)
-        part = Client().get(f"/training/{self.free.pk}/video/", HTTP_RANGE="bytes=100-199")
+        part = self.get(HTTP_RANGE="bytes=100-199")
         self.assertEqual((part.status_code, part["Content-Range"], part["Content-Length"]), (206, "bytes 100-199/10240", "100"))
         self.assertEqual(b"".join(part.streaming_content), self.data[100:200])
-        tail = Client().get(f"/training/{self.free.pk}/video/", HTTP_RANGE="bytes=-50")
-        self.assertEqual(b"".join(tail.streaming_content), self.data[-50:])
-        open_end = Client().get(f"/training/{self.free.pk}/video/", HTTP_RANGE="bytes=10000-")
-        self.assertEqual(b"".join(open_end.streaming_content), self.data[10000:])
+        self.assertEqual(b"".join(self.get(HTTP_RANGE="bytes=-50").streaming_content), self.data[-50:])
+        self.assertEqual(b"".join(self.get(HTTP_RANGE="bytes=10000-").streaming_content), self.data[10000:])
         for bad in ("bytes=99999-", "bytes=5-2", "lines=1-2", "bytes=-"):
-            self.assertEqual(Client().get(f"/training/{self.free.pk}/video/", HTTP_RANGE=bad).status_code, 416, bad)
+            self.assertEqual(self.get(HTTP_RANGE=bad).status_code, 416, bad)
 
-    def test_lesson_page_shows_the_uploaded_video(self):
-        self.assertIn(f'src="/training/{self.other_video.pk}/video/"', self.c.get(f"/training/{self.other_video.pk}/").content.decode())
-        self.assertEqual(Client().get(f"/training/{self.other_video.pk}/video/").status_code, 200)
-
-    def test_missing_or_inactive_files(self):
-        self.free.active = False
-        self.free.save()
-        self.assertEqual(Client().get(f"/training/{self.free.pk}/video/").status_code, 404)
-        other = Lesson.objects.get(title__startswith="Lanj")
-        self.assertEqual(Client().get(f"/training/{other.pk}/video/").status_code, 404)  # no video attached
-        Path(self.other_video.video_file.path).unlink()
-        self.assertEqual(self.c.get(f"/training/{self.other_video.pk}/video/").status_code, 404)  # file vanished from disk
+    def test_lessons_section_is_gone(self):
+        for url in ("/training/", "/training/1/", "/training/1/video/"):
+            self.assertEqual(Client().get(url).status_code, 404, url)
+        self.assertNotIn("/training/", Client().get("/").content.decode())
 
     def test_upload_rules(self):
         from django.core.exceptions import ValidationError
@@ -277,15 +270,6 @@ class UploadedVideoTests(TestCase):
             with self.assertRaises(ValidationError):
                 validate_video_file(SimpleUploadedFile("big.mp4", b"x"))
         validate_video_file(SimpleUploadedFile("ok.webm", b"x"))
-
-    def test_uploaded_file_beats_link_and_marks_lesson_as_having_video(self):
-        self.free.video_url = "https://youtu.be/dQw4w9WgXcQ"
-        self.free.save()
-        page = Client().get(f"/training/{self.free.pk}/").content.decode()
-        self.assertIn(f'src="/training/{self.free.pk}/video/"', page)
-        self.assertNotIn("youtube", page)
-        self.assertTrue(self.free.has_video)
-        self.assertIn("video", Client().get("/training/?day=0").content.decode().lower())
 
 
 class ChatTranslationTests(TestCase):

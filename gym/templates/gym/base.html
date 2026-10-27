@@ -38,6 +38,7 @@
           <div class="um-menu" role="menu">
             <div class="um-head"><b>{{ user.full_name }}</b><small class="muted">{{ user.email|default:user.member_code }}</small></div>
             <a role="menuitem" href="{% url 'profile' %}">👤 {% t 'nav_profile' %}</a>
+            <a role="menuitem" href="{% url 'account' %}">⚙ {% t 'acc_title' %}</a>
             <a role="menuitem" href="{% url 'dashboard' %}">🏠 {% t 'nav_dash' %}</a>
             <a role="menuitem" href="{% url 'inbox' %}">🔔 {% t 'inbox' %}{% if inbox_unread %} <b class="um-badge num">{{ inbox_unread }}</b>{% endif %}</a>
             <a role="menuitem" href="{% url 'card' %}">▣ {% t 'member_card' %}</a>
@@ -58,7 +59,6 @@
     <a href="{% url 'home' %}"{% if p == '/' %} aria-current="page"{% endif %}>{% t 'nav_home' %}</a>
     {% if user.is_authenticated %}<a href="{% url 'dashboard' %}"{% if '/dashboard' in p %} aria-current="page"{% endif %}>{% t 'nav_dash' %}</a>{% endif %}
     <a href="{% url 'plans' %}"{% if '/plans' in p %} aria-current="page"{% endif %}>{% t 'nav_plans' %}</a>
-    <a href="{% url 'training' %}"{% if '/training' in p %} aria-current="page"{% endif %}>{% t 'nav_training' %}</a>
     <a href="{% url 'shop' %}"{% if '/shop' in p or '/cart' in p %} aria-current="page"{% endif %}>{% t 'nav_shop' %}<span class="badge" id="cart-badge"{% if not cart_count %} hidden{% endif %}>{{ cart_count }}</span></a>
     <a href="{% url 'classes' %}"{% if '/classes' in p %} aria-current="page"{% endif %}>{% t 'nav_classes' %}</a>
     <a href="{% url 'trainers' %}"{% if '/trainers' in p %} aria-current="page"{% endif %}>{% t 'nav_trainers' %}</a>
@@ -108,7 +108,6 @@
       <h3>{% t 'ft_members' %}</h3>
       {% if user.is_authenticated %}<a href="{% url 'dashboard' %}">{% t 'nav_dash' %}</a><a href="{% url 'card' %}">{% t 'member_card' %}</a><a href="{% url 'records' %}">{% t 'records' %}</a>
       {% else %}<a href="{% url 'login' %}">{% t 'login' %}</a><a href="{% url 'register' %}">{% t 'register' %}</a>{% endif %}
-      <a href="{% url 'training' %}">{% t 'nav_training' %}</a>
       <a href="{% url 'ai' %}">{% t 'ai_coach' %}</a>
       <a href="{% url 'tools' %}">{% t 'tools' %}</a>
       <a href="{% url 'reviews' %}">{% t 'nav_reviews' %}</a>

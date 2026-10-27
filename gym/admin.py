@@ -9,8 +9,7 @@ from django.utils.safestring import mark_safe
 
 from . import services, telegram
 from .models import (Announcement, BodyLog, Booking, Category, ChatMessage, ChatReport, Exercise, GymClass, GymSettings, Membership, Order, OrderItem, Payment, PaymentCard, Plan,
-                     AIMessage, Lesson, Notification, PersonalRecord, Product, PromoCode, PTSession, Review, Trainer, User, Visit, WorkoutPlan,
-                     WorkoutType)
+                     AIMessage, Notification, PersonalRecord, Product, PromoCode, PTSession, Review, Trainer, User, Visit, WorkoutPlan)
 
 
 def export_csv(modeladmin, request, queryset, fields, name):
@@ -513,34 +512,6 @@ class ChatReportAdmin(admin.ModelAdmin):
         senders.update(chat_banned=True)
         ChatMessage.objects.filter(pk__in=qs.values("message")).update(deleted=True)
         qs.update(resolved=True)
-
-
-@admin.register(WorkoutType)
-class WorkoutTypeAdmin(admin.ModelAdmin):
-    list_display = ("name", "description", "order", "active", "lesson_count")
-    list_editable = ("order", "active")
-
-    @admin.display(description="Darslar")
-    def lesson_count(self, o):
-        return o.lessons.count()
-
-
-@admin.register(Lesson)
-class LessonAdmin(admin.ModelAdmin):
-    list_display = ("title", "workout_type", "weekday", "level", "duration_min", "has_video_flag", "active")
-    list_filter = ("workout_type", "weekday", "level", "active")
-    list_editable = ("active",)
-    search_fields = ("title", "summary", "muscles")
-    fieldsets = (
-        (None, {"fields": ("title", "workout_type", "weekday", "level", "duration_min", "summary", "active", "order")}),
-        ("Video", {"fields": ("video_file", "video_url"),
-                   "description": "Videoni saytga yuklang (mp4/webm) yoki YouTube/Vimeo/.mp4 havolasini yopishtiring (https). Yuklangan fayl havoladan ustun turadi."}),
-        ("Tushuntirish", {"fields": ("steps", "muscles", "equipment", "tips")}),
-    )
-
-    @admin.display(description="Video", boolean=True)
-    def has_video_flag(self, o):
-        return o.has_video
 
 
 @admin.register(PaymentCard)

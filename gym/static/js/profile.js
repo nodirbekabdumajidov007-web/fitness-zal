@@ -24,4 +24,9 @@
       af.submit();
     });
   }
+  // account settings: show the chosen file's name next to the "change" button
+  document.querySelectorAll('input[data-file-name]').forEach(function (inp) {
+    var label = inp.parentNode.querySelector('[data-file-label]');
+    inp.addEventListener('change', function () { if (label && inp.files.length) label.textContent = inp.files[0].name; });
+  });
 })();

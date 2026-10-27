@@ -815,6 +815,21 @@ avatar_remove||Rasmni o'chirish||Удалить фото||Remove the picture
 avatar_saved||Profil rasmi saqlandi||Фото профиля сохранено||Profile picture saved
 avatar_removed||Profil rasmi o'chirildi||Фото профиля удалено||Profile picture removed
 err_avatar||Faqat jpg, png yoki webp rasm (5 MB gacha) yuklang||Загрузите jpg, png или webp (до 5 МБ)||Upload a jpg, png or webp image (up to 5 MB)
+acc_title||Akkaunt sozlamalari||Настройки аккаунта||Account settings
+acc_back||Kabinetga qaytish||Назад в кабинет||Back to dashboard
+acc_pill||Akkaunt||Аккаунт||Account
+acc_sub||Profil va kirish ma'lumotlarini yangilang.||Обновите профиль и данные для входа.||Update your profile and sign-in details.
+acc_role_member||A'zo||Клиент||Member
+acc_role_trainer||Murabbiy||Тренер||Trainer
+acc_role_admin||Administrator||Администратор||Administrator
+acc_photo||Profil rasmi||Фото профиля||Profile photo
+acc_photo_now||Hozirgi||Сейчас||Currently
+acc_photo_none||Rasm yuklanmagan||Фото не загружено||No photo yet
+acc_photo_change||Almashtirish: fayl tanlang||Сменить: выберите файл||Change: choose a file
+acc_no_file||Fayl tanlanmagan||Файл не выбран||No file chosen
+acc_type||Hisob turi||Тип аккаунта||Account type
+acc_pw_help||Parolni o'zgartirmoqchi bo'lmasangiz, ikkala maydonni bo'sh qoldiring.||Чтобы не менять пароль, оставьте оба поля пустыми.||Leave both fields empty to keep your password.
+account_saved||Akkaunt sozlamalari saqlandi||Настройки аккаунта сохранены||Account settings saved
 scan_session||Sessiya tugagan: sahifani yangilab, admin sifatida qayta kiring||Сессия истекла: обновите страницу и войдите снова как администратор||Session ended: reload the page and sign in again as admin
 """
 

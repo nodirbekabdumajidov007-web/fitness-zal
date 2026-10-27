@@ -5,6 +5,24 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+def _load_dotenv(path):
+    """Local secrets (ANTHROPIC_API_KEY, EMAIL_*, CLOUDINARY_URL...) from a .env file next to manage.py: one KEY=value per line.
+    The file is git-ignored; real environment variables (e.g. on Render) always win over it."""
+    if not path.is_file():
+        return
+    for line in path.read_text(encoding="utf-8-sig").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key, value = key.strip(), value.strip().strip('"').strip("'")
+        if key and value and not os.environ.get(key):
+            os.environ[key] = value
+
+
+_load_dotenv(BASE_DIR / ".env")
+
+
 def _secret_key():
     """DJANGO_SECRET_KEY from env, otherwise a random key persisted in .secret_key (never committed)."""
     env = os.environ.get("DJANGO_SECRET_KEY")

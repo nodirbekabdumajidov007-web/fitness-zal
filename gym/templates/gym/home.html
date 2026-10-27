@@ -56,7 +56,6 @@
     {% if members_count %}<div><b class="num" data-count="{{ members_count }}">{{ members_count }}</b><span>{% t 'stat_members' %}</span></div>{% endif %}
     {% if trainers_count %}<div><b class="num" data-count="{{ trainers_count }}">{{ trainers_count }}</b><span>{% t 'trainers' %}</span></div>{% endif %}
     {% if classes_count %}<div><b class="num" data-count="{{ classes_count }}">{{ classes_count }}</b><span>{% t 'stat_classes' %}</span></div>{% endif %}
-    {% if lessons_count %}<div><b class="num" data-count="{{ lessons_count }}">{{ lessons_count }}</b><span>{% t 'stat_lessons' %}</span></div>{% endif %}
   </section>
 
   {% if announcements %}
@@ -67,7 +66,7 @@
   {% endif %}
 
   <section class="feat-grid">
-    <a class="feat reveal" href="{% url 'training' %}"><i>▶</i><b>{% t 'feat_training' %}</b><span>{% t 'feat_training_sub' %}</span></a>
+    <a class="feat reveal" href="{% url 'ai' %}"><i>✦</i><b>{% t 'ai_coach' %}</b><span>{% t 'ai_coach_sub' %}</span></a>
     <a class="feat reveal" href="{% url 'classes' %}"><i>◷</i><b>{% t 'nav_classes' %}</b><span>{% t 'feat_classes_sub' %}</span></a>
     <a class="feat reveal" href="{% url 'shop' %}"><i>◆</i><b>{% t 'nav_shop' %}</b><span>{% t 'feat_shop_sub' %}</span></a>
     <a class="feat reveal" href="{% url 'card' %}"><i>▣</i><b>{% t 'member_card' %}</b><span>{% t 'feat_card_sub' %}</span></a>

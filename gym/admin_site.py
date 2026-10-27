@@ -307,7 +307,7 @@ SECTIONS = [  # the sidebar groups the gym's many tables by job instead of one l
     ("A'zolar", ["user", "membership", "visit", "bodylog", "personalrecord"]),
     ("Moliya", ["payment", "paymentcard", "plan", "promocode"]),
     ("Do'kon", ["order", "product", "category"]),
-    ("Mashg'ulotlar", ["gymclass", "booking", "trainer", "ptsession", "workoutplan", "workouttype", "lesson"]),
+    ("Mashg'ulotlar", ["gymclass", "booking", "trainer", "ptsession", "workoutplan"]),
     ("Muloqot", ["aimessage", "notification", "chatmessage", "chatreport", "announcement", "review"]),
     ("Sozlamalar", ["gymsettings"]),
 ]

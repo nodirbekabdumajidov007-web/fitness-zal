@@ -1,0 +1,64 @@
+{% extends "gym/base.html" %}{% load gym_tags %}
+{% block title %}{% t 'acc_title' %}{% endblock %}
+{% block content %}
+<a class="acc-back" href="{% url 'dashboard' %}">← {% t 'acc_back' %}</a>
+<div class="acc-grid">
+  <aside class="acc-side">
+    <div class="acc-who">
+      <span class="acc-ava">{% if user.avatar %}<img src="{{ user.avatar_src }}" alt="">{% else %}{{ user.initials|slice:":1" }}{% endif %}</span>
+      <b>{{ user.full_name }}</b>
+      <small>{% t 'acc_role_'|add:role %}</small>
+    </div>
+    <nav class="acc-nav" aria-label="{% t 'acc_title' %}">
+      <a href="{% url 'dashboard' %}">{% t 'nav_dash' %}</a>
+      <a href="{% url 'card' %}">{% t 'member_card' %}</a>
+      <a href="{% url 'inbox' %}">{% t 'inbox' %}</a>
+      <a href="{% url 'payments' %}">{% t 'payments' %}</a>
+      <a href="{% url 'orders' %}">{% t 'orders' %}</a>
+      <a href="{% url 'profile' %}">{% t 'pf_tab_goals' %}</a>
+      <a href="{% url 'account' %}" aria-current="page">{% t 'acc_title' %}</a>
+    </nav>
+  </aside>
+
+  <section class="acc-card">
+    <span class="acc-pill">{% t 'acc_pill' %}</span>
+    <h1>{% t 'acc_title' %}</h1>
+    <p class="muted">{% t 'acc_sub' %}</p>
+    <form class="acc-form" method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
+      <label>{% t 'username' %} *<input name="username" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="30" value="{{ form.username.value|default:'' }}">
+        {% for e in form.username.errors %}<span class="field-err">{% t e %}</span>{% endfor %}</label>
+      <label>Email *<input name="email" type="email" autocomplete="email" maxlength="254" value="{{ form.email.value|default:'' }}">
+        {% for e in form.email.errors %}<span class="field-err">{% t e %}</span>{% endfor %}</label>
+      <label>{% t 'first_name' %}<input name="first_name" maxlength="40" autocomplete="given-name" value="{{ form.first_name.value|default:'' }}"></label>
+      <label>{% t 'last_name' %}<input name="last_name" maxlength="40" autocomplete="family-name" value="{{ form.last_name.value|default:'' }}"></label>
+      <label class="acc-wide">{% t 'phone' %}<div class="phone"><span>+998</span><input name="phone" inputmode="numeric" autocomplete="tel-national" placeholder="XX XXX XX XX" maxlength="17" value="{% if form.phone.value %}{{ form.phone.value|cut:'+998' }}{% endif %}" data-phone></div>
+        {% for e in form.phone.errors %}<span class="field-err">{% t e %}</span>{% endfor %}</label>
+
+      <div class="acc-wide acc-photo">
+        <span class="acc-label">{% t 'acc_photo' %}</span>
+        <div class="acc-photo-row">
+          <span class="acc-ava sm">{% if user.avatar %}<img src="{{ user.avatar_src }}" alt="">{% else %}{{ user.initials|slice:":1" }}{% endif %}</span>
+          <div class="acc-photo-txt">
+            {% if user.avatar %}<small class="muted">{% t 'acc_photo_now' %}: {{ user.avatar.name|cut:"avatars/" }}</small>
+            <label class="acc-clear"><input type="checkbox" name="avatar_clear" value="1"> {% t 'avatar_remove' %}</label>
+            {% else %}<small class="muted">{% t 'acc_photo_none' %}</small>{% endif %}
+          </div>
+        </div>
+        <label class="acc-file"><span>{% t 'acc_photo_change' %}</span><input type="file" name="avatar" accept="image/jpeg,image/png,image/webp" data-file-name><em data-file-label>{% t 'acc_no_file' %}</em></label>
+        {% if photo_error %}<span class="field-err">{% t photo_error %}</span>{% endif %}
+      </div>
+
+      <label class="acc-wide">{% t 'acc_type' %}<select disabled><option>{% t 'acc_role_'|add:role %}</option></select></label>
+
+      <label>{% t 'cur_pass' %}<div class="pw"><input id="acc_cur" name="current_password" type="password" autocomplete="current-password" maxlength="128"{% if not user.has_usable_password %} disabled placeholder="—"{% endif %}><button type="button" data-toggle-pw="acc_cur" data-show="👁" data-hide="🙈" aria-label="{% t 'show' %}">👁</button></div></label>
+      <label>{% t 'new_pass' %}<div class="pw"><input id="acc_new" name="new_password" type="password" autocomplete="new-password" maxlength="128" data-strength data-caps="{% t 'caps_on' %}"><button type="button" data-toggle-pw="acc_new" data-show="👁" data-hide="🙈" aria-label="{% t 'show' %}">👁</button></div></label>
+      <div class="acc-wide pw-meter" aria-hidden="true"><i></i></div>
+      {% for e in pw_errors %}<span class="field-err acc-wide">{% t e %}</span>{% endfor %}
+      <small class="muted acc-wide">{% t 'acc_pw_help' %}</small>
+
+      <div class="acc-wide acc-actions"><button class="btn primary pill" type="submit">💾 {% t 'save' %}</button></div>
+    </form>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{% vstatic 'js/profile.js' %}"></script>{% endblock %}

@@ -254,3 +254,41 @@ class AvatarTests(Base):
         self.c.post("/profile/", {"form": "avatar", "remove": "1"})
         self.assertFalse(User.objects.get(username="aziz_k").avatar)
         self.assertIn('class="um-ava"', self.c.get("/dashboard/").content.decode())
+
+
+class AccountSettingsTests(Base):
+    def setUp(self):
+        super().setUp()
+        self.register()
+        self.c = Client()
+        self.c.post("/login/", {"login": "aziz_k", "password": PW})
+
+    def post(self, **over):
+        data = {"username": "aziz_k", "email": "aziz@example.com", "first_name": "Aziz", "last_name": "K", "phone": ""}
+        data.update(over)
+        return self.c.post("/account/", data)
+
+    def test_page_and_menu(self):
+        r = self.c.get("/account/")
+        self.assertContains(r, "acc-side")
+        self.assertContains(r, 'aria-current="page"')
+        self.assertContains(self.c.get("/dashboard/"), 'href="/account/"')
+        self.assertEqual(Client().get("/account/").status_code, 302)
+
+    def test_change_details_and_password(self):
+        r = self.post(username="aziz2", first_name="Azizbek", phone="93 111 22 33")
+        self.assertRedirects(r, "/account/")
+        u = User.objects.get(pk=User.objects.get(username="aziz2").pk)
+        self.assertEqual((u.first_name, u.phone), ("Azizbek", "+998931112233"))
+        self.post(username="aziz2", current_password="wrong", new_password="Yangi-2026")
+        self.assertTrue(User.objects.get(username="aziz2").check_password(PW))  # wrong current password: unchanged
+        r = self.post(username="aziz2", current_password=PW, new_password="Yangi-2026")
+        self.assertRedirects(r, "/account/")
+        self.assertTrue(User.objects.get(username="aziz2").check_password("Yangi-2026"))
+        self.assertEqual(self.c.get("/account/").status_code, 200)  # still signed in after the change
+
+    def test_unique_username_and_email(self):
+        self.register(Client(), username="vali", email="vali@x.uz")
+        self.assertContains(self.post(username="VALI"), "field-err")
+        self.assertContains(self.post(email="vali@x.uz"), "field-err")
+        self.assertEqual(User.objects.filter(username="aziz_k").count(), 1)

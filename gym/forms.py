@@ -135,3 +135,40 @@ class ReviewForm(forms.ModelForm):
         model = Review
         fields = ["rating", "comment"]
         error_messages = {f: REQUIRED for f in fields}
+
+
+class AccountForm(forms.ModelForm):
+    """Account settings: login details and the shown name. Picture and password are handled next to it in the same view."""
+    phone = forms.CharField(max_length=20, required=False)
+
+    class Meta:
+        model = User
+        fields = ["username", "email", "first_name", "last_name", "phone"]
+        error_messages = {"username": REQUIRED, "email": {"required": "err_fields", "invalid": "err_email"}}
+
+    def clean_username(self):
+        u = (self.cleaned_data.get("username") or "").strip()
+        if not re.fullmatch(r"[A-Za-z0-9_.]{3,30}", u):
+            raise ValidationError("err_username")
+        if User.objects.filter(username__iexact=u).exclude(pk=self.instance.pk).exists():
+            raise ValidationError("err_username_taken")
+        return u
+
+    def clean_email(self):
+        e = (self.cleaned_data.get("email") or "").strip().lower()
+        if not e:
+            raise ValidationError("err_fields")
+        if User.objects.filter(email__iexact=e).exclude(pk=self.instance.pk).exists():
+            raise ValidationError("err_email_taken")
+        return e
+
+    def clean_phone(self):
+        raw = (self.cleaned_data.get("phone") or "").strip()
+        if not raw:
+            return None
+        p = normalize_phone(raw)
+        if not p:
+            raise ValidationError("err_phone")
+        if User.objects.filter(phone=p).exclude(pk=self.instance.pk).exists():
+            raise ValidationError("err_exists")
+        return p

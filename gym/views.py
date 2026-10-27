@@ -30,10 +30,10 @@ from django.views.decorators.http import require_POST
 
 from . import click, services, sms, telegram
 from .media import ranged_file_response, video_embed
-from .forms import BodyLogForm, LoginForm, PasswordForm, PhoneField, ProfileForm, RegisterForm, ReviewForm, find_user, normalize_phone
+from .forms import AccountForm, BodyLogForm, LoginForm, PasswordForm, PhoneField, ProfileForm, RegisterForm, ReviewForm, find_user, normalize_phone
 from .i18n import LANGS
-from .models import (Announcement, BodyLog, Booking, Category, Exercise, ExerciseLog, GymClass, GymSettings, Lesson, Membership, Order, Payment,
-                     Plan, Product, PTSession, Review, Trainer, User, Visit, WorkoutPlan, WorkoutType)
+from .models import (Announcement, BodyLog, Booking, Category, Exercise, ExerciseLog, GymClass, GymSettings, Membership, Order, Payment,
+                     Plan, Product, PTSession, Review, Trainer, User, Visit, WorkoutPlan)
 from .templatetags.gym_tags import translate
 from django.template.loader import render_to_string
 
@@ -128,7 +128,6 @@ def home(request):
         "classes_count": GymClass.objects.filter(active=True).count(),
         "members_count": Membership.objects.filter(starts__lte=now, expires__gt=now).values("user").distinct().count(),
         "trainers_count": Trainer.objects.filter(active=True).count(),
-        "lessons_count": Lesson.objects.filter(active=True).count(),
     })
 
 
@@ -805,57 +804,6 @@ def buy_plan(request, code):
         telegram.alert_admin(f"Yangi to'lov (tasdiq kutadi): {request.user.full_name} · {plan.name} · {pay.amount} so'm")
     flash(request, messages.SUCCESS, "bought_pending" if pay.status == Payment.Status.PENDING else "bought_paid")
     return redirect("dashboard")
-
-
-def training_view(request):
-    """Daily lessons: pick a weekday, optionally filter by type or level."""
-    today = timezone.localdate().weekday()
-    try:
-        day = int(request.GET.get("day", today))
-    except ValueError:
-        day = today
-    day = day if 0 <= day <= 6 else today
-    qs = (Lesson.objects.filter(active=True).filter(Q(workout_type__isnull=True) | Q(workout_type__active=True))
-          .filter(Q(weekday=day) | Q(weekday__isnull=True)).select_related("workout_type"))
-    wtype, level = request.GET.get("type", ""), request.GET.get("level", "")
-    if wtype.isdigit():
-        qs = qs.filter(workout_type_id=int(wtype))
-    if level in dict(Lesson.LEVELS):
-        qs = qs.filter(level=level)
-    return render(request, "gym/training.html", {
-        "lessons": qs.order_by("order", "id"), "day": day, "today": today, "days": [str(i) for i in range(7)],
-        "types": WorkoutType.objects.filter(active=True), "wtype": wtype, "level": level, "levels": Lesson.LEVELS,
-    })
-
-
-def lesson_view(request, pk):
-    lesson = get_object_or_404(Lesson.objects.select_related("workout_type"), pk=pk, active=True)
-    # an uploaded file wins over a pasted link
-    video = {"kind": "video", "src": reverse("lesson_video", args=[lesson.pk])} if lesson.video_file else video_embed(lesson.video_url)
-    related = Lesson.objects.filter(active=True, workout_type=lesson.workout_type).exclude(pk=lesson.pk)[:4] if lesson.workout_type_id else []
-    return render(request, "gym/lesson.html", {"l": lesson, "video": video,
-                                               "wd": None if lesson.weekday is None else str(lesson.weekday), "related": related})
-
-
-def lesson_video(request, pk):
-    """Streams an uploaded lesson video (with Range support for seeking)."""
-    lesson = get_object_or_404(Lesson, pk=pk, active=True)
-    if not lesson.video_file:
-        raise Http404()
-    from .media import is_local
-    if not is_local(lesson.video_file):  # Cloudinary streams it (with seeking) from its CDN
-        return redirect(lesson.video_file.url)
-    try:
-        path = lesson.video_file.path
-    except ValueError:
-        raise Http404()
-    import os
-    if not os.path.isfile(path):
-        raise Http404()
-    resp = ranged_file_response(request, path, "video/webm" if path.lower().endswith(".webm") else "video/mp4")
-    resp["Cache-Control"] = "private, max-age=3600"
-    resp["X-Content-Type-Options"] = "nosniff"
-    return resp
 
 
 def hero_video(request):
@@ -1548,3 +1496,54 @@ def ai_plan(request):
 def ai_clear(request):
     request.user.ai_messages.all().delete()
     return redirect("/ai/#chat")
+
+
+@login_required
+def account_view(request):
+    """Account settings: username, e-mail, shown name, phone, profile picture and password on one page (one Save button)."""
+    from .media import validate_image
+    u = request.user
+    form = AccountForm(request.POST or None, instance=u)
+    pw_errors, photo_error = [], None
+    if request.method == "POST":
+        current, new = request.POST.get("current_password", ""), request.POST.get("new_password", "")
+        if new:  # the password changes only when a new one is typed
+            key = f"rl:pw:{u.pk}"
+            if len(new) < 6 or len(new) > 128:
+                pw_errors.append("err_pass")
+            elif u.has_usable_password() and (not rl_check(key) or not u.check_password(current)):
+                rl_fail(key)
+                pw_errors.append("err_wrong_pass")
+        upload = request.FILES.get("avatar")
+        if upload:
+            try:
+                validate_image(upload)
+            except ValidationError:
+                photo_error = "err_avatar"
+        if form.is_valid() and not pw_errors and not photo_error:
+            old_phone, old_photo = User.objects.get(pk=u.pk).phone, u.avatar.name if u.avatar else ""
+            user = form.save(commit=False)
+            if user.phone != old_phone:
+                user.phone_verified = False  # a changed number has to be verified again
+            if upload:
+                user.avatar = upload
+            elif request.POST.get("avatar_clear"):
+                user.avatar = None
+            if new:
+                user.set_password(new)
+            user.save()
+            if old_photo and old_photo != (user.avatar.name if user.avatar else ""):
+                try:
+                    default_storage_for(user).delete(old_photo)
+                except OSError:
+                    pass
+            if new:
+                update_session_auth_hash(request, user)  # stay signed in on this device after a password change
+            flash(request, messages.SUCCESS, "account_saved")
+            return redirect("account")
+    role = "admin" if u.is_superuser else "trainer" if Trainer.objects.filter(user=u, active=True).exists() else "member"
+    return render(request, "gym/account.html", {"form": form, "pw_errors": pw_errors, "photo_error": photo_error, "role": role})
+
+
+def default_storage_for(user):
+    return user._meta.get_field("avatar").storage
