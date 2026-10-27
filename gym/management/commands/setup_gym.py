@@ -39,9 +39,9 @@ class Command(BaseCommand):
                 c = Category.objects.create(name=cat, order=i)
                 Product.objects.bulk_create(Product(category=c, name=n, price=p, stock=s) for n, p, s in items)
         if opts["demo"] and not Trainer.objects.exists():
-            a = Trainer.objects.create(name="Sardor Rahimov (namuna)", specialty="Pauerlifting", experience_years=9, bio="Namuna ma'lumot. Admin paneldan o'zgartiring.")
-            b = Trainer.objects.create(name="Bekzod Yusupov (namuna)", specialty="Yoga va stretching", experience_years=6)
-            c = Trainer.objects.create(name="Jasur Toshmatov (namuna)", specialty="Boks va funksional", experience_years=7)
+            a = Trainer.objects.create(name="Sardor Rahimov", specialty="Pauerlifting", experience_years=9, bio="Namuna ma'lumot. Admin paneldan o'zgartiring.")
+            b = Trainer.objects.create(name="Bekzod Yusupov", specialty="Yoga va stretching", experience_years=6)
+            c = Trainer.objects.create(name="Jasur Toshmatov", specialty="Boks va funksional", experience_years=7)
             for wd in (0, 2, 4):
                 GymClass.objects.create(name="Funksional", trainer=c, weekday=wd, start_time=time(18, 30), capacity=15)
                 GymClass.objects.create(name="Yoga", trainer=b, weekday=wd, start_time=time(10, 0), capacity=12)

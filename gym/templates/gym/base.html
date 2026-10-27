@@ -49,6 +49,7 @@
               <a role="menuitem" href="{% url 'chat' %}"><svg class="um-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>{% t 'chat' %}{% if chat_unread %}<b class="um-badge num">{{ chat_unread }}</b>{% endif %}</a>
             </div>
             <div class="um-group">
+              <a role="menuitem" href="{% url 'calories' %}"><svg class="um-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c1 3 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 1-9z"/></svg>{% t 'nav_calories' %}</a>
               <a role="menuitem" href="{% url 'payments' %}"><svg class="um-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/></svg>{% t 'payments' %}</a>
               <a role="menuitem" href="{% url 'orders' %}"><svg class="um-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>{% t 'orders' %}</a>
               <a role="menuitem" href="{% url 'account' %}"><svg class="um-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>{% t 'acc_title' %}</a>
@@ -119,7 +120,7 @@
     </nav>
     <nav class="ft-col" aria-label="{% t 'ft_members' %}">
       <h3>{% t 'ft_members' %}</h3>
-      {% if user.is_authenticated %}<a href="{% url 'dashboard' %}">{% t 'nav_dash' %}</a><a href="{% url 'card' %}">{% t 'member_card' %}</a><a href="{% url 'records' %}">{% t 'records' %}</a>
+      {% if user.is_authenticated %}<a href="{% url 'dashboard' %}">{% t 'nav_dash' %}</a><a href="{% url 'card' %}">{% t 'member_card' %}</a><a href="{% url 'records' %}">{% t 'records' %}</a><a href="{% url 'calories' %}">{% t 'nav_calories' %}</a>
       {% else %}<a href="{% url 'login' %}">{% t 'login' %}</a><a href="{% url 'register' %}">{% t 'register' %}</a>{% endif %}
       <a href="{% url 'ai' %}">{% t 'ai_coach' %}</a>
       <a href="{% url 'tools' %}">{% t 'tools' %}</a>
@@ -128,9 +129,11 @@
     <section class="ft-col ft-contact">
       <h3>{% t 'ft_contact' %}</h3>
       {% if gs.address %}<p><i aria-hidden="true">📍</i><span>{{ gs.address }}</span></p>{% endif %}
-      <p><i aria-hidden="true">📞</i><a href="tel:+998{{ gs.phone|cut:' ' }}">+998 {{ gs.phone }}</a></p>
       <p><i aria-hidden="true">🕒</i><span>{% t 'every_day' %} <b class="num">{{ gs.open_time|hm }}–{{ gs.close_time|hm }}</b>
         <span class="ft-state {% if is_open %}on{% endif %}"><i></i>{% if is_open %}{% t 'open' %}{% else %}{% t 'closed' %}{% endif %}</span></span></p>
+      <p><i aria-hidden="true">📞</i><a href="tel:+998{{ gs.phone|cut:' ' }}">+998 {{ gs.phone }}</a></p>
+      <p><i aria-hidden="true">📷</i><a href="https://instagram.com/{{ gs.instagram }}" target="_blank" rel="noopener">@{{ gs.instagram }}</a></p>
+      {% if gs.telegram %}<p><i aria-hidden="true">✈️</i><a href="{{ gs.telegram }}" target="_blank" rel="noopener">Telegram</a></p>{% endif %}
       {% include "gym/_route.html" with variant="up small" %}
     </section>
   </div>
@@ -142,6 +145,7 @@
 </footer>
 
 {% if messages %}<div class="msgs" role="status">{% for m in messages %}<div class="msg {{ m.level_tag }}">{{ m }}</div>{% endfor %}</div>{% endif %}
+<button type="button" class="totop" id="totop" aria-label="{% t 'back_top' %}" title="{% t 'back_top' %}" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 <script src="{% vstatic 'js/app.js' %}"></script>
 <script src="{% vstatic 'js/cart.js' %}"></script>
 {% block scripts %}{% endblock %}

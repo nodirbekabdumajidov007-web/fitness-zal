@@ -8,6 +8,10 @@ from . import views as v
 urlpatterns = [
     path("", v.home, name="home"),
     path("lang/<str:code>/", v.set_lang, name="set_lang"),
+    path("calories/", v.calories_view, name="calories"),
+    path("calories/add/", v.calories_add, name="calories_add"),
+    path("calories/<int:pk>/delete/", v.calories_delete, name="calories_delete"),
+    path("calories/ai/", v.calories_ai, name="calories_ai"),
     path("healthz", v.healthz),
     path("manifest.webmanifest", v.manifest, name="manifest"),
     path("sw.js", v.service_worker, name="sw"),

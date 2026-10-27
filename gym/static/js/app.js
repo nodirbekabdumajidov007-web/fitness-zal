@@ -250,3 +250,26 @@ document.addEventListener('DOMContentLoaded', function () {
     document.head.appendChild(s);
   }
 });
+
+/* Announcements: long bodies are clamped and get a "read more" toggle; plus the floating back-to-top button. */
+(function () {
+  document.querySelectorAll('.ann-body').forEach(function (p) {
+    if (p.scrollHeight <= p.clientHeight + 2) return;
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'ann-more'; b.textContent = p.getAttribute('data-more') || '+';
+    b.setAttribute('aria-expanded', 'false');
+    b.addEventListener('click', function () {
+      var open = p.classList.toggle('open');
+      b.textContent = p.getAttribute(open ? 'data-less' : 'data-more');
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    p.insertAdjacentElement('afterend', b);
+  });
+  var top = document.getElementById('totop');
+  if (!top) return;
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function toggle() { top.hidden = window.scrollY < 600; }
+  window.addEventListener('scroll', toggle, { passive: true });
+  top.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }); });
+  toggle();
+})();

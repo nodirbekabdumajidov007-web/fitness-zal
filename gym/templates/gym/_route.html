@@ -3,5 +3,6 @@
   <div class="route-menu" role="menu">
     <a role="menuitem" href="{{ r.yandex }}" target="_blank" rel="noopener"><b class="ym">Я</b>Yandex {% t 'maps' %}</a>
     <a role="menuitem" href="{{ r.google }}" target="_blank" rel="noopener"><b class="gm">G</b>Google {% t 'maps' %}</a>
+    {% if r.taxi %}<a role="menuitem" href="{{ r.taxi }}" target="_blank" rel="noopener"><b class="yg">Go</b>Yandex Go <small>{% t 'taxi_to_gym' %}</small></a>{% endif %}
   </div>
 </details>{% endif %}{% endwith %}

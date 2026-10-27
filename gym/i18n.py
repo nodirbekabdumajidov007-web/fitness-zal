@@ -838,6 +838,65 @@ ci_found||Topilgan a'zolar||Найденные участники||Members found
 ci_no_dm||Hali shaxsiy suhbat yo'q. Yuqoridagi qidiruvdan a'zoni topib, yozing.||Личных переписок пока нет. Найдите участника через поиск выше.||No private chats yet. Find a member with the search above.
 ci_privacy||Boshqalar faqat ismingiz va familiyangiz bosh harfini ko'radi, telefon raqamingiz hech kimga ko'rinmaydi.||Другие видят только имя и первую букву фамилии, телефон скрыт.||Others only see your first name and last initial; your phone stays hidden.
 ci_privacy_link||Qidiruvda ko'rinish sozlamasi||Настройка видимости в поиске||Search visibility setting
+taxi_to_gym||taksi||такси||taxi
+pg_prev||Oldingi||Назад||Previous
+pg_next||Keyingi||Далее||Next
+pg_label||Sahifalar||Страницы||Pages
+pg_of||{n} / {total}-sahifa||Страница {n} из {total}||Page {n} of {total}
+nav_calories||Kaloriya hisobi||Подсчёт калорий||Calorie tracker
+cal_sub||Nima yeganingizni yozing: kunlik me'yor va qolgan kaloriya darrov ko'rinadi.||Записывайте, что съели: норма дня и остаток калорий видны сразу.||Log what you ate: your daily target and what is left show up right away.
+cal_target||Kunlik me'yor||Норма на день||Daily target
+cal_how_profile||Vazn, bo'y, yosh va maqsadingiz bo'yicha hisoblandi||Рассчитано по весу, росту, возрасту и цели||Worked out from your weight, height, age and goal
+cal_how_default||Taxminiy me'yor. Aniqroq bo'lishi uchun profilda tug'ilgan kun va maqsadni, jismoniy ko'rsatkichlarda vazn va bo'yni kiriting.||Примерная норма. Для точности укажите в профиле дату рождения и цель, а в замерах вес и рост.||A rough target. For a precise one add your birth date and goal in the profile, and weight and height in measurements.
+cal_eaten||Yeyildi||Съедено||Eaten
+cal_left||Qoldi||Осталось||Left
+cal_over||Me'yordan oshdi||Сверх нормы||Over target
+cal_kcal||kkal||ккал||kcal
+cal_protein||Oqsil||Белки||Protein
+cal_fat||Yog'||Жиры||Fat
+cal_carbs||Uglevod||Углеводы||Carbs
+cal_macros||Makro nisbat (energiya bo'yicha)||Соотношение БЖУ (по энергии)||Macro split (by energy)
+cal_meals||Ovqatlanish bo'yicha||По приёмам пищи||By meal
+meal_breakfast||Nonushta||Завтрак||Breakfast
+meal_lunch||Tushlik||Обед||Lunch
+meal_dinner||Kechki ovqat||Ужин||Dinner
+meal_snack||Perekus||Перекус||Snack
+cal_plan_of||reja: {n} kkal||план: {n} ккал||plan: {n} kcal
+cal_advice||Qolgan kunni qanday taqsimlash||Как распределить остаток дня||How to spread the rest of the day
+cal_advice_line||{meal}: taxminan {n} kkal||{meal}: примерно {n} ккал||{meal}: about {n} kcal
+cal_add||Ovqat qo'shish||Добавить еду||Add food
+cal_pick||Ro'yxatdan tanlang||Выберите из списка||Pick from the list
+cal_search_ph||Ovqat nomini qidiring (osh, somsa, non...)||Найдите блюдо (плов, самса, хлеб...)||Search a food (plov, samsa, bread...)
+cal_grams||Gramm||Граммы||Grams
+cal_meal||Ovqat vaqti||Приём пищи||Meal
+cal_custom||Ro'yxatda yo'q, o'zim kiritaman||Нет в списке, введу сам||Not in the list, I will type it
+cal_name||Nomi||Название||Name
+cal_kcal_total||Kaloriya (butun porsiya)||Калории (вся порция)||Calories (whole portion)
+cal_preview||100 g da: {k} kkal · {p} oqsil · {f} yog' · {c} uglevod||На 100 г: {k} ккал · {p} белка · {f} жира · {c} углеводов||Per 100 g: {k} kcal · {p} protein · {f} fat · {c} carbs
+cal_save||Qo'shish||Добавить||Add
+cal_today||Bugun||Сегодня||Today
+cal_empty||Bu kunga hali hech narsa yozilmagan. Birinchi ovqatni qo'shing.||За этот день пока ничего нет. Добавьте первую еду.||Nothing logged for this day yet. Add your first meal.
+cal_bad_grams||Gramm 1 dan 5000 gacha bo'lishi kerak||Граммы должны быть от 1 до 5000||Grams must be between 1 and 5000
+cal_bad_food||Nomi va to'g'ri raqamlarni kiriting||Укажите название и корректные числа||Enter a name and valid numbers
+cal_added||Qo'shildi||Добавлено||Added
+cal_remove||O'chirish||Убрать||Remove
+cal_ai_title||AI bilan aniqlash||Определить с помощью ИИ||Estimate with AI
+cal_ai_ph||Masalan: 2 ta somsa va choy||Например: 2 самсы и чай||For example: 2 samsas and tea
+cal_ai_btn||AI bilan aniqlash||Определить с ИИ||Estimate with AI
+cal_ai_busy||Aniqlanmoqda...||Определяю...||Estimating...
+cal_ai_left||Bugun AI so'rovlari qoldi: {n}||Осталось запросов к ИИ сегодня: {n}||AI requests left today: {n}
+cal_note||Qiymatlar taxminiy. Kasallik yoki maxsus parhez bo'lsa, shifokor bilan maslahatlashing.||Значения примерные. При болезнях и особой диете проконсультируйтесь с врачом.||Values are approximate. For medical conditions or special diets, ask a doctor.
+ann_more||batafsil||подробнее||read more
+ann_less||yopish||свернуть||show less
+ann_empty||Hozircha e'lonlar yo'q||Пока нет объявлений||No announcements yet
+ft_hours||Ish vaqti||Часы работы||Hours
+ft_tg||Telegram||Telegram||Telegram
+pay_soon_tile||tez orada||скоро||soon
+pay_cash_sub||Qabulxonada to'laysiz||Оплата на ресепшене||Pay at the front desk
+pay_online_sub||Onlayn to'lov||Онлайн-оплата||Online payment
+pay_card_sub||Kartaga o'tkazma||Перевод на карту||Card transfer
+promo_ph||Bo'lsa, promokodni kiriting||Введите промокод, если есть||Enter a promo code if you have one
+back_top||Tepaga qaytish||Наверх||Back to top
 scan_session||Sessiya tugagan: sahifani yangilab, admin sifatida qayta kiring||Сессия истекла: обновите страницу и войдите снова как администратор||Session ended: reload the page and sign in again as admin
 """
 

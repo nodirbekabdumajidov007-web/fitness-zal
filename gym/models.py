@@ -196,7 +196,8 @@ class GymSettings(models.Model):
         out = {}
         if self.map_lat is not None and self.map_lng is not None:
             ll = f"{self.map_lat},{self.map_lng}"
-            out = {"yandex": f"https://yandex.uz/maps/?rtext=~{ll}&rtt=auto", "google": f"https://www.google.com/maps/dir/?api=1&destination={ll}"}
+            out = {"yandex": f"https://yandex.uz/maps/?rtext=~{ll}&rtt=auto", "google": f"https://www.google.com/maps/dir/?api=1&destination={ll}",
+                   "taxi": f"https://3.redirect.appmetrica.yandex.com/route?end-lat={self.map_lat}&end-lon={self.map_lng}&appmetrica_tracking_id=1178268795219780156"}
         elif self.address:
             q = quote(self.address)
             out = {"yandex": f"https://yandex.uz/maps/?text={q}", "google": f"https://www.google.com/maps/dir/?api=1&destination={q}"}
@@ -869,3 +870,25 @@ class AIMessage(models.Model):
     class Meta:
         ordering = ["id"]
         verbose_name, verbose_name_plural = "AI xabar", "AI xabarlar"
+
+
+class FoodEntry(models.Model):
+    """One thing a member ate (calorie tracker). The numbers are for the whole portion, not per 100 g."""
+    MEALS = [("breakfast", "Nonushta"), ("lunch", "Tushlik"), ("dinner", "Kechki ovqat"), ("snack", "Perekus")]
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="food_entries")
+    date = models.DateField("Sana", default=timezone.localdate, db_index=True)
+    meal = models.CharField("Ovqat vaqti", max_length=10, choices=MEALS, default="snack")
+    name = models.CharField("Nomi", max_length=80)
+    grams = models.PositiveIntegerField("Gramm", validators=[MinValueValidator(1), MaxValueValidator(5000)])
+    kcal = models.DecimalField("Kaloriya", max_digits=7, decimal_places=1, default=0)
+    protein = models.DecimalField("Oqsil (g)", max_digits=6, decimal_places=1, default=0)
+    fat = models.DecimalField("Yog' (g)", max_digits=6, decimal_places=1, default=0)
+    carbs = models.DecimalField("Uglevod (g)", max_digits=6, decimal_places=1, default=0)
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["date", "id"]
+        verbose_name, verbose_name_plural = "Ovqat yozuvi", "Ovqat yozuvlari"
+
+    def __str__(self):
+        return f"{self.name} {self.grams} g"

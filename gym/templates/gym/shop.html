@@ -4,7 +4,7 @@
 <div class="inline" style="align-items:center;justify-content:space-between"><h2>{% t 'shop' %}</h2><a class="btn primary" href="{% url 'cart' %}" style="flex:none">{% t 'cart' %}{% if cart_count %} ({{ cart_count }}){% endif %}</a></div>
 <div class="chips">
   <a href="{% url 'shop' %}"{% if not cat %} aria-current="true"{% endif %}>{% t 'all' %}</a>
-  {% for c in categories %}<a href="?cat={{ c.pk }}"{% if cat == c.pk|stringformat:"s" %} aria-current="true"{% endif %}>{{ c.name }}</a>{% endfor %}
+  {% for c in categories %}<a href="?cat={{ c.pk }}{% if q %}&amp;q={{ q|urlencode }}{% endif %}"{% if cat == c.pk|stringformat:"s" %} aria-current="true"{% endif %}>{{ c.name }}</a>{% endfor %}
 </div>
 <form method="get" class="inline"><label for="q">{% t 'search' %}<input id="q" name="q" value="{{ q }}"></label>{% if cat %}<input type="hidden" name="cat" value="{{ cat }}">{% endif %}<button class="btn" type="submit">{% t 'search' %}</button></form>
 <div class="grid g4">
@@ -23,5 +23,12 @@
   </div>
   {% empty %}<div class="muted">{% t 'no_results' %}</div>{% endfor %}
 </div>
+{% if pages %}
+<nav class="pager" aria-label="{% t 'pg_label' %}">
+  {% if page.has_previous %}<a class="pg-btn" rel="prev" href="?{{ keep }}page={{ page.previous_page_number }}">← <span>{% t 'pg_prev' %}</span></a>{% else %}<span class="pg-btn off">← <span>{% t 'pg_prev' %}</span></span>{% endif %}
+  <span class="pg-nums">{% for n in pages %}{% if n is None %}<span class="pg-gap">…</span>{% elif n == page.number %}<span class="pg-num cur" aria-current="page">{{ n }}</span>{% else %}<a class="pg-num" href="?{{ keep }}page={{ n }}">{{ n }}</a>{% endif %}{% endfor %}</span>
+  {% if page.has_next %}<a class="pg-btn" rel="next" href="?{{ keep }}page={{ page.next_page_number }}"><span>{% t 'pg_next' %}</span> →</a>{% else %}<span class="pg-btn off"><span>{% t 'pg_next' %}</span> →</span>{% endif %}
+</nav>
+{% endif %}
 {% include "gym/_cartbar.html" %}
 {% endblock %}

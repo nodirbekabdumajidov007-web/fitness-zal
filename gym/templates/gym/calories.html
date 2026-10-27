@@ -1,0 +1,92 @@
+{% extends "gym/base.html" %}{% load gym_tags %}
+{% block title %}{% t 'nav_calories' %}{% endblock %}
+{% block content %}
+<div class="cal">
+  <div class="cal-top">
+    <div><h2>🔥 {% t 'nav_calories' %}</h2><p class="muted">{% t 'cal_sub' %}</p></div>
+    <nav class="cal-days" aria-label="{% t 'date' %}">
+      <a class="btn small" href="?d={{ prev_day|date:'Y-m-d' }}" aria-label="←">←</a>
+      <span class="cal-day num">{% if is_today %}{% t 'cal_today' %} · {% endif %}{{ day|date:"d.m.Y" }}</span>
+      {% if next_day %}<a class="btn small" href="?d={{ next_day|date:'Y-m-d' }}" aria-label="→">→</a>{% else %}<span class="btn small off" aria-hidden="true">→</span>{% endif %}
+      {% if not is_today %}<a class="btn small" href="{% url 'calories' %}">{% t 'cal_today' %}</a>{% endif %}
+    </nav>
+  </div>
+
+  <section class="card cal-sum">
+    <div class="cal-ring" style="--p:{{ pct }}" role="img" aria-label="{{ eaten }} / {{ target }}">
+      <div><b class="num">{{ eaten }}</b><small>/ {{ target }} {% t 'cal_kcal' %}</small></div>
+    </div>
+    <div class="cal-sum-info">
+      <div class="cal-left{% if over %} over{% endif %}"><span>{% if over %}{% t 'cal_over' %}{% else %}{% t 'cal_left' %}{% endif %}</span> <b class="num">{% if over %}{{ left|cut:'-' }}{% else %}{{ left }}{% endif %}</b> {% t 'cal_kcal' %}</div>
+      <p class="muted cal-how">{% t 'cal_target' %}: <b class="num">{{ target }}</b> {% t 'cal_kcal' %}. {% if how == 'profile' %}{% t 'cal_how_profile' %}{% else %}{% t 'cal_how_default' %}{% endif %}</p>
+      <h3 class="cal-h">{% t 'cal_macros' %}</h3>
+      {% for key, grams, pc in macros %}<div class="cal-macro {{ key }}">
+        <span>{% if key == 'protein' %}{% t 'cal_protein' %}{% elif key == 'fat' %}{% t 'cal_fat' %}{% else %}{% t 'cal_carbs' %}{% endif %}</span>
+        <div class="cal-bar"><i style="width:{% if has_macros %}{{ pc }}{% else %}0{% endif %}%"></i></div>
+        <b class="num">{{ grams|floatformat:0 }} g · {{ pc }}%</b></div>{% endfor %}
+    </div>
+  </section>
+
+  {% if advice and eaten < target %}
+  <section class="card cal-advice">
+    <h3>💡 {% t 'cal_advice' %}</h3>
+    <ul>{% for meal, n in advice %}<li><span>{% if meal == 'breakfast' %}🍳 {% t 'meal_breakfast' %}{% elif meal == 'lunch' %}🍲 {% t 'meal_lunch' %}{% elif meal == 'dinner' %}🍽 {% t 'meal_dinner' %}{% else %}🍎 {% t 'meal_snack' %}{% endif %}</span><b class="num">~{{ n }} {% t 'cal_kcal' %}</b></li>{% endfor %}</ul>
+  </section>
+  {% endif %}
+
+  <section class="card cal-add" id="add">
+    <h3>＋ {% t 'cal_add' %}</h3>
+    <form method="post" action="{% url 'calories_add' %}" id="calForm">
+      {% csrf_token %}<input type="hidden" name="d" value="{{ day|date:'Y-m-d' }}"><input type="hidden" name="food" id="calFood" value="">
+      <div class="cal-meals" role="radiogroup" aria-label="{% t 'cal_meal' %}">
+        {% for m, icon in meal_choices %}<label><input type="radio" name="meal" value="{{ m }}"{% if m == default_meal %} checked{% endif %}><span>{{ icon }} {% if m == 'breakfast' %}{% t 'meal_breakfast' %}{% elif m == 'lunch' %}{% t 'meal_lunch' %}{% elif m == 'dinner' %}{% t 'meal_dinner' %}{% else %}{% t 'meal_snack' %}{% endif %}</span></label>{% endfor %}
+      </div>
+      <div class="cal-find">
+        <label for="calSearch">{% t 'cal_pick' %}<input id="calSearch" type="search" autocomplete="off" placeholder="{% t 'cal_search_ph' %}"></label>
+        <ul class="cal-results" id="calResults" role="listbox" hidden></ul>
+      </div>
+      <p class="muted cal-prev" id="calPrev" data-tpl="{% t 'cal_preview' k='%k' p='%p' f='%f' c='%c' %}" hidden></p>
+      <label for="calGrams">{% t 'cal_grams' %}<input id="calGrams" name="grams" type="number" inputmode="numeric" min="1" max="5000" value="100" required></label>
+      <details class="cal-custom" id="calCustom">
+        <summary>{% t 'cal_custom' %}</summary>
+        <div class="cal-custom-grid">
+          <label>{% t 'cal_name' %}<input name="name" maxlength="80"></label>
+          <label>{% t 'cal_kcal_total' %}<input name="kcal" type="number" inputmode="decimal" min="0" max="6000" step="0.1"></label>
+          <label>{% t 'cal_protein' %} (g)<input name="protein" type="number" inputmode="decimal" min="0" max="6000" step="0.1"></label>
+          <label>{% t 'cal_fat' %} (g)<input name="fat" type="number" inputmode="decimal" min="0" max="6000" step="0.1"></label>
+          <label>{% t 'cal_carbs' %} (g)<input name="carbs" type="number" inputmode="decimal" min="0" max="6000" step="0.1"></label>
+        </div>
+      </details>
+      <button class="btn primary" type="submit">{% t 'cal_save' %}</button>
+    </form>
+    {% if ai_on %}
+    <form method="post" action="{% url 'calories_ai' %}" class="cal-ai" id="calAi">
+      {% csrf_token %}<input type="hidden" name="d" value="{{ day|date:'Y-m-d' }}"><input type="hidden" name="meal" id="calAiMeal" value="{{ default_meal }}">
+      <label for="calAiText">✦ {% t 'cal_ai_title' %}<input id="calAiText" name="text" maxlength="300" placeholder="{% t 'cal_ai_ph' %}" required></label>
+      <button class="btn" type="submit" data-busy="{% t 'cal_ai_busy' %}">{% t 'cal_ai_btn' %}</button>
+      <small class="muted">{% t 'cal_ai_left' n=ai_left %}</small>
+      <div class="cal-err" id="calAiErr" role="alert" hidden></div>
+    </form>
+    {% endif %}
+  </section>
+
+  <h3 class="cal-h2">{% t 'cal_meals' %}</h3>
+  {% if not entries %}<div class="card cal-empty"><span aria-hidden="true">🥗</span><p class="muted">{% t 'cal_empty' %}</p></div>{% endif %}
+  <div class="grid g2">
+    {% for m in meals %}
+    <section class="card cal-meal">
+      <div class="cal-meal-head"><h3>{{ m.icon }} {% if m.key == 'breakfast' %}{% t 'meal_breakfast' %}{% elif m.key == 'lunch' %}{% t 'meal_lunch' %}{% elif m.key == 'dinner' %}{% t 'meal_dinner' %}{% else %}{% t 'meal_snack' %}{% endif %}</h3>
+        <span class="num"><b>{{ m.kcal }}</b> <small class="muted">/ {% t 'cal_plan_of' n=m.planned %}</small></span></div>
+      <div class="cal-bar"><i style="width:{{ m.pct }}%"></i></div>
+      <ul class="cal-items">
+        {% for e in m.items %}<li><span><b>{{ e.name }}</b><small class="muted num">{{ e.grams }} g · {% t 'cal_protein' %} {{ e.protein|floatformat:0 }} · {% t 'cal_fat' %} {{ e.fat|floatformat:0 }} · {% t 'cal_carbs' %} {{ e.carbs|floatformat:0 }}</small></span>
+          <span class="cal-kc num">{{ e.kcal|floatformat:0 }}</span>
+          <form method="post" action="{% url 'calories_delete' e.pk %}">{% csrf_token %}<button class="cal-x" type="submit" aria-label="{% t 'cal_remove' %}" title="{% t 'cal_remove' %}">×</button></form></li>{% endfor %}
+      </ul>
+    </section>{% endfor %}
+  </div>
+  <p class="muted cal-note">{% t 'cal_note' %}</p>
+</div>
+{{ foods|json_script:"calFoods" }}
+{% endblock %}
+{% block scripts %}<script src="{% vstatic 'js/calories.js' %}"></script>{% endblock %}

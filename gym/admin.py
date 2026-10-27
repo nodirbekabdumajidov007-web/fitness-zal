@@ -9,7 +9,7 @@ from django.utils.safestring import mark_safe
 
 from . import services, telegram
 from .models import (Announcement, BodyLog, Booking, Category, ChatMessage, ChatReport, Exercise, GymClass, GymSettings, Membership, Order, OrderItem, Payment, PaymentCard, Plan,
-                     AIMessage, Notification, PersonalRecord, Product, PromoCode, PTSession, Review, Trainer, User, Visit, WorkoutPlan)
+                     AIMessage, FoodEntry, Notification, PersonalRecord, Product, PromoCode, PTSession, Review, Trainer, User, Visit, WorkoutPlan)
 
 
 def export_csv(modeladmin, request, queryset, fields, name):
@@ -599,3 +599,12 @@ class TrainerAdmin(admin.ModelAdmin):
 
 
 admin.site.register([Category, Announcement, Membership, BodyLog])
+
+
+@admin.register(FoodEntry)
+class FoodEntryAdmin(admin.ModelAdmin):
+    list_display = ("user", "date", "meal", "name", "grams", "kcal")
+    list_filter = ("meal", "date")
+    search_fields = ("name", "user__username", "user__first_name")
+    autocomplete_fields = ()
+    raw_id_fields = ("user",)

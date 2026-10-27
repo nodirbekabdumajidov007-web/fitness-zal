@@ -770,11 +770,23 @@ def record_delete(request, pk):
     return redirect("records")
 
 
+def pay_tiles(gs):
+    """The payment choices of the plan form as tiles: what works now is selectable, the rest is shown as "soon"."""
+    ok = set(allowed_methods(gs))
+    rows = [("cash", "cash", "cash"), ("Payme", "Payme", "payme"), ("Click", "Click", "click"), ("Uzum", "Uzum", "uzum")]
+    tiles = [{"value": v, "label": lab, "brand": b, "ok": v in ok} for v, lab, b in rows]
+    if "click" in ok:  # the real Click gateway replaces the demo tile
+        tiles[2].update(value="click", ok=True)
+    if "card" in ok:
+        tiles.append({"value": "card", "label": "card", "brand": "card", "ok": True})
+    return tiles
+
+
 def plans_view(request):
     gs = GymSettings.load()
     m = services.active_membership(request.user) if request.user.is_authenticated else None
     return render(request, "gym/plans.html", {
-        "plans": Plan.objects.filter(active=True), "methods": allowed_methods(gs), "m": m,
+        "plans": Plan.objects.filter(active=True), "methods": allowed_methods(gs), "pay_tiles": pay_tiles(gs), "m": m,
         "max_freeze": gs.freeze_max_days, "freeze_options": [d for d in (7, 14, 30) if d <= gs.freeze_max_days],
     })
 
@@ -852,8 +864,28 @@ def shop(request):
         qs = qs.filter(category_id=int(cat))
     if q:
         qs = qs.filter(name__icontains=q)
-    return render(request, "gym/shop.html", {"products": qs, "categories": Category.objects.all(), "cat": cat or "", "q": q,
+    from django.core.paginator import Paginator
+    page = Paginator(qs.order_by("category__order", "id"), SHOP_PAGE_SIZE).get_page(request.GET.get("page"))
+    keep = urllib.parse.urlencode({k: v for k, v in (("cat", cat or ""), ("q", q)) if v})  # the pager links keep the filters
+    return render(request, "gym/shop.html", {"products": page, "page": page, "pages": page_window(page), "keep": keep and keep + "&",
+                                             "categories": Category.objects.all(), "cat": cat or "", "q": q,
                                              "popular": popular_ids(), **cart_context(request)})
+
+
+SHOP_PAGE_SIZE = 20
+
+
+def page_window(page, around=2):
+    """Page numbers for the pager: first, last and a few around the current one; None marks a gap ("...")."""
+    n, cur = page.paginator.num_pages, page.number
+    nums = sorted({1, n, *range(max(1, cur - around), min(n, cur + around) + 1)})
+    out, prev = [], 0
+    for x in nums:
+        if x - prev > 1:
+            out.append(None)
+        out.append(x)
+        prev = x
+    return out if n > 1 else []
 
 
 def cart_context(request):
@@ -1547,3 +1579,93 @@ def account_view(request):
 
 def default_storage_for(user):
     return user._meta.get_field("avatar").storage
+
+
+# ---------------------------------------------------------------- calorie tracker
+
+@login_required
+def calories_view(request):
+    from . import ai, calories
+    day = calories.parse_day(request.GET.get("d"))
+    today = timezone.localdate()
+    ctx = calories.day_summary(request.user, day)
+    ctx.update({"foods": calories.food_table(), "ai_on": ai.enabled(), "is_today": day == today,
+                "prev_day": day - timedelta(days=1), "next_day": day + timedelta(days=1) if day < today else None,
+                "meal_choices": [(m, calories.MEAL_ICON[m]) for m in calories.MEALS], "ai_left": max(0, ai.daily_limit() - ai.used_today(request.user)),
+                "default_meal": _meal_now()})
+    return render(request, "gym/calories.html", ctx)
+
+
+def _meal_now():
+    h = timezone.localtime().hour
+    return "breakfast" if h < 11 else "lunch" if h < 16 else "dinner" if h < 21 else "snack"
+
+
+def _decimal(raw, hi=6000):
+    from decimal import Decimal, InvalidOperation
+    try:
+        d = Decimal(str(raw).replace(",", ".").strip() or "0")
+    except InvalidOperation:
+        return None
+    return d.quantize(Decimal("0.1")) if 0 <= d <= hi else None
+
+
+@require_POST
+@login_required
+def calories_add(request):
+    """Adds one entry: either a food from the built-in table + grams, or a typed name with its own numbers."""
+    from . import calories
+    day = calories.parse_day(request.POST.get("d"))
+    meal = request.POST.get("meal") if request.POST.get("meal") in calories.MEALS else "snack"
+    back = redirect(f"{reverse('calories')}?d={day.isoformat()}")
+    try:
+        grams = int(request.POST.get("grams", ""))
+    except ValueError:
+        grams = 0
+    if not 1 <= grams <= 5000:
+        flash(request, messages.ERROR, "cal_bad_grams")
+        return back
+    idx = request.POST.get("food", "")
+    if idx.isdigit() and int(idx) < len(calories.FOODS):
+        food = calories.FOODS[int(idx)]
+        kcal, p, f, c = calories.per_portion(food, grams)
+        name = food[0]
+    else:
+        name = " ".join(request.POST.get("name", "").split())[:80]
+        kcal, p, f, c = (_decimal(request.POST.get(k, "0")) for k in ("kcal", "protein", "fat", "carbs"))
+        if not name or kcal is None or p is None or f is None or c is None:
+            flash(request, messages.ERROR, "cal_bad_food")
+            return back
+    request.user.food_entries.create(date=day, meal=meal, name=name, grams=grams, kcal=kcal, protein=p, fat=f, carbs=c)
+    flash(request, messages.SUCCESS, "cal_added")
+    return back
+
+
+@require_POST
+@login_required
+def calories_delete(request, pk):
+    entry = get_object_or_404(request.user.food_entries, pk=pk)
+    day = entry.date
+    entry.delete()
+    return redirect(f"{reverse('calories')}?d={day.isoformat()}")
+
+
+@require_POST
+@login_required
+def calories_ai(request):
+    """Free text -> AI estimate -> saved as entries of the chosen meal (JSON for the fetch call, redirect otherwise)."""
+    from . import ai, calories
+    day = calories.parse_day(request.POST.get("d"))
+    meal = request.POST.get("meal") if request.POST.get("meal") in calories.MEALS else "snack"
+    try:
+        items = calories.estimate(request.user, request.POST.get("text", ""), request.lang)
+    except ai.AIError as e:
+        if wants_json(request):
+            return JsonResponse({"ok": False, "error": translate(request.lang, e.key)}, status=400)
+        flash(request, messages.ERROR, e.key)
+        return redirect(f"{reverse('calories')}?d={day.isoformat()}")
+    request.user.food_entries.bulk_create([request.user.food_entries.model(user=request.user, date=day, meal=meal, **it) for it in items])
+    if wants_json(request):
+        return JsonResponse({"ok": True, "n": len(items)})
+    flash(request, messages.SUCCESS, "cal_added")
+    return redirect(f"{reverse('calories')}?d={day.isoformat()}")

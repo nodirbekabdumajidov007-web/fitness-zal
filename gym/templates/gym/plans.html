@@ -10,9 +10,16 @@
     <h3>{% plan_name p %}</h3>
     <div class="price num">{{ p.price|money }} <small>{% t 'price_unit' %}</small></div>
     <ul class="perks">{% plan_perks p as perks %}{% for x in perks %}<li>{{ x }}</li>{% endfor %}</ul>
-    <label for="m_{{ p.code }}">{% t 'pay_method' %}
-      <select id="m_{{ p.code }}" name="method">{% for mth in methods %}<option value="{{ mth }}">{% method_label mth %}</option>{% endfor %}</select></label>
-    <label for="p_{{ p.code }}">{% t 'promo' %}<input id="p_{{ p.code }}" name="promo" maxlength="20" autocomplete="off"></label>
+    <fieldset class="paytiles"><legend>{% t 'pay_method' %}</legend>
+      {% for x in pay_tiles %}<label class="ptile {{ x.brand }}{% if not x.ok %} off{% endif %}">
+        <input type="radio" name="method"{% if x.ok %} value="{{ x.value }}"{% if forloop.first %} checked{% endif %}{% else %} disabled{% endif %}>
+        <span class="pt-logo" aria-hidden="true">{% if x.brand == 'cash' %}💵{% elif x.brand == 'payme' %}<b>payme</b>{% elif x.brand == 'click' %}<b>click</b>{% elif x.brand == 'uzum' %}<b>uzum</b>{% else %}💳{% endif %}</span>
+        <span class="pt-txt"><b>{% if x.brand == 'cash' %}{% t 'cash' %}{% elif x.brand == 'card' %}{% t 'card_transfer' %}{% else %}{{ x.value }}{% endif %}</b>
+          <small>{% if not x.ok %}{% t 'pay_soon_tile' %}{% elif x.brand == 'cash' %}{% t 'pay_cash_sub' %}{% elif x.brand == 'card' %}{% t 'pay_card_sub' %}{% else %}{% t 'pay_online_sub' %}{% endif %}</small></span>
+        <i class="pt-tick" aria-hidden="true"></i>
+      </label>{% endfor %}
+    </fieldset>
+    <label for="p_{{ p.code }}">{% t 'promo' %}<input id="p_{{ p.code }}" name="promo" maxlength="20" autocomplete="off" placeholder="{% t 'promo_ph' %}"></label>
     <button class="btn primary" type="submit">{% t 'buy' %}</button>
   </form>
   {% endfor %}

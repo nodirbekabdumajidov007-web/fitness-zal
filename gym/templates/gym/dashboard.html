@@ -83,6 +83,11 @@
     {% else %}<span class="muted">{% t 'rest_day' %}</span>{% endif %}
   </a>
 
+  <a class="card db-tile db-cal" href="{% url 'calories' %}">
+    <div class="db-head"><h3>🔥 {% t 'nav_calories' %}</h3></div>
+    <span class="muted">{% t 'cal_sub' %}</span>
+  </a>
+
   <section class="card db-tile db-book">
     <div class="db-head"><h3>{% t 'my_bookings' %}</h3></div>
     {% for b in bookings %}
