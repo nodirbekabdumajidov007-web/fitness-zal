@@ -55,7 +55,7 @@ def inbox(request):
     rooms = []
     for r in ChatRoom.objects.filter(kind="room").order_by("id"):
         last = r.messages.filter(deleted=False).select_related("sender").order_by("-id").first()
-        rooms.append({"room": r, "last": last, "last_name": chat.display_name(last.sender) if last else ""})
+        rooms.append({"room": r, "last": last, "last_name": chat.display_name(last.sender) if last else "", "unread": unread.get(r.id, 0)})
     return render(request, "gym/chat_inbox.html", {
         "directs": directs, "rooms": rooms, "q": q,
         "results": [{"u": p, "name": chat.display_name(p), "initials": chat.initials(p), "hue": chat.hue(p)} for p in chat.search_people(u, q)],

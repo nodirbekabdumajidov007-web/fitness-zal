@@ -1,57 +1,59 @@
 {% extends "gym/base.html" %}{% load gym_tags %}
 {% block title %}{% t 'chat' %}{% endblock %}
 {% block content %}
-<div><h2>{% t 'chat' %}</h2><p class="muted" style="margin:8px 0 0">{% t 'chat_rules' %}</p></div>
-{% if user.chat_banned %}<div class="note warn">{% t 'chat_banned_notice' %}</div>{% endif %}
+<section class="ci-card">
+  <header class="ci-head">
+    <h1>{% t 'chat' %}</h1>
+    <details class="ci-rules"><summary aria-label="{% t 'ci_rules' %}" title="{% t 'ci_rules' %}">i</summary><p>{% t 'chat_rules' %}</p></details>
+  </header>
+  {% if user.chat_banned %}<div class="note warn">{% t 'chat_banned_notice' %}</div>{% endif %}
 
-<section class="grid">
-  <h3>{% t 'chat_rooms' %}</h3>
-  <div class="chat-list">
-    {% for r in rooms %}
-    <a class="chat-item" href="{% url 'chat_room' r.room.pk %}"><span class="m-ava big room">#</span>
-      <span class="ci-main"><b>{% t 'room_general' %}</b>
-        <span class="ci-last">{% if r.last %}{{ r.last_name }}: {% if r.last.body %}{{ r.last.body|truncatechars:60 }}{% else %}{% t 'chat_photo' %}{% endif %}{% else %}{% t 'room_general_help' %}{% endif %}</span></span>
-      <span class="ci-side">{% if r.last %}{{ r.last.created|date:"H:i" }}{% endif %}</span></a>
-    {% endfor %}
-  </div>
-</section>
+  <form class="ci-search" method="get" role="search">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+    <input name="q" value="{{ q }}" autocomplete="off" placeholder="{% t 'ci_search_ph' %}" aria-label="{% t 'chat_search' %}">
+    {% if q %}<a class="ci-clear" href="{% url 'chat' %}" aria-label="×">×</a>{% endif %}
+  </form>
 
-<section class="grid">
-  <h3>{% t 'chat_mine' %}</h3>
-  {% if directs %}
-  <div class="chat-list">
-    {% for d in directs %}
-    <a class="chat-item" href="{% url 'chat_room' d.room.pk %}">
-      <span class="m-ava big" style="--h:{{ d.hue }}">{{ d.initials }}{% if d.online %}<i class="m-dot"></i>{% endif %}</span>
-      <span class="ci-main"><b>{{ d.name }}{% if d.blocked %} <span class="pill mute">{% t 'chat_blocked_tag' %}</span>{% endif %}</b>
-        <span class="ci-last">{% if d.last.sender_id == user.pk %}{% t 'chat_you' %}: {% endif %}{% if d.last.deleted %}{% t 'chat_deleted' %}{% elif d.last.body %}{{ d.last.body|truncatechars:70 }}{% else %}{% t 'chat_photo' %}{% endif %}</span></span>
-      <span class="ci-side"><span class="num">{{ d.last.created|date:"d.m H:i" }}</span>{% if d.unread %}<span class="unread">{{ d.unread }}</span>{% endif %}</span>
-    </a>
-    {% endfor %}
-  </div>
-  {% else %}<div class="card muted">{% t 'chat_no_dm' %}</div>{% endif %}
-</section>
-
-<section class="grid">
-  <h3>{% t 'chat_people' %}</h3>
-  <form class="inline" method="get"><label for="cq">{% t 'chat_search' %}<input id="cq" name="q" value="{{ q }}" autocomplete="off" placeholder="Aziz  /  FZ-0012"></label><button class="btn primary" type="submit">{% t 'search' %}</button></form>
-  {% if short_q %}<span class="muted">{% t 'chat_min_search' %}</span>{% endif %}
-  {% if q and not short_q %}
-  <div class="chat-list">
-    {% for r in results %}
-    <form class="chat-item" method="post" action="{% url 'chat_start' r.u.pk %}">{% csrf_token %}
-      <span class="m-ava big" style="--h:{{ r.hue }}">{{ r.initials }}</span>
-      <span class="ci-main"><b>{{ r.name }}</b><span class="ci-last num">{{ r.u.member_code }}</span></span>
-      <button class="btn small primary" type="submit" style="flex:none">{% t 'chat_start_btn' %}</button></form>
-    {% empty %}<div class="chat-item muted">{% t 'no_results' %}</div>{% endfor %}
-  </div>
+  {% if q %}
+    <div class="ci-label">{% t 'ci_found' %}</div>
+    {% if short_q %}<p class="ci-empty">{% t 'chat_min_search' %}</p>{% else %}
+    <div class="ci-list">
+      {% for r in results %}
+      <form class="ci-row" method="post" action="{% url 'chat_start' r.u.pk %}">{% csrf_token %}
+        <span class="ci-ava" style="--h:{{ r.hue }}">{% if r.u.avatar %}<img src="{{ r.u.avatar_src }}" alt="">{% else %}{{ r.initials }}{% endif %}</span>
+        <span class="ci-main"><b>{{ r.name }}</b><small class="num">{{ r.u.member_code }}</small></span>
+        <button class="btn small primary" type="submit">{% t 'chat_start_btn' %}</button>
+      </form>
+      {% empty %}<p class="ci-empty">{% t 'no_results' %}</p>{% endfor %}
+    </div>{% endif %}
+  {% else %}
+    <div class="ci-list">
+      {% for r in rooms %}
+      <a class="ci-row" href="{% url 'chat_room' r.room.pk %}">
+        <span class="ci-ava room">#</span>
+        <span class="ci-main"><b>{% t 'room_general' %}</b>
+          <small>{% if r.last %}{{ r.last_name }}: {% if r.last.body %}{{ r.last.body|truncatechars:60 }}{% else %}{% t 'chat_photo' %}{% endif %}{% else %}{% t 'room_general_help' %}{% endif %}</small></span>
+        <span class="ci-side">{% if r.last %}<time class="num">{{ r.last.created|date:"H:i" }}</time>{% endif %}{% if r.unread %}<b class="ci-unread">{{ r.unread }}</b>{% endif %}</span>
+      </a>
+      {% endfor %}
+      {% for d in directs %}
+      <a class="ci-row{% if d.unread %} is-unread{% endif %}" href="{% url 'chat_room' d.room.pk %}">
+        <span class="ci-ava" style="--h:{{ d.hue }}">{% if d.other.avatar %}<img src="{{ d.other.avatar_src }}" alt="">{% else %}{{ d.initials }}{% endif %}{% if d.online %}<i class="ci-dot" title="online"></i>{% endif %}</span>
+        <span class="ci-main"><b>{{ d.name }}{% if d.blocked %} <span class="pill mute">{% t 'chat_blocked_tag' %}</span>{% endif %}</b>
+          <small>{% if d.last.sender_id == user.pk %}{% t 'chat_you' %}: {% endif %}{% if d.last.deleted %}{% t 'chat_deleted' %}{% elif d.last.body %}{{ d.last.body|truncatechars:70 }}{% else %}{% t 'chat_photo' %}{% endif %}</small></span>
+        <span class="ci-side"><time class="num">{{ d.last.created|date:"d.m H:i" }}</time>{% if d.unread %}<b class="ci-unread">{{ d.unread }}</b>{% endif %}</span>
+      </a>
+      {% empty %}
+      <p class="ci-empty">{% t 'ci_no_dm' %}</p>
+      {% endfor %}
+    </div>
   {% endif %}
-</section>
 
-{% if blocks %}
-<section class="grid"><h3>{% t 'chat_blocked_list' %}</h3>
-  <div class="chat-list">{% for b, name in blocks %}<form class="chat-item" method="post" action="{% url 'chat_unblock' b.pk %}">{% csrf_token %}<span class="ci-main"><b>{{ name }}</b></span><button class="btn small" type="submit" style="flex:none">{% t 'chat_unblock' %}</button></form>{% endfor %}</div>
+  <footer class="ci-foot">
+    {% if blocks %}<details class="ci-blocked"><summary>{% t 'chat_blocked_list' %} · {{ blocks|length }}</summary>
+      {% for b, name in blocks %}<form class="ci-row" method="post" action="{% url 'chat_unblock' b.pk %}">{% csrf_token %}<span class="ci-main"><b>{{ name }}</b></span><button class="btn small" type="submit">{% t 'chat_unblock' %}</button></form>{% endfor %}
+    </details>{% endif %}
+    <small class="muted">🔒 {% t 'ci_privacy' %} <a href="{% url 'profile' %}#me">{% t 'ci_privacy_link' %}</a></small>
+  </footer>
 </section>
-{% endif %}
-<div class="note">{% t 'chat_privacy_note' %} <a href="{% url 'profile' %}">{% t 'nav_profile' %}</a></div>
 {% endblock %}

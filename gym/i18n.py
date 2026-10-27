@@ -830,6 +830,14 @@ acc_no_file||Fayl tanlanmagan||Файл не выбран||No file chosen
 acc_type||Hisob turi||Тип аккаунта||Account type
 acc_pw_help||Parolni o'zgartirmoqchi bo'lmasangiz, ikkala maydonni bo'sh qoldiring.||Чтобы не менять пароль, оставьте оба поля пустыми.||Leave both fields empty to keep your password.
 account_saved||Akkaunt sozlamalari saqlandi||Настройки аккаунта сохранены||Account settings saved
+um_plan_until||Abonement:||Абонемент до||Membership until
+um_get_plan||olish||оформить||get one
+ci_rules||Chat qoidalari||Правила чата||Chat rules
+ci_search_ph||Ism yoki a'zo raqami (FZ-0012) bo'yicha qidirish||Поиск по имени или номеру (FZ-0012)||Search by name or member number (FZ-0012)
+ci_found||Topilgan a'zolar||Найденные участники||Members found
+ci_no_dm||Hali shaxsiy suhbat yo'q. Yuqoridagi qidiruvdan a'zoni topib, yozing.||Личных переписок пока нет. Найдите участника через поиск выше.||No private chats yet. Find a member with the search above.
+ci_privacy||Boshqalar faqat ismingiz va familiyangiz bosh harfini ko'radi, telefon raqamingiz hech kimga ko'rinmaydi.||Другие видят только имя и первую букву фамилии, телефон скрыт.||Others only see your first name and last initial; your phone stays hidden.
+ci_privacy_link||Qidiruvda ko'rinish sozlamasi||Настройка видимости в поиске||Search visibility setting
 scan_session||Sessiya tugagan: sahifani yangilab, admin sifatida qayta kiring||Сессия истекла: обновите страницу и войдите снова как администратор||Session ended: reload the page and sign in again as admin
 """
 

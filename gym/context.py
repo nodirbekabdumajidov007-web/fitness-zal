@@ -29,7 +29,13 @@ def gym(request):
                                      if request.user.is_authenticated else 0)
         return request._inbox_unread
 
-    return {"lang": getattr(request, "lang", "uz"), "is_trainer": is_trainer, "inbox_unread": inbox_unread, "gs": s, "is_open": is_open, "cart_count": sum(cart.values()), "chat_unread": chat_unread,
+    def my_membership():  # the account menu shows until when the membership runs
+        if not hasattr(request, "_my_m"):
+            from . import services
+            request._my_m = services.active_membership(request.user) if request.user.is_authenticated else None
+        return request._my_m
+
+    return {"lang": getattr(request, "lang", "uz"), "is_trainer": is_trainer, "my_membership": my_membership, "inbox_unread": inbox_unread, "gs": s, "is_open": is_open, "cart_count": sum(cart.values()), "chat_unread": chat_unread,
             "demo_on": bool(s.demo_payments and dj.ALLOW_DEMO_PAYMENTS),
             "admin_mode": bool(request.user.is_authenticated and request.user.is_staff and request.session.get("admin_mode")),
             "google_client_id": s.google_id(), "apple_client_id": s.apple_id(),
