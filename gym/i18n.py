@@ -897,6 +897,14 @@ pay_online_sub||Onlayn to'lov||Онлайн-оплата||Online payment
 pay_card_sub||Kartaga o'tkazma||Перевод на карту||Card transfer
 promo_ph||Bo'lsa, promokodni kiriting||Введите промокод, если есть||Enter a promo code if you have one
 back_top||Tepaga qaytish||Наверх||Back to top
+nav_g_main||Asosiy||Главное||Main
+nav_g_train||Mashg'ulot||Тренировки||Training
+nav_g_shop||Do'kon||Магазин||Shop
+nav_g_comm||Jamiyat||Сообщество||Community
+nav_g_staff||Xodimlar||Персонал||Staff
+nav_menu||Menyu||Меню||Menu
+nav_collapse||Menyuni yig'ish||Свернуть меню||Collapse menu
+nav_close||Yopish||Закрыть||Close
 scan_session||Sessiya tugagan: sahifani yangilab, admin sifatida qayta kiring||Сессия истекла: обновите страницу и войдите снова как администратор||Session ended: reload the page and sign in again as admin
 """
 

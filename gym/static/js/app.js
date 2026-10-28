@@ -262,3 +262,62 @@ document.addEventListener('DOMContentLoaded', function () {
   top.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }); });
   toggle();
 })();
+
+/* Sidebar: collapse to an icon rail (desktop), off-canvas drawer (tablet/phone). */
+(function () {
+  var root = document.documentElement, sb = document.getElementById('sidebar');
+  if (!sb) return;
+  var backdrop = document.getElementById('sb-backdrop'), collapse = document.getElementById('sb-collapse');
+  var openers = document.querySelectorAll('[data-sb-open]'), lastFocus = null;
+  var mq = window.matchMedia ? matchMedia('(max-width: 1023.98px)') : { matches: false };
+
+  // tooltips for the icon-only rail: reuse the visible label
+  sb.querySelectorAll('.sb-nav a, .sb-collapse').forEach(function (a) {
+    var l = a.querySelector('.sb-lbl');
+    if (l && !a.title) a.title = l.textContent.trim();
+  });
+
+  function setRail(on) {
+    root.classList.toggle('sb-rail', on);
+    if (collapse) collapse.setAttribute('aria-pressed', on ? 'true' : 'false');
+    try { localStorage.setItem('fz-sb', on ? 'rail' : 'full'); } catch (e) {}
+  }
+  if (collapse) {
+    collapse.setAttribute('aria-pressed', root.classList.contains('sb-rail') ? 'true' : 'false');
+    collapse.addEventListener('click', function () { setRail(!root.classList.contains('sb-rail')); });
+  }
+
+  function isOpen() { return root.classList.contains('sb-open'); }
+  function openDrawer() {
+    lastFocus = document.activeElement;
+    root.classList.add('sb-open');
+    // the drawer slides in under the finger: ignore the tap's trailing events so they don't hit a link in it
+    sb.style.pointerEvents = 'none';
+    setTimeout(function () { sb.style.pointerEvents = ''; }, 350);
+    if (backdrop) backdrop.hidden = false;
+    openers.forEach(function (b) { b.setAttribute('aria-expanded', 'true'); });
+    var cur = sb.querySelector('[aria-current="page"]') || sb.querySelector('.sb-nav a');
+    if (cur) setTimeout(function () { cur.focus({ preventScroll: true }); if (cur.scrollIntoView) cur.scrollIntoView({ block: 'center' }); }, 30);
+  }
+  function closeDrawer(restore) {
+    if (!isOpen()) return;
+    root.classList.remove('sb-open');
+    if (backdrop) backdrop.hidden = true;
+    openers.forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
+    if (restore !== false && lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  openers.forEach(function (b) { b.addEventListener('click', function () { isOpen() ? closeDrawer() : openDrawer(); }); });
+  sb.querySelectorAll('[data-sb-close]').forEach(function (b) { b.addEventListener('click', function () { closeDrawer(); }); });
+  if (backdrop) backdrop.addEventListener('click', function () { closeDrawer(); });
+  sb.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('.sb-nav a')) closeDrawer(false); });
+  document.addEventListener('keydown', function (e) {
+    if (!isOpen()) return;
+    if (e.key === 'Escape') { closeDrawer(); return; }
+    if (e.key !== 'Tab') return;   // keep focus inside the drawer
+    var f = sb.querySelectorAll('a[href], button'), first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+  var onMq = function () { if (!mq.matches) closeDrawer(false); };
+  if (mq.addEventListener) mq.addEventListener('change', onMq); else if (mq.addListener) mq.addListener(onMq);
+})();

@@ -17,6 +17,7 @@
 <div id="bg" aria-hidden="true"></div>
 <header class="top"><div class="wrap">
   <div class="top-row">
+    <button type="button" class="navtoggle" data-sb-open aria-controls="sidebar" aria-expanded="false" aria-label="{% t 'nav_menu' %}">{% icon 'menu' %}</button>
     <a class="logo" href="{% url 'home' %}"><img class="logo-mark" src="{% vstatic 'img/logo.png' %}" alt="" width="219" height="320"><span class="logo-txt">FITNES<span>.</span>ZAL</span></a>
     <span class="pill {% if is_open %}good{% else %}bad{% endif %}"><i class="dot"></i>{% if is_open %}{% t 'open' %}{% else %}{% t 'closed' %}{% endif %} · {{ gs.open_time|hm }}–{{ gs.close_time|hm }}</span>
     <div class="tools">
@@ -68,28 +69,64 @@
       {% endif %}
     </div>
   </div>
-  {% with p=request.path %}
-  <nav class="main" aria-label="Menu">
-    <a href="{% url 'home' %}"{% if p == '/' %} aria-current="page"{% endif %}>{% t 'nav_home' %}</a>
-    {% if user.is_authenticated %}<a href="{% url 'dashboard' %}"{% if '/dashboard' in p %} aria-current="page"{% endif %}>{% t 'nav_dash' %}</a>{% endif %}
-    <a href="{% url 'plans' %}"{% if '/plans' in p %} aria-current="page"{% endif %}>{% t 'nav_plans' %}</a>
-    <a href="{% url 'shop' %}"{% if '/shop' in p or '/cart' in p %} aria-current="page"{% endif %}>{% t 'nav_shop' %}<span class="badge" id="cart-badge"{% if not cart_count %} hidden{% endif %}>{{ cart_count }}</span></a>
-    <a href="{% url 'classes' %}"{% if '/classes' in p %} aria-current="page"{% endif %}>{% t 'nav_classes' %}</a>
-    <a href="{% url 'trainers' %}"{% if '/trainers' in p %} aria-current="page"{% endif %}>{% t 'nav_trainers' %}</a>
-    {% if user.is_authenticated %}<a href="{% url 'workouts' %}"{% if '/workouts' in p %} aria-current="page"{% endif %}>{% t 'workouts' %}</a>
-    <a href="{% url 'progress' %}"{% if '/progress' in p %} aria-current="page"{% endif %}>{% t 'nav_progress' %}</a>
-    <a href="{% url 'records' %}"{% if '/records' in p %} aria-current="page"{% endif %}>{% icon 'trophy' %} {% t 'records' %}</a>
-    <a href="{% url 'achievements' %}"{% if '/achievements' in p %} aria-current="page"{% endif %}>{% t 'achievements' %}</a>
-    <a href="{% url 'card' %}"{% if '/card' in p %} aria-current="page"{% endif %}>{% t 'member_card' %}</a>{% endif %}
-    {% if user.is_authenticated %}<a href="{% url 'chat' %}"{% if '/chat' in p %} aria-current="page"{% endif %}>{% t 'chat' %}{% if chat_unread %}<span class="badge">{{ chat_unread }}</span>{% endif %}</a>{% endif %}
-    <a href="{% url 'ai' %}"{% if '/ai/' in p %} aria-current="page"{% endif %}>✦ {% t 'ai_coach' %}</a>
-    <a href="{% url 'tools' %}"{% if '/tools' in p %} aria-current="page"{% endif %}>{% icon 'calculator' %} {% t 'tools' %}</a>
-    <a href="{% url 'reviews' %}"{% if '/reviews' in p %} aria-current="page"{% endif %}>{% t 'nav_reviews' %}</a>
-    {% if is_trainer %}<a class="nav-coach" href="{% url 'coach' %}"{% if '/coach' in p %} aria-current="page"{% endif %}>{% icon 'dumbbell' %} {% t 'coach_panel' %}</a>{% endif %}
-    {% if admin_mode %}<a href="{% url 'desk' %}"{% if '/staff' in p %} aria-current="page"{% endif %}>{% t 'nav_desk' %}</a><a href="/django-admin/">{% t 'nav_admin' %}</a>{% endif %}
-  </nav>
-  {% endwith %}
 </div></header>
+
+{% with p=request.path %}
+<div class="sb-backdrop" id="sb-backdrop" hidden></div>
+<aside class="sb" id="sidebar" aria-label="Menu">
+  <div class="sb-head">
+    <a class="logo" href="{% url 'home' %}"><img class="logo-mark" src="{% vstatic 'img/logo.png' %}" alt="" width="219" height="320"><span class="logo-txt">FITNES<span>.</span>ZAL</span></a>
+    <button type="button" class="sb-x" data-sb-close aria-label="{% t 'nav_close' %}">{% icon 'x' %}</button>
+  </div>
+  <nav class="sb-nav" aria-label="Menu">
+    <div class="sb-grp">
+      <h2 class="sb-cap">{% t 'nav_g_main' %}</h2>
+      <a href="{% url 'home' %}"{% if p == '/' %} aria-current="page"{% endif %}>{% icon 'home' %}<span class="sb-lbl">{% t 'nav_home' %}</span></a>
+      {% if user.is_authenticated %}<a href="{% url 'dashboard' %}"{% if '/dashboard' in p %} aria-current="page"{% endif %}>{% icon 'activity' %}<span class="sb-lbl">{% t 'nav_dash' %}</span></a>
+      <a href="{% url 'card' %}"{% if '/card' in p %} aria-current="page"{% endif %}>{% icon 'credit-card' %}<span class="sb-lbl">{% t 'member_card' %}</span></a>{% endif %}
+      <a href="{% url 'ai' %}"{% if '/ai/' in p %} aria-current="page"{% endif %}>{% icon 'sparkles' %}<span class="sb-lbl">{% t 'ai_coach' %}</span></a>
+    </div>
+    <div class="sb-grp">
+      <h2 class="sb-cap">{% t 'nav_g_train' %}</h2>
+      <a href="{% url 'plans' %}"{% if '/plans' in p %} aria-current="page"{% endif %}>{% icon 'ticket' %}<span class="sb-lbl">{% t 'nav_plans' %}</span></a>
+      <a href="{% url 'classes' %}"{% if '/classes' in p %} aria-current="page"{% endif %}>{% icon 'calendar' %}<span class="sb-lbl">{% t 'nav_classes' %}</span></a>
+      <a href="{% url 'trainers' %}"{% if '/trainers' in p %} aria-current="page"{% endif %}>{% icon 'users' %}<span class="sb-lbl">{% t 'nav_trainers' %}</span></a>
+      {% if user.is_authenticated %}<a href="{% url 'workouts' %}"{% if '/workouts' in p %} aria-current="page"{% endif %}>{% icon 'dumbbell' %}<span class="sb-lbl">{% t 'workouts' %}</span></a>
+      <a href="{% url 'progress' %}"{% if '/progress' in p %} aria-current="page"{% endif %}>{% icon 'trending-up' %}<span class="sb-lbl">{% t 'nav_progress' %}</span></a>
+      <a href="{% url 'records' %}"{% if '/records' in p %} aria-current="page"{% endif %}>{% icon 'trophy' %}<span class="sb-lbl">{% t 'records' %}</span></a>
+      <a href="{% url 'achievements' %}"{% if '/achievements' in p %} aria-current="page"{% endif %}>{% icon 'award' %}<span class="sb-lbl">{% t 'achievements' %}</span></a>
+      <a href="{% url 'calories' %}"{% if '/calories' in p %} aria-current="page"{% endif %}>{% icon 'flame' %}<span class="sb-lbl">{% t 'nav_calories' %}</span></a>{% endif %}
+      <a href="{% url 'tools' %}"{% if '/tools' in p %} aria-current="page"{% endif %}>{% icon 'calculator' %}<span class="sb-lbl">{% t 'tools' %}</span></a>
+    </div>
+    <div class="sb-grp">
+      <h2 class="sb-cap">{% t 'nav_g_shop' %}</h2>
+      <a href="{% url 'shop' %}"{% if '/shop' in p or '/cart' in p %} aria-current="page"{% endif %}>{% icon 'bag' %}<span class="sb-lbl">{% t 'nav_shop' %}</span><span class="badge" id="cart-badge"{% if not cart_count %} hidden{% endif %}>{{ cart_count }}</span></a>
+      {% if user.is_authenticated %}<a href="{% url 'orders' %}"{% if '/orders' in p %} aria-current="page"{% endif %}>{% icon 'package' %}<span class="sb-lbl">{% t 'orders' %}</span></a>{% endif %}
+    </div>
+    <div class="sb-grp">
+      <h2 class="sb-cap">{% t 'nav_g_comm' %}</h2>
+      {% if user.is_authenticated %}<a href="{% url 'chat' %}"{% if '/chat' in p %} aria-current="page"{% endif %}>{% icon 'message' %}<span class="sb-lbl">{% t 'chat' %}</span>{% if chat_unread %}<span class="badge">{{ chat_unread }}</span>{% endif %}</a>{% endif %}
+      <a href="{% url 'reviews' %}"{% if '/reviews' in p %} aria-current="page"{% endif %}>{% icon 'star' %}<span class="sb-lbl">{% t 'nav_reviews' %}</span></a>
+    </div>
+    {% if is_trainer or admin_mode %}<div class="sb-grp">
+      <h2 class="sb-cap">{% t 'nav_g_staff' %}</h2>
+      {% if is_trainer %}<a class="nav-coach" href="{% url 'coach' %}"{% if '/coach' in p %} aria-current="page"{% endif %}>{% icon 'clipboard' %}<span class="sb-lbl">{% t 'coach_panel' %}</span></a>{% endif %}
+      {% if admin_mode %}<a href="{% url 'desk' %}"{% if '/staff' in p %} aria-current="page"{% endif %}>{% icon 'monitor' %}<span class="sb-lbl">{% t 'nav_desk' %}</span></a>
+      <a href="/django-admin/">{% icon 'shield' %}<span class="sb-lbl">{% t 'nav_admin' %}</span></a>{% endif %}
+    </div>{% endif %}
+  </nav>
+  <button type="button" class="sb-collapse" id="sb-collapse" aria-pressed="false">{% icon 'chevrons-left' %}<span class="sb-lbl">{% t 'nav_collapse' %}</span></button>
+</aside>
+
+<nav class="tabbar" aria-label="Menu">
+  <a href="{% url 'home' %}"{% if p == '/' %} aria-current="page"{% endif %}>{% icon 'home' %}<span>{% t 'nav_home' %}</span></a>
+  <a href="{% url 'plans' %}"{% if '/plans' in p %} aria-current="page"{% endif %}>{% icon 'ticket' %}<span>{% t 'nav_plans' %}</span></a>
+  <a href="{% url 'shop' %}"{% if '/shop' in p or '/cart' in p %} aria-current="page"{% endif %}>{% icon 'bag' %}<span>{% t 'nav_shop' %}</span></a>
+  {% if user.is_authenticated %}<a href="{% url 'chat' %}"{% if '/chat' in p %} aria-current="page"{% endif %}>{% icon 'message' %}<span>{% t 'chat' %}</span>{% if chat_unread %}<b class="badge">{{ chat_unread }}</b>{% endif %}</a>
+  {% else %}<a href="{% url 'login' %}"{% if '/login' in p %} aria-current="page"{% endif %}>{% icon 'user' %}<span>{% t 'login' %}</span></a>{% endif %}
+  <button type="button" data-sb-open aria-controls="sidebar" aria-expanded="false">{% icon 'menu' %}<span>{% t 'nav_menu' %}</span></button>
+</nav>
+{% endwith %}
 
 {% block outer %}<main class="wrap">{% block content %}{% endblock %}</main>{% endblock %}
 
