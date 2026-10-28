@@ -7,7 +7,7 @@
     {% if p.image_src %}<img referrerpolicy="no-referrer" data-fallback="{% static p.illustration %}" src="{{ p.image_src }}" alt="{{ p.name }}" class="cover">{% else %}<img src="{% static p.illustration %}" alt="{{ p.name }}">{% endif %}
   </div>
   <div class="card buybox">
-    <div class="chips">{% if p.pk in popular %}<span class="pill tag-hot">🔥 {% t 'popular' %}</span>{% endif %}
+    <div class="chips">{% if p.pk in popular %}<span class="pill tag-hot">{% icon 'flame' %} {% t 'popular' %}</span>{% endif %}
       {% if p.stock > 0 %}<span class="pill {% if p.stock <= 5 %}tag-low{% else %}good{% endif %}">{% if p.stock <= 5 %}{% t 'low_stock' %} · {% endif %}{% t 'in_stock' %}: {{ p.stock }}</span>{% else %}<span class="pill bad">{% t 'sold_out' %}</span>{% endif %}</div>
     <h1 class="buybox-title">{{ p.name }}</h1>
     <div class="buybox-price">
@@ -15,11 +15,11 @@
     </div>
     {% if p.description %}<p class="buybox-desc">{{ p.description }}</p>{% endif %}
     <div class="buybox-row">{% with qty=in_cart|get_item:p.pk big=True %}{% include "gym/_qty.html" %}{% endwith %}
-      <a class="buybox-cart" href="{% url 'cart' %}">🛒 {% t 'cart' %} →</a></div>
+      <a class="buybox-cart" href="{% url 'cart' %}">{% icon 'cart' %} {% t 'cart' %} →</a></div>
     <ul class="buybox-perks">
-      <li><i>🏋️</i>{% t 'dlv_pickup_sub' %}</li>
-      {% if gs.delivery_on %}<li><i>🛵</i>{% t 'dlv_courier' %} · {{ gs.delivery_area }}</li>{% endif %}
-      <li><i>💳</i>{% t 'perk_pay' %}</li>
+      <li><i>{% icon 'dumbbell' %}</i>{% t 'dlv_pickup_sub' %}</li>
+      {% if gs.delivery_on %}<li><i>{% icon 'truck' %}</i>{% t 'dlv_courier' %} · {{ gs.delivery_area }}</li>{% endif %}
+      <li><i>{% icon 'credit-card' %}</i>{% t 'perk_pay' %}</li>
     </ul>
   </div>
 </div>

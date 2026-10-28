@@ -1631,20 +1631,7 @@ a.ci-row:hover{background:var(--bg)}
 @media (max-width:520px){.pg-btn span{display:none}.pg-btn,.pg-num{min-width:38px;height:38px;padding:0 10px}}
 
 /* ---------- announcements ---------- */
-.ann-list{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))}
-.ann{display:flex;gap:14px;align-items:flex-start;padding:18px;border-radius:18px;border:1px solid var(--line);background:var(--surface);position:relative;overflow:hidden;
   transition:transform .2s,box-shadow .2s,border-color .2s}
-.ann::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(var(--accent),color-mix(in srgb,var(--accent) 30%,transparent))}
-.ann:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 12px 30px rgba(0,0,0,.12)}
-.ann.pinned{background:color-mix(in srgb,var(--accent) 6%,var(--surface))}
-.ann-ico{flex:none;width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:1.5rem;background:color-mix(in srgb,var(--accent) 14%,var(--surface))}
-.ann-main{min-width:0;flex:1}
-.ann-head{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
-.ann-head h3{margin:0;overflow-wrap:anywhere}.ann-head time{font-size:.78rem;white-space:nowrap}
-.ann-body{margin:8px 0 0;color:var(--muted);line-height:1.55;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
-.ann-body.open{display:block;-webkit-line-clamp:unset}
-.ann-more{margin-top:6px;padding:0;background:none;border:0;color:var(--accent);font-weight:700;cursor:pointer;font-size:.88rem}
-.ann-more:hover{text-decoration:underline}
 
 /* ---------- contact blocks (home map card + footer) ---------- */
 .map-lines{display:grid;gap:8px;margin:10px 0 14px}
@@ -1721,3 +1708,66 @@ a.map-line:hover>i,.ft-contact p:hover>i{transform:rotate(-8deg) scale(1.1);back
 .cal-x:hover{border-color:var(--bad);color:var(--bad)}
 .cal-empty{text-align:center}.cal-empty span{font-size:2.4rem}.cal-note{font-size:.8rem;margin:0}
 @media (max-width:640px){.cal-sum{grid-template-columns:1fr;justify-items:center}.cal-sum-info{width:100%}.cal-ring{width:150px;height:150px}.cal-macro{grid-template-columns:70px 1fr auto}}
+
+/* Brand logos in contact chips (Instagram gradient / Telegram plane) */
+.map-line>i.brand-ico,.ft-contact p>i.brand-ico{background:#fff;border:1px solid rgba(0,0,0,.08);padding:6px}
+.brand-ico svg{width:100%;height:100%;display:block}
+a.map-line:hover>i.brand-ico,.ft-contact p:hover>i.brand-ico{background:#fff}
+
+/* Route dropdown must sit above the red ticker ribbon (z-index:2) */
+.home-flow{position:relative;z-index:3}
+.home-flow:has(.route[open]){z-index:10}
+.route[open]{z-index:60}
+
+/* ---------- line icons replacing emoji ---------- */
+.ico{width:1.15em;height:1.15em;flex:none;vertical-align:-.2em;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+h1 .ico,h2 .ico,h3 .ico{color:var(--accent);vertical-align:-.15em}
+.map-line>i,.ft-contact p>i,.feat i,.dlv-ico,.nf-ico,.otp-icon,.pf-ava-cam,.db-nav a>i,.card.lift>i,.pt-logo,.wo-empty-ico,.m-empty-ico,.cal-empty>span,.nf-empty>span,.rv-empty>span,.role-pick i{color:var(--accent)}
+.map-line>i .ico,.ft-contact p>i .ico{width:19px;height:19px}
+.dlv-ico .ico,.nf-ico .ico{width:22px;height:22px}
+.otp-icon .ico{width:34px;height:34px}
+.pf-ava-cam .ico{width:18px;height:18px;color:#fff}
+.wo-empty-ico .ico,.m-empty-ico .ico{width:2.2rem;height:2.2rem}
+.db-flame .ico{width:2.2rem;height:2.2rem;stroke:currentColor;fill:rgba(240,80,61,.25);color:var(--accent)}
+.nf.new .nf-ico{color:#fff}
+.ptile.payme .pt-logo,.ptile.click .pt-logo,.ptile.uzum .pt-logo{color:inherit}
+.pt-logo .ico{width:22px;height:22px;color:var(--accent)}
+/* contact rows: calm, same look everywhere; accent only on hover/keyboard focus */
+.map-line,.ft-contact p{outline:0;-webkit-tap-highlight-color:transparent}
+a.map-line:hover,.ft-contact p:hover{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+a.map-line:focus,a.map-line:active{border-color:var(--line)}
+a.map-line:focus-visible{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
+.map-line>i,.ft-contact p>i{font-size:0;background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.map-line>i.brand-ico,.ft-contact p>i.brand-ico{font-size:0}
+/* password eye */
+.pw input{padding-right:48px}
+.pw button.pw-eye{width:40px;height:40px;display:grid;place-items:center;padding:0;right:4px;font-size:0;border-radius:10px;color:var(--muted)}
+.pw button.pw-eye:hover{color:var(--accent)}
+.pw-eye .ico{width:20px;height:20px}
+.pw-eye .ico:last-child,.pw-eye.on .ico:first-child{display:none}
+.pw-eye.on .ico:last-child{display:block}
+
+/* ---------- mobile polish ---------- */
+.lp-menu,.um-menu{max-width:calc(100vw - 24px)}
+header.top{z-index:40}
+@media (max-width:640px){
+  /* dropdowns stay inside the screen: language menu opens from the left edge of its button, user menu from the right */
+  header.top .lp-menu{left:0;right:auto;width:min(240px,calc(100vw - 24px))}
+  header.top .um-menu{right:0;left:auto;width:min(300px,calc(100vw - 24px))}
+  .tools{gap:6px;flex-wrap:nowrap}.tools .btn,header.top .btn{white-space:nowrap;padding-inline:12px}
+  html,body{overflow-x:clip}
+  img,video,canvas,svg{max-width:100%}
+  h1,h2,h3,p,li,a,td,th,label,.card,.pill{overflow-wrap:anywhere}
+  .tbl,.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  input,select,textarea{font-size:16px!important;max-width:100%}
+  .btn,button,summary,.daynight,.bell,nav.main a{min-height:44px}
+  .bell{width:44px;height:44px}
+  .pw button.pw-eye{min-height:40px}
+  .ptile{width:100%}
+  .fab{right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+  .totop{left:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+  body:has(.cart-bar) .fab,body:has(.cart-bar) .totop{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+  footer{padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+  .wrap{padding-inline:max(16px,env(safe-area-inset-left,0px))}
+}
+@media (max-width:640px){.auth-page .glass,.auth-page form.card{max-width:100%;min-width:0;box-sizing:border-box}}

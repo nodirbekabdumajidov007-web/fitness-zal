@@ -35,7 +35,7 @@
     {% if r.comment %}<p>{{ r.comment }}</p>{% endif %}
   </article>
   {% empty %}
-  <div class="card rv-empty"><span>💬</span><b>{% t 'none_yet' %}</b><small class="muted">{% t 'review_first' %}</small></div>
+  <div class="card rv-empty"><span>{% icon 'message' %}</span><b>{% t 'none_yet' %}</b><small class="muted">{% t 'review_first' %}</small></div>
   {% endfor %}
 </div>
 {% endblock %}

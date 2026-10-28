@@ -6,7 +6,7 @@
   <h2>{% t 'forgot' %}</h2>
   <label for="rp">{% t 'phone' %}<div class="phone"><span>+998</span><input id="rp" name="phone" inputmode="numeric" maxlength="17" value="{{ phone|cut:'+998' }}" data-phone></div></label>
   <label for="rc">{% t 'sms_code' %}<input id="rc" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></label>
-  <label for="rn">{% t 'new_pass' %}<div class="pw"><input id="rn" name="new" type="password" maxlength="128" autocomplete="new-password"><button type="button" data-toggle-pw="rn" data-show="{% t 'show' %}" data-hide="{% t 'hide' %}">{% t 'show' %}</button></div></label>
+  <label for="rn">{% t 'new_pass' %}<div class="pw"><input id="rn" name="new" type="password" maxlength="128" autocomplete="new-password"><button type="button" class="pw-eye" data-toggle-pw="rn" data-show="{% t 'show' %}" data-hide="{% t 'hide' %}" aria-label="{% t 'show' %}">{% icon 'eye' %}{% icon 'eye-off' %}</button></div></label>
   {% for e in form.new.errors %}<span class="field-err">{% t e %}</span>{% endfor %}
   {% if error %}<span class="field-err" role="alert">{% t error %}</span>{% endif %}
   <button class="btn primary" type="submit">{% t 'change_pass' %}</button>

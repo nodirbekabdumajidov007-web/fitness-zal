@@ -24,7 +24,7 @@
 
 <div class="co-grid">
   <section class="card co-today">
-    <div class="db-head"><h3>📅 {% t 'coach_today' %}</h3><span class="muted">{% now "l" %}</span></div>
+    <div class="db-head"><h3>{% icon 'calendar' %} {% t 'coach_today' %}</h3><span class="muted">{% now "l" %}</span></div>
     {% for x in today_items %}
       <article class="co-class">
         <header><b class="num">{{ x.c.start_time|hm }}</b><span><b>{{ x.c.name }}</b><small class="muted">{{ x.c.duration_min }} {% t 'min' %}</small></span><span class="pill {% if x.w >= 90 %}warn{% else %}good{% endif %} num">{{ x.n }}/{{ x.c.capacity }}</span></header>
@@ -52,7 +52,7 @@
     {% for c in clients %}
       <a class="co-client{% if c.attention %} attn{% endif %}" href="{% url 'coach_client' c.u.pk %}">
         <span class="co-ava">{{ c.u.first_name|first|upper }}{{ c.u.last_name|first|upper }}</span>
-        <span><b>{{ c.u.full_name }}</b><small class="muted">{% if c.plan %}📈 {{ c.plan.title }}{% if not c.mine %} · {% t 'coach_other_plan' %}{% endif %}{% else %}{% t 'coach_no_plan' %}{% endif %}</small></span>
+        <span><b>{{ c.u.full_name }}</b><small class="muted">{% if c.plan %}{% icon 'trending-up' %} {{ c.plan.title }}{% if not c.mine %} · {% t 'coach_other_plan' %}{% endif %}{% else %}{% t 'coach_no_plan' %}{% endif %}</small></span>
         <span class="co-tag {{ c.why }}">{% if c.why == 'no_visit' %}{% t 'coach_never' %}{% elif c.why == 'away' %}{{ c.days }} {% t 'coach_days_away' %}{% elif c.why == 'no_plan' %}{% t 'coach_needs_plan' %}{% elif c.days == 0 %}{% t 'coach_today_in' %}{% else %}{{ c.days }} {% t 'coach_days_ago' %}{% endif %}</span>
       </a>
     {% empty %}<p class="muted">{% t 'coach_no_clients' %}</p>{% endfor %}
@@ -60,7 +60,7 @@
   </section>
 
   <section class="card co-week">
-    <div class="db-head"><h3>🗓 {% t 'coach_week' %}</h3></div>
+    <div class="db-head"><h3>{% icon 'calendar' %} {% t 'coach_week' %}</h3></div>
     <div class="co-week-grid">
       {% for d in week %}<div class="co-day{% if d.today %} today{% endif %}"><b>{% t 'wd_short_'|add:d.wd %}</b><small class="num">{{ d.d|date:"d.m" }}</small>
         {% for x in d.items %}<span class="co-slot{% if x.w >= 90 %} full{% endif %}" title="{{ x.c.name }} · {{ x.n }}/{{ x.c.capacity }}"><i class="num">{{ x.c.start_time|hm }}</i>{{ x.c.name }}<em class="num">{{ x.n }}</em></span>{% empty %}<span class="co-rest">—</span>{% endfor %}</div>{% endfor %}

@@ -50,13 +50,13 @@
 
       <label class="acc-wide">{% t 'acc_type' %}<select disabled><option>{% t 'acc_role_'|add:role %}</option></select></label>
 
-      <label>{% t 'cur_pass' %}<div class="pw"><input id="acc_cur" name="current_password" type="password" autocomplete="current-password" maxlength="128"{% if not user.has_usable_password %} disabled placeholder="—"{% endif %}><button type="button" data-toggle-pw="acc_cur" data-show="👁" data-hide="🙈" aria-label="{% t 'show' %}">👁</button></div></label>
-      <label>{% t 'new_pass' %}<div class="pw"><input id="acc_new" name="new_password" type="password" autocomplete="new-password" maxlength="128" data-strength data-caps="{% t 'caps_on' %}"><button type="button" data-toggle-pw="acc_new" data-show="👁" data-hide="🙈" aria-label="{% t 'show' %}">👁</button></div></label>
+      <label>{% t 'cur_pass' %}<div class="pw"><input id="acc_cur" name="current_password" type="password" autocomplete="current-password" maxlength="128"{% if not user.has_usable_password %} disabled placeholder="—"{% endif %}><button type="button" class="pw-eye" data-toggle-pw="acc_cur" data-show="{% t 'show' %}" data-hide="{% t 'hide' %}" aria-label="{% t 'show' %}">{% icon 'eye' %}{% icon 'eye-off' %}</button></div></label>
+      <label>{% t 'new_pass' %}<div class="pw"><input id="acc_new" name="new_password" type="password" autocomplete="new-password" maxlength="128" data-strength data-caps="{% t 'caps_on' %}"><button type="button" class="pw-eye" data-toggle-pw="acc_new" data-show="{% t 'show' %}" data-hide="{% t 'hide' %}" aria-label="{% t 'show' %}">{% icon 'eye' %}{% icon 'eye-off' %}</button></div></label>
       <div class="acc-wide pw-meter" aria-hidden="true"><i></i></div>
       {% for e in pw_errors %}<span class="field-err acc-wide">{% t e %}</span>{% endfor %}
       <small class="muted acc-wide">{% t 'acc_pw_help' %}</small>
 
-      <div class="acc-wide acc-actions"><button class="btn primary pill" type="submit">💾 {% t 'save' %}</button></div>
+      <div class="acc-wide acc-actions"><button class="btn primary pill" type="submit">{% icon 'save' %} {% t 'save' %}</button></div>
     </form>
   </section>
 </div>

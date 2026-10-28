@@ -53,7 +53,7 @@
     {% if blocks %}<details class="ci-blocked"><summary>{% t 'chat_blocked_list' %} · {{ blocks|length }}</summary>
       {% for b, name in blocks %}<form class="ci-row" method="post" action="{% url 'chat_unblock' b.pk %}">{% csrf_token %}<span class="ci-main"><b>{{ name }}</b></span><button class="btn small" type="submit">{% t 'chat_unblock' %}</button></form>{% endfor %}
     </details>{% endif %}
-    <small class="muted">🔒 {% t 'ci_privacy' %} <a href="{% url 'profile' %}#me">{% t 'ci_privacy_link' %}</a></small>
+    <small class="muted">{% icon 'lock' %} {% t 'ci_privacy' %} <a href="{% url 'profile' %}#me">{% t 'ci_privacy_link' %}</a></small>
   </footer>
 </section>
 {% endblock %}

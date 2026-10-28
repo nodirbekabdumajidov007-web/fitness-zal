@@ -47,8 +47,8 @@
 {% endif %}
 
 <nav class="dk-tabs" role="tablist" data-tabs>
-  <button type="button" role="tab" data-tab="pay" aria-selected="true">💳 {% t 'desk_pending' %} <i class="{% if pending %}hot{% endif %}">{{ pending|length }}</i></button>
-  <button type="button" role="tab" data-tab="orders" aria-selected="false">🛒 {% t 'desk_orders' %} <i class="{% if new_orders %}hot{% endif %}">{{ new_orders|length }}</i></button>
+  <button type="button" role="tab" data-tab="pay" aria-selected="true">{% icon 'credit-card' %} {% t 'desk_pending' %} <i class="{% if pending %}hot{% endif %}">{{ pending|length }}</i></button>
+  <button type="button" role="tab" data-tab="orders" aria-selected="false">{% icon 'cart' %} {% t 'desk_orders' %} <i class="{% if new_orders %}hot{% endif %}">{{ new_orders|length }}</i></button>
   <button type="button" role="tab" data-tab="pt" aria-selected="false">🤝 {% t 'pt_requests' %} <i class="{% if pt_requests %}hot{% endif %}">{{ pt_requests|length }}</i></button>
   <button type="button" role="tab" data-tab="visits" aria-selected="false">🚪 {% t 'visits_today' %} <i>{{ visits_today }}</i></button>
 </nav>
@@ -76,14 +76,14 @@
   <div class="dk-cards">
   {% for o in new_orders %}
     <article class="card dk-order{% if o.delivery == 'courier' %} courier{% endif %}">
-      <header><span class="dk-ava">{% if o.delivery == 'courier' %}🛵{% else %}🛍{% endif %}</span>
+      <header><span class="dk-ava">{% if o.delivery == 'courier' %}{% icon 'truck' %}{% else %}🛍{% endif %}</span>
         <div><b>#{{ o.pk }} · {{ o.user.full_name|default:"—" }}</b><small class="muted num">{{ o.created|dmyhm }}</small></div>
         <b class="dk-amount num">{{ o.total|money }}</b></header>
       <ul class="dk-items">{% for it in o.items.all %}<li><span>{{ it.name }}</span><b class="num">× {{ it.qty }}</b></li>{% endfor %}</ul>
-      {% if o.delivery == 'courier' %}<div class="dk-addr">📍 {{ o.address }}<br><a href="tel:{{ o.delivery_phone }}">{{ o.delivery_phone }}</a>{% if o.delivery_note %} · {{ o.delivery_note }}{% endif %}</div>
-        <span class="pill {% if o.status == 'shipping' %}good{% else %}warn{% endif %}">{% if o.status == 'shipping' %}🛵 {% t 'st_shipping' %}{% else %}{% t 'dlv_courier' %}{% endif %}</span>{% endif %}
+      {% if o.delivery == 'courier' %}<div class="dk-addr">{% icon 'map-pin' %} {{ o.address }}<br><a href="tel:{{ o.delivery_phone }}">{{ o.delivery_phone }}</a>{% if o.delivery_note %} · {{ o.delivery_note }}{% endif %}</div>
+        <span class="pill {% if o.status == 'shipping' %}good{% else %}warn{% endif %}">{% if o.status == 'shipping' %}{% icon 'truck' %} {% t 'st_shipping' %}{% else %}{% t 'dlv_courier' %}{% endif %}</span>{% endif %}
       <div class="dk-acts">
-        {% if o.delivery == 'courier' and o.status == 'new' %}<form method="post" action="{% url 'desk_ship' o.pk %}">{% csrf_token %}<button class="btn pill" type="submit">🛵 {% t 'ship_do' %}</button></form>{% endif %}
+        {% if o.delivery == 'courier' and o.status == 'new' %}<form method="post" action="{% url 'desk_ship' o.pk %}">{% csrf_token %}<button class="btn pill" type="submit">{% icon 'truck' %} {% t 'ship_do' %}</button></form>{% endif %}
         <form method="post" action="{% url 'desk_handover' o.pk %}">{% csrf_token %}<button class="btn primary pill" type="submit">✓ {% if o.delivery == 'courier' %}{% t 'delivered_do' %}{% else %}{% t 'hand_over' %}{% endif %}</button></form>
       </div>
     </article>

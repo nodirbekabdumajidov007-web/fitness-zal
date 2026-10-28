@@ -127,8 +127,9 @@ class MiscUiTests(TestCase):
         self.assertContains(r, 'class="paytiles"')
         self.assertContains(r, "tez orada")
 
-    def test_announcement_card(self):
-        Announcement.objects.create(title="Yangilik", body="Birinchi qator\nIkkinchi qator", pinned=True)
+    def test_home_has_no_announcements_or_trainer_cards(self):
+        Announcement.objects.create(title="Yangilik", body="Birinchi qator", pinned=True)
         r = self.client.get("/")
-        self.assertContains(r, "ann-body")
-        self.assertContains(r, "Birinchi qator<br>Ikkinchi qator")
+        self.assertEqual(r.status_code, 200)
+        self.assertNotContains(r, "ann-body")
+        self.assertNotContains(r, "cine-thumbs")

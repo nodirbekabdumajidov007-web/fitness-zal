@@ -78,7 +78,7 @@ class BroadcastTests(Base):
         r = self.staff.post("/django-admin/broadcast/", {"title": "Yakshanba", "body": "10:00 da ochilamiz", "audience": "all", "announce": "on"})
         self.assertRedirects(r, "/django-admin/broadcast/", fetch_redirect_response=False)
         self.assertTrue(Announcement.objects.filter(title="Yakshanba").exists())
-        self.assertContains(Client().get("/"), "10:00 da ochilamiz")
+        self.assertEqual(Client().get("/").status_code, 200)  # announcements are no longer shown on the home page
 
     def test_needs_text_and_channel(self):
         r = self.staff.post("/django-admin/broadcast/", {"title": "", "body": "x", "announce": "on"})

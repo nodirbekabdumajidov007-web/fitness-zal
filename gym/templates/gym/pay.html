@@ -65,7 +65,7 @@
         {% csrf_token %}
         <div class="co-mine" aria-hidden="true"><span class="bc-chip sm"></span><span class="num">•••• •••• •••• <b id="sl4-view">····</b></span><small>{% t 'your_card' %}</small></div>
         <label for="sl4">{% t 'sender_last4' %}<input id="sl4" name="sender_last4" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" autocomplete="off" placeholder="1234" required class="num"></label>
-        <button class="btn primary paybtn" type="submit"><span class="pb-label">🔒 {% t 'i_paid' %} · {{ p.amount|money }} {% t 'price_unit' %}</span><span class="pb-spin" aria-hidden="true"></span><span class="pb-ok" aria-hidden="true">✓</span></button>
+        <button class="btn primary paybtn" type="submit"><span class="pb-label">{% icon 'lock' %} {% t 'i_paid' %} · {{ p.amount|money }} {% t 'price_unit' %}</span><span class="pb-spin" aria-hidden="true"></span><span class="pb-ok" aria-hidden="true">✓</span></button>
       </form>
       <span class="muted" style="font-size:.85rem">{% t 'sender_last4_help' %} · {% t 'transfer_deadline' %} <b class="num">{{ deadline|dmyhm }}</b></span>
       <form method="post" action="{% url 'pay_cancel' p.pk %}">{% csrf_token %}<button class="btn small danger" type="submit" data-bin data-confirm="{% t 'sure' %}">{% t 'pay_cancel' %}</button></form>

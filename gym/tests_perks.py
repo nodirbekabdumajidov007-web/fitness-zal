@@ -92,7 +92,6 @@ class ImageTests(Base):
         tr.photo.save("t.jpg", SimpleUploadedFile("t.jpg", JPG), save=True)
         self.assertEqual(Client().get(tr.image_src)["Content-Type"], "image/jpeg")
         self.assertContains(Client().get("/trainers/"), tr.image_src)
-        self.assertContains(Client().get("/"), tr.image_src)
 
     def test_bad_requests(self):
         p = Product.objects.first()

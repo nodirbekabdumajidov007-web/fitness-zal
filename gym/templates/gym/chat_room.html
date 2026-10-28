@@ -39,7 +39,7 @@
         </div>
       </div>
     {% empty %}
-      <div class="m-empty" id="chat-empty"><span class="m-empty-ico" aria-hidden="true">💬</span><b>{% t 'chat_empty_room' %}</b><span class="muted">{% t 'chat_rules_short' %}</span></div>
+      <div class="m-empty" id="chat-empty"><span class="m-empty-ico" aria-hidden="true">{% icon 'message' %}</span><b>{% t 'chat_empty_room' %}</b><span class="muted">{% t 'chat_rules_short' %}</span></div>
     {% endfor %}
   </div>
 

@@ -13,7 +13,7 @@
 {% else %}
 <div class="ai-grid">
   <section class="card ai-chat" id="chat">
-    <header class="ai-chat-head"><b>💬 {% t 'ai_chat_title' %}</b>
+    <header class="ai-chat-head"><b>{% icon 'message' %} {% t 'ai_chat_title' %}</b>
       <span class="muted num" data-ai-used>{{ used }} / {{ limit }} {% t 'ai_today' %}</span>
       {% if chat %}<form method="post" action="{% url 'ai_clear' %}">{% csrf_token %}<button class="btn small ghost" type="submit" data-confirm="{% t 'sure' %}">{% t 'ai_clear' %}</button></form>{% endif %}
     </header>
@@ -31,7 +31,7 @@
   </section>
 
   <section class="card ai-plan" id="plan">
-    <h3>📋 {% t 'ai_plan_title' %}</h3>
+    <h3>{% icon 'clipboard' %} {% t 'ai_plan_title' %}</h3>
     <p class="muted">{% t 'ai_plan_sub' %}</p>
     {% if has_trainer_plan %}<div class="note">{% t 'program_trainer' %}</div>{% endif %}
     <form class="grid" method="post" action="{% url 'ai_plan' %}" data-ai-plan>

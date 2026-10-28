@@ -11,8 +11,8 @@
     <div class="auth-head"><img class="auth-logo" src="{% vstatic 'img/logo.png' %}" alt="" width="219" height="320"><span class="eyebrow">Fitnes Zal · {{ gs.open_time|hm }}–{{ gs.close_time|hm }}</span><h1>{% t 'welcome_back' %}</h1></div>
     <div class="seg"><a href="{% url 'login' %}" aria-current="page">{% t 'login' %}</a><a href="{% url 'register' %}">{% t 'register' %}</a></div>
     <div class="role-pick" role="radiogroup" aria-label="{% t 'login_as' %}">
-      <label><input type="radio" name="role" value="member"{% if role != 'trainer' %} checked{% endif %}><span><i aria-hidden="true">🏃</i>{% t 'role_member' %}</span></label>
-      <label><input type="radio" name="role" value="trainer"{% if role == 'trainer' %} checked{% endif %}><span><i aria-hidden="true">🏋</i>{% t 'role_trainer' %}</span></label>
+      <label><input type="radio" name="role" value="member"{% if role != 'trainer' %} checked{% endif %}><span><i aria-hidden="true">{% icon 'activity' %}</i>{% t 'role_member' %}</span></label>
+      <label><input type="radio" name="role" value="trainer"{% if role == 'trainer' %} checked{% endif %}><span><i aria-hidden="true">{% icon 'dumbbell' %}</i>{% t 'role_trainer' %}</span></label>
       <b class="role-glider" aria-hidden="true"></b>
     </div>
     <p class="role-note">{% t 'role_trainer_note' %}</p>
@@ -20,12 +20,12 @@
     <div class="note info">{% t 'google_required' %}</div>
     <div id="gbtn" data-client="{{ google_client_id }}"></div><span class="field-err" id="gerr"></span>
     {% if error %}<span class="field-err" role="alert">{% t error %}</span>{% endif %}
-    {% if sms_on %}<span class="muted">📱 {% t 'sms_login_note' %}</span>{% endif %}
+    {% if sms_on %}<span class="muted">{% icon 'smartphone' %} {% t 'sms_login_note' %}</span>{% endif %}
     <details class="admin-door"{% if error and error != 'google_required' %} open{% endif %}><summary>{% t 'admin_login' %}</summary><div class="grid">
     {% endif %}
     <label for="id_login">{% t 'login_field' %}<input id="id_login" class="login-box" name="login" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="254" placeholder="{% t 'login_field_ph' %}" value="{{ form.login.value|default:'' }}" autofocus></label>
     {% for e in form.login.errors %}<span class="field-err">{% t e %}</span>{% endfor %}
-    <label for="id_password">{% t 'password' %}<div class="pw"><input id="id_password" name="password" type="password" autocomplete="current-password" maxlength="140" data-caps="{% t 'caps_on' %}"><button type="button" data-toggle-pw="id_password" data-show="{% t 'show' %}" data-hide="{% t 'hide' %}">{% t 'show' %}</button></div></label>
+    <label for="id_password">{% t 'password' %}<div class="pw"><input id="id_password" name="password" type="password" autocomplete="current-password" maxlength="140" data-caps="{% t 'caps_on' %}"><button type="button" class="pw-eye" data-toggle-pw="id_password" data-show="{% t 'show' %}" data-hide="{% t 'hide' %}" aria-label="{% t 'show' %}">{% icon 'eye' %}{% icon 'eye-off' %}</button></div></label>
     {% for e in form.password.errors %}<span class="field-err">{% t e %}</span>{% endfor %}
     {% if error and not google_only %}<span class="field-err" role="alert">{% t error %}</span>{% endif %}
     <div class="auth-row">
@@ -34,12 +34,12 @@
     </div>
     <button class="btn primary portal" type="submit"><span>{% t 'login' %}</span></button>
     {% if google_only %}</div></details>{% else %}
-    {% if sms_on %}<span class="muted">📱 {% t 'sms_login_note' %}</span>{% endif %}
+    {% if sms_on %}<span class="muted">{% icon 'smartphone' %} {% t 'sms_login_note' %}</span>{% endif %}
     <div class="sep">{% t 'or_continue' %}</div>
     {% include "gym/_social.html" %}
     {% endif %}
     <span class="muted" style="text-align:center">{% t 'no_account' %} <a href="{% url 'register' %}">{% t 'register' %}</a></span>
-    <p class="auth-trust"><span>🔒 {% t 'trust_encrypted' %}</span>{% if sms_on %}<span>📱 {% t 'trust_2fa' %}</span>{% endif %}<span>🛡 {% t 'trust_attempts' %}</span></p>
+    <p class="auth-trust"><span>{% icon 'lock' %} {% t 'trust_encrypted' %}</span>{% if sms_on %}<span>{% icon 'smartphone' %} {% t 'trust_2fa' %}</span>{% endif %}<span>{% icon 'shield' %} {% t 'trust_attempts' %}</span></p>
   </form>
 </div></main>
 {% endblock %}

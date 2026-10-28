@@ -21,9 +21,9 @@
       {% if gs.delivery_on %}
       <fieldset class="dlv" id="dlv" data-fee="{{ gs.delivery_fee }}" data-free="{{ gs.free_delivery_from }}" data-unit="{% t 'price_unit' %}" data-free-label="{% t 'free' %}">
         <legend>{% t 'step_delivery' %}</legend>
-        <label class="dlv-opt"><input type="radio" name="delivery" value="pickup" checked><span class="dlv-ico" aria-hidden="true">🏋️</span>
+        <label class="dlv-opt"><input type="radio" name="delivery" value="pickup" checked><span class="dlv-ico" aria-hidden="true">{% icon 'dumbbell' %}</span>
           <span><b>{% t 'dlv_pickup' %}</b><small>{% t 'dlv_pickup_sub' %}</small></span><em>{% t 'free' %}</em></label>
-        <label class="dlv-opt"><input type="radio" name="delivery" value="courier"><span class="dlv-ico moto" aria-hidden="true">🛵</span>
+        <label class="dlv-opt"><input type="radio" name="delivery" value="courier"><span class="dlv-ico moto" aria-hidden="true">{% icon 'truck' %}</span>
           <span><b>{% t 'dlv_courier' %}</b><small>{{ gs.delivery_area }}{% if gs.free_delivery_from %} · {{ gs.free_delivery_from|money }} {% t 'dlv_free_from' %}{% endif %}</small></span><em class="num">{{ gs.delivery_fee|money }}</em></label>
         <div class="dlv-addr grid" id="dlv-addr" hidden>
           <label for="dlv-a">{% t 'address' %}<input id="dlv-a" name="address" maxlength="200" autocomplete="street-address" placeholder="{% t 'dlv_address_ph' %}"></label>

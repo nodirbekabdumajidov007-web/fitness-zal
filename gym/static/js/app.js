@@ -83,7 +83,8 @@ document.addEventListener('DOMContentLoaded', function () {
       var i = document.getElementById(b.getAttribute('data-toggle-pw'));
       var show = i.type === 'password';
       i.type = show ? 'text' : 'password';
-      b.textContent = show ? b.getAttribute('data-hide') : b.getAttribute('data-show');
+      b.classList.toggle('on', show);
+      b.setAttribute('aria-label', show ? b.getAttribute('data-hide') : b.getAttribute('data-show'));
     });
   });
 
@@ -251,20 +252,8 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 
-/* Announcements: long bodies are clamped and get a "read more" toggle; plus the floating back-to-top button. */
+/* Floating back-to-top button. */
 (function () {
-  document.querySelectorAll('.ann-body').forEach(function (p) {
-    if (p.scrollHeight <= p.clientHeight + 2) return;
-    var b = document.createElement('button');
-    b.type = 'button'; b.className = 'ann-more'; b.textContent = p.getAttribute('data-more') || '+';
-    b.setAttribute('aria-expanded', 'false');
-    b.addEventListener('click', function () {
-      var open = p.classList.toggle('open');
-      b.textContent = p.getAttribute(open ? 'data-less' : 'data-more');
-      b.setAttribute('aria-expanded', open ? 'true' : 'false');
-    });
-    p.insertAdjacentElement('afterend', b);
-  });
   var top = document.getElementById('totop');
   if (!top) return;
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;

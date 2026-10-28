@@ -12,7 +12,7 @@
       <video id="scan-video" playsinline muted></video>
       <span class="sc-frame" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b></span>
     </div>
-    <div class="inline"><button class="btn primary pill" type="button" id="scan-start">📷 {% t 'scan_start' %}</button><span class="muted" id="scan-support"></span></div>
+    <div class="inline"><button class="btn primary pill" type="button" id="scan-start">{% icon 'camera' %} {% t 'scan_start' %}</button><span class="muted" id="scan-support"></span></div>
     <label for="scan-code">{% t 'scan_manual' %}<input id="scan-code" autocomplete="off" placeholder="FZ:12:abcdef123456" autofocus></label>
     <p class="muted" style="margin:0;font-size:.85rem">{% t 'scan_help' %}</p>
     <div class="sc-log" id="sc-log" hidden><h3>{% t 'tk_recent' %}</h3><ol></ol></div>

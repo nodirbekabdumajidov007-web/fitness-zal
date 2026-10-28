@@ -37,13 +37,6 @@
     </aside>
   </div>
 
-  {% if trainers %}
-  <div class="cine-thumbs" aria-label="{% t 'trainers' %}">
-    {% for tr in trainers %}<a class="cthumb" href="{% url 'trainer' tr.pk %}" style="--i:{{ forloop.counter }}">
-      <img src="{% if tr.image_src %}{{ tr.image_src }}{% else %}{% static 'img/trainer.svg' %}{% endif %}" data-fallback="{% static 'img/trainer.svg' %}" alt="" loading="lazy" referrerpolicy="no-referrer">
-      <span><b>{{ tr.name }}</b><small>{{ tr.specialty }}</small></span></a>{% endfor %}
-  </div>
-  {% endif %}
   <a class="cine-down" href="#more" aria-label="{% t 'scroll_more' %}"><span></span></a>
 </section>
 
@@ -57,21 +50,6 @@
     {% if trainers_count %}<div><b class="num" data-count="{{ trainers_count }}">{{ trainers_count }}</b><span>{% t 'trainers' %}</span></div>{% endif %}
     {% if classes_count %}<div><b class="num" data-count="{{ classes_count }}">{{ classes_count }}</b><span>{% t 'stat_classes' %}</span></div>{% endif %}
   </section>
-
-  {% if announcements %}
-  <section class="grid reveal">
-    <h2>{% t 'announcements' %}</h2>
-    <div class="ann-list">
-    {% for a in announcements %}<article class="ann{% if a.pinned %} pinned{% endif %}">
-      <span class="ann-ico" aria-hidden="true">{% if a.pinned %}📌{% else %}{% cycle '📣' '🎉' '🏋️' %}{% endif %}</span>
-      <div class="ann-main">
-        <div class="ann-head"><h3>{{ a.title }}</h3><time class="muted num" datetime="{{ a.created|date:'Y-m-d' }}">{{ a.created|date:"d.m.Y" }}</time></div>
-        <p class="ann-body" data-more="{% t 'ann_more' %}" data-less="{% t 'ann_less' %}">{{ a.body|linebreaksbr }}</p>
-      </div>
-    </article>{% endfor %}
-    </div>
-  </section>
-  {% endif %}
 
   <section class="feat-grid">
     <a class="feat reveal" href="{% url 'ai' %}"><i>✦</i><b>{% t 'ai_coach' %}</b><span>{% t 'ai_coach_sub' %}</span></a>
@@ -95,20 +73,6 @@
     </div>
   </section>
 
-  {% if trainers %}
-  <section class="grid">
-    <div class="sec-head reveal"><span class="eyebrow">02 · {% t 'trainers' %}</span><h2>{% t 'home_trainers_title' %}</h2></div>
-    <div class="grid g3">
-      {% for tr in trainers %}
-      <a class="card lift trainer-card reveal" href="{% url 'trainer' tr.pk %}" style="text-decoration:none">
-        <span class="trainer-img" data-px="14">{% if tr.image_src %}<img data-fallback="{% static 'img/trainer.svg' %}" src="{{ tr.image_src }}" alt="{{ tr.name }}" loading="lazy" referrerpolicy="no-referrer">{% else %}<img src="{% static 'img/trainer.svg' %}" alt="">{% endif %}</span>
-        <span style="padding:14px 16px"><b>{{ tr.name }}</b><br><span class="muted">{{ tr.specialty }} · {{ tr.experience_years }} {% t 'years_exp' %}</span></span></a>
-      {% endfor %}
-    </div>
-    <div class="reveal"><a class="btn" href="{% url 'trainers' %}">{% t 'trainers' %} →</a> {% if classes_count %}<a class="btn" href="{% url 'classes' %}">{% t 'classes' %} →</a>{% endif %}</div>
-  </section>
-  {% endif %}
-
   {% if reviews %}
   <section class="grid">
     <div class="sec-head reveal"><span class="eyebrow">03 · {% t 'reviews' %}</span><h2>{% if rating.n %}<span class="num">{{ rating.a|floatformat:1 }}</span> / 5{% else %}{% t 'reviews' %}{% endif %}</h2></div>
@@ -120,20 +84,20 @@
 
   {% with embed=gs.map_embed %}{% if embed or gs.address %}
   <section class="grid" id="map">
-    <div class="sec-head reveal"><span class="eyebrow">04 · {% t 'find_us' %}</span><h2>📍 {% t 'find_us_title' %}</h2></div>
+    <div class="sec-head reveal"><span class="eyebrow">04 · {% t 'find_us' %}</span><h2>{% icon 'map-pin' %} {% t 'find_us_title' %}</h2></div>
     <div class="map-wrap reveal">
       {% if embed %}<div class="map-frame"><iframe src="{{ embed }}" title="{% t 'find_us' %}" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe></div>{% endif %}
       <aside class="card map-info">
         <h3>Fitnes Zal</h3>
         <div class="map-lines">
-        {% if gs.address %}<p class="map-line"><i aria-hidden="true">📍</i><span>{{ gs.address }}</span></p>{% endif %}
-        <p class="map-line"><i aria-hidden="true">🕒</i><span>{{ gs.open_time|hm }}–{{ gs.close_time|hm }} <span class="pill {% if is_open %}good{% else %}bad{% endif %}">{% if is_open %}{% t 'open' %}{% else %}{% t 'closed' %}{% endif %}</span></span></p>
-        <a class="map-line" href="tel:+998{{ gs.phone|cut:' ' }}"><i aria-hidden="true">📞</i><span>+998 {{ gs.phone }}</span></a>
-        <a class="map-line" href="https://instagram.com/{{ gs.instagram }}" target="_blank" rel="noopener"><i aria-hidden="true">📷</i><span>@{{ gs.instagram }}</span></a>
-        {% if gs.telegram %}<a class="map-line" href="{{ gs.telegram }}" target="_blank" rel="noopener"><i aria-hidden="true">✈️</i><span>Telegram</span></a>{% endif %}
+        {% if gs.address %}<p class="map-line"><i aria-hidden="true">{% icon 'map-pin' %}</i><span>{{ gs.address }}</span></p>{% endif %}
+        <p class="map-line"><i aria-hidden="true">{% icon 'clock' %}</i><span>{{ gs.open_time|hm }}–{{ gs.close_time|hm }} <span class="pill {% if is_open %}good{% else %}bad{% endif %}">{% if is_open %}{% t 'open' %}{% else %}{% t 'closed' %}{% endif %}</span></span></p>
+        <a class="map-line" href="tel:+998{{ gs.phone|cut:' ' }}"><i aria-hidden="true">{% icon 'phone' %}</i><span>+998 {{ gs.phone }}</span></a>
+        <a class="map-line" href="https://instagram.com/{{ gs.instagram|cut:'@' }}" target="_blank" rel="noopener"><i class="brand-ico" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><defs><radialGradient id="iggh" cx="30%" cy="107%" r="150%"><stop offset="0" stop-color="#fdf497"/><stop offset=".05" stop-color="#fdf497"/><stop offset=".45" stop-color="#fd5949"/><stop offset=".6" stop-color="#d6249f"/><stop offset=".9" stop-color="#285AEB"/></radialGradient></defs><path fill="url(#iggh)" d="M12 7.4A4.6 4.6 0 1 0 12 16.6 4.6 4.6 0 0 0 12 7.4zm0 7.6A3 3 0 1 1 12 9a3 3 0 0 1 0 6zm5.9-7.8a1.1 1.1 0 1 1-2.2 0 1.1 1.1 0 0 1 2.2 0zM21.9 8c-.1-1.4-.4-2.700-1.500-3.800S18.400 2.800 17 2.700C15.600 2.600 8.400 2.600 7 2.700 5.600 2.800 4.300 3.100 3.200 4.200S1.900 6.600 1.800 8c-.1 1.400-.1 6.600 0 8 .1 1.400.4 2.700 1.500 3.800s2.300 1.400 3.700 1.500c1.400.1 8.600.1 10 0 1.400-.1 2.700-.4 3.800-1.500s1.400-2.300 1.500-3.800c.1-1.400.1-6.600 0-8zm-2 10.200a3.400 3.400 0 0 1-1.900 1.900c-1.300.5-4.300.4-5.700.4s-4.400.1-5.700-.4a3.400 3.400 0 0 1-1.900-1.900c-.5-1.300-.4-4.300-.4-5.700s-.1-4.400.4-5.700A3.400 3.400 0 0 1 6.300 4.900c1.300-.5 4.300-.4 5.700-.4s4.400-.1 5.700.4a3.400 3.400 0 0 1 1.900 1.900c.5 1.300.4 4.300.4 5.700s.1 4.400-.4 5.700z"/></svg></i><span>@{{ gs.instagram }}</span></a>
+        {% if gs.telegram %}<a class="map-line" href="{{ gs.telegram }}" target="_blank" rel="noopener"><i class="brand-ico" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#229ED9"/><path fill="#fff" d="M5.4 11.9l11.2-4.3c.5-.2 1 .1.8.9l-1.900 9c-.1.600-.5.800-1 .500l-2.900-2.100-1.400 1.300c-.2.200-.3.300-.6.300l.2-3 5.400-4.900c.2-.2 0-.3-.4-.1l-6.700 4.200-2.900-.9c-.6-.2-.6-.6.100-.9z"/></svg></i><span>Telegram</span></a>{% endif %}
         </div>
         {% include "gym/_route.html" %}
-        {% if gs.yandex_map_url %}<a class="btn pill" href="{{ gs.yandex_map_url }}" target="_blank" rel="noopener">🗺 {% t 'open_in_yandex' %}</a>{% endif %}
+        {% if gs.yandex_map_url %}<a class="btn pill" href="{{ gs.yandex_map_url }}" target="_blank" rel="noopener">{% icon 'map' %} {% t 'open_in_yandex' %}</a>{% endif %}
       </aside>
     </div>
   </section>

@@ -19,7 +19,7 @@
     {% for e in form.username.errors %}<span class="field-err">{% t e %}</span>{% endfor %}
     <label for="id_email">Email<input id="id_email" name="email" type="email" autocomplete="email" maxlength="254" placeholder="siz@gmail.com" value="{{ form.email.value|default:'' }}"></label>
     {% for e in form.email.errors %}<span class="field-err">{% t e %}</span>{% endfor %}
-    <label for="id_password">{% t 'password' %}<div class="pw"><input id="id_password" name="password" type="password" autocomplete="new-password" maxlength="128" data-strength data-caps="{% t 'caps_on' %}"><button type="button" data-toggle-pw="id_password" data-show="{% t 'show' %}" data-hide="{% t 'hide' %}">{% t 'show' %}</button></div></label>
+    <label for="id_password">{% t 'password' %}<div class="pw"><input id="id_password" name="password" type="password" autocomplete="new-password" maxlength="128" data-strength data-caps="{% t 'caps_on' %}"><button type="button" class="pw-eye" data-toggle-pw="id_password" data-show="{% t 'show' %}" data-hide="{% t 'hide' %}" aria-label="{% t 'show' %}">{% icon 'eye' %}{% icon 'eye-off' %}</button></div></label>
     <div class="pw-meter" aria-hidden="true"><i></i></div>
     {% for e in form.password.errors %}<span class="field-err">{% t e %}</span>{% endfor %}
     <label for="id_password2">{% t 'password2' %}<input id="id_password2" name="password2" type="password" autocomplete="new-password" maxlength="128" data-caps="{% t 'caps_on' %}"></label>
@@ -33,12 +33,12 @@
       {% for e in form.phone.errors %}<span class="field-err">{% t e %}</span>{% endfor %}
     </div></details>
     <button class="btn primary portal" type="submit"><span>{% t 'register' %}</span></button>
-    {% if sms_on %}<span class="muted">📱 {% t 'sms_login_note' %}</span>{% endif %}
+    {% if sms_on %}<span class="muted">{% icon 'smartphone' %} {% t 'sms_login_note' %}</span>{% endif %}
     <div class="sep">{% t 'or_continue' %}</div>
     {% include "gym/_social.html" %}
     {% endif %}
     <span class="muted" style="text-align:center">{% t 'have_account' %} <a href="{% url 'login' %}">{% t 'login' %}</a></span>
-    <p class="auth-trust"><span>🔒 {% t 'trust_encrypted' %}</span><span>🎁 {% t 'trust_free' %}</span></p>
+    <p class="auth-trust"><span>{% icon 'lock' %} {% t 'trust_encrypted' %}</span><span>{% icon 'gift' %} {% t 'trust_free' %}</span></p>
   </form>
 </div></main>
 {% endblock %}

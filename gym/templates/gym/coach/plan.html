@@ -31,7 +31,7 @@
   </div>
   <div class="inline" style="justify-content:space-between;align-items:center">
     <button type="button" class="btn pill" data-add>＋ {% t 'coach_add_row' %}</button>
-    <button class="btn primary pill" type="submit">💾 {% t 'coach_save_plan' %}</button>
+    <button class="btn primary pill" type="submit">{% icon 'save' %} {% t 'coach_save_plan' %}</button>
   </div>
   {{ program_rows|json_script:"pb-programs" }}
 </form>

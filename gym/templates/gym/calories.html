@@ -3,7 +3,7 @@
 {% block content %}
 <div class="cal">
   <div class="cal-top">
-    <div><h2>🔥 {% t 'nav_calories' %}</h2><p class="muted">{% t 'cal_sub' %}</p></div>
+    <div><h2>{% icon 'flame' %} {% t 'nav_calories' %}</h2><p class="muted">{% t 'cal_sub' %}</p></div>
     <nav class="cal-days" aria-label="{% t 'date' %}">
       <a class="btn small" href="?d={{ prev_day|date:'Y-m-d' }}" aria-label="←">←</a>
       <span class="cal-day num">{% if is_today %}{% t 'cal_today' %} · {% endif %}{{ day|date:"d.m.Y" }}</span>
@@ -29,7 +29,7 @@
 
   {% if advice and eaten < target %}
   <section class="card cal-advice">
-    <h3>💡 {% t 'cal_advice' %}</h3>
+    <h3>{% icon 'lightbulb' %} {% t 'cal_advice' %}</h3>
     <ul>{% for meal, n in advice %}<li><span>{% if meal == 'breakfast' %}🍳 {% t 'meal_breakfast' %}{% elif meal == 'lunch' %}🍲 {% t 'meal_lunch' %}{% elif meal == 'dinner' %}🍽 {% t 'meal_dinner' %}{% else %}🍎 {% t 'meal_snack' %}{% endif %}</span><b class="num">~{{ n }} {% t 'cal_kcal' %}</b></li>{% endfor %}</ul>
   </section>
   {% endif %}

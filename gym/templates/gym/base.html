@@ -78,14 +78,14 @@
     <a href="{% url 'trainers' %}"{% if '/trainers' in p %} aria-current="page"{% endif %}>{% t 'nav_trainers' %}</a>
     {% if user.is_authenticated %}<a href="{% url 'workouts' %}"{% if '/workouts' in p %} aria-current="page"{% endif %}>{% t 'workouts' %}</a>
     <a href="{% url 'progress' %}"{% if '/progress' in p %} aria-current="page"{% endif %}>{% t 'nav_progress' %}</a>
-    <a href="{% url 'records' %}"{% if '/records' in p %} aria-current="page"{% endif %}>🏆 {% t 'records' %}</a>
+    <a href="{% url 'records' %}"{% if '/records' in p %} aria-current="page"{% endif %}>{% icon 'trophy' %} {% t 'records' %}</a>
     <a href="{% url 'achievements' %}"{% if '/achievements' in p %} aria-current="page"{% endif %}>{% t 'achievements' %}</a>
     <a href="{% url 'card' %}"{% if '/card' in p %} aria-current="page"{% endif %}>{% t 'member_card' %}</a>{% endif %}
     {% if user.is_authenticated %}<a href="{% url 'chat' %}"{% if '/chat' in p %} aria-current="page"{% endif %}>{% t 'chat' %}{% if chat_unread %}<span class="badge">{{ chat_unread }}</span>{% endif %}</a>{% endif %}
     <a href="{% url 'ai' %}"{% if '/ai/' in p %} aria-current="page"{% endif %}>✦ {% t 'ai_coach' %}</a>
-    <a href="{% url 'tools' %}"{% if '/tools' in p %} aria-current="page"{% endif %}>🧮 {% t 'tools' %}</a>
+    <a href="{% url 'tools' %}"{% if '/tools' in p %} aria-current="page"{% endif %}>{% icon 'calculator' %} {% t 'tools' %}</a>
     <a href="{% url 'reviews' %}"{% if '/reviews' in p %} aria-current="page"{% endif %}>{% t 'nav_reviews' %}</a>
-    {% if is_trainer %}<a class="nav-coach" href="{% url 'coach' %}"{% if '/coach' in p %} aria-current="page"{% endif %}>🏋 {% t 'coach_panel' %}</a>{% endif %}
+    {% if is_trainer %}<a class="nav-coach" href="{% url 'coach' %}"{% if '/coach' in p %} aria-current="page"{% endif %}>{% icon 'dumbbell' %} {% t 'coach_panel' %}</a>{% endif %}
     {% if admin_mode %}<a href="{% url 'desk' %}"{% if '/staff' in p %} aria-current="page"{% endif %}>{% t 'nav_desk' %}</a><a href="/django-admin/">{% t 'nav_admin' %}</a>{% endif %}
   </nav>
   {% endwith %}
@@ -128,12 +128,12 @@
     </nav>
     <section class="ft-col ft-contact">
       <h3>{% t 'ft_contact' %}</h3>
-      {% if gs.address %}<p><i aria-hidden="true">📍</i><span>{{ gs.address }}</span></p>{% endif %}
-      <p><i aria-hidden="true">🕒</i><span>{% t 'every_day' %} <b class="num">{{ gs.open_time|hm }}–{{ gs.close_time|hm }}</b>
+      {% if gs.address %}<p><i aria-hidden="true">{% icon 'map-pin' %}</i><span>{{ gs.address }}</span></p>{% endif %}
+      <p><i aria-hidden="true">{% icon 'clock' %}</i><span>{% t 'every_day' %} <b class="num">{{ gs.open_time|hm }}–{{ gs.close_time|hm }}</b>
         <span class="ft-state {% if is_open %}on{% endif %}"><i></i>{% if is_open %}{% t 'open' %}{% else %}{% t 'closed' %}{% endif %}</span></span></p>
-      <p><i aria-hidden="true">📞</i><a href="tel:+998{{ gs.phone|cut:' ' }}">+998 {{ gs.phone }}</a></p>
-      <p><i aria-hidden="true">📷</i><a href="https://instagram.com/{{ gs.instagram }}" target="_blank" rel="noopener">@{{ gs.instagram }}</a></p>
-      {% if gs.telegram %}<p><i aria-hidden="true">✈️</i><a href="{{ gs.telegram }}" target="_blank" rel="noopener">Telegram</a></p>{% endif %}
+      <p><i aria-hidden="true">{% icon 'phone' %}</i><a href="tel:+998{{ gs.phone|cut:' ' }}">+998 {{ gs.phone }}</a></p>
+      <p><i class="brand-ico" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><defs><radialGradient id="iggf" cx="30%" cy="107%" r="150%"><stop offset="0" stop-color="#fdf497"/><stop offset=".05" stop-color="#fdf497"/><stop offset=".45" stop-color="#fd5949"/><stop offset=".6" stop-color="#d6249f"/><stop offset=".9" stop-color="#285AEB"/></radialGradient></defs><path fill="url(#iggf)" d="M12 7.4A4.6 4.6 0 1 0 12 16.6 4.6 4.6 0 0 0 12 7.4zm0 7.6A3 3 0 1 1 12 9a3 3 0 0 1 0 6zm5.9-7.8a1.1 1.1 0 1 1-2.2 0 1.1 1.1 0 0 1 2.2 0zM21.9 8c-.1-1.4-.4-2.700-1.500-3.800S18.400 2.800 17 2.700C15.600 2.600 8.400 2.600 7 2.700 5.600 2.800 4.300 3.100 3.200 4.200S1.900 6.600 1.800 8c-.1 1.400-.1 6.600 0 8 .1 1.400.4 2.700 1.500 3.800s2.300 1.400 3.700 1.500c1.400.1 8.600.1 10 0 1.400-.1 2.700-.4 3.800-1.500s1.400-2.300 1.500-3.800c.1-1.400.1-6.600 0-8zm-2 10.200a3.400 3.400 0 0 1-1.900 1.900c-1.300.5-4.300.4-5.700.4s-4.400.1-5.700-.4a3.400 3.400 0 0 1-1.900-1.900c-.5-1.300-.4-4.300-.4-5.700s-.1-4.400.4-5.700A3.400 3.400 0 0 1 6.300 4.900c1.300-.5 4.300-.4 5.700-.4s4.400-.1 5.700.4a3.400 3.400 0 0 1 1.900 1.900c.5 1.300.4 4.300.4 5.700s.1 4.400-.4 5.700z"/></svg></i><a href="https://instagram.com/{{ gs.instagram }}" target="_blank" rel="noopener">@{{ gs.instagram }}</a></p>
+      {% if gs.telegram %}<p><i class="brand-ico" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#229ED9"/><path fill="#fff" d="M5.4 11.9l11.2-4.3c.5-.2 1 .1.8.9l-1.900 9c-.1.600-.5.800-1 .500l-2.900-2.100-1.400 1.300c-.2.200-.3.300-.6.300l.2-3 5.400-4.900c.2-.2 0-.3-.4-.1l-6.700 4.200-2.900-.9c-.6-.2-.6-.6.100-.9z"/></svg></i><a href="{{ gs.telegram }}" target="_blank" rel="noopener">Telegram</a></p>{% endif %}
       {% include "gym/_route.html" with variant="up small" %}
     </section>
   </div>

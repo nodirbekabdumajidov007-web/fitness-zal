@@ -8,10 +8,10 @@
     <h1>{{ user.first_name }} {{ user.last_name }}</h1>
     <div class="db-quick">
       <a href="{% url 'card' %}"><i>▣</i>{% t 'member_card' %}</a>
-      <a href="{% url 'classes' %}"><i>🗓</i>{% t 'nav_classes' %}</a>
-      <a href="{% url 'workouts' %}"><i>📈</i>{% t 'workouts' %}</a>
-      <a href="{% url 'shop' %}"><i>🛒</i>{% t 'nav_shop' %}</a>
-      <a href="{% url 'chat' %}"><i>💬</i>{% t 'chat' %}</a>
+      <a href="{% url 'classes' %}"><i>{% icon 'calendar' %}</i>{% t 'nav_classes' %}</a>
+      <a href="{% url 'workouts' %}"><i>{% icon 'trending-up' %}</i>{% t 'workouts' %}</a>
+      <a href="{% url 'shop' %}"><i>{% icon 'cart' %}</i>{% t 'nav_shop' %}</a>
+      <a href="{% url 'chat' %}"><i>{% icon 'message' %}</i>{% t 'chat' %}</a>
     </div>
   </div>
   {% if is_open %}<span class="crowd db-crowd {{ crowd.level }}" title="{% t 'crowd_help' %}"><span class="crowd-txt">{% t 'crowd_now' %}: <b>{% t 'crowd_'|add:crowd.level %}</b></span><span class="crowd-bar"><i style="width:{{ crowd.pct }}%"></i></span></span>{% endif %}
@@ -38,7 +38,7 @@
   </section>
 
   <section class="card db-tile db-streak">
-    <span class="db-flame{% if stats.streak %} lit{% endif %}" aria-hidden="true">🔥</span>
+    <span class="db-flame{% if stats.streak %} lit{% endif %}" aria-hidden="true">{% icon 'flame' %}</span>
     <b class="db-num num" data-count="{{ stats.streak }}">{{ stats.streak }}</b>
     <span class="muted">{% t 'streak' %}</span>
   </section>
@@ -70,7 +70,7 @@
 
   <!-- weight trend -->
   <a class="card db-tile db-weight" href="{% url 'progress' %}">
-    <div class="db-head"><h3>⚖ {% t 'weight' %}</h3>{% if w_change is not None %}<span class="pill {% if w_change < 0 %}good{% elif w_change > 0 %}warn{% endif %} num">{% if w_change > 0 %}+{% endif %}{{ w_change }} kg</span>{% endif %}</div>
+    <div class="db-head"><h3>{% icon 'scale' %} {% t 'weight' %}</h3>{% if w_change is not None %}<span class="pill {% if w_change < 0 %}good{% elif w_change > 0 %}warn{% endif %} num">{% if w_change > 0 %}+{% endif %}{{ w_change }} kg</span>{% endif %}</div>
     {% if spark %}<b class="db-num num">{{ w_last }} <small>kg</small></b>
       <svg class="spark" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="{{ spark }}" pathLength="100" vector-effect="non-scaling-stroke"/></svg>
     {% else %}<span class="muted">{% t 'weight_empty' %}</span>{% endif %}
@@ -78,13 +78,13 @@
 
   <!-- today's workout -->
   <a class="card db-tile db-wo" href="{% url 'workouts' %}">
-    <div class="db-head"><h3>📈 {% t 'workouts' %}</h3></div>
+    <div class="db-head"><h3>{% icon 'trending-up' %} {% t 'workouts' %}</h3></div>
     {% if todays %}<div class="wo-bar"><i style="width:{% widthratio done_today todays 100 %}%"></i></div><span class="muted">{% t 'today_ex' done=done_today total=todays %}</span>
     {% else %}<span class="muted">{% t 'rest_day' %}</span>{% endif %}
   </a>
 
   <a class="card db-tile db-cal" href="{% url 'calories' %}">
-    <div class="db-head"><h3>🔥 {% t 'nav_calories' %}</h3></div>
+    <div class="db-head"><h3>{% icon 'flame' %} {% t 'nav_calories' %}</h3></div>
     <span class="muted">{% t 'cal_sub' %}</span>
   </a>
 
@@ -97,20 +97,20 @@
   </section>
 
   <section class="card db-tile db-news">
-    <div class="db-head"><h3>📣 {% t 'announcements' %}</h3></div>
+    <div class="db-head"><h3>{% icon 'megaphone' %} {% t 'announcements' %}</h3></div>
     {% for a in announcements %}<div><b>{{ a.title }}</b><div class="muted">{{ a.body|truncatechars:140 }}</div></div>{% empty %}<span class="muted">{% t 'none_yet' %}</span>{% endfor %}
   </section>
 
   <section class="card db-tile db-invite">
-    <div class="db-head"><h3>🎁 {% t 'invite' %}</h3><span class="muted num">{% t 'invited_n' n=referred ok=referred_ok %}</span></div>
+    <div class="db-head"><h3>{% icon 'gift' %} {% t 'invite' %}</h3><span class="muted num">{% t 'invited_n' n=referred ok=referred_ok %}</span></div>
     <p class="muted" style="margin:0">{% t 'invite_help' days=bonus_days %}</p>
     <div class="inline"><input id="ref-link" value="{{ referral_url }}" readonly aria-label="{% t 'invite' %}"><button class="btn" type="button" data-copy="ref-link" data-done="{% t 'copied' %}">{% t 'copy' %}</button></div>
   </section>
 
   <nav class="db-links">
     <a class="card lift" href="{% url 'ai' %}"><i>✦</i><b>{% t 'ai_coach' %}</b><span class="muted">{% t 'ai_coach_sub' %}</span></a>
-    <a class="card lift" href="{% url 'orders' %}"><i>🛒</i><b>{% t 'orders' %}</b><span class="muted">{% t 'nav_shop' %}</span></a>
-    <a class="card lift" href="{% url 'payments' %}"><i>💳</i><b>{% t 'payments' %}</b><span class="muted">{% t 'receipt' %}</span></a>
+    <a class="card lift" href="{% url 'orders' %}"><i>{% icon 'cart' %}</i><b>{% t 'orders' %}</b><span class="muted">{% t 'nav_shop' %}</span></a>
+    <a class="card lift" href="{% url 'payments' %}"><i>{% icon 'credit-card' %}</i><b>{% t 'payments' %}</b><span class="muted">{% t 'receipt' %}</span></a>
   </nav>
 </div>
 {% endblock %}

@@ -1,11 +1,11 @@
 {% extends "gym/base.html" %}{% load gym_tags %}
 {% block title %}{% t 'inbox' %}{% endblock %}
 {% block content %}
-<section class="tl-hero"><span class="eyebrow">Fitnes Zal</span><h1>🔔 {% t 'inbox' %}</h1><p class="muted">{% t 'inbox_sub' %}</p></section>
+<section class="tl-hero"><span class="eyebrow">Fitnes Zal</span><h1>{% icon 'bell' %} {% t 'inbox' %}</h1><p class="muted">{% t 'inbox_sub' %}</p></section>
 <div class="nf-list">
   {% for n in items %}
   <article class="card nf{% if n.pk in unread_ids %} new{% endif %}" style="--i:{{ forloop.counter0 }}">
-    <span class="nf-ico" aria-hidden="true">{% if n.sender %}✉{% else %}⚡{% endif %}</span>
+    <span class="nf-ico" aria-hidden="true">{% if n.sender %}{% icon 'mail' %}{% else %}{% icon 'zap' %}{% endif %}</span>
     <div class="nf-body">
       <header><b>{{ n.title }}</b>{% if n.pk in unread_ids %}<span class="pill good">{% t 'new' %}</span>{% endif %}<time class="muted num">{{ n.created|dmyhm }}</time></header>
       {% if n.body %}<p>{{ n.body|linebreaksbr }}</p>{% endif %}
@@ -13,7 +13,7 @@
     </div>
   </article>
   {% empty %}
-  <div class="card nf-empty"><span aria-hidden="true">📭</span><b>{% t 'inbox_empty' %}</b><small class="muted">{% t 'inbox_empty_help' %}</small></div>
+  <div class="card nf-empty"><span aria-hidden="true">{% icon 'inbox' %}</span><b>{% t 'inbox_empty' %}</b><small class="muted">{% t 'inbox_empty_help' %}</small></div>
   {% endfor %}
 </div>
 {% endblock %}

@@ -17,7 +17,7 @@
     {% elif step == "new" %}
       {% if validlink %}
       <form class="grid" method="post" novalidate>{% csrf_token %}
-        <label for="id_new_password1">{% t 'new_pass' %}<div class="pw"><input id="id_new_password1" name="new_password1" type="password" autocomplete="new-password" data-strength data-caps="{% t 'caps_on' %}"><button type="button" data-toggle-pw="id_new_password1" data-show="{% t 'show' %}" data-hide="{% t 'hide' %}">{% t 'show' %}</button></div></label>
+        <label for="id_new_password1">{% t 'new_pass' %}<div class="pw"><input id="id_new_password1" name="new_password1" type="password" autocomplete="new-password" data-strength data-caps="{% t 'caps_on' %}"><button type="button" class="pw-eye" data-toggle-pw="id_new_password1" data-show="{% t 'show' %}" data-hide="{% t 'hide' %}" aria-label="{% t 'show' %}">{% icon 'eye' %}{% icon 'eye-off' %}</button></div></label>
         <div class="pw-meter" aria-hidden="true"><i></i></div>
         {% for e in form.new_password1.errors %}<span class="field-err">{{ e }}</span>{% endfor %}
         <label for="id_new_password2">{% t 'password2' %}<input id="id_new_password2" name="new_password2" type="password" autocomplete="new-password"></label>
