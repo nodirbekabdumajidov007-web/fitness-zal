@@ -131,6 +131,9 @@ html[data-theme="dark"] .fz-top-brand .fz-logo{filter:invert(1)}
   opacity:1;line-height:1}
 .theme-toggle:hover{border-color:var(--fz-red);color:var(--fz-red)}
 .theme-toggle svg{width:18px;height:18px;fill:currentColor}
+/* Django colours these icons with the header link colour (white): on our light top bar they vanished */
+.fz-tools .theme-toggle svg.theme-icon-when-auto,.fz-tools .theme-toggle svg.theme-icon-when-dark,
+.fz-tools .theme-toggle svg.theme-icon-when-light{fill:currentColor;color:inherit}
 .fz-site{flex:none;display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 14px;border-radius:10px;border:1px solid var(--fz-line);background:var(--fz-card);font-size:.85rem;font-weight:600;white-space:nowrap}
 .fz-site:hover{border-color:var(--fz-red);color:var(--fz-red)!important}
 .fz-user{position:relative;flex:none}
