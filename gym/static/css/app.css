@@ -1178,7 +1178,7 @@ input[aria-invalid=true]{border-color:var(--accent)!important;box-shadow:0 0 0 2
 .tl-link:hover{text-decoration:underline}.tl-link .ico{width:15px;height:15px}
 .tl-mlist li span{display:grid;gap:1px}.tl-mlist small{color:var(--muted);font-size:.7rem;font-weight:500}
 .tl-hrtop{display:flex;flex-wrap:wrap;gap:14px 24px;align-items:end}.tl-hrtop label{flex:1 1 220px;max-width:320px}
-.tl-zone{grid-template-columns:150px 80px 1fr;column-gap:12px}.tl-zone b{text-align:left;white-space:nowrap}
+.tl-zone{grid-template-columns:minmax(110px,140px) 9.5em minmax(60px,1fr);column-gap:14px}.tl-zone b{text-align:left;white-space:nowrap}
 [data-theme=dark] .tl-tag.normal,[data-theme=dark] .tl-tag.goal-keep,[data-theme=dark] .tl-tag.bf2,[data-theme=dark] .tl-tag.bf3{color:#5fdc98}
 [data-theme=dark] .tl-tag.over,[data-theme=dark] .tl-tag.goal-gain,[data-theme=dark] .tl-tag.bf4{color:#f0cf74}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tl-tag.normal,:root:not([data-theme="light"]) .tl-tag.goal-keep,:root:not([data-theme="light"]) .tl-tag.bf2,:root:not([data-theme="light"]) .tl-tag.bf3{color:#5fdc98}
