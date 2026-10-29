@@ -30,7 +30,7 @@
     setTimeout(landed, reduce ? 0 : 1600);
   }
 
-  // scroll: the hero shrinks into a rounded card and the giant word drifts
+  // scroll: the hero shrinks into a rounded card
   if (!reduce) {
     var ticking = false;
     function onScroll() {

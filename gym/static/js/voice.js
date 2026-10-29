@@ -128,6 +128,10 @@
   var PRICE = /(narx|qancha|necha pul|pul turadi|tarif|цен|стоим|прайс|price|cost|how much)/;
   var PLAN_STEM = PAGE_RULES[4][1];
   var EAT = /(yedim|yedik|yeb |yeyman|ichdim|qosh |qoshing|съел|поел|выпил|добав|\bate\b|eaten|\bhad\b|drank|\badd\b|\blog\b)/;
+  // the verbs that surely mean "I ate this"; the rest of EAT is ambiguous ("log in", "добавки" = supplements, "I had a question")
+  var STRONG_EAT = /(yedim|yedik|yeb |yeyman|ichdim|съел|поел|выпил|\bate\b|eaten|drank)/;
+  // a question about a page's topic ("osh necha kaloriya") is answered from the knowledge base; only a command ("kaloriyani och") opens the page
+  var QUESTION = /(necha|qancha|nechta|nima|qanday|nega|сколько|какой|какая|какие|какое|что|почему|зачем|\bhow\b|\bwhat\b|\bwhy\b|\bwhich\b)/;
 
   function pageOf(n) {
     for (var i = 0; i < PAGE_RULES.length; i++) if (PAGE_RULES[i][1].test(n)) return PAGE_RULES[i][0];
@@ -182,6 +186,7 @@
       if (items.length) {
         return local().catch(function () { say(T.vc_error); });
       }
+      if (!STRONG_EAT.test(n + ' ')) return fallback(raw);  // "how do I log in", "какие добавки нужны": not a meal after all
       say(T.vc_cal_unknown); return null;
     });
   }
@@ -232,6 +237,7 @@
         INFO_RULES.forEach(function (r) { if (!kind && r[1].test(n)) kind = r[0]; });
         if (!kind && PRICE.test(n) && (PLAN_STEM.test(n) || !pg)) kind = 'plans';
         if (kind) run = infoAnswer(kind, n);
+        else if (pg && !NAV_VERB.test(n) && QUESTION.test(n)) run = askKB(raw).then(function (found) { if (!found) go(pg); });
         else if (pg && (words <= 5 || NAV_VERB.test(n))) { go(pg); run = Promise.resolve(); }
         else run = fallback(raw);
       }
@@ -259,9 +265,11 @@
     rec.onend = function () {
       setListening(false);
       if (finalText.trim()) { handle(finalText); return; }
-      if (err === 'not-allowed' || err === 'service-not-allowed') say(T.vc_mic_denied);
+      // the microphone is blocked / missing / the speech service is down: the text box (hidden while the mic works) appears, the message says "or type"
+      function typing() { panel.classList.add('typing'); try { text.focus(); } catch (e) {} }
+      if (err === 'not-allowed' || err === 'service-not-allowed') { say(T.vc_mic_denied); typing(); }
       else if (err === 'no-speech' || !err) { if (panel.hidden) return; say(T.vc_no_speech); }
-      else if (err !== 'aborted') say(T.vc_error);
+      else if (err !== 'aborted') { say(T.vc_error); typing(); }
     };
     try { rec.start(); } catch (e) { setListening(false); }
   }

@@ -50,6 +50,44 @@ class MatchingTests(TestCase):
             got = scored[0][1]["id"] if scored and scored[0][0] >= assistant.THRESHOLD else None
             self.assertEqual(got, want, (q, lang))
 
+    def test_wrong_topic_regressions(self):
+        """Questions that used to land on the wrong topic (or nowhere) after the audit: the entry that must answer them."""
+        want = [
+            ("болят мышцы после тренировки что делать", "doms"),  # not the generic "what to do after training" cool-down
+            ("how do I cancel my membership", "refund"),  # not "my membership" (the personal status)
+            ("is it ok to train every day", "frequency"),  # "train" is not the coach entry "trainers"
+            ("what supplements should I take", "supplements"),  # "should" is not "shoulder"
+            ("до скольки вы работаете в субботу", "hours"),  # Russian "-ете" and "-ет" forms share one stem
+            ("yakshanba kuni zal ishlaydimi", "hours"),
+            ("что лучше кардио или силовые", "fat_loss_train"),
+            ("можно ли тренироваться при простуде", "sick_train"),
+            ("can I bring a guest", "facilities"),
+            ("kechqurun ovqat yesam semiraman?", "meal_timing"),
+            ("what is a good breakfast for muscle building", "breakfast"),
+            ("men 80 kg man, necha kaloriya yeyishim kerak", "tdee"),
+            ("Qaysi mashqlar bilan elka rivojlanadi", "overhead_press"),
+            ("kartaga pul o'tkazdim", "card_transfer"),
+        ]
+        for q, eid in want:
+            scored = assistant.score_all(q)
+            got = scored[0][1]["id"] if scored and scored[0][0] >= assistant.THRESHOLD else None
+            self.assertEqual(got, eid, q)
+
+    def test_every_suggested_question_is_answered(self):
+        """The coach page offers three example questions in each language: each must get a real answer (the Uzbek 'abs' and 'squat' ones did not)."""
+        from .i18n import T
+        for lang in ("uz", "ru", "en"):
+            for key in ("ai_q1", "ai_q2", "ai_q3"):
+                res = assistant.answer(T[lang][key], lang)
+                self.assertTrue(res["matched"], (lang, key, T[lang][key]))
+        for q in ("Abonementlar narxi", "Ish vaqti"):  # the voice panel's examples
+            self.assertTrue(assistant.answer(q, "uz")["matched"], q)
+
+    def test_stemmer_agent_ending(self):
+        self.assertEqual(assistant.stem("работаете"), assistant.stem("работает"))
+        self.assertFalse(assistant._has("trainer", {"train"}))
+        self.assertTrue(assistant._has("kaloriya", {"kaloriyali"}))
+
     def test_every_language_answers(self):
         for lang in ("uz", "ru", "en"):
             res = assistant.answer("protein", lang)

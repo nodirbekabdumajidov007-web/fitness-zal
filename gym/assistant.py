@@ -36,7 +36,7 @@ _LAT = sorted([(s, 3) for s in (
     key=lambda p: -len(p[0]))
 _RU = sorted([(s, 3) for s in (
     "ами", "ями", "ого", "его", "ому", "ему", "ыми", "ими", "ать", "ять", "ить", "еть", "ует", "ают", "яют", "ешь", "ишь", "ете", "ите",
-    "ется", "ится", "ая", "яя", "ое", "ее", "ие", "ые", "ий", "ый", "ой", "ей", "ом", "ем", "ам", "ям", "ах", "ях", "ов", "ев", "ою",
+    "ется", "ится", "ает", "яет", "ая", "яя", "ое", "ее", "ие", "ые", "ий", "ый", "ой", "ей", "ом", "ем", "ам", "ям", "ах", "ях", "ов", "ев", "ою",
     "ею", "ую", "юю", "у", "ю", "а", "я", "ы", "и", "е", "о", "ь", "й")], key=lambda p: -len(p[0]))
 
 
@@ -93,7 +93,9 @@ def _has(stem_, qset):
     if stem_ in qset:
         return True
     if len(stem_) >= 5:  # "kaloriya" ~ "kaloriyali": a long stem may differ from the question word by a short ending
-        return any(len(q) >= 5 and abs(len(q) - len(stem_)) <= 2 and (q.startswith(stem_) or stem_.startswith(q)) for q in qset)
+        # ... but not by the English agent ending: "train" (training) is not "trainer" (a coach), "lift" is not "lifter"
+        return any(len(q) >= 5 and abs(len(q) - len(stem_)) <= 2 and (q.startswith(stem_) or stem_.startswith(q))
+                   and (max(q, stem_, key=len)[min(len(q), len(stem_)):] not in ("er", "ers", "r")) for q in qset)
     return False
 
 

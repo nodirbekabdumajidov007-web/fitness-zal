@@ -102,7 +102,8 @@ class HomeAndGoogleTests(Base):
     def test_home_is_cinematic(self):
         r = Client().get("/")
         self.assertContains(r, 'class="cine"')
-        self.assertContains(r, "KUCH")
+        self.assertContains(r, "Kuch")  # the ticker under the hero (the giant outlined hero word is gone)
+        self.assertNotContains(r, "cine-word")
         self.assertContains(r, "js/home.js")
         self.assertNotContains(r, "<video")  # no clip uploaded: animated photo instead
         self.assertEqual(Client().get("/hero/video/").status_code, 404)

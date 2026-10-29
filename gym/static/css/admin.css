@@ -3,7 +3,9 @@
    and last the components of our own pages (dashboard, member card, schedule, cash, messages). */
 
 /* ---------- tokens ---------- */
-:root{
+/* html[data-theme="light"] too: Django's own base.css sets its variables on that selector (more specific than :root), so with the light theme
+   chosen by hand its red delete button, blue links and white panels replaced ours (red text on a red button). */
+:root,html[data-theme="light"]{
   --fz-red:#d6301f; --fz-red-dark:#b0262f; --fz-gold:#c99a2e; --fz-ink:#14181f; --fz-green:#16a34a;
   --fz-bg:#f3f4f7; --fz-card:#ffffff; --fz-soft:#f7f8fa; --fz-line:#e2e5ea; --fz-text:#171a21; --fz-muted:#5b6473; --fz-grid:#eceef1;
   --fz-shadow:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.05);
@@ -394,6 +396,8 @@ body.app-gym:not([class*="model-"]) #content-main>div.module[class*="app-"] tbod
 .fz-actions a{display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:9px;background:rgba(255,255,255,.1);color:#fff!important;font-weight:600;font-size:.86rem;text-decoration:none!important}
 .fz-actions a.red{background:var(--fz-red)}
 .fz-actions a:hover{filter:brightness(1.2)}
+/* the buttons are made for the dark hero banner; on the plain page (reports) white-on-white was invisible in the light theme */
+.fz-wrap>.fz-actions a:not(.red){background:var(--fz-card);color:var(--fz-text)!important;border:1px solid var(--fz-line)}
 .fz-actions .ai{width:1em;height:1em}
 .fz-qa{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .fz-qa a{display:inline-flex;align-items:center;gap:8px;min-height:38px;padding:0 14px;border-radius:10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);color:#fff!important;font-weight:600;font-size:.86rem;text-decoration:none!important;transition:background .15s}
@@ -459,6 +463,7 @@ html[data-theme="dark"] .fz-col.dark .bar{background:linear-gradient(180deg,#c3c
 .fz-hero code{background:rgba(255,255,255,.12);padding:1px 6px;border-radius:5px;color:#fff}
 .fz-hero-slim{padding:18px 24px}.fz-hero-slim h2{font-size:1.9rem}
 .fz-eyebrow{font-family:var(--font-family-monospace);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:#e2b84a}
+.bc-site .fz-eyebrow{color:var(--st-warn)}  /* the gold is for the dark banners; on the light preview card it was 1.8:1 */
 .fz-goal{text-align:center;color:#c3c9d2;font-size:.85rem;position:relative;z-index:1}
 .fz-goal p{margin:0}.fz-goal small{color:#9aa3b0}
 .fz-ring.big{width:140px;height:140px;background:conic-gradient(var(--fz-red) calc(var(--p)*1%),rgba(255,255,255,.1) 0);animation:fzSpin 1.2s cubic-bezier(.2,.8,.1,1) both}
@@ -509,6 +514,10 @@ html[data-theme="dark"] .fz-col.dark .bar{background:linear-gradient(180deg,#c3c
 .fz-live i{width:8px;height:8px;border-radius:50%;background:var(--nb-green);box-shadow:0 0 0 0 var(--nb-glow);animation:livePing 1.6s infinite}
 .fz-live time{color:#9aa3b0;font-weight:500;letter-spacing:.04em}
 .fz-live.sm{padding:3px 9px;font-size:.62rem}
+/* the bright green is for the dark theme; on the light card it was 2.9:1 */
+.fz-live{color:#0e7a36}
+:root[data-theme="dark"] .fz-live{color:var(--nb-green)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .fz-live{color:var(--nb-green)}}
 @keyframes livePing{70%{box-shadow:0 0 0 8px rgba(22,163,74,0)}100%{box-shadow:0 0 0 0 rgba(22,163,74,0)}}
 
 /* bento dashboard grid */
@@ -542,6 +551,10 @@ html[data-theme="dark"] .fz-col.dark .bar{background:linear-gradient(180deg,#c3c
 .nb-col::after{content:attr(data-tip);position:absolute;bottom:calc(var(--h)*1% + 10px);left:50%;transform:translate(-50%,6px);white-space:nowrap;padding:5px 9px;border-radius:9px;
   background:#14181f;color:#fff;font-size:.72rem;font-weight:700;opacity:0;pointer-events:none;transition:opacity .15s,transform .15s;z-index:3;box-shadow:0 8px 18px rgba(0,0,0,.3)}
 .nb-col:hover::after{opacity:1;transform:translate(-50%,0)}
+/* the tooltips of the last bars are right-aligned: a centred, invisible one stuck out of the card and gave the phone a sideways scrollbar (2-4px) */
+.nb-col:nth-last-child(-n+2)::after{left:auto;right:-6px;transform:translateY(6px)}
+.nb-col:nth-last-child(-n+2):hover::after{transform:none}
+.nb-chart{overflow-x:clip}
 .nb-line{position:absolute;left:0;right:0;top:26px;bottom:18px;width:100%;height:calc(100% - 44px);pointer-events:none;overflow:visible}
 .nb-line polyline{fill:none;stroke:var(--nb-green);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round;filter:drop-shadow(0 2px 6px var(--nb-glow));
   stroke-dasharray:100;stroke-dashoffset:100;animation:draw 1.6s .4s ease-out forwards}

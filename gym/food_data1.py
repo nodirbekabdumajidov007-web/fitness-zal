@@ -218,7 +218,7 @@ Onion rings | 290 4 17 31 | 15 100 | луковые кольца, piyoz halqalar
 Taco | 226 9 13 20 | 100 100 | тако, tako, tacos
 Burrito | 210 8 8 28 | 250 250 | буррито, burrito go'shtli
 Panini | 250 11 10 29 | 180 180 | панини, panini sendvich
-Sendvich (tovuqli, kichik) | 180 12 4 25 | 250 250 | subway, sabvey, subway sendvich, chicken sub, сэндвич с курицей
+Sendvich (tovuqli, kichik) | 180 12 4 25 | 250 250 | subway, sabvey, subway sendvich, chicken sub, сэндвич с курицей, tovuqli sendvich, sendvich tovuqli
 Donat | 420 5 22 50 | 60 60 | donut, doughnut, пончик, пончики, donat shirin
 Kruassan | 406 8 21 46 | 60 60 | croissant, круассан, kruasan, kruassan oddiy
 Kruassan (shokoladli) | 420 7 22 49 | 70 70 | шоколадный круассан, chocolate croissant

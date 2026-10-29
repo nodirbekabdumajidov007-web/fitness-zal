@@ -73,7 +73,7 @@ Qaymoq (20%) | 205 2.8 20 3.7 | 0 30 | сливки 20, medium cream, qaymoq 20
 Qaymoq (33%) | 330 2.2 33 3.2 | 0 30 | сливки 33, heavy cream, whipping cream, qaymoq 33, взбитые сливки
 Smetana (10%) | 116 3 10 3.2 | 0 30 | сметана 10, light sour cream
 Smetana (15%) | 160 2.6 15 3 | 0 30 | сметана 15
-Kefir (1%) | 40 3 1 4 | 0 200 | кефир 1, low fat kefir, kefir yog'siz
+Kefir (1%) | 40 3 1 4 | 0 200 | кефир 1, low fat kefir
 Kefir (yog'siz) | 30 3 0.1 4 | 0 200 | обезжиренный кефир, fat free kefir
 Ryajenka | 67 3 4 4.2 | 0 200 | ряженка, baked milk, rjenka, ryazhenka
 Ayron | 28 1.5 1.4 2.5 | 0 250 | айран, ayran, ayron ichimlik, айрон
@@ -285,7 +285,7 @@ Masala choy | 70 2 2 11 | 200 200 | масала чай, masala chai, chai latte
 Matcha latte | 60 2.5 2 8 | 250 250 | матча латте, matcha, matcha latte
 Qahva (qora, shakarsiz) | 2 0.1 0 0 | 150 150 | кофе, чёрный кофе, coffee, black coffee, qahva, kofe, americano
 Qahva (shakar bilan) | 25 0.1 0 6 | 150 150 | кофе с сахаром, coffee with sugar, shakarli qahva, kofe shakar bilan
-Qahva (sut bilan) | 40 1.5 1.5 4 | 200 200 | кофе с молоком, coffee with milk, sutli qahva, kofe sut bilan
+Qahva (sut bilan) | 40 1.5 1.5 4 | 200 200 | кофе с молоком, coffee with milk, sutli qahva, qahva sutli, kofe sut bilan, qahva sut bilan
 Kapuchino | 45 2.5 2 4 | 200 200 | капучино, cappuccino, kapuchino
 Latte | 55 3 2.5 5 | 250 250 | латте, latte, kofe latte
 Espresso | 2 0.1 0 0 | 30 30 | эспрессо, espresso, espresso qahva
@@ -320,7 +320,7 @@ Yogurt ichimlik | 70 3 1.5 11 | 250 250 | питьевой йогурт, drinkin
 Smuzi | 70 1 0.5 15 | 250 250 | смузи, smoothie, smuzi mevali
 Protein kokteyli (tayyor) | 70 12 1.5 3 | 330 330 | готовый протеиновый коктейль, ready protein shake, protein shake, protein kokteyl
 Pivo (och) | 43 0.5 0 3.6 | 500 500 | пиво, beer, pivo, lager, light beer, пиво светлое
-Pivo (qorong'i) | 48 0.5 0 4.5 | 500 500 | тёмное пиво, dark beer, stout
+Pivo (qorong'i) | 48 0.5 0 4.5 | 500 500 | тёмное пиво, dark beer, stout, qora pivo
 Pivo (alkogolsiz) | 25 0.4 0 5 | 500 500 | безалкогольное пиво, non alcoholic beer, alkogolsiz pivo
 Vino (qizil) | 85 0.1 0 2.6 | 150 150 | красное вино, red wine, vino, вино
 Vino (oq) | 82 0.1 0 2.6 | 150 150 | белое вино, white wine, oq vino

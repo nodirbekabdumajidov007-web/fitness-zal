@@ -1896,7 +1896,7 @@ body:has(.fab):has(.cart-bar:not([hidden])){--vb:150px}
 .vp-answer a{color:var(--accent);font-weight:600}
 .vp-warn{margin:0;padding:8px 10px;border-radius:10px;border:1px solid var(--warn);color:var(--warn);font-size:.85rem}
 .vp-form{display:none;gap:8px}
-.vpanel.nomic .vp-form{display:flex}
+.vpanel.nomic .vp-form,.vpanel.typing .vp-form{display:flex}  /* typing: the mic is blocked or failed, the box appears next to the mic button */
 .vp-form input{flex:1;min-width:0;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit}
 .vp-send{width:44px;border-radius:10px;border:0;background:var(--accent);color:var(--accent-ink);cursor:pointer;display:grid;place-items:center;padding:0}
 .vp-send .ico{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -2097,3 +2097,68 @@ main{gap:16px;padding-block:22px 48px}
 .cal-mylist li>span{display:grid;gap:2px;min-width:0}.cal-mylist b{overflow-wrap:anywhere}.cal-mylist small{font-size:.75rem}.cal-mylist form{display:block}
 @media (max-width:480px){.cal-results li{flex-direction:column;align-items:flex-start;gap:2px}.cal-results small{text-align:left}
   .cal-mylist li{grid-template-columns:1fr auto}.cal-mylist li .btn{grid-column:1;justify-self:start}}
+
+/* Visually hidden radio / checkbox inputs: the global `input{width:100%;min-height:40px}` made them as wide as the page (right next to a chip),
+   which pushed the document wider than the screen (a sideways scrollbar on /calories/ and others). */
+.cal-meals input,.role-pick input,.star-pick input,.dlv-opt input,.tl-sex input,.tl-goal input,.ptile input{width:1px;height:1px;min-height:0;padding:0;border:0}
+
+/* The receipt / member card is always white paper: give it the light theme's text colours, otherwise in the dark theme the green pill and
+   the grey hints are light-on-white (contrast 2.2 - 2.5). */
+.receipt{--muted:#5b6370;--good:#1d9a52;--warn:#b97d00;--bad:#c0261a;--line:#d5d9df}
+
+/* === Home hero polish === */
+/* ~88vh (max 760px) hero; the content is centred in the same .wrap column as the rest of the page: text + buttons on the left, the coach card on the
+   right (stacked under 860px). The giant outlined word is gone; the photo gets a darker overlay so the text keeps AA contrast. */
+.cine{min-height:min(88svh,760px);align-items:center}
+.cine-inner{grid-template-columns:minmax(0,1fr) minmax(280px,356px);gap:clamp(28px,5vw,64px);align-items:center;padding-block:clamp(48px,7vh,72px) clamp(84px,11vh,104px)}
+.cine-shade{background:
+  linear-gradient(90deg,rgba(8,10,14,.9) 0%,rgba(8,10,14,.72) 45%,rgba(8,10,14,.4) 100%),
+  linear-gradient(0deg,#0b0d11 0%,rgba(11,13,17,0) 30%),
+  linear-gradient(180deg,rgba(11,13,17,.5) 0%,rgba(11,13,17,0) 24%)}
+.cine-copy{gap:18px}
+/* status + crowd pills: one height, one baseline, wrap cleanly */
+.cine-badges{gap:8px 10px;align-items:center}
+.cine-eyebrow,.cine .crowd{box-sizing:border-box;display:inline-flex;align-items:center;gap:8px;min-height:34px;padding:0 14px;border-radius:99px;
+  font:600 .72rem/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;
+  background:rgba(11,13,17,.62);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.cine-eyebrow{color:#ff9d8d;border:1px solid rgba(240,80,61,.5);animation:none}
+.cine .crowd{color:#e6e9ef;border:1px solid rgba(255,255,255,.24);gap:12px}
+.cine .crowd-txt{display:inline-flex;align-items:center;gap:6px}
+.cine .crowd-txt b{font-weight:800}
+.cine .crowd-bar{flex:none;position:relative;width:64px;height:6px;border-radius:99px;background:rgba(255,255,255,.2);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);overflow:hidden}
+.cine .crowd-bar i{position:absolute;left:0;top:0;bottom:0;min-width:6px;max-width:100%;height:auto;border-radius:99px}
+/* title: compact, max 3 lines; each animated word reserves its own box so nothing jumps when the script splits it */
+.cine-title{font-size:clamp(40px,6vw,72px);line-height:.98;max-width:12ch}
+.cine-title .w{padding-block:.06em .1em;margin-block:-.06em -.1em}
+.cine-title .w:last-of-type>span{color:#ff6b57}  /* a touch lighter than --accent so the big word clears 3:1 on the brightest part of the photo */
+.cine-title:lang(ru){font-size:clamp(32px,4vw,56px);max-width:none}  /* Cyrillic falls back to a much wider face than Big Shoulders */
+.cine-sub{max-width:52ch;font-size:1rem;line-height:1.6;color:#dde1e8;text-shadow:0 1px 14px rgba(0,0,0,.45)}
+.cine-cta{gap:12px;align-items:center}
+.cine-cta .btn.pill,.cine-cta .route-btn{box-sizing:border-box;min-height:46px}
+.cine-cta .btn.pill{padding:11px 24px}
+/* assistant card: flat (no tilt), fully inside the hero, full-width button */
+.cine .paper{justify-self:end;width:100%;max-width:356px;box-sizing:border-box;transform:none;gap:14px;padding:22px;border-radius:18px;
+  box-shadow:0 28px 64px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.08);animation:heroCardIn .8s .5s cubic-bezier(.2,.8,.1,1) both}
+@keyframes heroCardIn{from{opacity:0;transform:translateY(20px)}}
+.cine .paper h3{font-size:clamp(1.5rem,2.1vw,1.8rem);line-height:1}
+.cine .paper ul{font-size:.92rem;line-height:1.4;gap:6px}
+.cine .paper-btn{display:flex;align-items:center;justify-content:center;width:100%;box-sizing:border-box;min-height:46px;padding:10px 16px}
+@media (max-width:860px){
+  .cine{min-height:0;margin-inline:0}  /* shrink on scroll by scale only: a changing side margin would re-wrap the text while scrolling */
+  .cine-inner{grid-template-columns:minmax(0,1fr);gap:28px;padding-block:40px}
+  .cine .paper{justify-self:stretch;max-width:440px}
+  .cine-down{display:none}
+  .cine-shade{background:linear-gradient(180deg,rgba(8,10,14,.78) 0%,rgba(8,10,14,.84) 55%,#0b0d11 100%)}
+  .cine-video,.cine-photo{object-position:62% 50%}
+  .cine-photo{background-position:62% 50%}
+}
+@media (max-width:520px){
+  .cine-inner{padding-block:32px;gap:24px}
+  .cine-copy{gap:16px}
+  .cine-cta .btn.pill{flex:1 1 auto;justify-content:center;text-align:center}
+}
+@media (max-width:400px){
+  .cine-eyebrow,.cine .crowd{padding:0 12px;font-size:.68rem}
+  .cine .crowd-bar{width:48px}
+}
+@media (prefers-reduced-motion:reduce){.cine .paper{animation:none}.cine-title .w>span{animation:none}}

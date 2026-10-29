@@ -222,7 +222,7 @@
           var h = document.createElement('b'); h.textContent = ai.getAttribute('data-found'); found.appendChild(h);
           var rows = j.items.map(function (it) {
             var row = document.createElement('div'); row.className = 'cal-found-row';
-            var name = document.createElement('span'); name.textContent = it.name + ' \u00b7 ' + it.kcal + ' kcal';
+            var name = document.createElement('span'); name.textContent = it.name + ' \u00b7 ' + it.kcal + ' ' + (ai.getAttribute('data-kcal') || 'kcal');
             var g = document.createElement('input'); g.type = 'number'; g.min = 1; g.max = 5000; g.value = it.grams; g.setAttribute('aria-label', 'g');
             row.appendChild(name); row.appendChild(g); found.appendChild(row);
             return { it: it, input: g };

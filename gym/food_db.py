@@ -13,20 +13,25 @@ _APOS = "ʻʼ’‘`´'"
 _NOT_WORD = re.compile(r"[^\w%]+", re.UNICODE)
 
 
+_DECIMAL = re.compile(r"(?<=\d)[.,](?=\d)")
+
+
 def plain(s):
-    """Lower case, apostrophes dropped (o'rik / o‘rik / orik), ё -> е, punctuation to single spaces."""
+    """Lower case, apostrophes dropped (o'rik / o‘rik / orik), ё -> е, punctuation to single spaces; a decimal point stays ("2.5%")."""
     s = str(s or "").lower().replace("ё", "е")
     for ch in _APOS:
         s = s.replace(ch, "")
-    return _NOT_WORD.sub(" ", s).strip()
+    s = _DECIMAL.sub("ǂ", s)  # a letter-like placeholder survives the punctuation clean-up below
+    return _NOT_WORD.sub(" ", s).strip().replace("ǂ", ".")
 
 
 class Food:
-    __slots__ = ("id", "name", "kcal", "p", "f", "c", "piece", "portion", "phrases", "parse_phrases", "mine")
+    __slots__ = ("id", "name", "kcal", "p", "f", "c", "piece", "portion", "phrases", "parse_phrases", "mine", "weak")
 
-    def __init__(self, id, name, kcal, p, f, c, piece, portion, phrases, parse_phrases, mine=False):
+    def __init__(self, id, name, kcal, p, f, c, piece, portion, phrases, parse_phrases, mine=False, weak=frozenset()):
         self.id, self.name, self.kcal, self.p, self.f, self.c = id, name, kcal, p, f, c
         self.piece, self.portion, self.phrases, self.parse_phrases, self.mine = piece, portion, phrases, parse_phrases, mine
+        self.weak = weak  # parse phrases taken from the brackets of the name: they lose to a food that has the phrase as its own name
 
     @property
     def default_grams(self):
@@ -43,7 +48,7 @@ def _n(v):
 
 
 def _load():
-    foods = []
+    rows = []
     for raw in (_RAW1, _RAW2):
         for line in raw.splitlines():
             line = line.strip()
@@ -60,12 +65,34 @@ def _load():
             if only_listed:
                 aliases[0] = aliases[0][1:].strip()
             base = plain(re.sub(r"\([^)]*\)", " ", name))
-            inner = [plain(m) for m in re.findall(r"\(([^)]*)\)", name)]
-            auto = [x for x in [base] + inner if x]
+            inner = [x for x in (plain(m) for m in re.findall(r"\(([^)]*)\)", name)) if x]
             listed = [plain(a) for a in aliases if plain(a)]
-            search = list(dict.fromkeys([plain(name)] + auto + listed))
-            parse = list(dict.fromkeys(listed if only_listed else auto + listed))
-            foods.append(Food(len(foods), name, k, p, f, c, piece, portion, tuple(search), tuple(parse)))
+            rows.append((name, k, p, f, c, piece, portion, base, inner, listed, only_listed))
+    # A one-word note in the brackets that several different foods share ("xom", "qaynatilgan", "yangi", "shakarsiz", "10%") describes
+    # a variant, it is not a name: on its own it must not pick a food ("yangi bodring" is not a fresh fig).
+    users = {}
+    for r in rows:
+        for q in r[8]:
+            if " " not in q:
+                users.setdefault(q, set()).add(r[7])
+    generic = {q for q, bases in users.items() if len(bases) > 1}
+    foods = []
+    for name, k, p, f, c, piece, portion, base, inner, listed, only_listed in rows:
+        auto = [x for x in [base] + inner if x]
+        search = list(dict.fromkeys([plain(name)] + auto + listed))
+        if only_listed:
+            parse, weak = list(dict.fromkeys(listed)), frozenset()
+        else:
+            # "pizza margarita", "margarita pizza", "xom guruch", "guruch xom": the base word together with a note of the brackets
+            combos = []
+            for q in inner:
+                combos.append(f"{base} {q}" if base else q)
+                if base and " " not in q:
+                    combos.append(f"{q} {base}")
+            alone = [q for q in inner if q not in generic]
+            parse = list(dict.fromkeys(([base] if base else []) + combos + alone + listed))
+            weak = frozenset(alone) - {base} - set(listed)
+        foods.append(Food(len(foods), name, k, p, f, c, piece, portion, tuple(search), tuple(parse), weak=weak))
     return foods
 
 
@@ -159,7 +186,8 @@ def stem_ok(tok, alias):
 
 def find_foods(toks, extra=()):
     """[(first_token, last_token, Food)] named in a token list, in text order. The longest phrase wins, then the member's own food,
-    then the longest alias, then the earlier table row; two foods never share a word."""
+    then the food whose own name it is, then a name over a bracket note, then the longest alias, then the earlier table row;
+    two foods never share a word."""
     cands = []
     for f in list(extra) + FOODS_DB:
         for ph in f.parse_phrases:
@@ -169,10 +197,10 @@ def find_foods(toks, extra=()):
                 continue
             for i in range(len(toks) - m + 1):
                 if all(toks[i + j] == words[j] for j in range(m - 1)) and stem_ok(toks[i + m - 1], words[-1]):
-                    cands.append((-m, not f.mine, -len(ph), f.id, i, i + m - 1, f))
-    cands.sort(key=lambda x: x[:4])
+                    cands.append((-m, not f.mine, ph != plain(f.name), ph in f.weak, -len(ph), f.id, i, i + m - 1, f))
+    cands.sort(key=lambda x: x[:6])
     taken, seen, out = set(), set(), []
-    for _, _, _, _, a, b, f in cands:
+    for _, _, _, _, _, _, a, b, f in cands:
         if (f.mine, f.id) in seen or any(k in taken for k in range(a, b + 1)):
             continue
         taken.update(range(a, b + 1))

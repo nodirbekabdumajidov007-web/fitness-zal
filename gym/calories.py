@@ -146,6 +146,9 @@ def _amount_tokens(toks):
     qs, i = [], 0
     while i < len(toks):
         t, v, unit = toks[i], None, None
+        if t.endswith("%"):  # "sut 2.5%" / "kefir 1%": a fat percentage names the product, it is not an amount
+            i += 1
+            continue
         if t[0].isdigit():
             v = float(t.replace(",", "."))
         elif t in NUM_WORDS:
@@ -171,7 +174,7 @@ def parse_text(text, user=None):
     """Free text -> [{idx, name, grams, kcal, protein, fat, carbs, mine}] for the foods it names (built-in database and the member's own foods),
     in the order they appear. A number before (or just after) a food is its amount: "200 g osh", "2 ta somsa", "osh 300 gramm";
     with no amount a usual portion is used. `idx` is what calories_add takes as `food`."""
-    toks = re.findall(r"\d+(?:[.,]\d+)?|[^\W\d_]+", _plain(text)[:300], re.UNICODE)
+    toks = [t.replace(",", ".") if t.endswith("%") else t for t in re.findall(r"\d+(?:[.,]\d+)?%?|[^\W\d_]+", _plain(text)[:300], re.UNICODE)]
     qs = _amount_tokens(toks)
     out = []
     found = food_db.find_foods(toks, user_foods(user))

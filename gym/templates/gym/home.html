@@ -7,14 +7,13 @@
     {% if gs.hero_video %}<video class="cine-video" muted playsinline autoplay preload="auto" poster="{% static 'img/gym-bg.webp' %}" src="{% url 'hero_video' %}?v={{ gs.hero_video.name|urlencode }}"></video>
     {% else %}<div class="cine-photo"></div>{% endif %}
   </div>
-  <div class="cine-word" aria-hidden="true"><span>{{ gs.hero_word }}</span></div>
   <div class="cine-shade" aria-hidden="true"></div>
 
   <div class="wrap cine-inner">
     <div class="cine-copy">
       <div class="cine-badges">
         <span class="cine-eyebrow"><i class="dot{% if not is_open %} off{% endif %}"></i>{% if is_open %}{% t 'open' %}{% else %}{% t 'closed' %}{% endif %} · <b class="num">{{ gs.open_time|hm }}–{{ gs.close_time|hm }}</b></span>
-        {% if is_open %}<span class="crowd {{ crowd.level }}" title="{% t 'crowd_help' %}"><span class="crowd-txt">{% t 'crowd_now' %}: <b>{% t 'crowd_'|add:crowd.level %}</b></span><span class="crowd-bar"><i style="width:{{ crowd.pct }}%"></i></span></span>{% endif %}
+        {% if is_open %}<span class="crowd {{ crowd.level }}" title="{% t 'crowd_help' %}"><span class="crowd-txt">{% t 'crowd_now' %}: <b>{% t 'crowd_'|add:crowd.level %}</b></span><span class="crowd-bar" aria-hidden="true"><i style="width:{{ crowd.pct }}%"></i></span></span>{% endif %}
       </div>
       <h1 class="cine-title" data-split>{% t 'tag' %}</h1>
       <p class="cine-sub">{% t 'tag_sub' %}</p>
