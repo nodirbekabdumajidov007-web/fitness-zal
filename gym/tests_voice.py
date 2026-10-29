@@ -27,7 +27,7 @@ class VoiceTests(TestCase):
         r = self.client.get(reverse("voice_info"))
         self.assertEqual(r.status_code, 200)
         d = r.json()
-        for k in ("open", "close", "phone", "address", "instagram", "telegram", "crowd", "plans", "is_open", "foods"):
+        for k in ("open", "close", "phone", "address", "instagram", "telegram", "crowd", "plans", "is_open"):
             self.assertIn(k, d)
         self.assertEqual(d["address"], "Toshkent, Test ko'chasi 1")
         self.assertTrue(any(p["code"] == "vtest" and p["price"] == 250000 for p in d["plans"]))

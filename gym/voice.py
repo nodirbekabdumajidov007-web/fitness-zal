@@ -8,7 +8,6 @@ from django.http import JsonResponse
 from django.urls import reverse
 from django.utils import timezone
 
-from .calories import FOODS
 from .i18n import T
 from .models import GymSettings, Plan
 
@@ -48,7 +47,7 @@ def config(request):
         "auth": bool(request.user.is_authenticated),
         "t": {k.replace("_", "-"): _t(lang, k) for k in UI_KEYS},  # no underscores: the page audit treats "a_b" words as leaked keys
         "pages": {k: {"url": reverse(name), "label": _t(lang, PAGE_LABEL[k])} for k, name in PAGES.items()},
-        "urls": {"assistant": "/assistant/ask/", "info": reverse("voice_info"), "calAdd": reverse("calories_add"),
+        "urls": {"assistant": "/assistant/ask/", "info": reverse("voice_info"), "calAdd": reverse("calories_add"), "calParse": reverse("calories_parse"),
                  "login": reverse("login"), "calories": reverse("calories")},
     }
 
@@ -73,7 +72,6 @@ def info(request):
             "crowd": crowd["level"], "crowd_pct": crowd["pct"],
             "plans": [{"code": p.code, "name": _t(lang, "plan_" + p.code) if ("plan_" + p.code) in T["uz"] else p.name,
                        "months": p.months, "price": int(p.price)} for p in Plan.objects.filter(active=True)],
-            "foods": [{"i": i, "name": f[0]} for i, f in enumerate(FOODS)],
         }
         cache.set(key, data, 60)
     gs = GymSettings.load()

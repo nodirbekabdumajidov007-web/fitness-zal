@@ -34,7 +34,13 @@
   </section>
   {% endif %}
 
-  <section class="card cal-add" id="add">
+  <section class="card cal-add" id="add" data-search="{% url 'calories_search' %}" data-save="{% url 'calories_food_save' %}"
+           data-del="{% url 'calories_food_delete' 0 %}" data-i18n-live="{% t 'cal_live' g='%g' k='%k' p='%p' f='%f' c='%c' %}"
+           data-i18n-row="{% t 'cal_row' k='%k' %}" data-i18n-portion="{% t 'cal_row_portion' g='%g' k='%k' %}"
+           data-i18n-mine="{% t 'cal_mine' %}" data-i18n-none="{% t 'cal_notfound' %}" data-i18n-wait="{% t 'cal_searching' %}"
+           data-i18n-net="{% t 'cal_net_err' %}" data-i18n-pick="{% t 'cal_pick_first' %}" data-i18n-edit="{% t 'cal_edit' %}"
+           data-i18n-remove="{% t 'cal_remove' %}" data-i18n-confirm="{% t 'cal_confirm_del' %}"
+           data-i18n-save="{% t 'cal_f_save' %}">
     <h3>＋ {% t 'cal_add' %}</h3>
     <form method="post" action="{% url 'calories_add' %}" id="calForm">
       {% csrf_token %}<input type="hidden" name="d" value="{{ day|date:'Y-m-d' }}"><input type="hidden" name="food" id="calFood" value="">
@@ -42,13 +48,14 @@
         {% for m, icon in meal_choices %}<label><input type="radio" name="meal" value="{{ m }}"{% if m == default_meal %} checked{% endif %}><span>{{ icon }} {% if m == 'breakfast' %}{% t 'meal_breakfast' %}{% elif m == 'lunch' %}{% t 'meal_lunch' %}{% elif m == 'dinner' %}{% t 'meal_dinner' %}{% else %}{% t 'meal_snack' %}{% endif %}</span></label>{% endfor %}
       </div>
       <div class="cal-find">
-        <label for="calSearch">{% t 'cal_pick' %}<input id="calSearch" type="search" autocomplete="off" placeholder="{% t 'cal_search_ph' %}"></label>
+        <label for="calSearch">{% t 'cal_pick' %}<input id="calSearch" type="search" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="60" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="calResults" placeholder="{% t 'cal_search_ph' %}"></label>
         <ul class="cal-results" id="calResults" role="listbox" hidden></ul>
       </div>
-      <p class="muted cal-prev" id="calPrev" data-tpl="{% t 'cal_preview' k='%k' p='%p' f='%f' c='%c' %}" hidden></p>
+      <p class="muted cal-prev" id="calPrev" aria-live="polite" hidden></p>
       <label for="calGrams">{% t 'cal_grams' %}<input id="calGrams" name="grams" type="number" inputmode="numeric" min="1" max="5000" value="100" required></label>
       <details class="cal-custom" id="calCustom">
         <summary>{% t 'cal_custom' %}</summary>
+        <p class="muted cal-hint">{% t 'cal_quick_hint' %}</p>
         <div class="cal-custom-grid">
           <label>{% t 'cal_name' %}<input name="name" maxlength="80"></label>
           <label>{% t 'cal_kcal_total' %}<input name="kcal" type="number" inputmode="decimal" min="0" max="6000" step="0.1"></label>
@@ -57,8 +64,37 @@
           <label>{% t 'cal_carbs' %} (g)<input name="carbs" type="number" inputmode="decimal" min="0" max="6000" step="0.1"></label>
         </div>
       </details>
+      <div class="cal-err" id="calErr" role="alert" hidden></div>
       <button class="btn primary" type="submit">{% t 'cal_save' %}</button>
     </form>
+
+    <details class="cal-newfood" id="calNew">
+      <summary>＋ {% t 'cal_newfood' %}</summary>
+      <form method="post" action="{% url 'calories_food_save' %}" id="calFoodForm">
+        {% csrf_token %}<input type="hidden" name="pk" value="">
+        <div class="cal-custom-grid">
+          <label class="wide">{% t 'cal_f_name' %}<input name="name" maxlength="60" required></label>
+          <label>{% t 'cal_f_kcal' %}<input name="kcal" type="number" inputmode="decimal" min="0" max="900" step="0.1" required></label>
+          <label>{% t 'cal_protein' %} (g / 100 g)<input name="protein" type="number" inputmode="decimal" min="0" max="100" step="0.1"></label>
+          <label>{% t 'cal_fat' %} (g / 100 g)<input name="fat" type="number" inputmode="decimal" min="0" max="100" step="0.1"></label>
+          <label>{% t 'cal_carbs' %} (g / 100 g)<input name="carbs" type="number" inputmode="decimal" min="0" max="100" step="0.1"></label>
+          <label>{% t 'cal_f_portion' %}<input name="portion_g" type="number" inputmode="numeric" min="1" max="5000" value="100"></label>
+        </div>
+        <div class="cal-err" id="calFoodErr" role="alert" hidden></div>
+        <div class="cal-actions"><button class="btn primary" type="submit">{% t 'cal_f_save' %}</button><button class="btn" type="button" id="calFoodCancel" hidden>{% t 'cal_f_cancel' %}</button></div>
+      </form>
+    </details>
+
+    <details class="cal-mine" id="calMineBox"{% if my_foods %} open{% endif %}>
+      <summary>{% t 'cal_my' %} <span class="num muted" id="calMineN">{{ my_foods|length }}</span></summary>
+      <p class="muted cal-hint" id="calMineEmpty"{% if my_foods %} hidden{% endif %}>{% t 'cal_my_empty' %}</p>
+      <ul class="cal-mylist" id="calMine">
+        {% for f in my_foods %}<li data-pk="{{ f.pk }}"><span><b>{{ f.name }}</b><small class="muted num">{{ f.kcal|floatformat:"-1" }} {% t 'cal_kcal' %} / 100 g · {% t 'cal_protein' %} {{ f.p|floatformat:"-1" }} · {% t 'cal_fat' %} {{ f.f|floatformat:"-1" }} · {% t 'cal_carbs' %} {{ f.c|floatformat:"-1" }} · {{ f.portion }} g</small></span>
+          <button class="btn small" type="button" data-edit="{{ f.pk }}" hidden>{% t 'cal_edit' %}</button>
+          <form method="post" action="{% url 'calories_food_delete' f.pk %}">{% csrf_token %}<button class="cal-x" type="submit" aria-label="{% t 'cal_remove' %}" title="{% t 'cal_remove' %}">×</button></form></li>{% endfor %}
+      </ul>
+    </details>
+
     <form method="post" action="{% url 'calories_parse' %}" class="cal-ai" id="calAi" data-add="{% url 'calories_add' %}" data-found="{% t 'cal_txt_found' %}" data-addall="{% t 'cal_txt_add' %}">
       {% csrf_token %}<input type="hidden" name="d" value="{{ day|date:'Y-m-d' }}"><input type="hidden" name="meal" id="calAiMeal" value="{{ default_meal }}">
       <label for="calAiText">{% t 'cal_txt_title' %}<input id="calAiText" name="text" maxlength="300" placeholder="{% t 'cal_txt_ph' %}" required></label>
@@ -86,6 +122,6 @@
   </div>
   <p class="muted cal-note">{% t 'cal_note' %}</p>
 </div>
-{{ foods|json_script:"calFoods" }}
+{{ my_foods|json_script:"calFoods" }}
 {% endblock %}
 {% block scripts %}<script src="{% vstatic 'js/calories.js' %}"></script>{% endblock %}

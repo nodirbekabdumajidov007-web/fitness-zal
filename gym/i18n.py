@@ -857,10 +857,10 @@ cal_advice||Qolgan kunni qanday taqsimlash||Как распределить ос
 cal_advice_line||{meal}: taxminan {n} kkal||{meal}: примерно {n} ккал||{meal}: about {n} kcal
 cal_add||Ovqat qo'shish||Добавить еду||Add food
 cal_pick||Ro'yxatdan tanlang||Выберите из списка||Pick from the list
-cal_search_ph||Ovqat nomini qidiring (osh, somsa, non...)||Найдите блюдо (плов, самса, хлеб...)||Search a food (plov, samsa, bread...)
+cal_search_ph||Istalgan ovqat nomini yozing (osh, somsa, burger, кофе, pizza...)||Введите любую еду (плов, самса, бургер, кофе, pizza...)||Type any food (plov, samsa, burger, coffee, pizza...)
 cal_grams||Gramm||Граммы||Grams
 cal_meal||Ovqat vaqti||Приём пищи||Meal
-cal_custom||Ro'yxatda yo'q, o'zim kiritaman||Нет в списке, введу сам||Not in the list, I will type it
+cal_custom||Tezkor qo'shish: ro'yxatda yo'q, nom va kaloriyani o'zim yozaman||Быстро: нет в списке, введу название и калории||Quick add: not in the list, I will type a name and calories
 cal_name||Nomi||Название||Name
 cal_kcal_total||Kaloriya (butun porsiya)||Калории (вся порция)||Calories (whole portion)
 cal_preview||100 g da: {k} kkal · {p} oqsil · {f} yog' · {c} uglevod||На 100 г: {k} ккал · {p} белка · {f} жира · {c} углеводов||Per 100 g: {k} kcal · {p} protein · {f} fat · {c} carbs
@@ -954,7 +954,7 @@ cal_txt_busy||Aniqlanmoqda...||Распознаю...||Recognizing...
 cal_txt_found||Topildi:||Найдено:||Recognized:
 cal_txt_add||Hammasini qo'shish||Добавить всё||Add all
 cal_txt_none||Hech narsa topilmadi. Masalan: «2 ta somsa», «200 g osh», «3 tuxum».||Ничего не найдено. Например: «2 самсы», «200 г плова», «3 яйца».||Nothing recognized. For example: «2 samsas», «200 g plov», «3 eggs».
-cal_txt_hint||Jadvaldagi taomlar taniladi, grammni o'zingiz to'g'rilashingiz mumkin.||Распознаются блюда из таблицы, граммы можно поправить.||Foods from the table are recognized; you can adjust the grams.
+cal_txt_hint||Ma'lumotlar bazasidagi 600 dan ortiq taom va o'z ovqatlaringiz taniladi, grammni o'zingiz to'g'rilashingiz mumkin.||Распознаются более 600 блюд из базы и ваша еда, граммы можно поправить.||Over 600 built-in foods and your own foods are recognized; you can adjust the grams.
 tl_range||{n}: {min}–{max} oralig'ida kiriting||{n}: введите от {min} до {max}||{n}: enter a value from {min} to {max}
 tl_from_profile||Profilingizdagi vazn, bo'y va tug'ilgan kun asosida to'ldirildi.||Заполнено по профилю: вес, рост и дата рождения.||Filled in from your profile: weight, height and birth date.
 act2_1||Kam harakat: ofis, mashg'ulotsiz (×1.2)||Минимум: офис, без тренировок (×1.2)||Sedentary: desk job, no workouts (×1.2)
@@ -1023,6 +1023,31 @@ pg_none||Bu filtrlarga mos dastur topilmadi.||Нет программ под э�
 pg_reset||Filtrni tozalash||Сбросить фильтры||Clear filters
 pg_rest||Dam||Отдых||Rest
 pg_found||ta dastur||программ||programs
+cal_live||{g} g: {k} kkal · oqsil {p} · yog' {f} · uglevod {c}||{g} г: {k} ккал · белки {p} · жиры {f} · углеводы {c}||{g} g: {k} kcal · protein {p} · fat {f} · carbs {c}
+cal_row||{k} kkal / 100 g||{k} ккал / 100 г||{k} kcal / 100 g
+cal_row_portion||porsiya {g} g = {k} kkal||порция {g} г = {k} ккал||portion {g} g = {k} kcal
+cal_mine||Mening ovqatim||Моя еда||My food
+cal_notfound||Topilmadi. O'zingiz qo'shing||Не найдено. Добавьте сами||Not found. Add it yourself
+cal_searching||Qidirilmoqda...||Ищу...||Searching...
+cal_net_err||Tarmoq xatosi, qayta urinib ko'ring||Ошибка сети, попробуйте ещё раз||Network error, try again
+cal_pick_first||Ro'yxatdan ovqat tanlang yoki o'zingiz kiriting||Выберите еду из списка или введите свою||Pick a food from the list or enter your own
+cal_newfood||Yangi ovqat yaratish||Создать свою еду||Create your own food
+cal_f_name||Nomi (60 belgigacha)||Название (до 60 символов)||Name (up to 60 characters)
+cal_f_kcal||Kaloriya, 100 g da (majburiy)||Калории на 100 г (обязательно)||Calories per 100 g (required)
+cal_f_portion||Odatiy porsiya (g)||Обычная порция (г)||Usual portion (g)
+cal_f_save||Ovqatni saqlash||Сохранить еду||Save food
+cal_f_cancel||Bekor qilish||Отмена||Cancel
+cal_f_saved||Ovqat saqlandi||Еда сохранена||Food saved
+cal_f_deleted||Ovqat o'chirildi||Еда удалена||Food deleted
+cal_f_bad||Nom (60 belgigacha) va kaloriya (0 dan 900 gacha) kerak. Oqsil, yog' va uglevod 100 g dan oshmasin, yig'indisi ham||Нужны название (до 60 символов) и калории (0-900). Белки, жиры и углеводы не больше 100 г, и сумма тоже||A name (up to 60 characters) and calories (0 to 900) are required. Protein, fat and carbs must not exceed 100 g each or in total
+cal_f_dup||Bunday nomli ovqatingiz allaqachon bor||Еда с таким названием у вас уже есть||You already have a food with that name
+cal_f_limit||Shaxsiy ovqatlar 200 tadan oshmasin||Своих продуктов не больше 200||You can keep up to 200 own foods
+cal_my||Mening ovqatlarim||Моя еда||My foods
+cal_my_empty||Hali o'z ovqatingiz yo'q. Qidiruvda topilmasa, o'zingiz qo'shing.||Своей еды пока нет. Если не нашли в поиске, добавьте.||No own foods yet. If search does not find something, add it.
+cal_edit||Tahrirlash||Изменить||Edit
+cal_quick||Tezkor qo'shish (saqlamasdan)||Быстро добавить (без сохранения)||Quick add (not saved)
+cal_quick_hint||Faqat nom va kiritgan miqdoringiz uchun kaloriya. Keyingi safar uchun saqlanmaydi.||Только название и калории на введённое количество. На будущее не сохраняется.||Just a name and the calories for the amount you entered. It is not kept for next time.
+cal_confirm_del||Ovqat o'chirilsinmi?||Удалить еду?||Delete this food?
 scan_session||Sessiya tugagan: sahifani yangilab, admin sifatida qayta kiring||Сессия истекла: обновите страницу и войдите снова как администратор||Session ended: reload the page and sign in again as admin
 """
 

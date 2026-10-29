@@ -72,7 +72,7 @@ ICONS = {
 
 # the icon each registered model gets wherever it is listed (sidebar, app page tiles)
 MODEL_ICONS = {
-    "user": "users", "membership": "ticket", "visit": "login", "bodylog": "scale", "personalrecord": "trophy", "foodentry": "food",
+    "user": "users", "membership": "ticket", "visit": "login", "bodylog": "scale", "personalrecord": "trophy", "foodentry": "food", "userfood": "food",
     "payment": "card", "paymentcard": "wallet", "plan": "list", "promocode": "tag",
     "order": "bag", "product": "package", "category": "folder",
     "gymclass": "calendar", "booking": "check", "trainer": "dumbbell", "ptsession": "user-check", "workoutplan": "trend",

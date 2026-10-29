@@ -6,6 +6,7 @@ from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 from django.db import models
+from django.db.models.functions import Lower
 from django.utils import timezone
 
 from .media import validate_image, validate_video_file, validate_video_url, video_storage
@@ -909,3 +910,23 @@ class FoodEntry(models.Model):
 
     def __str__(self):
         return f"{self.name} {self.grams} g"
+
+
+class UserFood(models.Model):
+    """A food a member added to their own list of the calorie tracker. Numbers are per 100 g; portion_g is the usual serving."""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="my_foods")
+    name = models.CharField("Nomi", max_length=60)
+    kcal = models.DecimalField("Kaloriya (100 g da)", max_digits=5, decimal_places=1, validators=[MinValueValidator(0), MaxValueValidator(900)])
+    protein = models.DecimalField("Oqsil (100 g da)", max_digits=4, decimal_places=1, default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    fat = models.DecimalField("Yog' (100 g da)", max_digits=4, decimal_places=1, default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    carbs = models.DecimalField("Uglevod (100 g da)", max_digits=4, decimal_places=1, default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    portion_g = models.PositiveIntegerField("Odatiy porsiya (g)", default=100, validators=[MinValueValidator(1), MaxValueValidator(5000)])
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name, verbose_name_plural = "Shaxsiy ovqat", "Shaxsiy ovqatlar"
+        constraints = [models.UniqueConstraint(Lower("name"), "user", name="uniq_userfood_user_lowername")]
+
+    def __str__(self):
+        return self.name

@@ -1650,7 +1650,8 @@ def calories_view(request):
     day = calories.parse_day(request.GET.get("d"))
     today = timezone.localdate()
     ctx = calories.day_summary(request.user, day)
-    ctx.update({"foods": calories.food_table(), "is_today": day == today,
+    mine = [_my_food_json(u) for u in request.user.my_foods.all()]
+    ctx.update({"my_foods": mine, "is_today": day == today,
                 "prev_day": day - timedelta(days=1), "next_day": day + timedelta(days=1) if day < today else None,
                 "meal_choices": [(m, calories.MEAL_ICON[m]) for m in calories.MEALS],
                 "default_meal": _meal_now()})
@@ -1668,13 +1669,13 @@ def _decimal(raw, hi=6000):
         d = Decimal(str(raw).replace(",", ".").strip() or "0")
     except InvalidOperation:
         return None
-    return d.quantize(Decimal("0.1")) if 0 <= d <= hi else None
+    return d.quantize(Decimal("0.1")) if d.is_finite() and 0 <= d <= hi else None  # "nan" and "inf" parse as Decimals
 
 
 @require_POST
 @login_required
 def calories_add(request):
-    """Adds one entry: either a food from the built-in table + grams, or a typed name with its own numbers."""
+    """Adds one entry: a built-in or own food + grams, or a typed name with its own numbers for the whole amount (quick add, saved nowhere else)."""
     from . import calories
     day = calories.parse_day(request.POST.get("d"))
     meal = request.POST.get("meal") if request.POST.get("meal") in calories.MEALS else "snack"
@@ -1688,11 +1689,10 @@ def calories_add(request):
             return JsonResponse({"ok": False, "error": translate(request.lang, "cal_bad_grams")}, status=400)
         flash(request, messages.ERROR, "cal_bad_grams")
         return back
-    idx = request.POST.get("food", "")
-    if idx.isdigit() and int(idx) < len(calories.FOODS):
-        food = calories.FOODS[int(idx)]
-        kcal, p, f, c = calories.per_portion(food, grams)
-        name = food[0]
+    food = calories.find_food(request.POST.get("food"), request.user)  # "12" = built-in row, "u5" = the member's own food
+    if food is not None:
+        kcal, p, f, c = calories.per_portion((food.name, food.kcal, food.p, food.f, food.c), grams)
+        name = food.name
     else:
         name = " ".join(request.POST.get("name", "").split())[:80]
         kcal, p, f, c = (_decimal(request.POST.get(k, "0")) for k in ("kcal", "protein", "fat", "carbs"))
@@ -1718,12 +1718,12 @@ def calories_delete(request, pk):
 @require_POST
 @login_required
 def calories_parse(request):
-    """Free text ("2 ta somsa va choy") -> foods of the built-in table. With fetch: JSON preview (the page then adds each item through
+    """Free text ("2 ta somsa va choy") -> foods of the built-in database and the member's own foods. With fetch: JSON preview (the page then adds each item through
     calories_add); without JavaScript the recognised foods are saved straight away."""
     from . import calories
     day = calories.parse_day(request.POST.get("d"))
     meal = request.POST.get("meal") if request.POST.get("meal") in calories.MEALS else "snack"
-    items = calories.parse_text(request.POST.get("text", ""))
+    items = calories.parse_text(request.POST.get("text", ""), request.user)
     if wants_json(request):
         return JsonResponse({"ok": bool(items), "items": items, "error": "" if items else translate(request.lang, "cal_txt_none")})
     back = redirect(f"{reverse('calories')}?d={day.isoformat()}")
@@ -1735,3 +1735,98 @@ def calories_parse(request):
         for i in items])
     flash(request, messages.SUCCESS, "cal_added")
     return back
+
+
+# ---- food search and the member's own foods
+
+SEARCH_LIMIT, SEARCH_WINDOW = 240, 60  # requests per member per minute: typing fires one request per pause
+
+
+def _my_food_json(u):
+    return {"id": f"u{u.pk}", "pk": u.pk, "name": u.name, "kcal": float(u.kcal), "p": float(u.protein), "f": float(u.fat), "c": float(u.carbs),
+            "portion": u.portion_g, "piece": 0, "mine": True}
+
+
+@login_required
+def calories_search(request):
+    """GET /calories/search/?q=... -> {"ok", "items": [{id, name, kcal, p, f, c, portion, piece, mine}]}: the member's own foods first, then the
+    built-in database (uz / ru / en names, typos forgiven). An empty q gives the member's own foods."""
+    from . import calories, food_db
+    key = f"cal:rl:{request.user.pk}"
+    cache.add(key, 0, SEARCH_WINDOW)
+    try:
+        limited = cache.incr(key) > SEARCH_LIMIT
+    except ValueError:
+        cache.set(key, 1, SEARCH_WINDOW)
+        limited = False
+    if limited:
+        return JsonResponse({"ok": False, "items": [], "error": translate(request.lang, "asst_rate")}, status=429)
+    items = food_db.search(request.GET.get("q", ""), calories.user_foods(request.user), 10)
+    resp = JsonResponse({"ok": True, "items": [f.as_dict() | ({"pk": f.id} if f.mine else {}) for f in items]})
+    resp["Cache-Control"] = "private, no-store"
+    return resp
+
+
+MY_FOODS_MAX = 200
+
+
+def _food_numbers(post):
+    """Cleaned (name, kcal, protein, fat, carbs, portion) from a form, or None when anything is out of range."""
+    name = " ".join(post.get("name", "").split())
+    kcal = _decimal(post.get("kcal", ""), 900) if post.get("kcal", "").strip() else None
+    macros = [_decimal(post.get(k, "0") or "0", 100) for k in ("protein", "fat", "carbs")]
+    try:
+        portion = int(post.get("portion_g") or 100)
+    except ValueError:
+        return None
+    if not name or len(name) > 60 or kcal is None or None in macros or sum(macros) > 105 or not 1 <= portion <= 5000:
+        return None
+    return name, kcal, macros[0], macros[1], macros[2], portion
+
+
+@require_POST
+@login_required
+def calories_food_save(request):
+    """Creates (no `pk`) or edits (`pk`) one of the member's own foods. With fetch the answer is JSON, otherwise a redirect to the page."""
+    from .models import UserFood
+    back = redirect(reverse("calories"))
+
+    def fail(key, status=400):
+        if wants_json(request):
+            return JsonResponse({"ok": False, "error": translate(request.lang, key)}, status=status)
+        flash(request, messages.ERROR, key)
+        return back
+
+    data = _food_numbers(request.POST)
+    if data is None:
+        return fail("cal_f_bad")
+    name, kcal, p, f, c, portion = data
+    pk = request.POST.get("pk", "")
+    obj = None
+    if pk:
+        obj = request.user.my_foods.filter(pk=pk if pk.isdigit() else 0).first()
+        if obj is None:
+            return fail("cal_f_bad", 404)
+    elif request.user.my_foods.count() >= MY_FOODS_MAX:
+        return fail("cal_f_limit")
+    if request.user.my_foods.filter(name__iexact=name).exclude(pk=obj.pk if obj else None).exists():
+        return fail("cal_f_dup")
+    if obj is None:
+        obj = UserFood(user=request.user)
+    obj.name, obj.kcal, obj.protein, obj.fat, obj.carbs, obj.portion_g = name, kcal, p, f, c, portion
+    obj.save()
+    if wants_json(request):
+        return JsonResponse({"ok": True, "food": _my_food_json(obj), "message": translate(request.lang, "cal_f_saved")})
+    flash(request, messages.SUCCESS, "cal_f_saved")
+    return back
+
+
+@require_POST
+@login_required
+def calories_food_delete(request, pk):
+    obj = get_object_or_404(request.user.my_foods, pk=pk)  # somebody else's food is a 404
+    obj.delete()  # earlier diary entries keep their numbers: they hold copies, not a link
+    if wants_json(request):
+        return JsonResponse({"ok": True})
+    flash(request, messages.SUCCESS, "cal_f_deleted")
+    return redirect(reverse("calories"))

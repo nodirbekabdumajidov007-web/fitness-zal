@@ -140,101 +140,10 @@
     return true;
   }
 
-  // ---- built-in food table matching: [stems, start of the table name (normalised), grams of one piece, default grams]
-  var FOOD_ALIASES = [
-    [['osh', 'palov', 'plov', 'плов', 'pilaf', 'pilav'], 'osh', 0, 250],
-    [['lagmon', 'lagman', 'лагман'], 'lagmon', 0, 350],
-    [['manti', 'манты', 'мант'], 'manti', 70, 210],
-    [['somsa', 'samsa', 'samosa', 'самс'], 'somsa', 120, 120],
-    [['shashlik', 'шашлык', 'kebab', 'kabob'], 'shashlik', 80, 160],
-    [['non', 'хлеб', 'лепёшк', 'лепешк', 'bread'], 'non', 150, 150],
-    [['guruch', 'рис', 'rice'], 'guruch', 0, 200],
-    [['grechka', 'grecha', 'гречк', 'buckwheat'], 'grechka', 0, 200],
-    [['makaron', 'макарон', 'pasta'], 'makaron', 0, 200],
-    [['kartoshka', 'картош', 'картоф', 'potato'], 'kartoshka', 0, 200],
-    [['tuxum', 'яйц', 'яиц', 'egg'], 'tuxum', 55, 55],
-    [['omlet', 'омлет'], 'omlet', 0, 150],
-    [['tovuq', 'куриц', 'курин', 'chicken'], 'tovuq', 0, 150],
-    [['mol', 'говяд', 'beef'], 'mol', 0, 150],
-    [['baliq', 'рыб', 'fish'], 'baliq', 0, 150],
-    [['suli', 'овсян', 'oat'], 'suli', 0, 250],
-    [['sut', 'молок', 'milk'], 'sut', 0, 200],
-    [['kefir', 'кефир'], 'kefir', 0, 200],
-    [['qatiq', 'катык', 'yogurt', 'йогурт'], 'qatiq', 0, 200],
-    [['tvorog', 'творог', 'cottage'], 'tvorog', 0, 150],
-    [['pishloq', 'сыр', 'cheese'], 'pishloq', 20, 30],
-    [['banan', 'банан'], 'banan', 120, 120],
-    [['olma', 'яблок', 'apple'], 'olma', 180, 180],
-    [['uzum', 'виноград', 'grape'], 'uzum', 0, 100],
-    [['apelsin', 'апельсин', 'orange'], 'apelsin', 150, 150],
-    [['qovun', 'дын', 'melon'], 'qovun', 0, 200],
-    [['tarvuz', 'арбуз', 'watermelon'], 'tarvuz', 0, 300],
-    [['anor', 'гранат', 'pomegranate'], 'anor', 0, 150],
-    [['pomidor', 'помидор', 'томат', 'tomato'], 'pomidor', 100, 100],
-    [['bodring', 'огур', 'cucumber'], 'bodring', 100, 100],
-    [['sabzi', 'морков', 'carrot'], 'sabzi', 80, 80],
-    [['yongoq', 'грецк', 'walnut'], 'yongoq', 0, 30],
-    [['bodom', 'миндал', 'almond'], 'bodom', 0, 30],
-    [['chuchvara', 'пельмен', 'dumpling'], 'chuchvara', 0, 200],
-    [['mastava', 'мастав'], 'mastava', 0, 300],
-    [['shorva', 'шурп', 'soup', 'суп'], 'shorva', 0, 300],
-    [['dimlama', 'димлям'], 'dimlama', 0, 300],
-    [['pitsa', 'pizza', 'пицц'], 'pitsa', 110, 110],
-    [['burger', 'бургер', 'gamburger'], 'burger', 200, 200],
-    [['kolbasa', 'колбас', 'sausage'], 'kolbasa', 50, 100],
-    [['shokolad', 'шоколад', 'chocolate'], 'shokolad', 0, 40],
-    [['pechenye', 'печень', 'cookie', 'biscuit'], 'pechenye', 12, 36],
-    [['choy', 'чай', 'tea'], 'choy', 200, 200],
-    [['kola', 'кола', 'cola', 'coke'], 'kola', 330, 330],
-    [['sariyog', 'сливочн', 'butter'], 'sariyog', 10, 10],
-    [['protein', 'протеин'], 'protein kukuni', 30, 30]
-  ];
+  // ---- foods: the server recognises them (/calories/parse/: ~600 built-in foods plus the member's own), so there is no table here
   var NUM_WORDS = { bir: 1, bitta: 1, ikki: 2, ikkita: 2, uch: 3, uchta: 3, tort: 4, tortta: 4, besh: 5, beshta: 5, olti: 6, oltita: 6, yetti: 7, yettita: 7,
     sakkiz: 8, sakkizta: 8, toqqiz: 9, toqqizta: 9, 'один': 1, 'одна': 1, 'одну': 1, 'два': 2, 'две': 2,
     'три': 3, 'четыре': 4, 'пять': 5, 'шесть': 6, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6 };
-  var GRAM_U = /^(gramm|gram|gr|g|г|гр|грам|грамм|грамма|граммов|граммах|grams|gramma)$/;
-  var KG_U = /^(kg|kilo|kilogramm|кг|кило|килограмм)$/;
-  var PC_U = /^(ta|dona|шт|штук|штуки|штука|pcs|pc|piece|pieces|portion|porsiya|порция|порции)$/;
-
-  function parseFoods(n, foods) {
-    var toks = n.split(' '), qs = [], i;
-    for (i = 0; i < toks.length; i++) {
-      var t = toks[i], v = null, unit = null;
-      if (/^\d+$/.test(t)) v = parseInt(t, 10);
-      else if (NUM_WORDS[t] != null) { v = NUM_WORDS[t]; if (/ta$/.test(t)) unit = 'pc'; }
-      if (v == null) continue;
-      var q = { v: v, unit: unit, s: i, e: i, used: false }, nx = toks[i + 1];
-      if (nx) { if (GRAM_U.test(nx)) { q.unit = 'g'; q.e = i + 1; } else if (KG_U.test(nx)) { q.unit = 'kg'; q.e = i + 1; } else if (PC_U.test(nx)) { q.unit = 'pc'; q.e = i + 1; } }
-      qs.push(q); i = q.e;
-    }
-    var hits = [];
-    FOOD_ALIASES.forEach(function (a) {
-      for (var k = 0; k < toks.length; k++) {
-        var hit = a[0].some(function (s) { return toks[k].indexOf(s) === 0 && toks[k].length - s.length <= (s.length <= 3 ? 3 : 5); });
-        if (hit) { hits.push({ a: a, i: k }); return; }
-      }
-    });
-    hits.sort(function (x, y) { return x.i - y.i; });
-    var out = [];
-    hits.forEach(function (h) {
-      var fi = -1;
-      foods.some(function (f) { if (norm(f.name).indexOf(h.a[1]) === 0) { fi = f.i; return true; } return false; });
-      if (fi < 0) return;
-      var q = null;
-      qs.forEach(function (c) { if (!q && !c.used && c.e < h.i && h.i - c.e <= 2) q = c; });
-      if (!q) qs.forEach(function (c) { if (!q && !c.used && c.s > h.i && c.s - h.i <= 3) q = c; });
-      var grams;
-      if (q) {
-        q.used = true;
-        if (q.unit === 'kg') grams = q.v * 1000;
-        else if (q.unit === 'g') grams = q.v;
-        else if (q.unit === 'pc' || q.v < 25) grams = q.v * (h.a[2] || h.a[3]);
-        else grams = q.v;
-      } else grams = h.a[2] || h.a[3];
-      out.push({ idx: fi, name: foods.filter(function (f) { return f.i === fi; })[0].name, grams: Math.max(1, Math.min(5000, Math.round(grams))) });
-    });
-    return out;
-  }
   function mealOf(n) {
     if (/(nonushta|завтрак|breakfast)/.test(n)) return 'breakfast';
     if (/(tushlik|обед|lunch)/.test(n)) return 'lunch';
@@ -257,9 +166,10 @@
   function logFood(raw, n) {
     if (!C.auth) { say(T.vc_login_cal, { url: C.urls.login, label: T.vc_login }); return Promise.resolve(); }
     var meal = mealOf(n);
-    var infoP = getInfo().catch(function () { return null; });
-    return infoP.then(function (info) {
-      var items = info ? parseFoods(n, info.foods || []) : [];
+    // the server does the matching; a failed request means "no items" and the friendly help text
+    var parsed = post(C.urls.calParse, { text: raw }).then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) { return d && d.ok ? d.items : []; }).catch(function () { return []; });
+    return parsed.then(function (items) {
       var hasNum = /\d/.test(n) || n.split(' ').some(function (w) { return NUM_WORDS[w] != null; });
       var local = function () {
         return addLocal(items, meal).then(function () {
@@ -269,7 +179,7 @@
       if (!items.length && !hasNum && /(nima|что|what)/.test(n)) {  // "what did I eat today" -> the calorie page
         say(T.vc_cal_open); setTimeout(function () { window.location.href = C.urls.calories; }, 1200); return null;
       }
-      if (items.length) {  // the built-in food table goes first; the AI estimate is only for what the table cannot parse
+      if (items.length) {
         return local().catch(function () { say(T.vc_error); });
       }
       say(T.vc_cal_unknown); return null;
@@ -377,5 +287,5 @@
   panel.querySelectorAll('[data-vchip]').forEach(function (c) {
     c.addEventListener('click', function () { handle(c.textContent); });
   });
-  window.FZVoice = { handle: handle, open: open, close: close, parseFoods: parseFoods, norm: norm };
+  window.FZVoice = { handle: handle, open: open, close: close, norm: norm };
 })();
