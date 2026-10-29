@@ -9,7 +9,7 @@
   {% csrf_token %}
   <div class="pb-start">
     <span class="muted">{% t 'coach_start_from' %}</span>
-    {% for p in programs %}<button type="button" class="btn small pill" data-program="{{ p.key }}">{{ p.emoji }} {{ p.title }}</button>{% endfor %}
+    {% for p in programs %}<button type="button" class="btn small pill" data-program="{{ p.key }}">{{ p.title }}</button>{% endfor %}
     <button type="button" class="btn small pill" data-program="">🧹 {% t 'coach_clear' %}</button>
   </div>
   <div class="grid g2">

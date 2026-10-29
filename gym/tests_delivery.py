@@ -76,7 +76,7 @@ class DeliveryTests(Base):
         self.c.post("/checkout/", {"method": "cash", "delivery": "courier", "address": "Chilonzor 5-kvartal, 12-uy"})
         o = Order.objects.get(user=self.m)
         staff = Client()
-        staff.post("/login/", {"phone": "908775505", "password": "AdminPass1.admin"})
+        staff.post("/login/", {"login": "admin1", "password": "AdminPass1.admin"})
         self.assertContains(staff.get("/staff/"), "Chilonzor")
         staff.post(f"/staff/ship/{o.pk}/")
         o.refresh_from_db()

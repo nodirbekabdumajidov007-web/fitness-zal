@@ -3,16 +3,8 @@
 {% block extrahead %}{{ block.super }}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800;900&family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
-<link rel="stylesheet" href="{% vstatic 'css/admin.css' %}">
 <script src="{% vstatic 'js/admin.js' %}" defer></script>
 {% endblock %}
-{% block branding %}
-<div id="site-name"><a href="{% url 'admin:index' %}" class="fz-brand"><img class="fz-logo" src="{% vstatic 'img/logo.png' %}" alt="" width="219" height="320">FITNES<span>.</span>ZAL <small>Admin</small></a></div>
-{% if user.is_anonymous %}{% include "admin/color_theme_toggle.html" %}{% endif %}
-{% endblock %}
-{% block nav-global %}
-{% if user.is_staff %}<nav class="fz-quick" aria-label="Tezkor havolalar">
-  <form class="fz-search" action="{% url 'admin:search' %}" method="get" role="search"><input name="q" type="search" placeholder="Qidirish: ism, telefon, FZ-0001, #to'lov…  ( / )" value="{{ q|default:'' }}" aria-label="Qidirish" id="fz-q"></form>
-  <a href="{% url 'admin:index' %}">Bosh sahifa</a><a href="{% url 'admin:schedule' %}">Jadval</a><a href="{% url 'admin:cash' %}">Kassa</a><a href="{% url 'admin:reports' %}">Hisobotlar</a><a href="{% url 'admin:broadcast' %}">E'lon</a><a href="{% url 'admin:message' %}">Shaxsiy xabar</a><a href="/staff/">Qabulxona</a><a href="/staff/scan/">QR skaner</a><a href="/">Sayt →</a>
-</nav>{% endif %}
+{% block responsive %}{{ block.super }}
+<link rel="stylesheet" href="{% vstatic 'css/admin.css' %}">{# after Django's responsive.css, so our rules win at equal weight #}
 {% endblock %}

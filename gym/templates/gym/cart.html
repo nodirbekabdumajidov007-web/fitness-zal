@@ -7,7 +7,7 @@
     <div class="cart-lines">
       {% for i in items %}
       <div class="cart-line" data-pid="{{ i.p.pk }}">
-        <a href="{% url 'product' i.p.pk %}" class="cl-img"><img referrerpolicy="no-referrer" data-fallback="{% static i.p.illustration %}" src="{% if i.p.image_src %}{{ i.p.image_src }}{% else %}{% static i.p.illustration %}{% endif %}" alt=""></a>
+        <a href="{% url 'product' i.p.pk %}" class="cl-img">{% include "gym/_prodpic.html" with p=i.p %}</a>
         <div class="cl-main"><a href="{% url 'product' i.p.pk %}"><b>{{ i.p.name }}</b></a><span class="muted num">{{ i.p.price|money }} {% t 'price_unit' %}</span></div>
         {% with p=i.p qty=i.qty %}{% include "gym/_qty.html" %}{% endwith %}
         <b class="num cl-sub" data-line="{{ i.p.pk }}">{{ i.sub|money }}</b>

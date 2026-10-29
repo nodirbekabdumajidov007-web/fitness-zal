@@ -4,7 +4,7 @@
 <div class="eyebrow"><a href="{% url 'shop' %}">{% t 'shop' %}</a>{% if p.category %} · <a href="{% url 'shop' %}?cat={{ p.category_id }}">{{ p.category.name }}</a>{% endif %}</div>
 <div class="grid g2" style="align-items:start">
   <div class="card prod-hero">
-    {% if p.image_src %}<img referrerpolicy="no-referrer" data-fallback="{% static p.illustration %}" src="{{ p.image_src }}" alt="{{ p.name }}" class="cover">{% else %}<img src="{% static p.illustration %}" alt="{{ p.name }}">{% endif %}
+    {% include "gym/_prodpic.html" %}
   </div>
   <div class="card buybox">
     <div class="chips">{% if p.pk in popular %}<span class="pill tag-hot">{% icon 'flame' %} {% t 'popular' %}</span>{% endif %}
@@ -27,8 +27,8 @@
 <section class="grid"><h3>{% t 'related_products' %}</h3>
   <div class="grid g4">{% for r in related %}
     <a class="card lift prod" href="{% url 'product' r.pk %}" style="text-decoration:none">
-      <span class="prod-img">{% if r.image_src %}<img referrerpolicy="no-referrer" data-fallback="{% static r.illustration %}" src="{{ r.image_src }}" alt="{{ r.name }}" loading="lazy" class="cover">{% else %}<img src="{% static r.illustration %}" alt="{{ r.name }}" loading="lazy">{% endif %}</span>
-      <b>{{ r.name }}</b><span class="num">{{ r.price|money }} {% t 'price_unit' %}</span></a>
+      <span class="prod-img">{% include "gym/_prodpic.html" with p=r %}</span>
+      <span class="prod-body"><b>{{ r.name }}</b><span class="num">{{ r.price|money }} {% t 'price_unit' %}</span></span></a>
   {% endfor %}</div>
 </section>
 {% endif %}

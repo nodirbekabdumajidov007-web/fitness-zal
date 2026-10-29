@@ -1,0 +1,130 @@
+{% load i18n static fz_admin %}<!DOCTYPE html>
+{% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
+<html lang="{{ LANGUAGE_CODE|default:"uz" }}" dir="{{ LANGUAGE_BIDI|yesno:'rtl,ltr,auto' }}">
+<head>
+<title>{% block title %}{% endblock %}</title>
+<link rel="stylesheet" href="{% block stylesheet %}{% static "admin/css/base.css" %}{% endblock %}">
+{% block dark-mode-vars %}
+  <link rel="stylesheet" href="{% static "admin/css/dark_mode.css" %}">
+  <script src="{% static "admin/js/theme.js" %}"></script>
+{% endblock %}
+<script>try{if(localStorage.getItem('fz-side')==='0')document.documentElement.classList.add('fz-collapsed')}catch(e){}</script>
+{% block extrastyle %}{% endblock %}
+{% if LANGUAGE_BIDI %}<link rel="stylesheet" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}">{% endif %}
+{% block extrahead %}{% endblock %}
+{% block responsive %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static "admin/css/responsive.css" %}">
+    {% if LANGUAGE_BIDI %}<link rel="stylesheet" href="{% static "admin/css/responsive_rtl.css" %}">{% endif %}
+{% endblock %}
+{% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE">{% endblock %}
+</head>
+
+<body class="{% if is_popup %}popup {% endif %}{% if not fz_nav %}fz-bare {% endif %}{% block bodyclass %}{% endblock %}"
+  data-admin-utc-offset="{% now "Z" %}">
+<a href="#content-start" class="skip-to-content-link">{% translate 'Skip to main content' %}</a>
+<div id="container" class="fz-app">
+  {% if not is_popup %}
+  {% if fz_nav %}
+  {% block nav-sidebar %}
+  <aside id="fz-side" class="fz-side" aria-label="Asosiy menyu">
+    <div class="fz-side-head">
+      <div id="branding">{% block branding %}{% include "admin/_brand.html" %}{% endblock %}</div>
+    </div>
+    <nav class="fz-nav" aria-label="Bo'limlar">
+      {% for g in fz_nav %}
+      <section class="fz-grp">
+        <h2>{{ g.title }}</h2>
+        <ul>
+          {% for i in g.items %}
+          <li><a class="fz-nav-a{% if i.on %} on{% endif %}" href="{{ i.url }}"{% if i.on %} aria-current="page"{% endif %} title="{{ i.label }}">{% if i.model %}{% model_icon i.model %}{% else %}{% aicon i.icon %}{% endif %}<span class="fz-nav-t">{{ i.label }}</span>{% if i.badge %}<b class="fz-badge" title="Kutilmoqda: {{ i.badge }}">{{ i.badge }}</b>{% endif %}</a></li>
+          {% endfor %}
+        </ul>
+      </section>
+      {% endfor %}
+    </nav>
+    <div class="fz-side-foot">
+      <button type="button" class="fz-collapse" data-fz-collapse aria-label="Yon panelni yig'ish yoki yoyish" title="Yon panelni yig'ish yoki yoyish">{% aicon 'panel' %}<span class="fz-nav-t">Yig'ish</span></button>
+    </div>
+  </aside>
+  <div class="fz-scrim" data-fz-toggle></div>
+  {% endblock %}
+  {% endif %}
+  {% endif %}
+
+  <div class="fz-page">
+    {% if not is_popup %}
+    {% block header %}
+    <header id="header" class="fz-top">
+      {% if fz_nav %}<button type="button" class="fz-burger" data-fz-toggle aria-controls="fz-side" aria-label="Menyuni ochish">{% aicon 'menu' %}</button>{% else %}<div class="fz-top-brand">{% include "admin/_brand.html" %}</div>{% endif %}
+      {% block nav-breadcrumbs %}
+      <nav class="fz-crumbs" aria-label="{% translate 'Breadcrumbs' %}">
+        {% block breadcrumbs %}
+        <div class="breadcrumbs">
+          <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+          {% if title %}<span class="sep" aria-hidden="true">/</span><span class="here">{{ title }}</span>{% endif %}
+        </div>
+        {% endblock %}
+      </nav>
+      {% endblock %}
+      {% if has_permission %}
+      <form class="fz-search" action="{% url 'admin:search' %}" method="get" role="search">
+        {% aicon 'search' %}<input name="q" type="search" placeholder="Qidirish: ism, telefon, FZ-0001, #to'lov" value="{{ q|default:'' }}" aria-label="Qidirish" id="fz-q" autocomplete="off"><kbd aria-hidden="true">/</kbd>
+      </form>
+      {% endif %}
+      <div class="fz-tools">
+        {% include "admin/color_theme_toggle.html" %}
+        {% if has_permission %}
+        <a class="fz-site" href="{{ site_url|default:'/' }}">{% aicon 'globe' %}<span>Saytga o'tish</span></a>
+        {% block usertools %}
+        <details class="fz-user">
+          <summary aria-label="Foydalanuvchi menyusi"><span class="fz-ava sm">{{ user|initials }}</span><span class="fz-uname">{% firstof user.first_name user.get_username %}</span>{% aicon 'chevron' %}</summary>
+          <div class="fz-menu">
+            <div class="fz-menu-head"><b>{{ user.full_name|default:user.get_username }}</b><small>{% if user.is_superuser %}Bosh admin{% else %}Xodim{% endif %}</small></div>
+            {% if user.has_usable_password %}<a href="{% url 'admin:password_change' %}">{% aicon 'key' %}Parolni o'zgartirish</a>{% endif %}
+            <form id="logout-form" method="post" action="{% url 'admin:logout' %}">{% csrf_token %}<button type="submit" class="danger">{% aicon 'logout' %}Chiqish</button></form>
+          </div>
+        </details>
+        {% endblock %}
+        {% endif %}
+      </div>
+      {% block nav-global %}{% endblock %}
+    </header>
+    {% endblock %}
+    {% endif %}
+
+    <main id="content-start" class="content" tabindex="-1">
+      {% block messages %}
+        {% if messages %}
+          <ul class="messagelist">{% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|capfirst }}</li>
+          {% endfor %}</ul>
+        {% endif %}
+      {% endblock messages %}
+      <!-- Content -->
+      <div id="content" class="{% block coltype %}colM{% endblock %}">
+        {% block pretitle %}{% endblock %}
+        {% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %}
+        {% block content_subtitle %}{% if subtitle %}<h2>{{ subtitle }}</h2>{% endif %}{% endblock %}
+        {% block content %}
+          {% block object-tools %}{% endblock %}
+          {{ content }}
+        {% endblock %}
+        {% block sidebar %}{% endblock %}
+        <br class="clear">
+      </div>
+      <!-- END Content -->
+    </main>
+    <footer id="footer">{% block footer %}{% endblock %}</footer>
+  </div>
+</div>
+
+<!-- SVGs (the theme toggle uses them) -->
+<svg xmlns="http://www.w3.org/2000/svg" class="base-svgs">
+  <symbol viewBox="0 0 24 24" width="1.5rem" height="1.5rem" id="icon-auto"><path d="M0 0h24v24H0z" fill="currentColor"/><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-2V4a8 8 0 1 0 0 16z"/></symbol>
+  <symbol viewBox="0 0 24 24" width="1.5rem" height="1.5rem" id="icon-moon"><path d="M0 0h24v24H0z" fill="currentColor"/><path d="M10 7a7 7 0 0 0 12 4.9v.1c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2h.1A6.979 6.979 0 0 0 10 7zm-6 5a8 8 0 0 0 15.062 3.762A9 9 0 0 1 8.238 4.938 7.999 7.999 0 0 0 4 12z"/></symbol>
+  <symbol viewBox="0 0 24 24" width="1.5rem" height="1.5rem" id="icon-sun"><path d="M0 0h24v24H0z" fill="currentColor"/><path d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM11 1h2v3h-2V1zm0 19h2v3h-2v-3zM3.515 4.929l1.414-1.414L7.05 5.636 5.636 7.05 3.515 4.93zM16.95 18.364l1.414-1.414 2.121 2.121-1.414 1.414-2.121-2.121zm2.121-14.85l1.414 1.415-2.121 2.121-1.414-1.414 2.121-2.121zM5.636 16.95l1.414 1.414-2.121 2.121-1.414-1.414 2.121-2.121zM23 11v2h-3v-2h3zM4 11v2H1v-2h3z"/></symbol>
+</svg>
+{% block extrabody %}{% endblock extrabody %}
+</body>
+</html>

@@ -184,5 +184,5 @@ def plan(request, uid):
     programs = {k: [{"wd": e[0], "name": e[1], "sets": e[2], "reps": e[3], "note": ""} for e in v["ex"]] for k, v in services.PROGRAMS.items()}
     return render(request, "gym/coach/plan.html", {
         "t": t, "m": u, "current": current, "rows": rows or [{"wd": timezone.localdate().weekday(), "name": "", "sets": 3, "reps": "10", "note": ""}],
-        "programs": [{"key": k, "title": v["title"], "emoji": v["emoji"]} for k, v in services.PROGRAMS.items()], "program_rows": programs,
+        "programs": [{"key": k, "title": v["title"]} for k, v in services.PROGRAMS.items()], "program_rows": programs,
     })

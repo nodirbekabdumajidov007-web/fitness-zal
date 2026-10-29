@@ -83,13 +83,14 @@ class LoginForm(forms.Form):
 
 
 def find_user(login):
-    """The account a sign-in box refers to: a phone number, an e-mail or a username (case does not matter)."""
+    """The account a sign-in box refers to: a phone number, an e-mail or a username (case does not matter).
+    Staff and superuser accounts cannot be reached by phone: the owner signs in as `admin1` (or by e-mail)."""
     login = (login or "").strip()
     if not login:
         return None
     phone = normalize_phone(login) if not re.search(r"[A-Za-z@]", login) else None
     if phone:
-        return User.objects.filter(phone=phone).first()
+        return User.objects.filter(phone=phone, is_staff=False, is_superuser=False).first()
     if "@" in login:
         return User.objects.filter(email__iexact=login).first()
     return User.objects.filter(username__iexact=login).first()

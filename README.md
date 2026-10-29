@@ -11,7 +11,7 @@ Testlar (42 ta): `.venv\Scripts\python manage.py test gym`
 
 ## Admin kirishi
 
-Telefon `+998 90 877 55 05`, parol oxiriga `.admin` qo'shing (`parolim.admin`). `.admin`siz kirsangiz oddiy a'zo bo'lasiz, admin sahifalar esa a'zolarga 404 ko'rinadi.
+Login `admin1` (telefon bilan kirib bo'lmaydi), parol oxiriga `.admin` qo'shing (`parolim.admin`). `.admin`siz kirsangiz oddiy a'zo bo'lasiz, admin sahifalar esa a'zolarga 404 ko'rinadi.
 
 - `/django-admin/`: dashboard, a'zolar, to'lovlar, buyurtmalar, mahsulotlar, mashq rejalari, shaxsiy mashg'ulotlar, sozlamalar va amallar (+30 kun, bloklash, tasdiqlash, CSV).
 - `/django-admin/reports/`: hisobotlar (oylik tushum, yangi a'zolar, gavjum kun va soatlar, eng ko'p sotilgan mahsulot, qayta obuna).
@@ -54,9 +54,17 @@ Narx, muddat va chegirma foizi admin panelda: **Zal sozlamalari**. Narxni brauze
 - **Mehmon taklifnomasi:** oyiga 1 ta. VIP sahifasida mehmon ismi va kunini yozasiz, QR va 8 belgili kod chiqadi. Qabulxonada QR skaner yoki qidiruv orqali **faqat o'sha kuni, bir marta** ishlaydi.
 - Bular hammasi admin panel → **Zal sozlamalari**da o'zgartiriladi.
 
+## Murabbiy yordamchi (`/ai/`, ovozli yordamchi)
+
+Tashqi sun'iy intellekt (Claude/OpenAI va h.k.) ishlatilmaydi, API kalit kerak emas. Javoblar `gym/assistant_kb_*.py` dagi bilimlar bazasidan olinadi
+(zal, mashq, ovqatlanish; ish vaqti, narx, telefon kabi faktlar bazadan o'qiladi). `POST /assistant/ask/` (mehmonlar uchun ham, daqiqasiga 30 so'rov).
+Haftalik reja (`gym/assistant_plan.py`) tayyor shablonlardan tuziladi, kaloriya sahifasidagi matn tahlili `gym/calories.py` jadvalidan foydalanadi.
+Yangi savol-javob qo'shish: tegishli `assistant_kb_*.py` fayliga bitta qator qo'shing.
+
 ## Rasmlar
 - Admin panel → **Mahsulotlar** va **Murabbiylar** → "Rasm" maydoniga jpg/png/webp yuklang (5 MB gacha, `FZ_MAX_IMAGE_MB`). Fayl turi nomidan emas, ichidagi baytlardan tekshiriladi, SVG/HTML qabul qilinmaydi.
-- Rasm yuklanmaguncha mahsulotlarda nomiga qarab chizilgan illyustratsiya (suv, protein, ichimlik, batonchik, sheyker), murabbiylarda siluet chiqadi.
+- **Mahsulotga haqiqiy foto yuklang**: kvadrat, kamida 800 px, shaffof PNG yoki oq fon (do'kon, mahsulot sahifasi va savatda chiroyli ko'rinadi).
+- Foto yuklanmaguncha mahsulotda kategoriya rangidagi yumshoq kartochka va bitta chiziqli ikonka (shisha, banka, sheyker, idish, batonchik, quti) chiqadi; murabbiylarda siluet.
 - Har mahsulotning alohida sahifasi bor (`/shop/<id>/`): katta rasm, tavsif, VIP narxi, o'xshash mahsulotlar. "Ommabop" (so'nggi 60 kunda eng ko'p sotilgan 3 ta) va "Kam qoldi" (5 tadan kam) belgilari o'zi chiqadi.
 - Har murabbiyning sahifasi (`/trainers/<id>/`): rasm, tanishtiruv, olib boradigan mashg'ulotlari, shaxsiy mashg'ulotga yozilish.
 - Rasmlar ham `media/` papkasida turadi: internetga chiqarganda doimiy disk kerak.

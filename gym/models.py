@@ -1,3 +1,4 @@
+import re
 from datetime import timedelta
 from decimal import Decimal
 
@@ -334,7 +335,8 @@ class Product(models.Model):
     price = models.BigIntegerField("Narx")
     stock = models.PositiveIntegerField("Omborda", default=0)
     active = models.BooleanField("Sotuvda", default=True)
-    image = models.FileField("Rasm (jpg, png, webp)", upload_to="products/", blank=True, validators=[validate_image])
+    image = models.FileField("Rasm (jpg, png, webp)", upload_to="products/", blank=True, validators=[validate_image],
+                             help_text="Haqiqiy foto yuklang: kvadrat, kamida 800 px, shaffof PNG yoki oq fon. Foto bo'lmasa, do'konda chiroyli belgi ko'rinadi.")
     image_url = models.URLField("Yoki rasm havolasi (https)", max_length=500, blank=True,
                                 validators=[RegexValidator(r"^https://", "Faqat https:// havola")],
                                 help_text="Boshqa saytdagi rasm. U o'chirilsa yoki o'zgarsa, bu yerda ham yo'qoladi; ishonchliroq yo'l: rasmni yuklash.")
@@ -353,15 +355,30 @@ class Product(models.Model):
         return image_url("product", self) or self.image_url
 
     @property
-    def illustration(self):
-        """A drawn picture used until a real photo is uploaded."""
+    def kind(self):
+        """bottle / can / shaker / tub / bar / box: picks the line icon of the placeholder shown until a photo is uploaded."""
         n = self.name.lower()
         for keys, pic in ((("shaker",), "shaker"), (("kokteyl",), "shaker"), (("suv", "water"), "bottle"),
                           (("energetik", "izotonik", "energy"), "can"), (("batonchik", "bar"), "bar"),
                           (("whey", "protein", "kreatin", "bcaa", "gainer"), "tub")):
             if any(k in n for k in keys):
-                return f"img/products/{pic}.svg"
-        return "img/products/box.svg"
+                return pic
+        return "box"
+
+    @property
+    def illustration(self):
+        return f"img/products/{self.kind}.svg"
+
+    @property
+    def tone(self):
+        """Tint of the placeholder tile: drinks blue, protein red-orange, snacks amber, accessories grey."""
+        return {"bottle": "drink", "can": "drink", "tub": "protein", "bar": "snack"}.get(self.kind, "gear")
+
+    @property
+    def size_label(self):
+        """'0.5 l', '900 g' ... taken from the name, shown small on the placeholder."""
+        m = re.search(r"(\d+(?:[.,]\d+)?)\s*(litr|l|ml|kg|gr|g|ta|dona)\b", self.name.lower())
+        return f"{m.group(1).replace(',', '.')} {m.group(2)}" if m else ""
 
 
 class Order(models.Model):
@@ -861,7 +878,7 @@ class ChatReport(models.Model):
 
 
 class AIMessage(models.Model):
-    """One turn of a member's conversation with the AI coach (kept so the coach remembers earlier questions)."""
+    """One turn of a member's conversation with the coach assistant (kept so the page can show the history)."""
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="ai_messages")
     role = models.CharField(max_length=10, choices=[("user", "A'zo"), ("assistant", "AI")])
     content = models.TextField()

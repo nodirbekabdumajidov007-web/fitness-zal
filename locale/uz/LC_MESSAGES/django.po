@@ -290,3 +290,53 @@ msgstr "Oyna yopilmoqda…"
 
 msgid "Unknown content"
 msgstr "Noma'lum yozuv"
+
+msgid "Error:"
+msgstr "Xato:"
+
+msgid "Model name"
+msgstr "Jadval nomi"
+
+msgid "Add link"
+msgstr "Qo'shish havolasi"
+
+msgid "Change or view list link"
+msgstr "Ro'yxatni ochish havolasi"
+
+msgid "Old password"
+msgstr "Eski parol"
+
+msgid "Password change successful"
+msgstr "Parol almashtirildi"
+
+msgid "Logged out"
+msgstr "Tizimdan chiqildi"
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "Admin panelda ishlaganingiz uchun rahmat."
+
+msgid "Your password can’t be too similar to your other personal information."
+msgstr "Parol ism, login va boshqa shaxsiy ma'lumotlaringizga juda o'xshash bo'lmasligi kerak."
+
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "Parol «%(verbose_name)s» ga juda o'xshash."
+
+msgid "This password is too common."
+msgstr "Bu parol juda oddiy."
+
+msgid "Your password can’t be a commonly used password."
+msgstr "Parol ko'p ishlatiladigan oddiy parol bo'lmasligi kerak."
+
+msgid "This password is entirely numeric."
+msgstr "Parol faqat raqamlardan iborat."
+
+msgid "Your password can’t be entirely numeric."
+msgstr "Parol faqat raqamlardan iborat bo'lmasligi kerak."
+
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "Parol kamida %(min_length)d ta belgidan iborat bo'lishi kerak."
+
+msgid "This password is too short. It must contain at least %d character."
+msgid_plural "This password is too short. It must contain at least %d characters."
+msgstr[0] "Parol juda qisqa: kamida %d ta belgi kerak."

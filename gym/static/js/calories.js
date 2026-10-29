@@ -1,4 +1,4 @@
-/* Calorie tracker: food search over the built-in table (no network), per-portion preview, AI estimate via fetch. */
+/* Calorie tracker: food search over the built-in table (no network), per-portion preview, free-text recognition via fetch. */
 (function () {
   'use strict';
   var data = document.getElementById('calFoods');
@@ -73,10 +73,36 @@
       var btn = ai.querySelector('button'), err = document.getElementById('calAiErr'), label = btn.textContent;
       btn.disabled = true; btn.textContent = btn.getAttribute('data-busy'); err.hidden = true;
       function fail(msg) { err.textContent = msg || 'Error'; err.hidden = false; btn.disabled = false; btn.textContent = label; }
+      var token = ai.querySelector('[name=csrfmiddlewaretoken]').value, found = document.getElementById('calAiFound');
+      function reset() { btn.disabled = false; btn.textContent = label; }
       fetch(ai.action, { method: 'POST', body: new FormData(ai), credentials: 'same-origin',
-        headers: { 'X-CSRFToken': ai.querySelector('[name=csrfmiddlewaretoken]').value, 'X-Requested-With': 'fetch' } })
+        headers: { 'X-CSRFToken': token, 'X-Requested-With': 'fetch' } })
         .then(function (r) { return r.json(); })
-        .then(function (j) { if (j.ok) location.reload(); else fail(j.error); })
+        .then(function (j) {
+          if (!j.ok) return fail(j.error);
+          // show what was recognised (grams can be edited), then add each item through the normal add endpoint
+          found.hidden = false; found.textContent = '';
+          var h = document.createElement('b'); h.textContent = ai.getAttribute('data-found'); found.appendChild(h);
+          var rows = j.items.map(function (it) {
+            var row = document.createElement('div'); row.className = 'cal-found-row';
+            var name = document.createElement('span'); name.textContent = it.name + ' \u00b7 ' + it.kcal + ' kcal';
+            var g = document.createElement('input'); g.type = 'number'; g.min = 1; g.max = 5000; g.value = it.grams; g.setAttribute('aria-label', 'g');
+            row.appendChild(name); row.appendChild(g); found.appendChild(row);
+            return { it: it, input: g };
+          });
+          var add = document.createElement('button'); add.type = 'button'; add.className = 'btn primary'; add.textContent = ai.getAttribute('data-addall');
+          add.addEventListener('click', function () {
+            add.disabled = true;
+            var meal = ai.querySelector('[name=meal]').value, day = ai.querySelector('[name=d]').value;
+            rows.reduce(function (p, r) {
+              return p.then(function () {
+                var body = new FormData(); body.append('food', r.it.idx); body.append('grams', r.input.value); body.append('meal', meal); body.append('d', day);
+                return fetch(ai.getAttribute('data-add'), { method: 'POST', body: body, credentials: 'same-origin', headers: { 'X-CSRFToken': token, 'X-Requested-With': 'fetch' } });
+              });
+            }, Promise.resolve()).then(function () { location.reload(); }).catch(function () { add.disabled = false; fail(); });
+          });
+          found.appendChild(add); reset();
+        })
         .catch(function () { fail(); });
     });
   }

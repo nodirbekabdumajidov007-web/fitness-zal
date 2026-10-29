@@ -174,8 +174,23 @@ ICONS = {
     "menu": '<path d="M4 6h16M4 12h16M4 18h16"/>',
     "chevrons-left": '<path d="m11 17-5-5 5-5M18 17l-5-5 5-5"/>',
     "x": '<path d="M18 6 6 18M6 6l12 12"/>',
+    "mic": '<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/>',
+    "volume": '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/>',
+    "volume-off": '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M22 9l-6 6M16 9l6 6"/>',
     "eye": '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/>' + _c(12, 12, 3),
+    "qr": '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M21 14v.01M14 21h.01M17 21h4v-4"/>',
+    "printer": '<path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/>',
+    "door": '<path d="M14 3H6a1 1 0 0 0-1 1v17h9"/><path d="M14 3l5 2v16h-5z"/><path d="M11 12h.01"/>',
+    "handshake": '<path d="m11 17 2 2a1.4 1.4 0 0 0 2-2"/><path d="m14 14 2.5 2.5a1.4 1.4 0 0 0 2-2l-3.6-3.6a3 3 0 0 0-4.2 0l-.9.9a1.4 1.4 0 0 1-2-2l3-3a5 5 0 0 1 6.6-.4L20 7"/><path d="M2 13l5 5M22 8l-4 4M2 8h3l4-2"/>',
+    "search": _c(11, 11, 7) + '<path d="m20 20-3.5-3.5"/>',
+    "check": '<polyline points="20 6 9 17 4 12"/>',
     "eye-off": '<path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.53 13.53 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><path d="M2 2l20 20"/>',
+    "bottle": '<path d="M10 2h4v3l1.5 2.5V21a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1V7.5L10 5z"/><path d="M8.5 11h7M8.5 17h7"/>',
+    "can": '<path d="M7 5c0-1.1 2.2-2 5-2s5 .9 5 2v14c0 1.1-2.2 2-5 2s-5-.9-5-2z"/><path d="M7 5c0 1.1 2.2 2 5 2s5-.9 5-2M7 10h10M7 15h10"/>',
+    "shaker": '<path d="M9 2h6M10 2v3h4V2"/><path d="M8 5h8l1 3-1.5 12.2a1 1 0 0 1-1 .8h-5a1 1 0 0 1-1-.8L7 8z"/><path d="M8 11h8"/>',
+    "tub": '<rect x="5" y="3" width="14" height="4" rx="1"/><path d="M6 7v12.5A1.5 1.5 0 0 0 7.5 21h9a1.5 1.5 0 0 0 1.5-1.5V7"/><path d="M6 11h12M6 17h12"/>',
+    "bar": '<rect x="2" y="8" width="20" height="9" rx="2"/><path d="M6 8v9M18 8v9M2 12.5h4M18 12.5h4"/>',
+    "box": '<rect x="3" y="7" width="18" height="14" rx="2"/><path d="M3 12h18M10 12v3h4v-3M5 3h14l2 4H3z"/>',
 }
 
 
@@ -183,3 +198,10 @@ ICONS = {
 def icon(name, cls=""):
     body = ICONS.get(name, "")
     return mark_safe(f'<svg class="ico{" " + cls if cls else ""}" viewBox="0 0 24 24" aria-hidden="true" focusable="false">{body}</svg>')
+
+
+@register.simple_tag(takes_context=True)
+def voice_config(context):
+    """Settings and strings for the voice assistant (rendered with |json_script, never as inline JavaScript)."""
+    from .. import voice
+    return voice.config(context["request"])

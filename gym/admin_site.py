@@ -1,14 +1,16 @@
 import csv
 from datetime import timedelta
+from functools import wraps
 
 from django.conf import settings
 from django.contrib import admin
+from django.core.exceptions import PermissionDenied
 from django.db.models import Count, ExpressionWrapper, F, Max, Sum
 from django.db.models.fields import BigIntegerField
 from django.db.models.functions import ExtractHour, ExtractWeekDay, TruncDate, TruncMonth
 from django.http import HttpResponse
 from django.template.response import TemplateResponse
-from django.urls import path
+from django.urls import path, reverse
 from django.utils import timezone
 
 
@@ -125,19 +127,19 @@ def extra_stats(now, today, revenue_month):
         classes.append({"c": c, "n": n, "w": min(100, round(n / c.capacity * 100)) if c.capacity else 0})
     feed = []
     for u in User.objects.filter(is_superuser=False).order_by("-created")[:6]:
-        feed.append({"ts": u.created, "icon": "＋", "cls": "green", "text": f"Yangi a'zo: {u.first_name} {u.last_name}", "url": reverse("admin:member", args=[u.pk])})
+        feed.append({"ts": u.created, "icon": "plus", "cls": "green", "text": f"Yangi a'zo: {u.first_name} {u.last_name}", "url": reverse("admin:member", args=[u.pk])})
     for p in Payment.objects.select_related("user").order_by("-created")[:6]:
-        feed.append({"ts": p.created, "icon": {"paid": "✓", "pending": "…"}.get(p.status, "×"),
+        feed.append({"ts": p.created, "icon": {"paid": "tick", "pending": "clock"}.get(p.status, "x"),
                      "cls": "gold" if p.status == "pending" else ("green" if p.status == "paid" else ""),
                      "text": f"To'lov #{p.pk}: {p.amount:,} so'm · {p.get_status_display()}".replace(",", " ") + (f" · {p.user.first_name}" if p.user else ""),
                      "url": reverse("admin:gym_payment_change", args=[p.pk])})
     for o in Order.objects.select_related("user").order_by("-created")[:5]:
-        feed.append({"ts": o.created, "icon": "🛒", "cls": "", "text": f"Buyurtma #{o.pk}: {o.total:,} so'm".replace(",", " ") + (f" · {o.user.first_name}" if o.user else ""),
+        feed.append({"ts": o.created, "icon": "bag", "cls": "", "text": f"Buyurtma #{o.pk}: {o.total:,} so'm".replace(",", " ") + (f" · {o.user.first_name}" if o.user else ""),
                      "url": reverse("admin:gym_order_change", args=[o.pk])})
     for v in Visit.objects.select_related("user").order_by("-ts")[:6]:
-        feed.append({"ts": v.ts, "icon": "→", "cls": "dark", "text": f"Zalga keldi: {v.user.first_name} {v.user.last_name}", "url": reverse("admin:member", args=[v.user_id])})
+        feed.append({"ts": v.ts, "icon": "login", "cls": "dark", "text": f"Zalga keldi: {v.user.first_name} {v.user.last_name}", "url": reverse("admin:member", args=[v.user_id])})
     for r in Review.objects.select_related("user").order_by("-created")[:4]:
-        feed.append({"ts": r.created, "icon": "★", "cls": "gold", "text": f"Fikr {r.rating}/5: {r.user.first_name}" + ("" if r.approved else " · tasdiq kutmoqda"),
+        feed.append({"ts": r.created, "icon": "star", "cls": "gold", "text": f"Fikr {r.rating}/5: {r.user.first_name}" + ("" if r.approved else " · tasdiq kutmoqda"),
                      "url": reverse("admin:gym_review_change", args=[r.pk])})
     feed.sort(key=lambda x: x["ts"], reverse=True)
     hour = timezone.localtime(now).hour
@@ -313,11 +315,141 @@ SECTIONS = [  # the sidebar groups the gym's many tables by job instead of one l
 ]
 
 
+# Left navigation of the admin: (group, [(label, icon, target, permission, badge)]). A target is "model:<name>[?query]" for a
+# registered model's list, "view:<url name>" for one of our own pages, or a plain path. Only entries the signed-in
+# staff member may open are shown, and nothing here points at a page that does not exist.
+NAV = [
+    ("Asosiy", [("Bosh sahifa", "home", "view:index", None, None),
+                ("Qabulxona", "desk", "/staff/", None, None),
+                ("QR skaner", "scan", "/staff/scan/", None, None)]),
+    ("Moliya", [("Kassa", "wallet", "view:cash", "gym.view_payment", None),
+                ("To'lovlar", "card", "model:payment", None, "payments"),
+                ("Hisobotlar", "chart", "view:reports", "gym.view_payment", None),
+                ("Abonement turlari", "list", "model:plan", None, None),
+                ("Promokodlar", "tag", "model:promocode", None, None),
+                ("To'lov kartalari", "wallet", "model:paymentcard", None, None)]),
+    ("A'zolar", [("Foydalanuvchilar", "users", "model:user", None, None),
+                 ("Abonementlar", "ticket", "model:membership", None, None),
+                 ("Tashriflar", "login", "model:visit", None, None),
+                 ("Shaxsiy xabar", "mail", "view:message", "gym.view_user", None),
+                 ("E'lon yuborish", "megaphone", "view:broadcast", "gym.add_announcement", None)]),
+    ("Zal", [("Haftalik jadval", "calendar", "view:schedule", "gym.view_gymclass", None),
+             ("Mashg'ulotlar", "calendar", "model:gymclass", None, None),
+             ("Bronlar", "check", "model:booking", None, None),
+             ("Murabbiylar", "dumbbell", "model:trainer", None, None),
+             ("Shaxsiy mashg'ulotlar", "user-check", "model:ptsession", None, "pt"),
+             ("Mashq rejalari", "trend", "model:workoutplan", None, None),
+             ("Fikrlar", "star", "model:review", None, None),
+             ("Sozlamalar", "settings", "model:gymsettings", None, None)]),
+    ("Do'kon", [("Mahsulotlar", "package", "model:product", None, None),
+                ("Buyurtmalar", "bag", "model:order", None, "orders"),
+                ("Kategoriyalar", "folder", "model:category", None, None)]),
+    ("Chat va xavfsizlik", [("Shikoyatlar", "flag", "model:chatreport", None, "reports"),
+                            ("Chat xabarlari", "chat", "model:chatmessage", None, None),
+                            ("Bloklangan a'zolar", "ban", "model:user?is_active__exact=0", None, None)]),
+]
+# own pages that belong to a model's section, so the right sidebar entry stays lit on them
+NAV_ALIASES = {"gym_user_changelist": ("admin:member", "admin:search")}
+VIEW_PERMS = {"reports": "gym.view_payment", "reports_csv": "gym.view_payment", "cash": "gym.view_payment", "live": "gym.view_payment",
+              "search": "gym.view_user", "member": "gym.view_user", "message": "gym.view_user", "broadcast": "gym.add_announcement",
+              "schedule": "gym.view_gymclass"}
+
+
+def nav_badges():
+    """Small counters next to the sidebar entries that wait for someone. Cached for a few seconds: this runs on every admin page."""
+    from django.core.cache import cache
+    from .models import ChatReport, Order, Payment, PTSession
+    got = cache.get("fz_nav_badges")
+    if got is None:
+        now = timezone.now()
+        got = {"payments": Payment.objects.filter(status="pending").count(), "orders": Order.objects.filter(status="new").count(),
+               "reports": ChatReport.objects.filter(resolved=False).count(),
+               "pt": PTSession.objects.filter(status="requested", starts__gte=now).count()}
+        cache.set("fz_nav_badges", got, 20)
+    return got
+
+
 class GymAdminSite(admin.AdminSite):
     site_header = "Fitnes Zal · Admin"
     site_title = "Fitnes Zal"
     index_title = "Boshqaruv paneli"
     index_template = "admin/dashboard.html"
+
+    def each_context(self, request):
+        ctx = super().each_context(request)
+        user = getattr(request, "user", None)
+        if user is not None and user.is_authenticated and user.is_staff:
+            ctx["fz_nav"] = self.build_nav(request, ctx.get("available_apps", []))
+        return ctx
+
+    def build_nav(self, request, apps):
+        """The sidebar: NAV filtered by what this user may open, with the entry for the current page marked, and a catch-all
+        «Boshqalar» group so a model registered later never disappears from the menu."""
+        by_model = {m["object_name"].lower(): m for a in apps for m in a["models"] if a["app_label"] == "gym"}
+        badges = nav_badges()
+        path, user = request.path, request.user
+        used, groups = set(), []
+
+        def model_url(name):
+            m = by_model.get(name)
+            if not m or not m.get("admin_url"):
+                return ""
+            if name == "gymsettings":  # a single row: go straight to it instead of a one-line list
+                from .models import GymSettings
+                pk = GymSettings.objects.values_list("pk", flat=True).first()
+                if pk:
+                    return reverse("admin:gym_gymsettings_change", args=[pk])
+            return m["admin_url"]
+
+        def active_for(name, base, query):
+            on = bool(base) and path.startswith(base)
+            if name == "user":  # the member card and search results belong to «Foydalanuvchilar» too
+                if on:
+                    return (request.GET.get("is_active__exact") == "0") == ("is_active__exact=0" in query)
+                return not query and (path.startswith("/django-admin/member/") or path.startswith(reverse("admin:search")))
+            return on
+
+        for title, entries in NAV:
+            items = []
+            for label, icon, target, perm, badge in entries:
+                query = ""
+                if perm and not user.has_perm(perm):
+                    continue
+                if target.startswith("model:"):
+                    name, _, query = target[6:].partition("?")
+                    url = model_url(name)
+                    if not url:
+                        continue
+                    used.add(name)
+                    on = active_for(name, by_model[name]["admin_url"], query)
+                elif target.startswith("view:"):
+                    url = reverse("admin:" + target[5:])
+                    on = path == url if target == "view:index" else path.startswith(url)
+                else:
+                    url, on = target, False
+                if query:
+                    url = f"{url}?{query}"
+                items.append({"label": label, "icon": icon, "url": url, "on": on, "badge": badges.get(badge, 0) if badge else 0})
+            if items:
+                groups.append({"title": title, "items": items})
+        rest = [{"label": str(m["name"]), "icon": "", "model": m["object_name"], "url": m["admin_url"], "on": path.startswith(m["admin_url"]), "badge": 0}
+                for name, m in by_model.items() if name not in used and m.get("admin_url")]
+        for a in apps:  # models of other apps (none today) are kept reachable as well
+            if a["app_label"] != "gym":
+                rest += [{"label": str(m["name"]), "icon": "", "model": m["object_name"], "url": m["admin_url"], "on": path.startswith(m["admin_url"]), "badge": 0}
+                         for m in a["models"] if m.get("admin_url")]
+        if rest:
+            groups.append({"title": "Boshqalar", "items": rest})
+        return groups
+
+    def gated(self, view, perm):
+        """admin_view() plus a permission check: staff who may not see payments or members do not get our summary pages either."""
+        @wraps(view)
+        def inner(request, *a, **kw):
+            if not request.user.has_perm(perm):
+                raise PermissionDenied
+            return view(request, *a, **kw)
+        return self.admin_view(inner)
 
     def get_app_list(self, request, app_label=None):
         apps = super().get_app_list(request, app_label)
@@ -337,20 +469,24 @@ class GymAdminSite(admin.AdminSite):
         return out + [a for a in apps if a["app_label"] != "gym"]
 
     def index(self, request, extra_context=None):
+        if not request.user.has_perm("gym.view_payment"):  # the dashboard shows takings: staff without that right get the plain list
+            resp = super().index(request, extra_context)
+            resp.template_name = "admin/index.html"
+            return resp
         extra = dashboard_stats()
         extra.update(extra_context or {})
         return super().index(request, extra)
 
     def get_urls(self):
-        return [path("reports/", self.admin_view(self.reports_view), name="reports"),
-                path("reports/csv/", self.admin_view(self.reports_csv), name="reports_csv"),
-                path("search/", self.admin_view(self.search_view), name="search"),
-                path("member/<int:pk>/", self.admin_view(self.member_view), name="member"),
-                path("broadcast/", self.admin_view(self.broadcast_view), name="broadcast"),
-                path("message/", self.admin_view(self.message_view), name="message"),
-                path("live/", self.admin_view(self.live_view), name="live"),
-                path("schedule/", self.admin_view(self.schedule_view), name="schedule"),
-                path("cash/", self.admin_view(self.cash_view), name="cash")] + super().get_urls()
+        return [path("reports/", self.gated(self.reports_view, VIEW_PERMS["reports"]), name="reports"),
+                path("reports/csv/", self.gated(self.reports_csv, VIEW_PERMS["reports_csv"]), name="reports_csv"),
+                path("search/", self.gated(self.search_view, VIEW_PERMS["search"]), name="search"),
+                path("member/<int:pk>/", self.gated(self.member_view, VIEW_PERMS["member"]), name="member"),
+                path("broadcast/", self.gated(self.broadcast_view, VIEW_PERMS["broadcast"]), name="broadcast"),
+                path("message/", self.gated(self.message_view, VIEW_PERMS["message"]), name="message"),
+                path("live/", self.gated(self.live_view, VIEW_PERMS["live"]), name="live"),
+                path("schedule/", self.gated(self.schedule_view, VIEW_PERMS["schedule"]), name="schedule"),
+                path("cash/", self.gated(self.cash_view, VIEW_PERMS["cash"]), name="cash")] + super().get_urls()
 
     def schedule_view(self, request):
         """The week's group classes as a timetable, with how full each one is."""

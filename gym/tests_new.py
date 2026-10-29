@@ -1,6 +1,5 @@
 """Username sign-up and sign-in, e-mail (SMTP) messages and password reset, the AI coach and AI plans (API mocked),
 Cloudinary switches and the removal of VIP."""
-import json
 from unittest import mock
 
 from django.core import mail
@@ -8,7 +7,7 @@ from django.core.cache import cache
 from django.core.management import call_command
 from django.test import Client, TestCase, override_settings
 
-from . import ai, services
+from . import services
 from .models import AIMessage, Lesson, Plan, User, WorkoutPlan
 
 PW = "Kuchli-Parol-77"
@@ -70,10 +69,34 @@ class RegistrationTests(Base):
             self.assertIn("_auth_user_id", c.session, login)
         self.assertContains(Client().post("/login/", {"login": "aziz_k", "password": "wrong"}), "field-err")
 
-    def test_owner_signs_in_as_admin(self):
-        r = Client().post("/login/", {"login": "admin", "password": "AdminPass1.admin"})
+    def test_owner_signs_in_as_admin1(self):
+        r = Client().post("/login/", {"login": "admin1", "password": "AdminPass1.admin"})
         self.assertEqual(r["Location"], "/django-admin/")
+        self.assertEqual(self.admin.username, "admin1")
+
+    def test_owner_cannot_sign_in_by_phone(self):
+        for login in ("90 877 55 05", "+998908775505", "908775505"):
+            r = Client().post("/login/", {"login": login, "password": "AdminPass1.admin"})
+            self.assertEqual(r.status_code, 200, login)
+            self.assertContains(r, "field-err")
+        c = Client()
+        c.post("/login/", {"login": "ADMIN1", "password": "AdminPass1"})  # case-insensitive, normal (non-admin) mode
+        self.assertIn("_auth_user_id", c.session)
+
+    def test_migration_renames_admin_to_admin1(self):
+        import importlib
+        from django.apps import apps as real_apps
+        mig = importlib.import_module("gym.migrations.0023_rename_admin_to_admin1")
+        User.objects.filter(pk=self.admin.pk).update(username="admin")
+        mig.rename(real_apps, None)
+        self.admin.refresh_from_db()
+        self.assertEqual(self.admin.username, "admin1")
+        User.objects.filter(pk=self.admin.pk).update(username="admin")
+        other = User.objects.create_user("admin1", PW, email="x1@example.com")
+        mig.rename(real_apps, None)  # admin1 is taken: nothing changes
+        self.admin.refresh_from_db()
         self.assertEqual(self.admin.username, "admin")
+        other.delete()
 
 
 class EmailTests(Base):
@@ -99,99 +122,53 @@ class EmailTests(Base):
         self.register()
         u = User.objects.get(username="aziz_k")
         staff = Client()
-        staff.post("/login/", {"login": "admin", "password": "AdminPass1.admin"})
+        staff.post("/login/", {"login": "admin1", "password": "AdminPass1.admin"})
         staff.post("/django-admin/message/", {"ids": [u.pk], "title": "Salom, {ism}!", "body": "Ertaga zal 10:00 da", "email": "on"})
         self.assertEqual(mail.outbox[-1].to, ["aziz@example.com"])
         self.assertIn("Salom, aziz_k!", mail.outbox[-1].subject)
 
 
-class FakeBlock:
-    def __init__(self, text):
-        self.type, self.text = "text", text
-
-
-class FakeResponse:
-    def __init__(self, text, stop="end_turn"):
-        self.content, self.stop_reason = [FakeBlock(text)], stop
-
-
 @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
 class AITests(Base):
+    """The coach page runs on the offline assistant: no API key, no network."""
     def setUp(self):
         super().setUp()
         self.register()
         self.u = User.objects.get(username="aziz_k")
         self.c = Client()
         self.c.post("/login/", {"login": "aziz_k", "password": PW})
-        self.env = mock.patch.dict("os.environ", {"ANTHROPIC_API_KEY": "test-key", "FZ_AI_DAILY_LIMIT": "3"})
-        self.env.start()
-        self.addCleanup(self.env.stop)
-
-    def fake(self, text, stop="end_turn"):
-        create = mock.Mock(return_value=FakeResponse(text, stop))
-        client = mock.Mock()
-        client.beta.messages.create = create
-        return mock.patch("anthropic.Anthropic", return_value=client), create
 
     def test_page_for_guests_and_members(self):
+        self.assertContains(Client().get("/ai/"), 'data-ai-form')
         self.assertContains(Client().get("/ai/"), "/login/?next=/ai/")
-        self.assertContains(self.c.get("/ai/"), 'data-ai-form')
+        r = self.c.get("/ai/")
+        self.assertContains(r, 'name="equipment"')
+        self.assertNotContains(r, "ANTHROPIC")
 
-    def test_chat_knows_the_member_and_is_stored(self):
-        self.u.goal, self.u.target_weight = "lose", 70
-        self.u.save()
-        patcher, create = self.fake("Kuniga 2 litr suv iching.")
-        with patcher:
-            r = self.c.post("/ai/ask/", {"q": "Qancha suv ichay?"}, HTTP_X_REQUESTED_WITH="fetch")
-        self.assertEqual(r.json()["answer"], "Kuniga 2 litr suv iching.")
-        kw = create.call_args.kwargs
-        self.assertEqual(kw["model"], "claude-opus-5-5")
-        self.assertIn("Ozish", kw["messages"][-1]["content"])      # goal in the profile
-        self.assertIn("Target weight: 70", kw["messages"][-1]["content"])
-        self.assertIn("Uzbek", kw["system"])
+    def test_chat_answers_locally_and_is_stored(self):
+        r = self.c.post("/ai/ask/", {"q": "Kuniga qancha oqsil kerak?"}, HTTP_X_REQUESTED_WITH="fetch")
+        d = r.json()
+        self.assertTrue(d["ok"] and d["matched"])
+        self.assertIn("1,6-2,2", d["answer"])
         self.assertEqual(list(AIMessage.objects.values_list("role", flat=True)), ["user", "assistant"])
-        with patcher:  # the next question carries the earlier turns
-            self.c.post("/ai/ask/", {"q": "Yana?"}, HTTP_X_REQUESTED_WITH="fetch")
-        self.assertEqual([m["role"] for m in create.call_args.kwargs["messages"]], ["user", "assistant", "user"])
+        self.assertEqual(self.c.post("/ai/ask/", {"q": "  "}, HTTP_X_REQUESTED_WITH="fetch").status_code, 400)
 
-    def test_daily_limit_refusal_and_no_key(self):
-        patcher, _ = self.fake("ok")
-        with patcher:
-            for _ in range(3):
-                self.c.post("/ai/ask/", {"q": "savol"}, HTTP_X_REQUESTED_WITH="fetch")
-            r = self.c.post("/ai/ask/", {"q": "savol"}, HTTP_X_REQUESTED_WITH="fetch")
-        self.assertEqual(r.status_code, 400)
-        cache.clear()
-        patcher, _ = self.fake("", stop="refusal")
-        with patcher:
-            r = self.c.post("/ai/ask/", {"q": "savol"}, HTTP_X_REQUESTED_WITH="fetch")
-        self.assertEqual(r.status_code, 400)
-        with mock.patch.dict("os.environ", {"ANTHROPIC_API_KEY": ""}):
-            self.assertFalse(ai.enabled())
-            r = self.c.post("/ai/ask/", {"q": "savol"}, HTTP_X_REQUESTED_WITH="fetch")
-        self.assertEqual(r.status_code, 400)
+    def test_guest_can_ask_but_nothing_is_stored(self):
+        r = Client().post("/ai/ask/", {"q": "squat qanday qilinadi"}, HTTP_X_REQUESTED_WITH="fetch")
+        self.assertTrue(r.json()["matched"])
+        self.assertEqual(AIMessage.objects.count(), 0)
 
     def test_plan_is_saved_as_current_plan(self):
-        plan = {"title": "Kuchli start", "notes": "Har hafta og'irlikni oshiring.", "exercises": [
-            {"weekday": 0, "name": "O'tirib turish (Squat)", "sets": 3, "reps": "8-10", "note": "Orqa tekis"},
-            {"weekday": 2, "name": "Tortilish (Pull-up)", "sets": 99, "reps": "max", "note": ""},
-            {"weekday": 9, "name": "Noto'g'ri kun", "sets": 3, "reps": "10", "note": ""}]}
-        patcher, create = self.fake(json.dumps(plan))
-        with patcher:
-            r = self.c.post("/ai/plan/", {"level": "beginner", "days": "3", "minutes": "60"})
+        r = self.c.post("/ai/plan/", {"goal": "muscle", "level": "beginner", "days": "3", "equipment": "gym"})
         self.assertEqual(r["Location"], "/workouts/")
-        self.assertEqual(create.call_args.kwargs["output_config"]["format"]["type"], "json_schema")
         p = WorkoutPlan.objects.get(user=self.u, active=True)
-        self.assertEqual(p.title, "✦ Kuchli start")
-        self.assertEqual([(e.weekday, e.sets) for e in p.exercises.all()], [(0, 3), (2, 10)])  # bad day dropped, sets capped
+        self.assertTrue(p.title.startswith("✦"))
+        self.assertEqual(sorted({e.weekday for e in p.exercises.all()}), [0, 2, 4])
 
     def test_trainer_plan_is_never_replaced(self):
         from .models import Trainer
         WorkoutPlan.objects.create(user=self.u, trainer=Trainer.objects.first(), title="Murabbiy rejasi", active=True)
-        patcher, create = self.fake("{}")
-        with patcher:
-            self.c.post("/ai/plan/", {"level": "beginner", "days": "3", "minutes": "60"})
-        create.assert_not_called()
+        self.c.post("/ai/plan/", {"goal": "muscle", "level": "beginner", "days": "3", "equipment": "gym"})
         self.assertEqual(WorkoutPlan.objects.get(user=self.u, active=True).title, "Murabbiy rejasi")
 
 

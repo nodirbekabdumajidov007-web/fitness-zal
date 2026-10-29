@@ -26,7 +26,7 @@ class Base(TestCase):
         self.m = User.objects.create_user(phone="+998901112233", password=PW, first_name="Aziz", last_name="Karimov")
         self.m2 = User.objects.create_user(phone="+998935550011", password=PW, first_name="Malika", last_name="S")
         self.staff = Client()
-        self.staff.post("/login/", {"phone": "908775505", "password": "AdminPass1.admin"})
+        self.staff.post("/login/", {"login": "admin1", "password": "AdminPass1.admin"})
         self.member = Client()
         self.member.post("/login/", {"phone": "901112233", "password": PW})
         gs = GymSettings.load()

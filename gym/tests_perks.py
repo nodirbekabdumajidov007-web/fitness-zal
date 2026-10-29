@@ -42,7 +42,7 @@ class Base(TestCase):
 
     def staff(self):
         c = Client()
-        c.post("/login/", {"phone": "908775505", "password": "AdminPass1.admin"})
+        c.post("/login/", {"login": "admin1", "password": "AdminPass1.admin"})
         return c
 
 
@@ -61,7 +61,7 @@ class ImageTests(Base):
     def test_uploaded_picture_is_served_safely_and_shown(self):
         p = Product.objects.get(name="Suv 0.5 l")
         self.assertEqual(p.image_src, "")
-        self.assertContains(Client().get("/shop/"), "img/products/bottle")  # drawn illustration until a photo exists
+        self.assertContains(Client().get("/shop/"), "pp-ph")  # line-icon placeholder until a photo exists
         p.image.save("water.png", SimpleUploadedFile("water.png", PNG), save=True)
         r = Client().get(p.image_src)
         self.assertEqual((r.status_code, r["Content-Type"], r["X-Content-Type-Options"]), (200, "image/png", "nosniff"))
@@ -78,7 +78,7 @@ class ImageTests(Base):
         p.save()
         page = Client().get("/shop/").content.decode()
         self.assertIn('src="https://example.com/water.jpg"', page)
-        self.assertIn('referrerpolicy="no-referrer" data-fallback="/static/img/products/bottle.svg"', page)  # no referrer, and a drawing if the link breaks
+        self.assertIn('data-ph referrerpolicy="no-referrer"', page)  # no referrer; the placeholder icon stays under it if the link breaks
         p.image.save("w.png", SimpleUploadedFile("w.png", PNG), save=True)
         self.assertTrue(p.image_src.startswith(f"/img/product/{p.pk}/"))  # an uploaded file wins over the link
         for bad in ("http://example.com/a.jpg", "javascript:alert(1)"):

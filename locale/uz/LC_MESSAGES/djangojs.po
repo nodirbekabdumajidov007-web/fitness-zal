@@ -1,0 +1,153 @@
+# Uzbek strings Django's admin JavaScript (date picker, two-box selector) leaves untranslated. Compile with: python manage.py build_locale
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: uz\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Choose all %s"
+msgstr "Hammasini tanlash"
+
+msgid "Choose selected %s"
+msgstr "Belgilanganlarni tanlash"
+
+msgid "Remove selected %s"
+msgstr "Belgilanganlarni olib tashlash"
+
+msgid "Remove all %s"
+msgstr "Hammasini olib tashlash"
+
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "Tanlanganlar ro'yxatini saralash uchun shu yerga yozing."
+
+msgid "(click to clear)"
+msgstr "(tozalash uchun bosing)"
+
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s ta tanlangan variant ko'rinmayapti"
+
+msgid "Sunday"
+msgstr "Yakshanba"
+
+msgid "Monday"
+msgstr "Dushanba"
+
+msgid "Tuesday"
+msgstr "Seshanba"
+
+msgid "Wednesday"
+msgstr "Chorshanba"
+
+msgid "Thursday"
+msgstr "Payshanba"
+
+msgid "Friday"
+msgstr "Juma"
+
+msgid "Saturday"
+msgstr "Shanba"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Yan"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Fev"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Mar"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Apr"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "May"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Iyn"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Iyl"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Avg"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Sen"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Okt"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Noy"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Dek"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "Yak"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "Dush"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "Sesh"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "Chor"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "Pay"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "Jum"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "Shan"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "Y"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "D"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "S"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "C"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "P"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "J"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "S"

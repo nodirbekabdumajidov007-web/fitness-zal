@@ -73,21 +73,30 @@ class CaloriesTests(TestCase):
         self.assertEqual(how, "profile")
         self.assertTrue(1200 <= t < 3000)
 
-    def test_ai_button_hidden_without_key(self):
-        import os
-        os.environ.pop("ANTHROPIC_API_KEY", None)
-        r = self.client.get(reverse("calories"))
-        self.assertNotContains(r, 'id="calAi"')
-        r = self.client.post(reverse("calories_ai"), {"text": "2 ta somsa"}, headers={"X-Requested-With": "fetch"})
-        self.assertEqual(r.status_code, 400)
+    def test_text_parse_preview_and_fallback_save(self):
+        r = self.client.post(reverse("calories_parse"), {"text": "2 ta somsa va choy"}, headers={"X-Requested-With": "fetch"})
+        d = r.json()
+        self.assertTrue(d["ok"])
+        self.assertEqual([i["grams"] for i in d["items"]], [240, 200])
+        self.assertEqual(FoodEntry.objects.count(), 0)  # the preview saves nothing
+        self.client.post(reverse("calories_parse"), {"text": "200 g osh", "meal": "lunch"})
+        e = FoodEntry.objects.get()
+        self.assertEqual((e.grams, e.meal, e.kcal), (200, "lunch", Decimal("400.0")))
+        r = self.client.post(reverse("calories_parse"), {"text": "xyz"}, headers={"X-Requested-With": "fetch"})
+        self.assertFalse(r.json()["ok"])
 
-    def test_ai_estimate_saved(self):
-        from unittest import mock
-        fake = '{"items":[{"name":"Somsa","grams":240,"kcal":700,"protein":22,"fat":40,"carbs":60}]}'
-        with mock.patch("gym.ai.enabled", return_value=True), mock.patch("gym.ai._call", return_value=fake):
-            r = self.client.post(reverse("calories_ai"), {"text": "2 ta somsa", "meal": "lunch"}, headers={"X-Requested-With": "fetch"})
-        self.assertEqual(r.json(), {"ok": True, "n": 1})
-        self.assertEqual(FoodEntry.objects.get().name, "Somsa")
+    def test_parse_text_variants(self):
+        g = lambda t: [(i["name"].split()[0], i["grams"]) for i in calories.parse_text(t)]
+        self.assertEqual(g("3 tuxum"), [("Tuxum", 165)])
+        self.assertEqual(g("osh 300 gramm"), [("Osh", 300)])
+        self.assertEqual(g("1.5 kg tarvuz"), [("Tarvuz", 1500)])
+        self.assertEqual(g("2 самсы"), [("Somsa", 240)])
+        self.assertEqual(g("nothing here"), [])
+
+    def test_no_ai_leftovers_on_page(self):
+        r = self.client.get(reverse("calories"))
+        self.assertContains(r, 'id="calAi"')
+        self.assertNotContains(r, "calories/ai")
 
 
 class MiscUiTests(TestCase):

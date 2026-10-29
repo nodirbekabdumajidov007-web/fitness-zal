@@ -1,0 +1,29 @@
+{% load gym_tags %}{% voice_config as vcfg %}
+{{ vcfg|json_script:"voice-i18n" }}
+<button type="button" class="vmic" id="vmic" aria-label="{% t 'vc_open' %}" title="{% t 'vc_title' %}" aria-haspopup="dialog" aria-expanded="false" aria-controls="vpanel">{% icon 'mic' %}</button>
+<section class="vpanel" id="vpanel" role="dialog" aria-labelledby="vtitle" hidden>
+  {% csrf_token %}
+  <header class="vp-head">
+    <h2 id="vtitle">{% icon 'mic' %}{% t 'vc_title' %}</h2>
+    <button type="button" class="vp-ib" id="vspk" aria-pressed="true" aria-label="{% t 'vc_speaker_on' %}" title="{% t 'vc_speaker_on' %}">{% icon 'volume' 'on' %}{% icon 'volume-off' 'off' %}</button>
+    <button type="button" class="vp-ib" id="vclose" aria-label="{% t 'vc_close' %}" title="{% t 'vc_close' %}">{% icon 'x' %}</button>
+  </header>
+  <div class="vp-body">
+    <button type="button" class="vp-big" id="vbig" aria-label="{% t 'vc_start' %}">{% icon 'mic' %}</button>
+    <p class="vp-state" id="vstate">{% t 'vc_idle' %}</p>
+    <p class="vp-heard" id="vheard" aria-live="off"></p>
+    <div class="vp-answer" id="vanswer" role="status" aria-live="polite" aria-atomic="true" hidden></div>
+    <p class="vp-warn" id="vwarn" hidden>{% t 'vc_unsupported' %}</p>
+    <form class="vp-form" id="vform" autocomplete="off">
+      <input type="text" id="vtext" maxlength="300" placeholder="{% t 'vc_ph' %}" aria-label="{% t 'vc_ph' %}" enterkeyhint="send">
+      <button type="submit" class="vp-send" aria-label="{% t 'vc_send' %}" title="{% t 'vc_send' %}">{% icon 'send' %}</button>
+    </form>
+    <div class="vp-chips" role="group" aria-label="{% t 'vc_examples' %}">
+      <button type="button" data-vchip>{% t 'vc_ex1' %}</button>
+      <button type="button" data-vchip>{% t 'vc_ex2' %}</button>
+      <button type="button" data-vchip>{% t 'vc_ex3' %}</button>
+      <button type="button" data-vchip>{% t 'vc_ex4' %}</button>
+    </div>
+    <p class="vp-note">{% t 'vc_privacy' %}</p>
+  </div>
+</section>

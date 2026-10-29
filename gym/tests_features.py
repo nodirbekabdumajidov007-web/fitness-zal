@@ -36,7 +36,7 @@ class Base(TestCase):
 
     def staff(self):
         c = Client()
-        c.post("/login/", {"phone": "908775505", "password": "AdminPass1.admin"})
+        c.post("/login/", {"login": "admin1", "password": "AdminPass1.admin"})
         return c
 
     def give_membership(self, user, days=30):

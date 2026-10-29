@@ -1,11 +1,11 @@
-{% extends "admin/base_site.html" %}{% load gym_tags %}
+{% extends "admin/base_site.html" %}{% load gym_tags fz_admin %}
 {% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url 'admin:index' %}">Bosh sahifa</a> › Jadval</div>{% endblock %}
 {% block content %}
 <div class="fz-wrap">
   <section class="fz-hero fz-hero-slim">
     <div><span class="fz-eyebrow">{{ monday|date:"d.m" }} – {{ sunday|date:"d.m.Y" }}</span><h2>Haftalik jadval</h2>
       <p>Shu haftada jami <b>{{ total }}</b> ta bron</p>
-      <div class="fz-actions"><a href="?w={{ shift|add:'-1' }}">← Oldingi hafta</a>{% if shift %}<a class="red" href="?w=0">Shu hafta</a>{% endif %}<a href="?w={{ shift|add:'1' }}">Keyingi hafta →</a><a href="{% url 'admin:gym_gymclass_add' %}">＋ Mashg'ulot</a></div></div>
+      <div class="fz-actions"><a href="?w={{ shift|add:'-1' }}">← Oldingi hafta</a>{% if shift %}<a class="red" href="?w=0">Shu hafta</a>{% endif %}<a href="?w={{ shift|add:'1' }}">Keyingi hafta →</a><a href="{% url 'admin:gym_gymclass_add' %}">{% aicon 'plus' %} Mashg'ulot</a></div></div>
   </section>
   <div class="sched">
     {% for col in cols %}

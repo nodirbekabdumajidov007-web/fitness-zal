@@ -84,7 +84,7 @@ class AdminExtraTests(Base):
     def setUp(self):
         super().setUp()
         self.staff = Client()
-        self.staff.post("/login/", {"phone": "908775505", "password": "AdminPass1.admin"})
+        self.staff.post("/login/", {"login": "admin1", "password": "AdminPass1.admin"})
 
     def test_sidebar_sections(self):
         r = self.staff.get("/django-admin/")

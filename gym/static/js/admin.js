@@ -1,5 +1,5 @@
-/* Admin niceties: "/" jumps to the search box, numbers count up, and the dashboard's LIVE numbers refresh every 20 seconds.
-   Everything works without it. */
+/* Admin niceties: sidebar drawer/collapse, user menu, collapsible filters, "/" jumps to the search box, numbers count up,
+   and the dashboard's LIVE numbers refresh every 20 seconds. Everything works without it. */
 document.addEventListener('DOMContentLoaded', function () {
   var q = document.getElementById('fz-q');
   document.addEventListener('keydown', function (e) {
@@ -37,8 +37,46 @@ document.addEventListener('DOMContentLoaded', function () {
     sync();
   }
 
-  var nf = document.getElementById('nav-filter');
-  if (nf) nf.placeholder = "Bo'limni qidirish…";  // Django ships this one only in English
+  // sidebar: a drawer on phones (hamburger + scrim), collapsible to icons on desktop (remembered)
+  var body = document.body, root = document.documentElement;
+  function setDrawer(open) {
+    body.classList.toggle('fz-nav-open', open);
+    document.querySelectorAll('.fz-burger').forEach(function (b) { b.setAttribute('aria-expanded', open ? 'true' : 'false'); });
+  }
+  document.querySelectorAll('[data-fz-toggle]').forEach(function (b) {
+    b.addEventListener('click', function () { setDrawer(!body.classList.contains('fz-nav-open')); });
+  });
+  document.querySelectorAll('.fz-nav-a').forEach(function (a) { a.addEventListener('click', function () { setDrawer(false); }); });
+  var col = document.querySelector('[data-fz-collapse]');
+  if (col) col.addEventListener('click', function () {
+    var on = root.classList.toggle('fz-collapsed');
+    try { localStorage.setItem('fz-side', on ? '0' : '1'); } catch (e) {}
+  });
+  var cur = document.querySelector('.fz-nav-a.on');
+  if (cur && cur.scrollIntoView) { var nav = cur.closest('.fz-nav'); if (nav && (cur.offsetTop > nav.clientHeight - 60)) nav.scrollTop = cur.offsetTop - nav.clientHeight / 2; }
+
+  // user menu closes on an outside click or Escape
+  var um = document.querySelector('.fz-user');
+  document.addEventListener('click', function (e) { if (um && um.open && !um.contains(e.target)) um.open = false; });
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    if (um && um.open) { um.open = false; um.querySelector('summary').focus(); }
+    if (body.classList.contains('fz-nav-open')) setDrawer(false);
+  });
+
+  // change lists: on small screens the filters panel hides behind a button
+  var flt = document.getElementById('changelist-filter');
+  if (flt) {
+    var tg = document.createElement('button');
+    tg.type = 'button'; tg.className = 'fz-filter-toggle'; tg.setAttribute('aria-expanded', 'false'); tg.setAttribute('aria-controls', 'changelist-filter');
+    tg.textContent = 'Filtrlar';
+    var holder = document.querySelector('#changelist .changelist-form-container');
+    if (holder) holder.insertBefore(tg, holder.firstChild);
+    var active = Array.from(new URLSearchParams(location.search).keys()).some(function (k) { return ['q', 'o', 'p', 'e', '_changelist_filters'].indexOf(k) < 0; });
+    if (active) { flt.classList.add('fz-open'); tg.setAttribute('aria-expanded', 'true'); tg.textContent = 'Filtrlar (faol)'; }
+    tg.addEventListener('click', function () { var o = flt.classList.toggle('fz-open'); tg.setAttribute('aria-expanded', o ? 'true' : 'false'); });
+  }
+
   var calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
   function fmt(el, n) { el.textContent = el.hasAttribute('data-money') ? Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') : Math.round(n); }
   function tween(el, from, to) {

@@ -7,7 +7,15 @@
       tabs.querySelectorAll('[data-tab]').forEach(function (b) { b.setAttribute('aria-selected', b.dataset.tab === name ? 'true' : 'false'); });
       panels.forEach(function (p) { p.hidden = p.dataset.panel !== name; });
       try { localStorage.setItem('fz-desk-tab', name); } catch (e) {}
+      var on = tabs.querySelector('[aria-selected="true"]');
+      if (on && tabs.scrollWidth > tabs.clientWidth) tabs.scrollLeft = on.offsetLeft - (tabs.clientWidth - on.offsetWidth) / 2;
     }
+    document.querySelectorAll('[data-goto]').forEach(function (k) {
+      k.addEventListener('click', function () {
+        var t = tabs.querySelector('[data-tab="' + k.dataset.goto + '"]');
+        if (t) { t.click(); tabs.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+      });
+    });
     tabs.addEventListener('click', function (e) { var b = e.target.closest('[data-tab]'); if (b) pick(b.dataset.tab); });
     var saved = null;
     try { saved = localStorage.getItem('fz-desk-tab'); } catch (e) {}

@@ -8,6 +8,7 @@ from gym import seed_lessons
 from gym.models import (Announcement, Category, GymClass, GymSettings, Lesson, Plan, Product, PromoCode, Trainer, User, WorkoutType)
 
 ADMIN_PHONE = "+998908775505"
+ADMIN_USERNAME = "admin1"
 
 
 def admin_password_from_env():
@@ -64,14 +65,14 @@ class Command(BaseCommand):
                 admin.is_active = True
                 admin.save(update_fields=["password", "is_active"])
                 self.stdout.write("=" * 60)
-                self.stdout.write(f" ADMIN paroli FZ_ADMIN_PASSWORD ga almashtirildi. Telefon: {admin.phone}")
+                self.stdout.write(f" ADMIN paroli FZ_ADMIN_PASSWORD ga almashtirildi. Login: {admin.username}")
                 self.stdout.write(" Kirgach Render'dan FZ_ADMIN_RESET ni o'chiring.")
                 self.stdout.write("=" * 60)
         if not User.objects.filter(is_superuser=True).exists():
             pw = admin_password_from_env() or secrets.token_urlsafe(9)
-            User.objects.create_superuser("admin", pw, phone=ADMIN_PHONE, first_name="Admin", last_name="Fitnes Zal")
+            User.objects.create_superuser(ADMIN_USERNAME, pw, phone=ADMIN_PHONE, first_name="Admin", last_name="Fitnes Zal")
             self.stdout.write("=" * 60)
-            self.stdout.write(f" ADMIN yaratildi. Login: admin  (yoki telefon: {ADMIN_PHONE})")
+            self.stdout.write(f" ADMIN yaratildi. Login: {ADMIN_USERNAME}  (telefon profilda: {ADMIN_PHONE})")
             self.stdout.write(f" Parol: {pw}   (admin panel uchun parol oxiriga .admin qo'shing)")
             self.stdout.write(" Bu parol faqat bir marta ko'rsatiladi. Kirgach o'zgartiring.")
             self.stdout.write("=" * 60)

@@ -1,6 +1,6 @@
 {% extends "admin/change_form.html" %}
 {% block object-tools-items %}
-  {% if original %}<li><a href="{% url 'admin:member' original.pk %}" class="fz-tool-red">A'zo kartochkasi →</a></li>{% endif %}
+  {% if original %}<li><a href="{% url 'admin:member' original.pk %}" class="fz-tool-red">A'zo kartochkasi</a></li>{% endif %}
   {{ block.super }}
 {% endblock %}
 {% block form_top %}
@@ -11,7 +11,7 @@
     <div>
       <span class="fz-eyebrow">{{ original.member_code }} · a'zo {{ original.created|date:"d.m.Y" }} dan</span>
       <h2>{{ original.first_name }} {{ original.last_name }}{% if not original.is_active %} <span class="fz-pill red">Bloklangan</span>{% endif %}{% if original.is_superuser %} <span class="fz-pill gold">Bosh admin</span>{% elif original.is_staff %} <span class="fz-pill">Xodim</span>{% endif %}</h2>
-      <p>{% if original.phone %}{{ original.phone }}{% if original.phone_verified %} ✓{% endif %}{% endif %}{% if original.email %} · {{ original.email }}{% endif %}</p>
+      <p>{% if original.phone %}{{ original.phone }}{% if original.phone_verified %} <span class="fz-pill green">tasdiqlangan</span>{% endif %}{% endif %}{% if original.email %} · {{ original.email }}{% endif %}</p>
     </div>
   </div>
 </div>

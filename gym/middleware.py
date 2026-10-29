@@ -53,6 +53,7 @@ class CspMiddleware:
 
     def __call__(self, request):
         response = self.get_response(request)
+        response.headers.setdefault("Permissions-Policy", "microphone=(self)")  # the voice assistant listens via the browser's speech service
         if not request.path.startswith("/django-admin/"):  # the built-in admin uses inline scripts
             host = request.get_host()  # live chat may open a socket back to this same host only
             response.headers.setdefault("Content-Security-Policy", CSP.replace("connect-src 'self'", f"connect-src 'self' ws://{host} wss://{host}"))

@@ -1,4 +1,4 @@
-{% extends "admin/index.html" %}{% load gym_tags %}
+{% extends "admin/index.html" %}{% load gym_tags fz_admin %}
 {% block coltype %}colM{% endblock %}
 {% block sidebar %}{% endblock %}{# the live feed replaces Django's "recent actions" column, so the bento grid gets the full width #}
 {% block content %}
@@ -7,7 +7,7 @@
     <div>
       <span class="fz-eyebrow">{% now "l, d.m.Y" %}</span>
       <h2>{{ greeting }}, {{ user.first_name|default:"admin" }}!</h2>
-      <div class="fz-actions"><a class="red" href="/staff/">Qabulxona</a><a href="/staff/scan/">QR skaner</a><a href="{% url 'admin:broadcast' %}">E'lon</a><a href="{% url 'admin:message' %}">✉ Shaxsiy xabar</a><a href="{% url 'admin:reports' %}">Hisobotlar</a><a href="/">Sayt</a></div>
+      <nav class="fz-qa" aria-label="Tezkor amallar"><a class="red" href="/staff/">{% aicon 'desk' %}Qabulxona</a><a href="/staff/scan/">{% aicon 'scan' %}QR skaner</a><a href="{% url 'admin:cash' %}">{% aicon 'wallet' %}Kassa</a><a href="{% url 'admin:broadcast' %}">{% aicon 'megaphone' %}E'lon</a><a href="{% url 'admin:message' %}">{% aicon 'mail' %}Shaxsiy xabar</a><a href="{% url 'admin:reports' %}">{% aicon 'chart' %}Hisobotlar</a><a href="{% url 'admin:schedule' %}">{% aicon 'calendar' %}Jadval</a></nav>
     </div>
     <span class="fz-live" title="Har 20 soniyada yangilanadi"><i></i>LIVE <time data-live="time">{% now "H:i:s" %}</time></span>
   </section>
@@ -37,7 +37,7 @@
     <section class="nb b-goal">
       <header><small>Oylik maqsad</small></header>
       <div class="fz-ring big nb-ring" style="--p:{{ goal_pct }}"><span><b>{{ goal_pct }}%</b><small>bajarildi</small></span></div>
-      <p class="nb-sub center">{{ revenue_month|short_money }} / {{ goal|short_money }}<br>{% if goal_left %}yana <b>{{ goal_left|short_money }}</b>{% else %}🎉 bajarildi{% endif %}</p>
+      <p class="nb-sub center">{{ revenue_month|short_money }} / {{ goal|short_money }}<br>{% if goal_left %}yana <b>{{ goal_left|short_money }}</b>{% else %}bajarildi{% endif %}</p>
     </section>
 
     <!-- gym pulse: visits per hour today as an animated equalizer -->
@@ -49,7 +49,7 @@
     </section>
 
     <section class="nb b-members">
-      <header><small>A'zolar</small><a class="nb-add" href="/staff/" title="Qabulxonada abonement sotish">＋</a></header>
+      <header><small>A'zolar</small><a class="nb-add" href="/staff/" title="Qabulxonada abonement sotish" aria-label="Qabulxonada abonement sotish">{% aicon 'plus' %}</a></header>
       <b class="nb-big" data-count="{{ members }}">{{ members }}</b>
       <div class="mini-bars">{% for s in signups %}<i style="--h:{{ s.h }}" title="{{ s.label }}-kun: {{ s.v }} ta yangi"></i>{% endfor %}</div>
       <p class="nb-sub">7 kunda <b>+{{ signups_week }}</b> yangi · faol abonement: <b>{{ active_members }}</b></p>
@@ -64,29 +64,30 @@
     </nav>
 
     <section class="nb b-feed"><header><small>Jonli lenta</small><span class="fz-muted">zalda va saytda</span></header>
-      <ul class="fz-feed">{% for f in feed %}<li><i class="{{ f.cls }}">{{ f.icon }}</i><a href="{{ f.url }}">{{ f.text }}</a><time title="{{ f.ts|date:'d.m.Y H:i' }}">{{ f.ts|timesince }}</time></li>{% empty %}<li class="fz-empty">Hali hech narsa yo'q</li>{% endfor %}</ul></section>
+      <ul class="fz-feed">{% for f in feed %}<li><i class="{{ f.cls }}">{% aicon f.icon %}</i><a href="{{ f.url }}">{{ f.text }}</a><time title="{{ f.ts|date:'d.m.Y H:i' }}">{{ f.ts|timesince }}</time></li>{% empty %}<li class="fz-empty">Hali hech narsa yo'q</li>{% endfor %}</ul></section>
 
     <section class="nb b-classes"><header><small>Bugungi guruh mashg'ulotlari</small></header>
       <div class="fz-hbars">{% for x in today_classes %}<div class="fz-hrow{% if x.w >= 90 %} gold{% endif %}"><span>{{ x.c.start_time|time:"H:i" }} · <b>{{ x.c.name }}</b>{% if x.c.trainer %} <span class="fz-muted">· {{ x.c.trainer.name }}</span>{% endif %}</span><b>{{ x.n }}/{{ x.c.capacity }}</b><span class="track"><i style="width:{{ x.w }}%"></i></span></div>{% empty %}<p class="fz-empty">Bugun mashg'ulot yo'q</p>{% endfor %}</div></section>
 
     <section class="nb b-setup"><header><small>Sozlash holati · {{ setup_done }}/{{ setup|length }}</small></header>
-      <ul class="fz-check">{% for s in setup %}<li class="{% if s.ok %}ok{% endif %}"><i>{% if s.ok %}✓{% else %}!{% endif %}</i><span><b>{% if s.url %}<a href="{{ s.url }}">{{ s.name }}</a>{% else %}{{ s.name }}{% endif %}</b>{% if not s.ok %}<small>{{ s.hint }}</small>{% endif %}</span></li>{% endfor %}</ul></section>
+      <ul class="fz-check">{% for s in setup %}<li class="{% if s.ok %}ok{% endif %}"><i>{% if s.ok %}{% aicon 'tick' %}{% else %}{% aicon 'alert' %}{% endif %}</i><span><b>{% if s.url %}<a href="{{ s.url }}">{{ s.name }}</a>{% else %}{{ s.name }}{% endif %}</b>{% if not s.ok %}<small>{{ s.hint }}</small>{% endif %}</span></li>{% endfor %}</ul></section>
 
     <section class="nb b-coaches"><header><small>Murabbiylar reytingi · shu oy</small><a class="fz-muted" href="{% url 'admin:gym_trainer_changelist' %}">Boshqarish →</a></header>
-      <div class="fz-hbars">{% for c in coaches %}<div class="fz-hrow{% if forloop.first and c.score %} gold{% endif %}"><span>{% if forloop.first and c.score %}🏆 {% endif %}<b>{{ c.t.name }}</b> <span class="fz-muted">· PT {{ c.pt }} · bron {{ c.bk }}</span>{% if not c.linked %} <a class="fz-pill" href="{% url 'admin:gym_trainer_change' c.t.pk %}" title="Murabbiy paneliga kira olishi uchun akkauntini bog'lang">panel yo'q</a>{% endif %}</span><b>{{ c.score }}</b><span class="track"><i style="width:{{ c.w }}%"></i></span></div>{% empty %}<p class="fz-empty">Murabbiylar yo'q</p>{% endfor %}</div></section>
+      <div class="fz-hbars">{% for c in coaches %}<div class="fz-hrow{% if forloop.first and c.score %} gold{% endif %}"><span>{% if forloop.first and c.score %}{% aicon 'trophy' 'inl' %} {% endif %}<b>{{ c.t.name }}</b> <span class="fz-muted">· PT {{ c.pt }} · bron {{ c.bk }}</span>{% if not c.linked %} <a class="fz-pill" href="{% url 'admin:gym_trainer_change' c.t.pk %}" title="Murabbiy paneliga kira olishi uchun akkauntini bog'lang">panel yo'q</a>{% endif %}</span><b>{{ c.score }}</b><span class="track"><i style="width:{{ c.w }}%"></i></span></div>{% empty %}<p class="fz-empty">Murabbiylar yo'q</p>{% endfor %}</div></section>
 
-    <section class="nb b-exp"><header><small>7 kunda tugaydigan abonementlar</small>{% if expiring %}<a class="fz-muted" href="{% url 'admin:message' %}?aud=expiring">✉ Hammasiga yozish</a>{% endif %}</header>
-      <ul class="fz-list">{% for u in expiring %}<li><a href="{% url 'admin:member' u.pk %}">{{ u.first_name }} {{ u.last_name }}</a><span><span class="fz-pill gold">{{ u.until|date:"d.m" }}</span> <a class="fz-pill" href="{% url 'admin:message' %}?ids={{ u.pk }}" title="Shaxsiy xabar">✉</a></span></li>{% empty %}<li class="fz-empty">Yo'q</li>{% endfor %}</ul></section>
+    <section class="nb b-exp"><header><small>7 kunda tugaydigan abonementlar</small>{% if expiring %}<a class="fz-muted" href="{% url 'admin:message' %}?aud=expiring">Hammasiga yozish</a>{% endif %}</header>
+      <ul class="fz-list">{% for u in expiring %}<li><a href="{% url 'admin:member' u.pk %}">{{ u.first_name }} {{ u.last_name }}</a><span><span class="fz-pill gold">{{ u.until|date:"d.m" }}</span> <a class="fz-pill" href="{% url 'admin:message' %}?ids={{ u.pk }}" title="Shaxsiy xabar" aria-label="Shaxsiy xabar">{% aicon 'mail' %}</a></span></li>{% empty %}<li class="fz-empty">Yo'q</li>{% endfor %}</ul></section>
 
-    <section class="nb b-bday"><header><small>🎂 Bugun tug'ilgan kun</small>{% if birthdays %}<a class="fz-muted" href="{% url 'admin:message' %}?ids={{ birthday_ids }}">✉ Tabriklash</a>{% endif %}</header>
+    <section class="nb b-bday"><header><small>Bugun tug'ilgan kun</small>{% if birthdays %}<a class="fz-muted" href="{% url 'admin:message' %}?ids={{ birthday_ids }}">Tabriklash</a>{% endif %}</header>
       <ul class="fz-list">{% for u in birthdays %}<li><a href="{% url 'admin:member' u.pk %}">{{ u.first_name }} {{ u.last_name }}</a><span class="fz-pill gold">{{ u.turns }} yosh</span></li>{% empty %}<li class="fz-empty">Bugun yo'q</li>{% endfor %}</ul></section>
 
-    <section class="nb b-away"><header><small>Abonementi bor, 14 kundan beri kelmagan</small>{% if away %}<a class="fz-muted" href="{% url 'admin:message' %}?ids={{ away_ids }}">✉ Sog'indik deb yozish</a>{% endif %}</header>
-      <ul class="fz-list">{% for u in away %}<li><a href="{% url 'admin:member' u.pk %}">{{ u.first_name }} {{ u.last_name }}</a><span class="fz-pill">{% if u.last %}{{ u.last|timesince }} oldin{% else %}hech kelmagan{% endif %}</span></li>{% empty %}<li class="fz-empty">Hamma kelib turibdi 💪</li>{% endfor %}</ul></section>
+    <section class="nb b-away"><header><small>Abonementi bor, 14 kundan beri kelmagan</small>{% if away %}<a class="fz-muted" href="{% url 'admin:message' %}?ids={{ away_ids }}">Sog'indik deb yozish</a>{% endif %}</header>
+      <ul class="fz-list">{% for u in away %}<li><a href="{% url 'admin:member' u.pk %}">{{ u.first_name }} {{ u.last_name }}</a><span class="fz-pill">{% if u.last %}{{ u.last|timesince }} oldin{% else %}hech kelmagan{% endif %}</span></li>{% empty %}<li class="fz-empty">Hamma kelib turibdi</li>{% endfor %}</ul></section>
 
     <section class="nb b-stock"><header><small>Kam qolgan mahsulotlar</small><a class="fz-muted" href="{% url 'admin:gym_product_changelist' %}?zaxira=low">Omborga →</a></header>
       <ul class="fz-list">{% for r in low_stock %}<li><a href="{% url 'admin:gym_product_change' r.p.pk %}">{{ r.p.name }}</a><span><span class="fz-pill red">{{ r.p.stock }} ta</span> <span class="fz-pill green" title="2 haftalik savdoga yetadigan miqdor">+{{ r.need }} kerak</span></span></li>{% empty %}<li class="fz-empty">Hammasi yetarli</li>{% endfor %}</ul></section>
   </div>
 </div>
+<h2 class="fz-sect">Barcha bo'limlar</h2>
 {{ block.super }}
 {% endblock %}

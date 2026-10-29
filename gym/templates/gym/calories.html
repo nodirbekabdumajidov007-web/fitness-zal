@@ -59,15 +59,14 @@
       </details>
       <button class="btn primary" type="submit">{% t 'cal_save' %}</button>
     </form>
-    {% if ai_on %}
-    <form method="post" action="{% url 'calories_ai' %}" class="cal-ai" id="calAi">
+    <form method="post" action="{% url 'calories_parse' %}" class="cal-ai" id="calAi" data-add="{% url 'calories_add' %}" data-found="{% t 'cal_txt_found' %}" data-addall="{% t 'cal_txt_add' %}">
       {% csrf_token %}<input type="hidden" name="d" value="{{ day|date:'Y-m-d' }}"><input type="hidden" name="meal" id="calAiMeal" value="{{ default_meal }}">
-      <label for="calAiText">✦ {% t 'cal_ai_title' %}<input id="calAiText" name="text" maxlength="300" placeholder="{% t 'cal_ai_ph' %}" required></label>
-      <button class="btn" type="submit" data-busy="{% t 'cal_ai_busy' %}">{% t 'cal_ai_btn' %}</button>
-      <small class="muted">{% t 'cal_ai_left' n=ai_left %}</small>
+      <label for="calAiText">{% t 'cal_txt_title' %}<input id="calAiText" name="text" maxlength="300" placeholder="{% t 'cal_txt_ph' %}" required></label>
+      <button class="btn" type="submit" data-busy="{% t 'cal_txt_busy' %}">{% t 'cal_txt_btn' %}</button>
+      <small class="muted">{% t 'cal_txt_hint' %}</small>
       <div class="cal-err" id="calAiErr" role="alert" hidden></div>
+      <div class="cal-found" id="calAiFound" hidden></div>
     </form>
-    {% endif %}
   </section>
 
   <h3 class="cal-h2">{% t 'cal_meals' %}</h3>

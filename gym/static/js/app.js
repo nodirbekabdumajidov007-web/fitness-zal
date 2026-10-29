@@ -10,6 +10,13 @@ document.addEventListener('DOMContentLoaded', function () {
     if (img.complete && img.naturalWidth === 0 && img.currentSrc) swap();
   });
 
+  // product photo that fails to load: drop it so the line-icon placeholder underneath shows
+  document.querySelectorAll('img[data-ph]').forEach(function (img) {
+    function drop() { img.remove(); }
+    img.addEventListener('error', drop);
+    if (img.complete && img.naturalWidth === 0 && img.getAttribute('loading') !== 'lazy') drop();
+  });
+
   // theme toggle (auto -> follows the OS until the visitor picks one)
   // day / night switch: the look follows the theme in CSS; here we only flip it, remember it and keep aria-checked right
   var tb = document.getElementById('theme-btn');

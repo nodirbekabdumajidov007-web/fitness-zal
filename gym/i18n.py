@@ -2,8 +2,8 @@
 
 RAW = """
 brand||Fitnes Zal||Fitnes Zal||Fitnes Zal
-tag||Kuch temirdan boshlanadi||Сила начинается с железа||Strength starts with iron
-tag_sub||Zamonaviy jihozlar, tajribali murabbiylar va qulay abonementlar.||Современное оборудование, опытные тренеры и удобные абонементы.||Modern equipment, experienced trainers and flexible memberships.
+tag||Yangi sen bugundan boshlanadi||Новый ты начинается сегодня||A new you starts today
+tag_sub||Har bir mashg'ulot — kuchliroq, sog'lomroq va o'ziga ishongan sen sari bir qadam.||Каждая тренировка — шаг к более сильному, здоровому и уверенному себе.||Every workout is a step towards a stronger, healthier, more confident you.
 nav_home||Bosh sahifa||Главная||Home
 nav_dash||Kabinet||Кабинет||Dashboard
 nav_plans||Abonementlar||Абонементы||Memberships
@@ -742,18 +742,16 @@ trust_2fa||SMS bilan 2 bosqichli himoya||Двухэтапная защита п�
 trust_attempts||Ko'p xato urinish bloklanadi||Подбор пароля блокируется||Repeated wrong attempts are blocked
 trust_free||Ro'yxatdan o'tish bepul||Регистрация бесплатна||Signing up is free
 last_seen||Oldingi kirish: {when}. Bu siz bo'lmasangiz, parolni almashtiring.||Предыдущий вход: {when}. Если это были не вы, смените пароль.||Previous sign-in: {when}. If that wasn't you, change your password.
-ai_coach||AI murabbiy||AI-тренер||AI coach
-ai_coach_sub||Mashq va ovqatlanish bo'yicha savol bering||Спросите о тренировках и питании||Ask about training and nutrition
-ai_sub||Maqsadingiz, vazningiz va mashq rejangizni biladigan shaxsiy yordamchi. Savol bering yoki haftalik reja tuzdiring.||Личный помощник, который знает вашу цель, вес и план тренировок. Задайте вопрос или составьте недельный план.||A personal assistant that knows your goal, weight and workout plan. Ask a question or get a weekly plan.
-ai_home_title||AI murabbiy doim yoningizda||AI-тренер всегда рядом||An AI coach always at hand
+ai_coach||Murabbiy yordamchi||Помощник-тренер||Coach assistant
+ai_coach_sub||Mashq, ovqatlanish va zal haqida savol bering||Спросите о тренировках, питании и зале||Ask about training, nutrition and the gym
+ai_sub||Zal, abonement, mashq texnikasi va ovqatlanish bo'yicha tezkor javoblar. Kirgan bo'lsangiz, abonementingiz va kaloriyangizni ham aytib beradi. Haftalik mashq rejasini ham tuzadi.||Быстрые ответы о зале, абонементах, технике и питании. Если вы вошли, назовёт срок абонемента и ваши калории. Составит и недельный план тренировок.||Quick answers about the gym, memberships, technique and nutrition. When you are signed in it can tell your membership expiry and calories. It also builds a weekly workout plan.
+ai_home_title||Murabbiy yordamchi doim yoningizda||Помощник-тренер всегда рядом||A coach assistant always at hand
 ai_home_1||Texnika va mashq bo'yicha savollarga javob||Ответы о технике и упражнениях||Answers on technique and exercises
 ai_home_2||Maqsadingizga mos haftalik reja||Недельный план под вашу цель||A weekly plan built for your goal
 ai_home_3||Kun-u tun, o'zbek, rus va ingliz tilida||Круглосуточно, на узбекском, русском и английском||Day and night, in Uzbek, Russian and English
 ai_try||Sinab ko'rish||Попробовать||Try it
-ai_off||AI hali ulanmagan: administrator ANTHROPIC_API_KEY ni sozlashi kerak.||AI ещё не подключён: администратору нужно указать ANTHROPIC_API_KEY.||AI is not connected yet: the admin needs to set ANTHROPIC_API_KEY.
-ai_login||AI murabbiy sizning ma'lumotlaringizga qarab javob beradi, shuning uchun avval kiring.||AI-тренер отвечает с учётом ваших данных, поэтому сначала войдите.||The AI coach answers using your own data, so please sign in first.
-ai_chat_title||AI murabbiy bilan suhbat||Чат с AI-тренером||Chat with the AI coach
-ai_today||bugun||сегодня||today
+ai_login||Reja tuzish va suhbatni saqlash uchun kiring.||Войдите, чтобы составлять план и сохранять переписку.||Sign in to build a plan and keep your conversation.
+ai_chat_title||Yordamchi bilan suhbat||Чат с помощником||Chat with the assistant
 ai_clear||Suhbatni tozalash||Очистить чат||Clear chat
 ai_try_title||Masalan, shunday so'rang:||Например, спросите:||For example, ask:
 ai_q1||Qorin uchun eng yaxshi 5 ta mashq qaysi?||Какие 5 лучших упражнений для пресса?||What are the 5 best ab exercises?
@@ -762,21 +760,14 @@ ai_q3||Skvatni qanday to'g'ri bajaraman?||Как правильно делать
 ai_thinking||O'ylayapman…||Думаю…||Thinking…
 ai_placeholder||Savolingizni yozing… (Enter — yuborish)||Напишите вопрос… (Enter — отправить)||Type your question… (Enter to send)
 ai_send||Yuborish||Отправить||Send
-ai_disclaimer||AI shifokor emas: og'riq yoki kasallikda shifokor va murabbiyga murojaat qiling.||AI не врач: при боли или болезни обратитесь к врачу и тренеру.||The AI is not a doctor: for pain or illness, see a doctor and a trainer.
-ai_plan_title||AI mashq rejasi||AI-план тренировок||AI workout plan
-ai_plan_sub||Darajangiz va vaqtingizni kiriting — AI sizga haftalik reja tuzib, «Mashq rejam» bo'limiga saqlaydi.||Укажите уровень и время — AI составит недельный план и сохранит его в «Мой план».||Enter your level and time — the AI builds a weekly plan and saves it to «My plan».
+ai_disclaimer||Yordamchi shifokor emas: og'riq yoki kasallikda shifokor va murabbiyga murojaat qiling.||Помощник не врач: при боли или болезни обратитесь к врачу и тренеру.||The assistant is not a doctor: for pain or illness, see a doctor and a trainer.
+ai_plan_title||Haftalik mashq rejasi||Недельный план тренировок||Weekly workout plan
+ai_plan_sub||Maqsad, daraja, kunlar va jihozni tanlang: tayyor shablonlardan haftalik reja tuzib, «Mashq rejam» bo'limiga saqlayman.||Выберите цель, уровень, дни и инвентарь: я соберу недельный план из готовых шаблонов и сохраню его в «Мой план».||Pick a goal, level, days and equipment: I build a weekly plan from ready templates and save it to «My plan».
 ai_level||Darajangiz||Ваш уровень||Your level
 ai_days||Haftasiga necha kun||Дней в неделю||Days per week
-ai_minutes||Bir mashg'ulot (daqiqa)||Одна тренировка (мин)||One session (min)
-ai_notes||Qo'shimcha (ixtiyoriy)||Дополнительно (необязательно)||Extra (optional)
-ai_notes_ph||Masalan: tizzam og'riydi, faqat gantel bor, qo'llarga urg'u…||Например: болит колено, только гантели, акцент на руки…||e.g. sore knee, dumbbells only, focus on arms…
 ai_plan_btn||Reja tuzish||Составить план||Build my plan
-ai_plan_busy||Tuzilmoqda… (1 daqiqagacha)||Составляю… (до 1 минуты)||Building… (up to a minute)
-ai_plan_ok||✦ AI rejangiz tayyor! Pastda kunlar bo'yicha mashqlar.||✦ AI-план готов! Ниже упражнения по дням.||✦ Your AI plan is ready! The exercises by day are below.
-ai_limit||Bugungi AI so'rovlar limiti tugadi. Ertaga yana urinib ko'ring.||Дневной лимит запросов к AI исчерпан. Попробуйте завтра.||Today's AI request limit is used up. Try again tomorrow.
-ai_busy||AI hozir band. Bir daqiqadan keyin qayta urinib ko'ring.||AI сейчас занят. Попробуйте через минуту.||The AI is busy right now. Try again in a minute.
+ai_plan_ok||✦ Reja tayyor! Pastda kunlar bo'yicha mashqlar, dam kunlarida mashq yo'q.||✦ План готов! Ниже упражнения по дням, в дни отдыха тренировок нет.||✦ Your plan is ready! The exercises by day are below; rest days have no workout.
 ai_error||AI javob bera olmadi. Qayta urinib ko'ring.||AI не смог ответить. Попробуйте ещё раз.||The AI could not answer. Please try again.
-ai_refused||Bu savolga AI javob bera olmaydi. Boshqacha so'rab ko'ring yoki murabbiyga murojaat qiling.||На этот вопрос AI ответить не может. Переформулируйте или обратитесь к тренеру.||The AI can't answer this. Rephrase it or ask a trainer.
 ai_empty||Savolni yozing||Напишите вопрос||Type a question
 login_field||Login, email yoki telefon||Логин, email или телефон||Username, e-mail or phone
 login_field_ph||masalan: aziz_karimov||например: aziz_karimov||e.g. aziz_karimov
@@ -880,11 +871,6 @@ cal_bad_grams||Gramm 1 dan 5000 gacha bo'lishi kerak||Граммы должны 
 cal_bad_food||Nomi va to'g'ri raqamlarni kiriting||Укажите название и корректные числа||Enter a name and valid numbers
 cal_added||Qo'shildi||Добавлено||Added
 cal_remove||O'chirish||Убрать||Remove
-cal_ai_title||AI bilan aniqlash||Определить с помощью ИИ||Estimate with AI
-cal_ai_ph||Masalan: 2 ta somsa va choy||Например: 2 самсы и чай||For example: 2 samsas and tea
-cal_ai_btn||AI bilan aniqlash||Определить с ИИ||Estimate with AI
-cal_ai_busy||Aniqlanmoqda...||Определяю...||Estimating...
-cal_ai_left||Bugun AI so'rovlari qoldi: {n}||Осталось запросов к ИИ сегодня: {n}||AI requests left today: {n}
 cal_note||Qiymatlar taxminiy. Kasallik yoki maxsus parhez bo'lsa, shifokor bilan maslahatlashing.||Значения примерные. При болезнях и особой диете проконсультируйтесь с врачом.||Values are approximate. For medical conditions or special diets, ask a doctor.
 ann_more||batafsil||подробнее||read more
 ann_less||yopish||свернуть||show less
@@ -905,6 +891,138 @@ nav_g_staff||Xodimlar||Персонал||Staff
 nav_menu||Menyu||Меню||Menu
 nav_collapse||Menyuni yig'ish||Свернуть меню||Collapse menu
 nav_close||Yopish||Закрыть||Close
+vc_title||Ovozli yordamchi||Голосовой помощник||Voice assistant
+vc_open||Ovozli yordamchini ochish||Открыть голосового помощника||Open voice assistant
+vc_close||Yopish||Закрыть||Close
+vc_idle||Mikrofonni bosing va gapiring||Нажмите на микрофон и говорите||Tap the microphone and speak
+vc_listening||Tinglayapman...||Слушаю...||Listening...
+vc_start||Gapirishni boshlash||Начать говорить||Start speaking
+vc_stop||To'xtatish||Остановить||Stop
+vc_speaker_on||Ovozli javob yoqilgan||Озвучивание включено||Spoken answers on
+vc_speaker_off||Ovozli javob o'chirilgan||Озвучивание выключено||Spoken answers off
+vc_unsupported||Bu brauzerda ovozli kiritish ishlamaydi. Savolingizni yozing.||В этом браузере голосовой ввод не работает. Напишите вопрос.||Voice input is not supported in this browser. Type your question.
+vc_ph||Savolingizni yozing...||Напишите вопрос...||Type your question...
+vc_send||Yuborish||Отправить||Send
+vc_privacy||Chrome'da nutq brauzerning nutqni aniqlash xizmatida qayta ishlanadi.||В Chrome речь обрабатывается службой распознавания речи браузера.||In Chrome, speech is processed by the browser's speech service.
+vc_ex1||Abonementlar narxi||Цены абонементов||Membership prices
+vc_ex2||Ish vaqti||Часы работы||Opening hours
+vc_ex3||Do'konni och||Открой магазин||Open the shop
+vc_ex4||Bugun nima yedim — 2 ta somsa||Что я съел сегодня — 2 самсы||What I ate today: 2 samsas
+vc_examples||Misollar||Примеры||Examples
+vc_help||Men sahifalarga o'tkaza olaman (do'kon, abonementlar, kaloriya), zal haqida aytib beraman (ish vaqti, narxlar, telefon, manzil) va ovqatni yozib qo'yaman: "2 ta somsa yedim".||Я могу открывать страницы (магазин, абонементы, калории), рассказывать о зале (часы работы, цены, телефон, адрес) и записывать еду: «съел 2 самсы».||I can open pages (shop, memberships, calories), tell you about the gym (hours, prices, phone, address) and log food: "I ate 2 samsas".
+vc_mic_denied||Mikrofonga ruxsat berilmadi. Brauzer sozlamalaridan ruxsat bering yoki savolni yozing.||Доступ к микрофону запрещён. Разрешите его в настройках браузера или напишите вопрос.||Microphone access was denied. Allow it in the browser settings or type your question.
+vc_no_speech||Hech narsa eshitilmadi. Qayta urinib ko'ring.||Ничего не слышно. Попробуйте ещё раз.||I did not hear anything. Please try again.
+vc_login_cal||Ovqat yozish uchun tizimga kiring||Чтобы записывать еду, войдите в систему||Sign in to log food
+vc_login||Kirish||Войти||Sign in
+vc_going||Ochilmoqda: {page}||Открываю: {page}||Opening: {page}
+vc_state_open||hozir ochiq||сейчас открыто||open now
+vc_state_closed||hozir yopiq||сейчас закрыто||closed now
+vc_hours||Zal har kuni {open} dan {close} gacha ishlaydi, {state}.||Зал работает ежедневно с {open} до {close}, {state}.||The gym is open every day from {open} to {close}, {state}.
+vc_phone||Zal telefoni: {phone}.||Телефон зала: {phone}.||The gym phone number is {phone}.
+vc_address||Manzil: {address}.||Адрес: {address}.||Address: {address}.
+vc_no_address||Manzil hozircha kiritilmagan. Telefon: {phone}.||Адрес пока не указан. Телефон: {phone}.||The address is not set yet. Phone: {phone}.
+vc_social||Instagram: @{instagram}. Telegram: {telegram}.||Instagram: @{instagram}. Telegram: {telegram}.||Instagram: @{instagram}. Telegram: {telegram}.
+vc_crowd_calm||Hozir zal tinch, odam kam.||Сейчас в зале спокойно, людей мало.||The gym is quiet right now.
+vc_crowd_mid||Hozir zalda odam o'rtacha.||Сейчас в зале умеренно людно.||The gym is moderately busy right now.
+vc_crowd_busy||Hozir zal gavjum, odam ko'p.||Сейчас в зале многолюдно.||The gym is busy right now.
+vc_plans||Abonementlar: {list}.||Абонементы: {list}.||Memberships: {list}.
+vc_no_plans||Hozircha abonementlar yo'q.||Пока нет доступных абонементов.||No memberships are available yet.
+vc_added||Qo'shildi: {items}.||Добавлено: {items}.||Added: {items}.
+vc_cal_unknown||Bu ovqatni topa olmadim. Masalan: "2 ta somsa yedim" yoki "200 gramm osh".||Не нашёл такую еду. Например: «съел 2 самсы» или «200 грамм плова».||I could not find that food. For example: "I ate 2 samsas" or "200 grams of pilaf".
+vc_thinking||O'ylayapman...||Думаю...||Thinking...
+vc_error||Xatolik yuz berdi. Keyinroq qayta urinib ko'ring.||Произошла ошибка. Попробуйте позже.||Something went wrong. Please try again later.
+vc_you||Siz||Вы||You
+vc_answer||Javob||Ответ||Answer
+vc_cal_open||Kaloriya sahifasini ochaman, u yerda bugungi ovqatlaringizni ko'rasiz.||Открываю страницу калорий, там видно, что вы съели сегодня.||Opening the calorie page, where you can see what you ate today.
+vc_net||Tarmoq xatosi.||Ошибка сети.||Network error.
+ai_goal||Maqsad||Цель||Goal
+ai_goal_fat||Ozish (yog' yo'qotish)||Похудение (жиросжигание)||Fat loss
+ai_goal_muscle||Mushak o'stirish||Рост мышц||Muscle gain
+ai_goal_strength||Kuch||Сила||Strength
+ai_goal_general||Umumiy fitnes||Общая форма||General fitness
+ai_equip||Jihoz||Инвентарь||Equipment
+ai_equip_gym||Zalda (trenajyor va shtanga)||В зале (тренажёры и штанга)||At the gym (machines and barbell)
+ai_equip_home||Uyda (jihozsiz yoki gantel)||Дома (без инвентаря или гантели)||At home (bodyweight or dumbbells)
+asst_unknown||Bu savolga aniq javob topa olmadim. Quyidagilardan birini so'rab ko'ring yoki murabbiydan so'rang.||Не нашёл точного ответа на этот вопрос. Попробуйте один из вариантов ниже или спросите тренера.||I could not find an exact answer to that. Try one of the questions below or ask a trainer.
+asst_login||Bu ma'lumot sizning hisobingizga tegishli: avval tizimga kiring.||Это информация вашего аккаунта: сначала войдите в систему.||That is information from your own account: please sign in first.
+asst_rate||Juda ko'p savol yuborildi. Bir daqiqadan keyin qayta urinib ko'ring.||Слишком много вопросов. Попробуйте через минуту.||Too many questions. Try again in a minute.
+asst_suggest||Shuni so'rab ko'ring:||Попробуйте спросить:||Try asking:
+cal_txt_title||Matn bilan yozish||Записать текстом||Type it in
+cal_txt_ph||Masalan: 2 ta somsa va choy, 200 g osh, 3 tuxum||Например: 2 самсы и чай, 200 г плова, 3 яйца||For example: 2 samsas and tea, 200 g plov, 3 eggs
+cal_txt_btn||Aniqlash||Распознать||Recognize
+cal_txt_busy||Aniqlanmoqda...||Распознаю...||Recognizing...
+cal_txt_found||Topildi:||Найдено:||Recognized:
+cal_txt_add||Hammasini qo'shish||Добавить всё||Add all
+cal_txt_none||Hech narsa topilmadi. Masalan: «2 ta somsa», «200 g osh», «3 tuxum».||Ничего не найдено. Например: «2 самсы», «200 г плова», «3 яйца».||Nothing recognized. For example: «2 samsas», «200 g plov», «3 eggs».
+cal_txt_hint||Jadvaldagi taomlar taniladi, grammni o'zingiz to'g'rilashingiz mumkin.||Распознаются блюда из таблицы, граммы можно поправить.||Foods from the table are recognized; you can adjust the grams.
+tl_range||{n}: {min}–{max} oralig'ida kiriting||{n}: введите от {min} до {max}||{n}: enter a value from {min} to {max}
+tl_from_profile||Profilingizdagi vazn, bo'y va tug'ilgan kun asosida to'ldirildi.||Заполнено по профилю: вес, рост и дата рождения.||Filled in from your profile: weight, height and birth date.
+act2_1||Kam harakat: ofis, mashg'ulotsiz (×1.2)||Минимум: офис, без тренировок (×1.2)||Sedentary: desk job, no workouts (×1.2)
+act2_2||Yengil: haftasiga 1–3 mashg'ulot (×1.375)||Лёгкая: 1–3 тренировки в неделю (×1.375)||Light: 1–3 workouts a week (×1.375)
+act2_3||O'rtacha: haftasiga 3–5 mashg'ulot (×1.55)||Средняя: 3–5 тренировок в неделю (×1.55)||Moderate: 3–5 workouts a week (×1.55)
+act2_4||Yuqori: haftasiga 6–7 mashg'ulot (×1.725)||Высокая: 6–7 тренировок в неделю (×1.725)||High: 6–7 workouts a week (×1.725)
+act2_5||Juda yuqori: kuniga 2 mashg'ulot yoki og'ir mehnat (×1.9)||Очень высокая: 2 тренировки в день или тяжёлый труд (×1.9)||Very high: 2 workouts a day or heavy labour (×1.9)
+tl_kg||kg||кг||kg
+tl_wk||hafta||неделя||week
+tl_kcal||kkal||ккал||kcal
+tl_bpm||urish/daq||уд/мин||bpm
+tl_healthy||Sog'lom vazn oralig'i||Здоровый диапазон веса||Healthy weight range
+tl_bmi_help||JSST (WHO) bo'yicha: 18.5 dan kam, 18.5–24.9 normal, 25–29.9 ortiqcha, 30 dan yuqori semizlik. BMI mushak massasini hisobga olmaydi.||По ВОЗ: до 18,5 дефицит, 18,5–24,9 норма, 25–29,9 избыток, от 30 ожирение. ИМТ не учитывает мышечную массу.||WHO classes: under 18.5 underweight, 18.5–24.9 normal, 25–29.9 overweight, 30+ obese. BMI ignores muscle mass.
+tl_adjust||Tuzatish||Корректировка||Adjustment
+tl_deficit||Kunlik defitsit||Дефицит в день||Daily deficit
+tl_surplus||Kunlik profitsit||Профицит в день||Daily surplus
+tl_pace||Taxminiy tezlik||Ожидаемый темп||Expected pace
+tl_pace_lose||≈ −{x} kg / hafta||≈ −{x} кг / нед||≈ −{x} kg / week
+tl_pace_gain||≈ +{x} kg / hafta||≈ +{x} кг / нед||≈ +{x} kg / week
+tl_pace_keep||vazn o'zgarmaydi||вес стабилен||weight stays stable
+tl_floor||Defitsit BMR dan pastga tushmasligi uchun cheklandi.||Дефицит ограничен, чтобы калории не опускались ниже BMR.||The deficit is capped so intake never drops below your BMR.
+tl_cal_help||BMR: Mifflin–St Jeor. TDEE = BMR × faollik. Ozish: −20% (BMR dan past emas), massa: +12%. 1 kg yog ≈ 7700 kkal.||BMR: Миффлин — Сан-Жеор. TDEE = BMR × активность. Похудение: −20% (не ниже BMR), набор: +12%. 1 кг жира ≈ 7700 ккал.||BMR: Mifflin–St Jeor. TDEE = BMR × activity. Lose: −20% (never below BMR), gain: +12%. 1 kg of fat ≈ 7700 kcal.
+tl_go_cal||Kaloriya hisobiga o'tish||Перейти к учёту калорий||Go to calorie log
+tl_macro_help||Oqsil, yog' va uglevod maqsad kaloriyaga mos hisoblanadi.||Белки, жиры и углеводы рассчитаны под целевые калории.||Protein, fat and carbs are sized to your target calories.
+tl_macro_note||Oqsil {p} g/kg, yog' {f} g/kg (kamida 20% kkal), qolgani uglevod.||Белок {p} г/кг, жиры {f} г/кг (не менее 20% ккал), остальное углеводы.||Protein {p} g/kg, fat {f} g/kg (at least 20% of kcal), carbs fill the rest.
+tl_orm_note||Epley va Brzycki formulalarining o'rtachasi; 1–12 takror uchun ishonchli.||Среднее формул Эпли и Бжицки; надёжно для 1–12 повторов.||Average of the Epley and Brzycki formulas; reliable for 1–12 reps.
+tl_orm_bad||Takror butun son bo'lsin (1–12): undan ko'pda 1RM noaniq.||Повторы — целое число 1–12: при большем числе 1ПМ неточен.||Reps must be a whole number 1–12: beyond that the 1RM is unreliable.
+tl_hot||Issiq havo yoki jazirama (+0.5 l)||Жара (+0,5 л)||Hot weather (+0.5 l)
+tl_glasses||{n} stakan (250 ml)||{n} стак. (250 мл)||{n} glasses (250 ml)
+tl_water_help||~33 ml/kg + mashg'ulotga daqiqasiga 10 ml. Faqat suv emas, choy va ovqatdagi suyuqlik ham hisobga olinadi.||~33 мл/кг + 10 мл за минуту тренировки. Чай и жидкость из еды тоже считаются.||~33 ml/kg + 10 ml per training minute. Tea and the water in food count too.
+tl_rest_opt||Tinch holatdagi puls (ixtiyoriy)||Пульс в покое (необязательно)||Resting heart rate (optional)
+tl_hr_max||Maksimal puls||Максимальный пульс||Max heart rate
+tl_hr_simple||Maksimal puls Tanaka formulasi bilan: 208 − 0.7×yosh = {m}. Tinch pulsni kiritsangiz, zonalar Karvonen usulida aniqlashadi.||Максимум по Танака: 208 − 0,7×возраст = {m}. Введите пульс покоя, и зоны пересчитаются по Карвонену.||Max HR by Tanaka: 208 − 0.7×age = {m}. Enter a resting heart rate to switch to Karvonen zones.
+tl_hr_help2||Tinch holatdagi pulsni kiritsangiz, zonalar sizga moslab hisoblanadi.||Введите пульс покоя — зоны рассчитаются точнее под вас.||Enter your resting heart rate for personalised zones.
+tl_hr_karvonen||Maksimal puls Tanaka: 208 − 0.7×yosh = {m}. Zonalar Karvonen usulida (zaxira puls) hisoblangan.||Максимум по Танака: 208 − 0,7×возраст = {m}. Зоны по Карвонену (резерв пульса).||Max HR by Tanaka: 208 − 0.7×age = {m}. Zones use the Karvonen (heart-rate reserve) method.
+tl_bf||Tana yog'i (US Navy)||Жир в теле (US Navy)||Body fat (US Navy)
+tl_neck||Bo'yin (sm)||Шея (см)||Neck (cm)
+tl_waist||Bel (sm)||Талия (см)||Waist (cm)
+tl_hip||Son (sm)||Бёдра (см)||Hips (cm)
+tl_lean||Yog'siz massa||Сухая масса||Lean mass
+tl_ideal||Ideal vazn (Devine ±10%)||Идеальный вес (Девайн ±10%)||Ideal weight (Devine ±10%)
+tl_bf_bad||O'lchamlar mantiqqa to'g'ri kelmaydi: belni va bo'yinni qayta tekshiring.||Замеры не сходятся: проверьте талию и шею.||The measurements do not add up: re-check waist and neck.
+tl_bf_help||Santimetrda: bo'yin adam olmasi ostida, bel kindik sathida, ayollarda son eng keng joyida. Taxminiy natija.||В сантиметрах: шея под кадыком, талия на уровне пупка, бёдра по самому широкому месту. Результат приблизительный.||In centimetres: neck below the Adam's apple, waist at the navel, hips at the widest point. A rough estimate.
+tl_bf_c1||Muhim yog' (juda past)||Критически низкий||Essential fat (very low)
+tl_bf_c2||Sportchi darajasi||Атлетический||Athletic
+tl_bf_c3||Fitnes darajasi||Фитнес||Fitness
+tl_bf_c4||O'rtacha||Средний||Average
+tl_bf_c5||Yuqori||Повышенный||High
+pg_goal||Maqsad||Цель||Goal
+pg_goal_lose||Ozish||Похудение||Fat loss
+pg_goal_mass||Massa||Масса||Muscle
+pg_goal_strength||Kuch||Сила||Strength
+pg_goal_tone||Tonus||Тонус||Toning
+pg_goal_endurance||Chidamlilik||Выносливость||Endurance
+pg_days||Kunlar||Дни||Days
+pg_per_week||kun / hafta||дн. / нед.||days / week
+pg_place||Joy||Место||Place
+pg_place_gym||Zal||Зал||Gym
+pg_place_home||Uy||Дом||Home
+pg_details||Batafsil||Подробнее||Details
+pg_close||Yopish||Закрыть||Close
+pg_schedule||Haftalik jadval||Расписание недели||Weekly schedule
+pg_tips||Maslahatlar||Советы||Tips
+pg_rec||Sizga mos||Вам подходит||Suits you
+pg_none||Bu filtrlarga mos dastur topilmadi.||Нет программ под эти фильтры.||No programs match these filters.
+pg_reset||Filtrni tozalash||Сбросить фильтры||Clear filters
+pg_rest||Dam||Отдых||Rest
+pg_found||ta dastur||программ||programs
 scan_session||Sessiya tugagan: sahifani yangilab, admin sifatida qayta kiring||Сессия истекла: обновите страницу и войдите снова как администратор||Session ended: reload the page and sign in again as admin
 """
 

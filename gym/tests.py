@@ -36,7 +36,7 @@ class Base(TestCase):
 
     def staff(self):
         c = Client()
-        r = c.post("/login/", {"phone": "908775505", "password": "AdminPass1.admin"})
+        r = c.post("/login/", {"login": "admin1", "password": "AdminPass1.admin"})
         self.assertEqual((r.status_code, r["Location"]), (302, "/django-admin/"))
         return c
 
@@ -79,7 +79,7 @@ class AuthTests(Base):
         self.assertEqual(c.get("/django-admin/").status_code, 404)  # a member cannot even see it exists
         self.assertEqual(c.get("/staff/").status_code, 404)
         plain = Client()
-        plain.post("/login/", {"phone": "908775505", "password": "AdminPass1"})
+        plain.post("/login/", {"login": "admin1", "password": "AdminPass1"})
         self.assertEqual(plain.get("/django-admin/")["Location"], "/login/?need_admin=1")
         self.assertEqual(Client().get("/staff/").status_code, 302)
         a = self.staff()

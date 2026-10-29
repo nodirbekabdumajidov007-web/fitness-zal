@@ -55,18 +55,78 @@
 {% if not from_trainer %}
 <section class="grid">
   <div class="sec-head"><span class="eyebrow" style="color:var(--accent)">{% t 'programs' %}</span><h2>{% t 'programs_title' %}</h2></div>
-  <div class="prog-grid">
+  <div class="pf" data-pfilters>
+    <div class="pf-group" data-pf="goal" role="group" aria-label="{% t 'pg_goal' %}"><span class="pf-label">{% t 'pg_goal' %}</span>
+      <button type="button" data-v="" aria-pressed="true">{% t 'all' %}</button>
+      <button type="button" data-v="lose" aria-pressed="false">{% t 'pg_goal_lose' %}</button>
+      <button type="button" data-v="mass" aria-pressed="false">{% t 'pg_goal_mass' %}</button>
+      <button type="button" data-v="strength" aria-pressed="false">{% t 'pg_goal_strength' %}</button>
+      <button type="button" data-v="tone" aria-pressed="false">{% t 'pg_goal_tone' %}</button>
+      <button type="button" data-v="endurance" aria-pressed="false">{% t 'pg_goal_endurance' %}</button></div>
+    <div class="pf-group" data-pf="level" role="group" aria-label="{% t 'level' %}"><span class="pf-label">{% t 'level' %}</span>
+      <button type="button" data-v="" aria-pressed="true">{% t 'all' %}</button>
+      <button type="button" data-v="beginner" aria-pressed="false">{% t 'level_beginner' %}</button>
+      <button type="button" data-v="intermediate" aria-pressed="false">{% t 'level_intermediate' %}</button>
+      <button type="button" data-v="advanced" aria-pressed="false">{% t 'level_advanced' %}</button></div>
+    <div class="pf-group" data-pf="days" role="group" aria-label="{% t 'pg_days' %}"><span class="pf-label">{% t 'pg_days' %}</span>
+      <button type="button" data-v="" aria-pressed="true">{% t 'all' %}</button>
+      <button type="button" data-v="3" aria-pressed="false">3</button>
+      <button type="button" data-v="4" aria-pressed="false">4</button>
+      <button type="button" data-v="5" aria-pressed="false">5</button>
+      <button type="button" data-v="6" aria-pressed="false">6</button></div>
+    <div class="pf-group" data-pf="place" role="group" aria-label="{% t 'pg_place' %}"><span class="pf-label">{% t 'pg_place' %}</span>
+      <button type="button" data-v="" aria-pressed="true">{% t 'all' %}</button>
+      <button type="button" data-v="gym" aria-pressed="false">{% t 'pg_place_gym' %}</button>
+      <button type="button" data-v="home" aria-pressed="false">{% t 'pg_place_home' %}</button></div>
+    <div class="pf-foot"><span class="muted"><b class="num" data-pf-count>{{ programs|length }}</b> {% t 'pg_found' %}</span>
+      <button type="button" class="btn small pill" data-pf-reset hidden>{% icon 'x' %} {% t 'pg_reset' %}</button></div>
+  </div>
+
+  <div class="prog-grid" data-prog-grid>
     {% for p in programs %}
-    <article class="card prog lift lvl-{{ p.level }}">
-      <span class="prog-emoji" aria-hidden="true">{{ p.emoji }}</span>
+    <article class="card prog lvl-{{ p.level }}{% if p.active %} is-active{% endif %}{% if p.recommended %} is-rec{% endif %}"
+             data-goal="{{ p.goal }}" data-level="{{ p.level }}" data-days="{{ p.per_week }}" data-place="{{ p.place }}">
+      <div class="prog-top">
+        <span class="prog-ico" aria-hidden="true">{% icon p.icon %}</span>
+        <span class="prog-badges">
+          {% if p.active %}<span class="pill good">{% icon 'check-circle' %} {% t 'active' %}</span>{% endif %}
+          {% if p.recommended %}<span class="pill prog-rec">{% icon 'star' %} {% t 'pg_rec' %}</span>{% endif %}
+        </span>
+      </div>
       <h3>{{ p.title }}</h3>
-      <div class="chips"><span class="pill mute">{{ p.days }}</span><span class="pill mute">{{ p.count }} {% t 'exercises_n' %}</span><span class="pill mute">{% t 'level_'|add:p.level %}</span></div>
+      <div class="chips">
+        <span class="pill mute">{% icon 'target' %} {% t 'pg_goal_'|add:p.goal %}</span>
+        <span class="pill mute">{% icon 'activity' %} {% t 'level_'|add:p.level %}</span>
+        <span class="pill mute">{% icon 'calendar' %} {{ p.per_week }} {% t 'pg_per_week' %}</span>
+        <span class="pill mute">{% icon 'clock' %} ~{{ p.minutes }} {% t 'min' %}</span>
+        <span class="pill mute">{% icon 'dumbbell' %} {{ p.count }} {% t 'exercises_n' %}</span>
+        <span class="pill mute">{% if p.place == 'home' %}{% icon 'home' %}{% else %}{% icon 'users' %}{% endif %} {% t 'pg_place_'|add:p.place %}</span>
+      </div>
       <p class="muted">{{ p.about }}</p>
-      <form method="post" action="{% url 'start_program' p.key %}">{% csrf_token %}<button class="btn primary pill" type="submit"{% if plan %} data-confirm="{% t 'program_replace' %}"{% endif %}>{% t 'program_start' %} →</button></form>
+      <div class="prog-acts">
+        <button class="btn pill" type="button" data-prog-open="pd-{{ p.key }}">{% t 'pg_details' %}</button>
+        <form method="post" action="{% url 'start_program' p.key %}">{% csrf_token %}<button class="btn primary pill" type="submit"{% if plan %} data-confirm="{% t 'program_replace' %}"{% endif %}>{% t 'program_start' %}</button></form>
+      </div>
+
+      <dialog class="prog-dlg" id="pd-{{ p.key }}" aria-label="{{ p.title }}">
+        <div class="prog-dlg-head"><h3>{{ p.title }}</h3><button class="prog-x" type="button" data-prog-close aria-label="{% t 'pg_close' %}">{% icon 'x' %}</button></div>
+        <p class="muted">{{ p.about }}</p>
+        <h4>{% t 'pg_schedule' %}</h4>
+        {% for d in p.schedule %}
+        <section class="prog-day">
+          <h5>{% t 'weekday_'|add:d.wd %} <span class="muted">· {{ d.label }}</span></h5>
+          <ul>{% for e in d.ex %}<li><span>{{ e.name }}</span><span class="num muted">{{ e.sets }} × {{ e.reps }}{% if e.rest %} · {% t 'pg_rest' %} {{ e.rest }}{% endif %}</span></li>{% endfor %}</ul>
+        </section>
+        {% endfor %}
+        <h4>{% t 'pg_tips' %}</h4>
+        <ul class="prog-tips">{% for tip in p.tips %}<li>{% icon 'lightbulb' %}<span>{{ tip }}</span></li>{% endfor %}</ul>
+        <form method="post" action="{% url 'start_program' p.key %}" class="prog-dlg-foot">{% csrf_token %}<button class="btn primary pill" type="submit"{% if plan %} data-confirm="{% t 'program_replace' %}"{% endif %}>{% t 'program_start' %}</button></form>
+      </dialog>
     </article>
     {% endfor %}
   </div>
+  <p class="muted prog-none" data-pf-none hidden>{% t 'pg_none' %}</p>
 </section>
 {% endif %}
 {% endblock %}
-{% block scripts %}<script src="{% vstatic 'js/workouts.js' %}"></script>{% endblock %}
+{% block scripts %}<script src="{% vstatic 'js/workouts.js' %}"></script><script src="{% vstatic 'js/programs.js' %}"></script>{% endblock %}

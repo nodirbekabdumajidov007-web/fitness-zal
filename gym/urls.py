@@ -4,6 +4,7 @@ from django.urls import path
 from . import chat_views as c
 from . import coach_views as coach
 from . import views as v
+from . import voice
 
 urlpatterns = [
     path("", v.home, name="home"),
@@ -11,8 +12,9 @@ urlpatterns = [
     path("calories/", v.calories_view, name="calories"),
     path("calories/add/", v.calories_add, name="calories_add"),
     path("calories/<int:pk>/delete/", v.calories_delete, name="calories_delete"),
-    path("calories/ai/", v.calories_ai, name="calories_ai"),
+    path("calories/parse/", v.calories_parse, name="calories_parse"),
     path("healthz", v.healthz),
+    path("voice/info/", voice.info, name="voice_info"),
     path("manifest.webmanifest", v.manifest, name="manifest"),
     path("sw.js", v.service_worker, name="sw"),
     path("offline/", v.offline, name="offline"),
@@ -45,6 +47,7 @@ urlpatterns = [
     path("workouts/program/<slug:key>/", v.start_program, name="start_program"),
     path("workouts/stop/", v.stop_plan, name="stop_plan"),
     path("account/", v.account_view, name="account"),
+    path("assistant/ask/", v.assistant_ask, name="assistant_ask"),
     path("ai/", v.ai_view, name="ai"),
     path("ai/ask/", v.ai_ask, name="ai_ask"),
     path("ai/plan/", v.ai_plan, name="ai_plan"),

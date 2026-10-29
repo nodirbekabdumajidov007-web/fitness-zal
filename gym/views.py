@@ -674,9 +674,25 @@ def workouts_view(request):
     return render(request, "gym/workouts.html", {
         "plan": plan, "days": days, "strip": strip, "from_trainer": from_trainer,
         "week_pct": round(week_done / week_total * 100) if week_total else 0, "week_done": week_done, "week_total": week_total,
-        "programs": [{"key": k, **{x: v[x] for x in ("title", "days", "about", "emoji", "level")}, "count": len({e[1] for e in v["ex"]})}
-                     for k, v in services.PROGRAMS.items()],
+        "programs": _program_cards(request.user, plan),
     })
+
+
+def _program_cards(user, plan):
+    """The ready-made program cards: facts, weekly schedule for the preview, 'active' and 'recommended' marks."""
+    from . import programs as P
+    rec = P.recommended(user.goal, ExerciseLog.objects.filter(user=user).count())
+    cards = []
+    for k, v in P.PROGRAMS.items():
+        days = P.days_list(v)
+        sched = P.schedule(v)
+        cards.append({
+            "key": k, "title": v["title"], "about": v["about"], "goal": v["goal"], "level": v["level"], "place": v["place"], "icon": v["icon"],
+            "minutes": v["minutes"], "per_week": len(days), "weekdays": [str(d) for d in days], "tips": v["tips"] + P.COMMON_TIPS,
+            "count": len({e["name"] for d in sched for e in d["ex"]}), "schedule": sched,
+            "active": bool(plan and not plan.trainer_id and plan.title.endswith(v["title"])), "recommended": k == rec,
+        })
+    return cards
 
 
 @require_POST
@@ -1477,46 +1493,91 @@ def desk_pt(request, pk, action):
     return desk_back(request)
 
 
-# ---------------------------------------------------------------- AI coach and AI workout plans
-def ai_view(request):
-    """The AI coach page: the conversation, a question box and the plan generator. Guests see what it does and a sign-in button."""
-    from . import ai
-    ctx = {"ai_on": ai.enabled(), "limit": ai.daily_limit(), "levels": [("beginner", "level_beginner"), ("intermediate", "level_intermediate"),
-                                                                          ("advanced", "level_advanced")]}
+# ---------------------------------------------------------------- assistant (offline knowledge base) and rule-based workout plans
+ASK_LIMIT, ASK_WINDOW = 30, 60  # questions per minute per member / session / IP
+
+
+def ask_limited(request):
+    """True when this member (or session, or IP for guests) already asked ASK_LIMIT questions in the last minute."""
     if request.user.is_authenticated:
-        ctx.update({"chat": request.user.ai_messages.order_by("-id")[:40][::-1], "used": ai.used_today(request.user),
-                    "has_trainer_plan": request.user.workout_plans.filter(active=True, trainer__isnull=False).exists()})
+        who = f"u{request.user.pk}"
+    else:
+        who = request.session.session_key or request.META.get("REMOTE_ADDR", "?")
+    key = f"asst:rl:{who}"
+    cache.add(key, 0, ASK_WINDOW)
+    try:
+        return cache.incr(key) > ASK_LIMIT
+    except ValueError:
+        cache.set(key, 1, ASK_WINDOW)
+        return False
+
+
+def ask_text(request):
+    """The question from a JSON body {"q": "..."} or from form fields (voice.js and the coach page send a form)."""
+    if (request.content_type or "").startswith("application/json"):
+        return json_field(request, "q")
+    return request.POST.get("q", "")
+
+
+def ask_payload(request, q):
+    from . import assistant
+    lang = request.POST.get("lang") if request.POST.get("lang") in ("uz", "ru", "en") else request.lang
+    res = assistant.answer(q, lang, request.user)
+    return {"ok": True, "answer": res["answer"], "links": res["links"], "matched": res["matched"], "suggest": res["suggest"]}
+
+
+@require_POST
+def assistant_ask(request):
+    """POST /assistant/ask/ - works for guests too; personal answers (membership, calories) only when signed in."""
+    if ask_limited(request):
+        return JsonResponse({"ok": False, "error": translate(request.lang, "asst_rate")}, status=429)
+    q = ask_text(request).strip()[:1500]
+    if not q:
+        return JsonResponse({"ok": False, "error": translate(request.lang, "ai_empty")}, status=400)
+    return JsonResponse(ask_payload(request, q))
+
+
+def ai_view(request):
+    """The coach page: the conversation, a question box and the plan generator. Guests can ask; the plan needs an account."""
+    goal_map = {"lose": "fat_loss", "gain": "muscle", "strength": "strength"}
+    ctx = {"levels": [("beginner", "level_beginner"), ("intermediate", "level_intermediate"), ("advanced", "level_advanced")],
+           "goals": [("fat_loss", "ai_goal_fat"), ("muscle", "ai_goal_muscle"), ("strength", "ai_goal_strength"), ("general", "ai_goal_general")],
+           "equipment": [("gym", "ai_equip_gym"), ("home", "ai_equip_home")], "goal_default": "general"}
+    if request.user.is_authenticated:
+        ctx.update({"chat": request.user.ai_messages.order_by("-id")[:40][::-1],
+                    "has_trainer_plan": request.user.workout_plans.filter(active=True, trainer__isnull=False).exists(),
+                    "goal_default": goal_map.get(request.user.goal, "general")})
     return render(request, "gym/ai.html", ctx)
 
 
 @require_POST
-@login_required
 def ai_ask(request):
-    from . import ai
-    try:
-        msg = ai.ask(request.user, request.POST.get("q", ""), request.lang)
-    except ai.AIError as e:
+    """A question from the coach page; signed-in members get the conversation stored (AIMessage)."""
+    from .models import AIMessage
+    q = ask_text(request).strip()[:1500]
+    if ask_limited(request) or not q:
+        key = "asst_rate" if q else "ai_empty"
         if wants_json(request):
-            return JsonResponse({"ok": False, "error": translate(request.lang, e.key)}, status=400)
-        flash(request, messages.ERROR, e.key)
+            return JsonResponse({"ok": False, "error": translate(request.lang, key)}, status=429 if q else 400)
+        flash(request, messages.ERROR, key)
         return redirect("/ai/#chat")
+    data = ask_payload(request, q)
+    if request.user.is_authenticated:
+        AIMessage.objects.create(user=request.user, role="user", content=q)
+        AIMessage.objects.create(user=request.user, role="assistant", content=data["answer"])
     if wants_json(request):
-        return JsonResponse({"ok": True, "answer": msg.content, "used": ai.used_today(request.user), "limit": ai.daily_limit()})
+        return JsonResponse(data)
     return redirect("/ai/#chat")
 
 
 @require_POST
 @login_required
 def ai_plan(request):
-    from . import ai
+    from . import assistant_plan
     try:
-        days = max(2, min(6, int(request.POST.get("days", 3))))
-        minutes = max(20, min(120, int(request.POST.get("minutes", 60))))
-    except ValueError:
-        days, minutes = 3, 60
-    try:
-        ai.make_plan(request.user, request.POST.get("level", "beginner"), days, minutes, request.POST.get("notes", ""), request.lang)
-    except ai.AIError as e:
+        assistant_plan.make_plan(request.user, request.POST.get("goal", ""), request.POST.get("level", "beginner"), request.POST.get("days", 3),
+                                 request.POST.get("equipment", "gym"), request.lang)
+    except assistant_plan.PlanError as e:
         flash(request, messages.ERROR, e.key)
         return redirect("/ai/#plan")
     flash(request, messages.SUCCESS, "ai_plan_ok")
@@ -1585,13 +1646,13 @@ def default_storage_for(user):
 
 @login_required
 def calories_view(request):
-    from . import ai, calories
+    from . import calories
     day = calories.parse_day(request.GET.get("d"))
     today = timezone.localdate()
     ctx = calories.day_summary(request.user, day)
-    ctx.update({"foods": calories.food_table(), "ai_on": ai.enabled(), "is_today": day == today,
+    ctx.update({"foods": calories.food_table(), "is_today": day == today,
                 "prev_day": day - timedelta(days=1), "next_day": day + timedelta(days=1) if day < today else None,
-                "meal_choices": [(m, calories.MEAL_ICON[m]) for m in calories.MEALS], "ai_left": max(0, ai.daily_limit() - ai.used_today(request.user)),
+                "meal_choices": [(m, calories.MEAL_ICON[m]) for m in calories.MEALS],
                 "default_meal": _meal_now()})
     return render(request, "gym/calories.html", ctx)
 
@@ -1623,6 +1684,8 @@ def calories_add(request):
     except ValueError:
         grams = 0
     if not 1 <= grams <= 5000:
+        if wants_json(request):
+            return JsonResponse({"ok": False, "error": translate(request.lang, "cal_bad_grams")}, status=400)
         flash(request, messages.ERROR, "cal_bad_grams")
         return back
     idx = request.POST.get("food", "")
@@ -1634,11 +1697,13 @@ def calories_add(request):
         name = " ".join(request.POST.get("name", "").split())[:80]
         kcal, p, f, c = (_decimal(request.POST.get(k, "0")) for k in ("kcal", "protein", "fat", "carbs"))
         if not name or kcal is None or p is None or f is None or c is None:
+            if wants_json(request):
+                return JsonResponse({"ok": False, "error": translate(request.lang, "cal_bad_food")}, status=400)
             flash(request, messages.ERROR, "cal_bad_food")
             return back
     request.user.food_entries.create(date=day, meal=meal, name=name, grams=grams, kcal=kcal, protein=p, fat=f, carbs=c)
-    flash(request, messages.SUCCESS, "cal_added")
-    return back
+    flash(request, messages.SUCCESS, "cal_added")  # the text box reloads the page afterwards and shows it
+    return JsonResponse({"ok": True}) if wants_json(request) else back
 
 
 @require_POST
@@ -1652,20 +1717,21 @@ def calories_delete(request, pk):
 
 @require_POST
 @login_required
-def calories_ai(request):
-    """Free text -> AI estimate -> saved as entries of the chosen meal (JSON for the fetch call, redirect otherwise)."""
-    from . import ai, calories
+def calories_parse(request):
+    """Free text ("2 ta somsa va choy") -> foods of the built-in table. With fetch: JSON preview (the page then adds each item through
+    calories_add); without JavaScript the recognised foods are saved straight away."""
+    from . import calories
     day = calories.parse_day(request.POST.get("d"))
     meal = request.POST.get("meal") if request.POST.get("meal") in calories.MEALS else "snack"
-    try:
-        items = calories.estimate(request.user, request.POST.get("text", ""), request.lang)
-    except ai.AIError as e:
-        if wants_json(request):
-            return JsonResponse({"ok": False, "error": translate(request.lang, e.key)}, status=400)
-        flash(request, messages.ERROR, e.key)
-        return redirect(f"{reverse('calories')}?d={day.isoformat()}")
-    request.user.food_entries.bulk_create([request.user.food_entries.model(user=request.user, date=day, meal=meal, **it) for it in items])
+    items = calories.parse_text(request.POST.get("text", ""))
     if wants_json(request):
-        return JsonResponse({"ok": True, "n": len(items)})
+        return JsonResponse({"ok": bool(items), "items": items, "error": "" if items else translate(request.lang, "cal_txt_none")})
+    back = redirect(f"{reverse('calories')}?d={day.isoformat()}")
+    if not items:
+        flash(request, messages.ERROR, "cal_txt_none")
+        return back
+    request.user.food_entries.bulk_create([request.user.food_entries.model(
+        user=request.user, date=day, meal=meal, name=i["name"], grams=i["grams"], kcal=i["kcal"], protein=i["protein"], fat=i["fat"], carbs=i["carbs"])
+        for i in items])
     flash(request, messages.SUCCESS, "cal_added")
-    return redirect(f"{reverse('calories')}?d={day.isoformat()}")
+    return back

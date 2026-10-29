@@ -7,77 +7,130 @@
   <p class="muted">{% t 'tools_sub' %}</p>
 </section>
 
-<div class="tl-grid" data-tools>
+<div class="tl-grid" data-tools data-profile-w="{{ w|stringformat:'s' }}" data-profile-h="{{ h }}"
+     data-birth="{% if request.user.is_authenticated and request.user.birth_date %}{{ request.user.birth_date|date:'Y-m-d' }}{% endif %}"
+     data-goal="{% if request.user.is_authenticated %}{{ request.user.goal }}{% endif %}">
   <!-- shared inputs: filled once, used by every calculator -->
   <section class="card tl-me">
     <h3>{% icon 'user' %} {% t 'tools_me' %}</h3>
     <div class="tl-sex" role="radiogroup" aria-label="{% t 'tools_sex' %}">
-      <label><input type="radio" name="sex" value="m" checked><span>♂ {% t 'tools_male' %}</span></label>
-      <label><input type="radio" name="sex" value="f"><span>♀ {% t 'tools_female' %}</span></label>
+      <label><input type="radio" name="sex" value="m" checked><span>{% t 'tools_male' %}</span></label>
+      <label><input type="radio" name="sex" value="f"><span>{% t 'tools_female' %}</span></label>
     </div>
     <div class="tl-inputs">
-      <label>{% t 'tools_age' %}<input type="number" name="age" min="12" max="90" value="25"></label>
-      <label>{% t 'weight' %}<input type="number" name="w" min="30" max="250" step="0.1" value="{{ w|default:70 }}"></label>
-      <label>{% t 'tools_height' %} (sm)<input type="number" name="h" min="120" max="230" value="{{ h|default:175 }}"></label>
+      <label>{% t 'tools_age' %}<input type="number" inputmode="numeric" name="age" min="14" max="90" value="25"></label>
+      <label>{% t 'weight' %}<input type="number" inputmode="decimal" name="w" min="30" max="250" step="0.1" value="{{ w|default:70|stringformat:'s' }}"></label>
+      <label>{% t 'tools_height' %} (sm)<input type="number" inputmode="numeric" name="h" min="120" max="230" value="{{ h|default:175 }}"></label>
     </div>
     <label>{% t 'tools_activity' %}
       <select name="act">
-        <option value="1.2">{% t 'act_1' %}</option><option value="1.375">{% t 'act_2' %}</option>
-        <option value="1.55" selected>{% t 'act_3' %}</option><option value="1.725">{% t 'act_4' %}</option><option value="1.9">{% t 'act_5' %}</option>
+        <option value="1.2">{% t 'act2_1' %}</option><option value="1.375">{% t 'act2_2' %}</option>
+        <option value="1.55" selected>{% t 'act2_3' %}</option><option value="1.725">{% t 'act2_4' %}</option><option value="1.9">{% t 'act2_5' %}</option>
       </select></label>
     <div class="tl-goal" role="radiogroup" aria-label="{% t 'tools_goal' %}">
-      <label><input type="radio" name="goal" value="-500"><span>{% icon 'flame' %} {% t 'goal_lose' %}</span></label>
-      <label><input type="radio" name="goal" value="0" checked><span>{% icon 'scale' %} {% t 'goal_keep' %}</span></label>
-      <label><input type="radio" name="goal" value="300"><span>{% icon 'dumbbell' %} {% t 'goal_gain' %}</span></label>
+      <label><input type="radio" name="goal" value="lose"><span>{% icon 'flame' %} {% t 'goal_lose' %}</span></label>
+      <label><input type="radio" name="goal" value="keep" checked><span>{% icon 'scale' %} {% t 'goal_keep' %}</span></label>
+      <label><input type="radio" name="goal" value="gain"><span>{% icon 'dumbbell' %} {% t 'goal_gain' %}</span></label>
     </div>
+    <small class="tl-hint" data-hint="me" hidden></small>
+    <small class="tl-note muted" data-out="from-profile" hidden>{% icon 'check-circle' %} {% t 'tl_from_profile' %}</small>
+
+    <hr class="tl-sep">
+    <h4>{% icon 'activity' %} {% t 'tl_bf' %}</h4>
+    <div class="tl-inputs">
+      <label>{% t 'tl_neck' %}<input type="number" inputmode="decimal" name="neck" min="25" max="60" step="0.5" placeholder="38"></label>
+      <label>{% t 'tl_waist' %}<input type="number" inputmode="decimal" name="waist" min="50" max="200" step="0.5" placeholder="85"></label>
+      <label class="tl-hipf" data-hip>{% t 'tl_hip' %}<input type="number" inputmode="decimal" name="hip" min="60" max="200" step="0.5" placeholder="98"></label>
+    </div>
+    <small class="tl-hint" data-hint="bf" hidden></small>
+    <div class="tl-bf">
+      <b class="tl-mid num" data-out="bf">—</b>
+      <span class="tl-tag" data-out="bf-cat"></span>
+    </div>
+    <ul class="tl-list">
+      <li><span>{% t 'tl_lean' %}</span><b class="num" data-out="lean">—</b></li>
+      <li><span>{% t 'tl_ideal' %}</span><b class="num" data-out="ideal">—</b></li>
+    </ul>
+    <small class="muted">{% t 'tl_bf_help' %}</small>
   </section>
 
   <section class="card tl-card">
     <h3>{% icon 'ruler' %} BMI</h3>
-    <b class="tl-big num" data-out="bmi">—</b><span class="tl-tag" data-out="bmi-cat"></span>
+    <div class="tl-row"><b class="tl-big num" data-out="bmi">—</b><span class="tl-tag" data-out="bmi-cat"></span></div>
     <div class="tl-gauge"><i data-out="bmi-pin"></i><span>18.5</span><span>25</span><span>30</span></div>
-    <small class="muted">{% t 'bmi_help' %}</small>
+    <ul class="tl-list"><li><span>{% t 'tl_healthy' %}</span><b class="num" data-out="healthy">—</b></li></ul>
+    <small class="muted">{% t 'tl_bmi_help' %}</small>
   </section>
 
   <section class="card tl-card">
     <h3>{% icon 'flame' %} {% t 'tools_calories' %}</h3>
-    <b class="tl-big num" data-out="kcal">—</b><span class="muted">{% t 'kcal_day' %}</span>
-    <ul class="tl-list"><li><span>{% t 'tools_bmr' %}</span><b class="num" data-out="bmr">—</b></li><li><span>{% t 'tools_tdee' %}</span><b class="num" data-out="tdee">—</b></li></ul>
+    <div><b class="tl-big num" data-out="kcal">—</b> <span class="muted">{% t 'kcal_day' %}</span></div>
+    <span class="tl-tag" data-out="goal-tag"></span>
+    <ul class="tl-list">
+      <li><span>{% t 'tools_bmr' %}</span><b class="num" data-out="bmr">—</b></li>
+      <li><span>{% t 'tools_tdee' %}</span><b class="num" data-out="tdee">—</b></li>
+      <li><span data-out="adj-label">{% t 'tl_adjust' %}</span><b class="num" data-out="adj">—</b></li>
+      <li><span>{% t 'tl_pace' %}</span><b class="num" data-out="pace">—</b></li>
+    </ul>
+    <small class="tl-note muted" data-out="floor" hidden>{% t 'tl_floor' %}</small>
+    <small class="muted">{% t 'tl_cal_help' %}</small>
+    <a class="tl-link" data-out="cal-link" href="{% url 'calories' %}">{% t 'tl_go_cal' %} {% icon 'send' %}</a>
   </section>
 
   <section class="card tl-card">
-    <h3>🥗 {% t 'tools_macros' %}</h3>
+    <h3>{% icon 'leaf' %} {% t 'tools_macros' %}</h3>
     <div class="tl-macro">
-      <div class="tl-donut" data-out="donut"><span><b class="num" data-out="kcal2">—</b><small>kcal</small></span></div>
-      <ul class="tl-list"><li><i class="p"></i><span>{% t 'protein' %}</span><b class="num" data-out="p">—</b></li>
-        <li><i class="f"></i><span>{% t 'fat' %}</span><b class="num" data-out="f">—</b></li>
-        <li><i class="c"></i><span>{% t 'carbs' %}</span><b class="num" data-out="c">—</b></li></ul>
+      <div class="tl-donut" data-out="donut"><span><b class="num" data-out="kcal2">—</b><small>{% t 'tl_kcal' %}</small></span></div>
+      <ul class="tl-list tl-mlist"><li><i class="p"></i><span>{% t 'protein' %}<small data-out="p-sub"></small></span><b class="num" data-out="p">—</b></li>
+        <li><i class="f"></i><span>{% t 'fat' %}<small data-out="f-sub"></small></span><b class="num" data-out="f">—</b></li>
+        <li><i class="c"></i><span>{% t 'carbs' %}<small data-out="c-sub"></small></span><b class="num" data-out="c">—</b></li></ul>
     </div>
+    <small class="muted" data-out="macro-note">{% t 'tl_macro_help' %}</small>
   </section>
 
   <section class="card tl-card">
     <h3>{% icon 'dumbbell' %} 1RM</h3>
-    <div class="tl-inputs two"><label>{% t 'tools_lifted' %} (kg)<input type="number" name="lw" min="1" max="500" step="0.5" value="60"></label>
-      <label>{% t 'reps' %}<input type="number" name="lr" min="1" max="30" value="8"></label></div>
-    <b class="tl-big num" data-out="orm">—</b><span class="muted">{% t 'tools_orm_help' %}</span>
+    <div class="tl-inputs two"><label>{% t 'tools_lifted' %} (kg)<input type="number" inputmode="decimal" name="lw" min="1" max="500" step="0.5" value="60"></label>
+      <label>{% t 'reps' %} (1–12)<input type="number" inputmode="numeric" name="lr" min="1" max="12" value="8"></label></div>
+    <small class="tl-hint" data-hint="orm" hidden></small>
+    <div><b class="tl-big num" data-out="orm">—</b> <span class="muted">{% t 'tools_orm_help' %}</span></div>
     <div class="tl-pct" data-out="pct"></div>
+    <small class="muted">{% t 'tl_orm_note' %}</small>
   </section>
 
   <section class="card tl-card">
     <h3>{% icon 'droplet' %} {% t 'water' %}</h3>
-    <label>{% t 'tools_train_min' %}<input type="number" name="tm" min="0" max="300" value="60"></label>
-    <b class="tl-big num" data-out="water">—</b><span class="muted">{% t 'tools_liters' %}</span>
+    <label>{% t 'tools_train_min' %}<input type="number" inputmode="numeric" name="tm" min="0" max="300" value="60"></label>
+    <label class="tl-check"><input type="checkbox" name="hot"><span>{% t 'tl_hot' %}</span></label>
+    <small class="tl-hint" data-hint="water" hidden></small>
+    <div><b class="tl-big num" data-out="water">—</b> <span class="muted">{% t 'tools_liters' %}</span></div>
+    <span class="muted" data-out="glasses"></span>
     <div class="tl-cups" data-out="cups"></div>
+    <small class="muted">{% t 'tl_water_help' %}</small>
   </section>
 
   <section class="card tl-card tl-wide">
     <h3>{% icon 'heart' %} {% t 'tools_hr' %}</h3>
-    <label>{% t 'tools_rest_hr' %}<input type="number" name="rhr" min="35" max="110" value="65"></label>
+    <div class="tl-hrtop">
+      <label>{% t 'tl_rest_opt' %}<input type="number" inputmode="numeric" name="rhr" min="30" max="120" placeholder="65"></label>
+      <div><span class="muted">{% t 'tl_hr_max' %}</span> <b class="tl-mid num" data-out="hrmax">—</b></div>
+    </div>
+    <small class="tl-hint" data-hint="hr" hidden></small>
     <div class="tl-zones" data-out="zones"></div>
-    <small class="muted">{% t 'tools_hr_help' %}</small>
+    <small class="muted" data-out="hr-help">{% t 'tl_hr_help2' %}</small>
   </section>
 </div>
 <div hidden id="tl-i18n" data-under="{% t 'bmi_under' %}" data-normal="{% t 'bmi_normal' %}" data-over="{% t 'bmi_over' %}" data-obese="{% t 'bmi_obese' %}"
-     data-z1="{% t 'zone_1' %}" data-z2="{% t 'zone_2' %}" data-z3="{% t 'zone_3' %}" data-z4="{% t 'zone_4' %}" data-z5="{% t 'zone_5' %}" data-reps="{% t 'reps' %}"></div>
+     data-z1="{% t 'zone_1' %}" data-z2="{% t 'zone_2' %}" data-z3="{% t 'zone_3' %}" data-z4="{% t 'zone_4' %}" data-z5="{% t 'zone_5' %}" data-reps="{% t 'reps' %}"
+     data-range="{% t 'tl_range' %}" data-n-age="{% t 'tools_age' %}" data-n-w="{% t 'weight' %}" data-n-h="{% t 'tools_height' %}"
+     data-n-lw="{% t 'tools_lifted' %}" data-n-lr="{% t 'reps' %}" data-n-tm="{% t 'tools_train_min' %}" data-n-rhr="{% t 'tl_rest_opt' %}"
+     data-n-neck="{% t 'tl_neck' %}" data-n-waist="{% t 'tl_waist' %}" data-n-hip="{% t 'tl_hip' %}"
+     data-lose="{% t 'goal_lose' %}" data-keep="{% t 'goal_keep' %}" data-gain="{% t 'goal_gain' %}"
+     data-adj-lose="{% t 'tl_deficit' %}" data-adj-gain="{% t 'tl_surplus' %}" data-adj-keep="{% t 'tl_adjust' %}"
+     data-pace-lose="{% t 'tl_pace_lose' %}" data-pace-gain="{% t 'tl_pace_gain' %}" data-pace-keep="{% t 'tl_pace_keep' %}"
+     data-macro-note="{% t 'tl_macro_note' %}" data-kcal="{% t 'tl_kcal' %}" data-glasses="{% t 'tl_glasses' %}"
+     data-orm-bad="{% t 'tl_orm_bad' %}" data-bf-bad="{% t 'tl_bf_bad' %}" data-hr-karvonen="{% t 'tl_hr_karvonen' %}" data-hr-simple="{% t 'tl_hr_simple' %}"
+     data-bf1="{% t 'tl_bf_c1' %}" data-bf2="{% t 'tl_bf_c2' %}" data-bf3="{% t 'tl_bf_c3' %}" data-bf4="{% t 'tl_bf_c4' %}" data-bf5="{% t 'tl_bf_c5' %}"
+     data-kg="{% t 'tl_kg' %}" data-wk="{% t 'tl_wk' %}" data-bpm="{% t 'tl_bpm' %}"></div>
 {% endblock %}
 {% block scripts %}<script src="{% vstatic 'js/tools.js' %}"></script>{% endblock %}

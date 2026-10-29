@@ -1,8 +1,8 @@
-{% extends "admin/base_site.html" %}{% load gym_tags %}
+{% extends "admin/base_site.html" %}{% load gym_tags fz_admin %}
 {% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url 'admin:index' %}">Bosh sahifa</a> › Hisobotlar</div>{% endblock %}
 {% block content %}
 <div class="fz-wrap">
-  <div class="fz-actions"><a class="red" href="{% url 'admin:reports_csv' %}">⬇ CSV ga yuklab olish</a><a href="{% url 'admin:index' %}">← Boshqaruv paneli</a></div>
+  <div class="fz-actions"><a class="red" href="{% url 'admin:reports_csv' %}">{% aicon 'download' %} CSV ga yuklab olish</a><a href="{% url 'admin:index' %}">← Boshqaruv paneli</a></div>
 
   <div class="fz-kpis">
     <div class="fz-kpi"><small>Shu oy tushum</small><b>{{ kpi.rev_this|money }} <small>so'm</small></b>

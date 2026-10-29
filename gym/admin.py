@@ -29,8 +29,12 @@ def export_csv(modeladmin, request, queryset, fields, name):
     return resp
 
 
+TONES = {"#1d9a52": "ok", "#c0261a": "bad", "#b97d00": "warn", "#1f5bd6": "info"}  # old colour codes -> theme-aware pill classes
+
+
 def badge(text, color):
-    return format_html('<b style="color:{}">{}</b>', color, text)
+    """A status pill; the colours come from admin.css so it stays readable in the dark theme too."""
+    return format_html('<span class="fz-st {}">{}</span>', TONES.get(color, "mute"), text)
 
 
 class MembershipInline(admin.TabularInline):
@@ -48,7 +52,7 @@ class BodyLogInline(admin.TabularInline):
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = ("code", "username", "first_name", "last_name", "phone", "email", "state", "until", "created", "card")
-    list_filter = ("is_active", "is_staff", "phone_verified", "goal", "created")
+    list_filter = ("is_active", "chat_banned", "is_staff", "phone_verified", "goal", "created")
     search_fields = ("username", "phone", "email", "first_name", "last_name", "referral_code")
     readonly_fields = ("last_login", "created", "referral_code", "referred_by", "referral_rewarded", "telegram_chat_id")
     # the password hash is never shown: it is useless to read and members change passwords on the site
@@ -74,7 +78,7 @@ class UserAdmin(admin.ModelAdmin):
     actions = ["message", "extend_30", "block", "unblock", "csv"]
     list_per_page = 40
 
-    @admin.action(description="✉ Tanlanganlarga shaxsiy xabar yozish")
+    @admin.action(description="Tanlanganlarga shaxsiy xabar yozish")
     def message(self, request, qs):
         from django.shortcuts import redirect
         from django.urls import reverse
@@ -186,7 +190,9 @@ class OrderItemInline(admin.TabularInline):
 class OrderAdmin(admin.ModelAdmin):
     list_display = ("id", "user", "total", "method", "how", "state", "created")
     list_filter = ("status", "delivery", "method", "created")
-    search_fields = ("user__phone", "user__first_name", "user__last_name", "address", "delivery_phone")
+    list_select_related = ("user",)
+    date_hierarchy = "created"
+    search_fields = ("id", "user__phone", "user__first_name", "user__last_name", "address", "delivery_phone")
     inlines = [OrderItemInline]
     readonly_fields = ("user", "total", "delivery_fee", "method", "created", "shipped_at", "done_at")
     fieldsets = ((None, {"fields": ("user", ("total", "delivery_fee"), "method", "status", ("created", "shipped_at", "done_at"))}),
@@ -202,9 +208,9 @@ class OrderAdmin(admin.ModelAdmin):
 
     @admin.display(description="Olish", ordering="delivery")
     def how(self, o):
-        return format_html("🛵 {}", o.address[:40]) if o.delivery == Order.Delivery.COURIER else "🏋️ Zaldan"
+        return format_html("Kuryer: {}", o.address[:40]) if o.delivery == Order.Delivery.COURIER else "Zaldan olib ketadi"
 
-    @admin.action(description="🛵 Yo'lga chiqdi (kuryer olib ketdi)")
+    @admin.action(description="Yo'lga chiqdi (kuryer olib ketdi)")
     def shipped(self, request, qs):
         self.message_user(request, f"{sum(1 for o in qs if services.ship_order(o))} ta buyurtma yo'lga chiqdi.", messages.SUCCESS)
 
@@ -289,7 +295,7 @@ class ProductAdmin(admin.ModelAdmin):
     def restock(self, request, qs):
         qs.update(stock=F("stock") + 10, low_alert_on=None)
 
-    @admin.action(description="📱 Kam qolganlar haqida hozir SMS yuborish")
+    @admin.action(description="Kam qolganlar haqida hozir SMS yuborish")
     def alert_now(self, request, qs):
         qs.update(low_alert_on=None)
         n = len(services.check_low_stock(list(qs)))
@@ -298,12 +304,16 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(Plan)
 class PlanAdmin(admin.ModelAdmin):
+    search_fields = ("name", "code")
+    list_filter = ("active",)
     list_display = ("name", "code", "months", "price", "active", "order")
     list_editable = ("price", "active", "order")
 
 
 @admin.register(PromoCode)
 class PromoAdmin(admin.ModelAdmin):
+    search_fields = ("code",)
+    list_filter = ("active",)
     list_display = ("code", "percent", "valid_until", "used", "max_uses", "active")
     list_editable = ("active",)
 
@@ -312,6 +322,8 @@ class PromoAdmin(admin.ModelAdmin):
 class ReviewAdmin(admin.ModelAdmin):
     list_display = ("user", "rating", "short", "approved", "created")
     list_filter = ("approved", "rating")
+    list_select_related = ("user",)
+    search_fields = ("comment", "user__first_name", "user__last_name", "user__phone")
     actions = ["approve", "hide"]
 
     @admin.display(description="Fikr")
@@ -331,18 +343,24 @@ class ReviewAdmin(admin.ModelAdmin):
 class GymClassAdmin(admin.ModelAdmin):
     list_display = ("name", "trainer", "weekday", "start_time", "duration_min", "capacity", "active")
     list_filter = ("weekday", "trainer", "active")
+    list_select_related = ("trainer",)
+    search_fields = ("name",)
 
 
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
     list_display = ("user", "gym_class", "date", "created")
     list_filter = ("date", "gym_class")
+    list_select_related = ("user", "gym_class")
+    search_fields = ("user__phone", "user__first_name", "user__last_name", "gym_class__name")
+    raw_id_fields = ("user",)
     date_hierarchy = "date"
 
 
 @admin.register(Visit)
 class VisitAdmin(admin.ModelAdmin):
     list_display = ("user", "ts")
+    list_select_related = ("user",)
     date_hierarchy = "ts"
     search_fields = ("user__phone", "user__first_name", "user__last_name")
     readonly_fields = ("user", "ts")
@@ -396,6 +414,7 @@ class ExerciseInline(admin.TabularInline):
 class WorkoutPlanAdmin(admin.ModelAdmin):
     list_display = ("title", "user", "trainer", "active", "created")
     list_filter = ("active", "trainer")
+    list_select_related = ("user", "trainer")
     search_fields = ("title", "user__phone", "user__first_name", "user__last_name")
     autocomplete_fields = ("user",)
     inlines = [ExerciseInline]
@@ -405,6 +424,8 @@ class WorkoutPlanAdmin(admin.ModelAdmin):
 class PTSessionAdmin(admin.ModelAdmin):
     list_display = ("user", "trainer", "starts", "state", "note")
     list_filter = ("status", "trainer")
+    list_select_related = ("user", "trainer")
+    search_fields = ("user__phone", "user__first_name", "user__last_name", "trainer__name")
     date_hierarchy = "starts"
     actions = ["confirm", "cancel"]
     readonly_fields = ("user", "trainer", "starts", "note", "created")
@@ -480,6 +501,8 @@ class ChatMessageAdmin(admin.ModelAdmin):
 class ChatReportAdmin(admin.ModelAdmin):
     list_display = ("id", "reported", "reporter", "reason", "resolved", "created")
     list_filter = ("resolved",)
+    list_select_related = ("message__sender", "reporter")
+    search_fields = ("reason", "message__body", "reporter__first_name", "reporter__last_name")
     readonly_fields = ("message", "reporter", "reason", "created", "context")
     fields = ("resolved", "message", "reporter", "reason", "created", "context")
     actions = ["resolve", "resolve_and_hide", "resolve_and_ban"]
@@ -517,6 +540,7 @@ class ChatReportAdmin(admin.ModelAdmin):
 @admin.register(PaymentCard)
 class PaymentCardAdmin(admin.ModelAdmin):
     list_display = ("bank", "masked", "holder", "is_primary", "active")
+    search_fields = ("bank", "holder")
     list_editable = ("is_primary", "active")
     fields = ("bank", "number", "holder", "is_primary", "active", "note")
 
@@ -530,9 +554,10 @@ class PaymentCardAdmin(admin.ModelAdmin):
 
 @admin.register(AIMessage)
 class AIMessageAdmin(admin.ModelAdmin):
-    """Read-only log of AI coach conversations (useful to see what members ask and to check the answers)."""
+    """Read-only log of coach assistant conversations (shows what members ask, so missing knowledge-base topics can be added)."""
     list_display = ("user", "role", "short", "created")
     list_filter = ("role", "created")
+    list_select_related = ("user",)
     search_fields = ("content", "user__username", "user__first_name", "user__phone")
     date_hierarchy = "created"
 
@@ -551,6 +576,7 @@ class AIMessageAdmin(admin.ModelAdmin):
 class NotificationAdmin(admin.ModelAdmin):
     list_display = ("title", "user", "sender", "created", "seen")
     list_filter = ("created", ("sender", admin.EmptyFieldListFilter))
+    list_select_related = ("user", "sender")
     search_fields = ("title", "body", "user__phone", "user__first_name", "user__last_name")
     raw_id_fields = ("user", "sender")
     readonly_fields = ("created", "read_at")
@@ -568,6 +594,7 @@ class NotificationAdmin(admin.ModelAdmin):
 class PersonalRecordAdmin(admin.ModelAdmin):
     list_display = ("user", "lift", "weight", "reps", "rm", "date")
     list_filter = ("lift", "date")
+    list_select_related = ("user",)
     search_fields = ("user__phone", "user__first_name", "user__last_name")
     raw_id_fields = ("user",)
 
@@ -581,13 +608,16 @@ class TrainerAdmin(admin.ModelAdmin):
     list_display = ("thumb", "name", "specialty", "experience_years", "pt_price", "account", "active")
     list_display_links = ("thumb", "name")
     list_editable = ("active",)
+    list_select_related = ("user",)
+    search_fields = ("name", "specialty")
+    list_filter = ("active",)
     fields = ("name", "specialty", "experience_years", "pt_price", "active", "user", "photo", "preview", "photo_url", "bio")
     readonly_fields = ("preview",)
     raw_id_fields = ("user",)  # picks the member account by id/search instead of loading every member into a dropdown
 
     @admin.display(description="Kirish (murabbiy paneli)")
     def account(self, o):
-        return format_html("✓ {}", o.user.phone or o.user.email) if o.user_id else "—"
+        return format_html("Ulangan: {}", o.user.phone or o.user.email or o.user.username) if o.user_id else "—"
 
     @admin.display(description="Rasm")
     def thumb(self, o):
@@ -598,13 +628,53 @@ class TrainerAdmin(admin.ModelAdmin):
         return thumb_html(o.image_src, 160) if o.pk else "—"
 
 
-admin.site.register([Category, Announcement, Membership, BodyLog])
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ("name", "order")
+    list_editable = ("order",)
+    search_fields = ("name",)
+
+
+@admin.register(Announcement)
+class AnnouncementAdmin(admin.ModelAdmin):
+    list_display = ("title", "pinned", "active", "created")
+    list_editable = ("pinned", "active")
+    list_filter = ("active", "pinned", "created")
+    search_fields = ("title", "body")
+
+
+@admin.register(Membership)
+class MembershipAdmin(admin.ModelAdmin):
+    list_display = ("user", "plan", "starts", "expires", "state", "freeze_used")
+    list_filter = ("plan", "freeze_used", "expires")
+    list_select_related = ("user", "plan")
+    search_fields = ("user__phone", "user__first_name", "user__last_name", "user__username")
+    raw_id_fields = ("user",)  # a dropdown with every member would be slow and endless
+    date_hierarchy = "expires"
+
+    @admin.display(description="Holat")
+    def state(self, o):
+        now = timezone.now()
+        if o.expires <= now:
+            return badge("Tugagan", "#888")
+        return badge("Faol", "#1d9a52") if o.starts <= now else badge("Boshlanmagan", "#b97d00")
+
+
+@admin.register(BodyLog)
+class BodyLogAdmin(admin.ModelAdmin):
+    list_display = ("user", "date", "weight", "height_cm", "note")
+    list_filter = ("date",)
+    list_select_related = ("user",)
+    search_fields = ("user__phone", "user__first_name", "user__last_name", "note")
+    raw_id_fields = ("user",)
+    date_hierarchy = "date"
 
 
 @admin.register(FoodEntry)
 class FoodEntryAdmin(admin.ModelAdmin):
     list_display = ("user", "date", "meal", "name", "grams", "kcal")
     list_filter = ("meal", "date")
-    search_fields = ("name", "user__username", "user__first_name")
+    list_select_related = ("user",)
+    search_fields = ("name", "user__username", "user__first_name", "user__last_name")
     autocomplete_fields = ()
     raw_id_fields = ("user",)

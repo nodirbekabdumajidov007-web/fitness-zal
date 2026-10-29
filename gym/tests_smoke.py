@@ -60,7 +60,7 @@ class SmokeTests(TestCase):
         self.msg = ChatMessage.objects.create(room=self.room, sender=other, body="salom")
         self.lesson = Lesson.objects.first()
         self.staff = Client()
-        self.staff.post("/login/", {"phone": "908775505", "password": "AdminPass1.admin"})
+        self.staff.post("/login/", {"login": "admin1", "password": "AdminPass1.admin"})
         self.other = other
 
     def args_for(self, name, converters):

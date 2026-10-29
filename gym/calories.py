@@ -3,6 +3,7 @@
 Food values are per 100 g (kcal, protein, fat, carbs): rounded averages of common reference tables, good enough
 for tracking, not for medical diets.
 """
+import re
 from datetime import date
 from decimal import Decimal
 
@@ -117,49 +118,132 @@ def parse_day(raw):
     return d if date(2020, 1, 1) <= d <= timezone.localdate() else timezone.localdate()
 
 
-# ---------------------------------------------------------------- AI estimate
+# ---------------------------------------------------------------- free text -> foods ("2 ta somsa va choy", "200 g osh", "3 tuxum")
+# No network and no AI: the words are matched against the built-in table above.
 
-ESTIMATE_SCHEMA = {
-    "type": "object",
-    "properties": {"items": {"type": "array", "items": {
-        "type": "object",
-        "properties": {"name": {"type": "string"}, "grams": {"type": "integer"}, "kcal": {"type": "number"},
-                       "protein": {"type": "number"}, "fat": {"type": "number"}, "carbs": {"type": "number"}},
-        "required": ["name", "grams", "kcal", "protein", "fat", "carbs"], "additionalProperties": False}}},
-    "required": ["items"], "additionalProperties": False,
-}
+# stems (a word that starts with one of them, up to a short ending, names the food), start of the table name (no apostrophes, lower case),
+# grams of one piece (0 = not counted in pieces), default portion in grams when no amount is given
+FOOD_ALIASES = [
+    (("osh", "palov", "plov", "плов", "pilaf", "pilav"), "osh", 0, 250), (("lagmon", "lagman", "лагман"), "lagmon", 0, 350),
+    (("manti", "манты", "мант"), "manti", 70, 210), (("somsa", "samsa", "samosa", "самс"), "somsa", 120, 120),
+    (("shashlik", "шашлык", "kebab", "kabob"), "shashlik", 80, 160), (("non", "хлеб", "лепёшк", "лепешк", "bread"), "non", 150, 150),
+    (("guruch", "рис", "rice"), "guruch", 0, 200), (("grechka", "grecha", "гречк", "buckwheat"), "grechka", 0, 200),
+    (("makaron", "макарон", "pasta"), "makaron", 0, 200), (("kartoshka", "картош", "картоф", "potato"), "kartoshka", 0, 200),
+    (("tuxum", "яйц", "яиц", "egg"), "tuxum", 55, 55), (("omlet", "омлет"), "omlet", 0, 150),
+    (("tovuq", "куриц", "курин", "chicken"), "tovuq", 0, 150), (("mol", "говяд", "beef"), "mol", 0, 150),
+    (("baliq", "рыб", "fish"), "baliq", 0, 150), (("suli", "овсян", "oat"), "suli", 0, 250), (("sut", "молок", "milk"), "sut", 0, 200),
+    (("kefir", "кефир"), "kefir", 0, 200), (("qatiq", "катык", "yogurt", "йогурт"), "qatiq", 0, 200),
+    (("tvorog", "творог", "cottage"), "tvorog", 0, 150), (("pishloq", "сыр", "cheese"), "pishloq", 20, 30),
+    (("banan", "банан"), "banan", 120, 120), (("olma", "яблок", "apple"), "olma", 180, 180), (("uzum", "виноград", "grape"), "uzum", 0, 100),
+    (("apelsin", "апельсин", "orange"), "apelsin", 150, 150), (("qovun", "дын", "melon"), "qovun", 0, 200),
+    (("tarvuz", "арбуз", "watermelon"), "tarvuz", 0, 300), (("anor", "гранат", "pomegranate"), "anor", 0, 150),
+    (("behi", "айв", "quince"), "behi", 0, 150), (("pomidor", "помидор", "томат", "tomato"), "pomidor", 100, 100),
+    (("bodring", "огур", "cucumber"), "bodring", 100, 100), (("sabzi", "морков", "carrot"), "sabzi", 80, 80),
+    (("yongoq", "грецк", "walnut"), "yongoq", 0, 30), (("bodom", "миндал", "almond"), "bodom", 0, 30),
+    (("pista", "фисташк", "pistachio"), "pista", 0, 30), (("mayiz", "изюм", "raisin"), "mayiz", 0, 30),
+    (("orik", "курага", "apricot"), "orik", 0, 30), (("asal", "мёд", "мед", "honey"), "asal", 0, 20),
+    (("qand", "shakar", "сахар", "sugar"), "qand", 0, 10), (("chuchvara", "пельмен", "dumpling"), "chuchvara", 0, 200),
+    (("mastava", "мастав"), "mastava", 0, 300), (("shorva", "шурп", "soup", "суп"), "shorva", 0, 300),
+    (("shirchoy",), "shirchoy", 0, 300), (("dimlama", "димлям"), "dimlama", 0, 300), (("pitsa", "pizza", "пицц"), "pitsa", 110, 110),
+    (("burger", "бургер", "gamburger"), "burger", 200, 200), (("kolbasa", "колбас", "sausage"), "kolbasa", 50, 100),
+    (("tuna", "тунец", "тунц"), "tuna", 0, 100), (("shokolad", "шоколад", "chocolate"), "shokolad", 0, 40),
+    (("pechenye", "печень", "cookie", "biscuit"), "pechenye", 12, 36), (("choy", "чай", "tea"), "choy", 200, 200),
+    (("kola", "кола", "cola", "coke"), "kola", 330, 330), (("sariyog", "сливочн", "butter"), "sariyog", 10, 10),
+    (("protein", "протеин"), "protein kukuni", 30, 30),
+]
+NUM_WORDS = {"bir": 1, "bitta": 1, "ikki": 2, "ikkita": 2, "uch": 3, "uchta": 3, "tort": 4, "tortta": 4, "besh": 5, "beshta": 5,
+             "olti": 6, "oltita": 6, "yetti": 7, "yettita": 7, "sakkiz": 8, "sakkizta": 8, "toqqiz": 9, "toqqizta": 9,
+             "один": 1, "одна": 1, "одну": 1, "два": 2, "две": 2, "три": 3, "четыре": 4, "пять": 5, "шесть": 6,
+             "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6}
+_GRAM_U = {"gramm", "gram", "gr", "g", "г", "гр", "грам", "грамм", "грамма", "граммов", "граммах", "grams", "gramma"}
+_KG_U = {"kg", "kilo", "kilogramm", "кг", "кило", "килограмм"}
+_PC_U = {"ta", "dona", "шт", "штук", "штуки", "штука", "pcs", "pc", "piece", "pieces", "portion", "porsiya", "порция", "порции"}
+_APOS = "ʻʼ’‘`´'"
 
 
-def estimate(user, text, lang="uz"):
-    """Free text ("2 ta somsa va choy") -> list of dicts for the whole portions. One AI request of the daily limit."""
-    import json
-    from . import ai
-    text = (text or "").strip()[:300]
-    if not text:
-        raise ai.AIError("ai_empty")
-    ai._take_quota(user)
-    raw = ai._call(
-        max_tokens=2000,
-        system=("You estimate food nutrition for a calorie tracker used in Uzbekistan. Split the meal description into separate foods, "
-                "guess a realistic portion in grams when it is not given (one somsa about 120 g, one egg 55 g, a cup of tea 200 g), "
-                "and give kcal, protein, fat and carbs of the WHOLE portion. Names short, in " + ai.LANG_NAMES.get(lang, "Uzbek (Latin script)") + "."),
-        output_config={"effort": "low", "format": {"type": "json_schema", "schema": ESTIMATE_SCHEMA}},
-        messages=[{"role": "user", "content": f"<meal>{text}</meal>"}],
-    )
-    try:
-        data = json.loads(raw)
-    except ValueError:
-        raise ai.AIError("ai_error")
+def _plain(s):
+    s = str(s or "").lower().replace("ё", "е")
+    for ch in _APOS:
+        s = s.replace(ch, "")
+    return s
+
+
+def _resolve_aliases():
+    names = [_plain(f[0]) for f in FOODS]
     out = []
-    for it in data.get("items", [])[:12]:  # nothing the model returns is trusted blindly
-        try:
-            grams = max(1, min(int(it["grams"]), 5000))
-            vals = [max(0.0, min(float(it[k]), 6000.0)) for k in ("kcal", "protein", "fat", "carbs")]
-        except (KeyError, TypeError, ValueError):
+    for stems, prefix, piece, default in FOOD_ALIASES:
+        idx = next((i for i, n in enumerate(names) if n.startswith(prefix)), None)
+        if idx is not None:
+            out.append((tuple(_plain(s) for s in stems), idx, piece, default))
+    return out
+
+
+_ALIASES = _resolve_aliases()
+
+
+def _amount_tokens(toks):
+    """[{v, unit, s, e, used}]: every number (digits or a number word) with the unit that follows it."""
+    qs, i = [], 0
+    while i < len(toks):
+        t, v, unit = toks[i], None, None
+        if t[0].isdigit():
+            v = float(t.replace(",", "."))
+        elif t in NUM_WORDS:
+            v = float(NUM_WORDS[t])
+            unit = "pc" if t.endswith("ta") else None
+        if v is None:
+            i += 1
             continue
-        name = str(it.get("name", "")).strip()[:80]
-        if name:
-            out.append({"name": name, "grams": grams, "kcal": round(vals[0], 1), "protein": round(vals[1], 1), "fat": round(vals[2], 1), "carbs": round(vals[3], 1)})
-    if not out:
-        raise ai.AIError("ai_error")
+        q = {"v": v, "unit": unit, "s": i, "e": i, "used": False}
+        nxt = toks[i + 1] if i + 1 < len(toks) else ""
+        if nxt in _GRAM_U:
+            q["unit"], q["e"] = "g", i + 1
+        elif nxt in _KG_U:
+            q["unit"], q["e"] = "kg", i + 1
+        elif nxt in _PC_U:
+            q["unit"], q["e"] = "pc", i + 1
+        qs.append(q)
+        i = q["e"] + 1
+    return qs
+
+
+def parse_text(text):
+    """Free text -> [{idx, name, grams, kcal, protein, fat, carbs}] for the foods of the built-in table it names, in the order they appear.
+    A number before (or just after) a food is its amount: "200 g osh", "2 ta somsa", "osh 300 gramm"; with no amount a usual portion is used."""
+    toks = re.findall(r"\d+(?:[.,]\d+)?|[^\W\d_]+", _plain(text)[:300], re.UNICODE)
+    qs = _amount_tokens(toks)
+    hits = []
+    for stems, idx, piece, default in _ALIASES:
+        for k, tok in enumerate(toks):
+            if tok[0].isdigit():
+                continue
+            if any(tok.startswith(s) and len(tok) - len(s) <= (3 if len(s) <= 3 else 5) for s in stems):
+                hits.append((k, idx, piece, default))
+                break
+    hits.sort()
+    out, seen = [], set()
+    for k, idx, piece, default in hits:
+        if idx in seen:
+            continue
+        seen.add(idx)
+        q = next((c for c in qs if not c["used"] and c["e"] < k and k - c["e"] <= 2), None) \
+            or next((c for c in qs if not c["used"] and c["s"] > k and c["s"] - k <= 3), None)
+        unit_g = piece or default
+        if q:
+            q["used"] = True
+            if q["unit"] == "kg":
+                grams = q["v"] * 1000
+            elif q["unit"] == "g":
+                grams = q["v"]
+            elif q["unit"] == "pc" or q["v"] < 25:
+                grams = q["v"] * unit_g
+            else:
+                grams = q["v"]
+        else:
+            grams = unit_g
+        grams = max(1, min(5000, int(round(grams))))
+        kcal, p, f, c = (float(x) for x in per_portion(FOODS[idx], grams))
+        out.append({"idx": idx, "name": FOODS[idx][0], "grams": grams, "kcal": kcal, "protein": p, "fat": f, "carbs": c})
+        if len(out) >= 12:
+            break
     return out

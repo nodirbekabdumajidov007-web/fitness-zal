@@ -17,7 +17,6 @@ services:
           property: connectionString
       - key: FZ_ADMIN_PASSWORD   # set this in the Render dashboard: it becomes the admin password on first deploy
         sync: false
-      - key: ANTHROPIC_API_KEY      # AI coach and AI plans (console.anthropic.com -> API keys)
         sync: false
       - key: CLOUDINARY_URL         # cloudinary://API_KEY:API_SECRET@CLOUD_NAME (cloudinary.com -> Dashboard -> API environment variable)
         sync: false

@@ -11,14 +11,16 @@
   {% for p in products %}
   <div class="card lift prod">
     <a class="prod-img" href="{% url 'product' p.pk %}">
-      {% if p.image_src %}<img referrerpolicy="no-referrer" data-fallback="{% static p.illustration %}" src="{{ p.image_src }}" alt="{{ p.name }}" loading="lazy" class="cover">{% else %}<img src="{% static p.illustration %}" alt="{{ p.name }}" loading="lazy">{% endif %}
-      <span class="badges">{% if p.pk in popular %}<span class="pill tag-hot">{% t 'popular' %}</span>{% endif %}{% if p.stock > 0 and p.stock <= 5 %}<span class="pill tag-low">{% t 'low_stock' %}</span>{% endif %}</span>
+      {% include "gym/_prodpic.html" %}
+      {% if p.pk in popular %}<span class="badges"><span class="pill tag-hot">{% t 'popular' %}</span></span>{% endif %}
     </a>
+    <div class="prod-body">
     <a href="{% url 'product' p.pk %}" class="prod-name"><b>{{ p.name }}</b></a>
-    <span class="muted num" style="font-size:.85rem">{% if p.stock > 0 %}{% t 'in_stock' %}: {{ p.stock }}{% else %}{% t 'sold_out' %}{% endif %}</span>
+    <span class="stock-badge {% if p.stock < 1 %}out{% elif p.stock <= 5 %}low{% endif %} num">{% if p.stock > 0 %}{% t 'in_stock' %}: {{ p.stock }}{% if p.stock <= 5 %} · {% t 'low_stock' %}{% endif %}{% else %}{% t 'sold_out' %}{% endif %}</span>
     <div class="prod-foot">
       <span class="num"><span class="price prod-price">{{ p.price|money }}</span></span>
       {% with qty=in_cart|get_item:p.pk %}{% include "gym/_qty.html" %}{% endwith %}
+    </div>
     </div>
   </div>
   {% empty %}<div class="muted">{% t 'no_results' %}</div>{% endfor %}

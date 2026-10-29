@@ -1,4 +1,4 @@
-/* AI coach page: the question is sent without reloading the page, the answer appears as a chat bubble.
+/* Coach assistant page (offline knowledge base): the question is sent without reloading the page, the answer appears as a chat bubble.
    Without JavaScript the same form posts normally and the page reloads with the answer. */
 (function () {
   var form = document.querySelector('[data-ai-form]');
@@ -6,11 +6,26 @@
   if (form && log) {
     var box = form.querySelector('textarea'), btn = form.querySelector('button');
     function csrf() { return form.querySelector('[name=csrfmiddlewaretoken]').value; }
-    function bubble(role, text) {
+    function bubble(role, text, extra) {
       var empty = log.querySelector('[data-ai-empty]'); if (empty) empty.remove();
       var d = document.createElement('div'), p = document.createElement('p');
       d.className = 'ai-msg ' + role; p.textContent = text;  // textContent: the answer is never treated as HTML
-      d.appendChild(p); log.appendChild(d); log.scrollTop = log.scrollHeight;
+      d.appendChild(p);
+      if (extra && extra.links && extra.links.length) {
+        var l = document.createElement('p');
+        extra.links.forEach(function (k) { var a = document.createElement('a'); a.href = k.url; a.textContent = k.label + ' \u2192'; l.appendChild(a); l.appendChild(document.createTextNode(' ')); });
+        d.appendChild(l);
+      }
+      if (extra && !extra.matched && extra.suggest && extra.suggest.length) {
+        var c = document.createElement('div'); c.className = 'ai-chips';
+        extra.suggest.forEach(function (s) {
+          var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = s;
+          b.addEventListener('click', function () { box.value = s; box.focus(); });
+          c.appendChild(b);
+        });
+        d.appendChild(c);
+      }
+      log.appendChild(d); log.scrollTop = log.scrollHeight;
       return d;
     }
     log.scrollTop = log.scrollHeight;
@@ -33,20 +48,18 @@
         .then(function (d) {
           wait.remove();
           if (d.ok) {
-            bubble('assistant', d.answer);
-            var used = document.querySelector('[data-ai-used]');
-            if (used) used.textContent = used.textContent.replace(/^\d+\s*\/\s*\d+/, d.used + ' / ' + d.limit);
+            bubble('assistant', d.answer, d);
           } else { bubble('assistant error', d.error || form.dataset.err); box.value = q; }
         })
         .catch(function () { wait.remove(); bubble('assistant error', form.dataset.err); box.value = q; })
         .then(function () { btn.disabled = false; btn.classList.remove('loading'); box.focus(); });
     });
   }
-  // the plan takes up to a minute: show it is working and stop a double click from paying twice
+  // stop a double click from saving the plan twice
   var plan = document.querySelector('[data-ai-plan]');
   if (plan) plan.addEventListener('submit', function (e) {
     var b = plan.querySelector('button[type=submit]');
     if (b.disabled) { e.preventDefault(); return; }
-    setTimeout(function () { b.disabled = true; b.classList.add('loading'); b.textContent = b.dataset.busy; }, 0);
+    setTimeout(function () { b.disabled = true; }, 0);
   });
 })();

@@ -136,7 +136,7 @@ class ToolsAndRecordsTests(Base):
 
     def test_admin_dashboard_coaches(self):
         staff = Client()
-        staff.post("/login/", {"phone": "908775505", "password": "AdminPass1.admin"})
+        staff.post("/login/", {"login": "admin1", "password": "AdminPass1.admin"})
         r = staff.get("/django-admin/")
         self.assertContains(r, "Murabbiylar reytingi")
         self.assertTrue(any(c["linked"] for c in r.context["coaches"]))

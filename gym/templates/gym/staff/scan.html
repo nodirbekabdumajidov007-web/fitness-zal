@@ -20,7 +20,7 @@
   <section class="sc-printer" aria-live="polite">
     <div class="sc-slot noprint" aria-hidden="true"><span class="sc-led" id="sc-led"></span></div>
     <div class="sc-paper" id="scan-result"><p class="sc-wait noprint">{% t 'tk_wait' %}</p></div>
-    <button class="btn pill sc-print noprint" type="button" id="sc-print" hidden>🖨 {% t 'tk_print' %}</button>
+    <button class="btn pill sc-print noprint" type="button" id="sc-print" hidden>{% icon 'printer' %} {% t 'tk_print' %}</button>
   </section>
 </div>
 <div id="scan-i18n" hidden data-err="{% t 'scan_err' %}" data-nocam="{% t 'scan_nocam' %}" data-session="{% t 'scan_session' %}"></div>

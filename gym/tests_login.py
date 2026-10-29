@@ -104,7 +104,7 @@ class SmsLoginTests(Base):
     def test_admin_also_needs_the_code_then_lands_in_panel(self):
         self.switch(login_sms_code=True)
         c = Client()
-        r = c.post("/login/", {"phone": "908775505", "password": "AdminPass1.admin"})
+        r = c.post("/login/", {"login": "admin1", "password": "AdminPass1.admin"})
         self.assertRedirects(r, "/login/code/", fetch_redirect_response=False)
         self.assertEqual(c.get("/django-admin/").status_code, 302)
         r = c.post("/login/code/", {"code": self.last_code(self.admin.phone)})
@@ -157,7 +157,7 @@ class GoogleOnlyTests(Base):
     def test_owner_keeps_password_door(self):
         self.switch(require_google=True)
         c = Client()
-        r = c.post("/login/", {"phone": "908775505", "password": "AdminPass1.admin"})
+        r = c.post("/login/", {"login": "admin1", "password": "AdminPass1.admin"})
         self.assertRedirects(r, "/django-admin/", fetch_redirect_response=False)
 
     def test_register_form_is_closed(self):

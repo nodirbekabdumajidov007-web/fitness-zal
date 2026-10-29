@@ -280,47 +280,28 @@ def check_low_stock(products):
 
 # ---------------------------------------------------------------- ready-made training programs
 # weekday: 0 = Monday. Exercise names are written for members in Uzbek with the usual gym name in brackets.
-PROGRAMS = {
-    "beginner": {"title": "Boshlang'ich: butun tana", "days": "Du · Cho · Ju", "level": "beginner", "emoji": "🌱",
-                 "about": "Haftasiga 3 marta. Asosiy harakatlarni o'rganish va kuchni bir tekis oshirish uchun.",
-                 "ex": [(d, n, s, r) for d in (0, 2, 4) for n, s, r in (
-                     ("O'tirib turish (Squat)", 3, "12"), ("Polga tayanib ko'tarilish (Push-up)", 3, "10"),
-                     ("Yuqori blokni tortish (Lat pulldown)", 3, "12"), ("Gantel bilan eshkak (Dumbbell row)", 3, "12"),
-                     ("Planka (Plank)", 3, "30 s"))]},
-    "ppl": {"title": "Itarish · Tortish · Oyoq", "days": "6 kun", "level": "advanced", "emoji": "🔥",
-            "about": "Push / Pull / Legs: har mushak guruhi haftasiga 2 marta. Massa va kuch uchun.",
-            "ex": [(d, n, s, r) for d in (0, 3) for n, s, r in (
-                ("Shtanga bilan jim yotib itarish (Bench press)", 4, "8"), ("Qiya o'rindiqda gantel (Incline DB press)", 3, "10"),
-                ("Yelka uchun itarish (Shoulder press)", 3, "10"), ("Yon tomonga ko'tarish (Lateral raise)", 3, "15"),
-                ("Triceps blokda (Pushdown)", 3, "12"))]
-            + [(d, n, s, r) for d in (1, 4) for n, s, r in (
-                ("Stanovoy (Deadlift)", 4, "6"), ("Turnikda tortilish (Pull-up)", 4, "8"), ("Shtanga bilan eshkak (Barbell row)", 3, "10"),
-                ("Yuzga tortish (Face pull)", 3, "15"), ("Biceps (Curl)", 3, "12"))]
-            + [(d, n, s, r) for d in (2, 5) for n, s, r in (
-                ("O'tirib turish (Squat)", 4, "8"), ("Rumincha stanovoy (RDL)", 3, "10"), ("Oyoq bilan itarish (Leg press)", 3, "12"),
-                ("Son orqasi (Leg curl)", 3, "12"), ("Boldir (Calf raise)", 4, "15"))]},
-    "fatloss": {"title": "Yog' yoqish", "days": "Du · Se · Pa · Ju", "level": "intermediate", "emoji": "⚡",
-                "about": "Aylana (circuit) mashqlar va kardio: puls baland, dam olish qisqa (30–45 s).",
-                "ex": [(d, n, s, r) for d in (0, 3) for n, s, r in (
-                    ("Burpi (Burpee)", 4, "12"), ("Girya silkitish (Kettlebell swing)", 4, "15"), ("Arqon (Jump rope)", 4, "60 s"),
-                    ("Tog'ga chiqish (Mountain climber)", 4, "30 s"), ("Yugurish yo'lakchasi", 1, "20 daq"))]
-                + [(d, n, s, r) for d in (1, 4) for n, s, r in (
-                    ("Gantel bilan o'tirib turish (Goblet squat)", 4, "15"), ("Polga tayanib ko'tarilish (Push-up)", 4, "12"),
-                    ("Hamla (Lunges)", 3, "12"), ("Eshkak trenajyori (Rowing)", 1, "15 daq"), ("Planka (Plank)", 3, "45 s"))]},
-}
+from . import programs as _programs  # the program data lives in gym/programs.py
+
+
+def _flat_program(p):
+    rows = _programs.rows(p)
+    return {**p, "ex": [(wd, n, s, r) for wd, n, s, r, _rest in rows], "rest": {i: row[4] for i, row in enumerate(rows)}, "rows": rows}
+
+
+PROGRAMS = {k: _flat_program(p) for k, p in _programs.PROGRAMS.items()}
 
 
 @transaction.atomic
 def start_program(user, key):
     """Gives the member a ready-made plan. A plan from a trainer always wins, so it is never replaced here."""
-    from .models import WorkoutPlan
+    from .models import Exercise, WorkoutPlan
     prog = PROGRAMS.get(key)
     if not prog or user.workout_plans.filter(active=True, trainer__isnull=False).exists():
         return None
     user.workout_plans.filter(active=True).update(active=False)
-    plan = WorkoutPlan.objects.create(user=user, title=f"{prog['emoji']} {prog['title']}", notes=prog["about"], active=True)
-    for i, (wd, name, sets, reps) in enumerate(prog["ex"]):
-        plan.exercises.create(weekday=wd, name=name, sets=sets, reps=reps, order=i)
+    plan = WorkoutPlan.objects.create(user=user, title=prog["title"], notes=prog["about"], active=True)
+    plan.exercises.bulk_create([Exercise(plan=plan, weekday=wd, name=name, sets=sets, reps=reps, order=i, note=f"Dam: {rest}" if rest else "")
+                                for i, (wd, name, sets, reps, rest) in enumerate(prog["rows"])])
     return plan
 
 

@@ -1,0 +1,2 @@
+{% load gym_tags %}{# Product picture: the uploaded photo over a line-icon placeholder (kept visible if there is no photo or it fails to load). Needs `p`. #}
+<span class="pp pp-{{ p.tone }}"><span class="pp-ph">{% icon p.kind 'pp-ico' %}{% if p.size_label %}<small>{{ p.size_label }}</small>{% endif %}</span>{% if p.image_src %}<img class="pp-photo" data-ph referrerpolicy="no-referrer" src="{{ p.image_src }}" alt="{{ p.name }}" loading="lazy">{% endif %}</span>

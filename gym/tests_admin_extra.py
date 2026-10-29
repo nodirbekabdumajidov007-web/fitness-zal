@@ -29,7 +29,7 @@ class Base(TestCase):
         Visit.objects.create(user=self.m)
         Payment.objects.create(user=self.m, kind="plan", amount=400000, method="cash", status="paid")
         self.staff = Client()
-        self.staff.post("/login/", {"phone": "908775505", "password": "AdminPass1.admin"})
+        self.staff.post("/login/", {"login": "admin1", "password": "AdminPass1.admin"})
 
 
 class DashboardTests(Base):

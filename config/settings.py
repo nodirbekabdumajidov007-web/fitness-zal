@@ -6,7 +6,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 def _load_dotenv(path):
-    """Local secrets (ANTHROPIC_API_KEY, EMAIL_*, CLOUDINARY_URL...) from a .env file next to manage.py: one KEY=value per line.
+    """Local secrets (EMAIL_*, CLOUDINARY_URL...) from a .env file next to manage.py: one KEY=value per line.
     The file is git-ignored; real environment variables (e.g. on Render) always win over it."""
     if not path.is_file():
         return

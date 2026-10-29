@@ -50,7 +50,7 @@ class AuditBase(TestCase):
         self.t.user = self.coach_user
         self.t.save()
         self.staff = Client()
-        self.staff.post("/login/", {"phone": "908775505", "password": "AdminPass1.admin"})
+        self.staff.post("/login/", {"login": "admin1", "password": "AdminPass1.admin"})
         self.coach = Client()
         self.coach.post("/login/", {"phone": "935554433", "password": PW, "role": "trainer"})
 
@@ -168,7 +168,7 @@ class AdminResetOnDeployTests(AuditBase):
             call_command("setup_gym", verbosity=0)
         self.admin.refresh_from_db()
         self.assertTrue(self.admin.check_password("Yangi-Parol-2026"))
-        r = Client().post("/login/", {"phone": "908775505", "password": "Yangi-Parol-2026.admin"})
+        r = Client().post("/login/", {"login": "admin1", "password": "Yangi-Parol-2026.admin"})
         self.assertEqual(r["Location"], "/django-admin/")
 
     def test_admin_suffix_in_env_is_not_part_of_the_password(self):
@@ -177,7 +177,7 @@ class AdminResetOnDeployTests(AuditBase):
             call_command("setup_gym", verbosity=0)
         self.admin.refresh_from_db()
         self.assertTrue(self.admin.check_password("2012"))
-        r = Client().post("/login/", {"phone": "908775505", "password": "2012.admin"})
+        r = Client().post("/login/", {"login": "admin1", "password": "2012.admin"})
         self.assertEqual(r["Location"], "/django-admin/")
         User.objects.filter(is_superuser=True).delete()  # a brand-new database (first deploy) gets the same treatment
         with mock.patch.dict("os.environ", {"FZ_ADMIN_PASSWORD": "2012.admin"}):

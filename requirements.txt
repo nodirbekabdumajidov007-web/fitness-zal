@@ -3,6 +3,5 @@ segno>=1.6
 channels>=4.1
 uvicorn>=0.30
 websockets>=12
-anthropic>=2.3
 cloudinary>=1.40
 django-cloudinary-storage>=0.3
