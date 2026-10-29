@@ -1,5 +1,6 @@
 import os
 import secrets
+import warnings
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,6 +22,10 @@ def _load_dotenv(path):
 
 
 _load_dotenv(BASE_DIR / ".env")
+
+# Under uvicorn (ASGI) every static file / photo served by WhiteNoise or FileResponse logs this warning: the file is
+# streamed from a worker thread instead of an async iterator. It works fine and only floods the Render logs.
+warnings.filterwarnings("ignore", message="StreamingHttpResponse must consume synchronous iterators")
 
 
 def _secret_key():
