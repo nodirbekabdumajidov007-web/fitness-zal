@@ -1,0 +1,67 @@
+{% load gym_tags %}
+<div class="tk-charts" data-tk data-url="{{ data_url }}" data-period="{{ period }}">
+  <div class="tk-bar">
+    <div class="tk-periods" role="group" aria-label="{% t 'ftr_period' %}">
+      {% for p in periods %}<button type="button" data-period="{{ p }}" aria-pressed="{% if p == period %}true{% else %}false{% endif %}">{% t 'ftr_p_'|add:p %}</button>{% endfor %}
+    </div>
+    <span class="muted tk-streak" data-streak></span>
+  </div>
+
+  <section class="card tk-chart" data-chart="weight">
+    <div class="db-head"><h3>{% icon 'scale' %} {% t 'ftr_weight' %}</h3><span class="pill mute num" data-delta></span></div>
+    <div class="tk-legend" data-legend></div>
+    <div class="tk-plot" data-plot></div>
+    <details class="tk-table"><summary>{% t 'ftr_table' %}</summary><div data-table></div></details>
+  </section>
+
+  <section class="card tk-chart" data-chart="measures">
+    <div class="db-head"><h3>{% icon 'ruler' %} {% t 'ftr_measures' %}</h3></div>
+    <div class="tk-legend tk-toggles" data-legend></div>
+    <div class="tk-plot" data-plot></div>
+    <details class="tk-table"><summary>{% t 'ftr_table' %}</summary><div data-table></div></details>
+  </section>
+
+  <section class="card tk-chart" data-chart="body_fat">
+    <div class="db-head"><h3>{% icon 'activity' %} {% t 'ftr_body_fat' %} / {% t 'ftr_resting_hr' %}</h3></div>
+    <div class="tk-legend" data-legend></div>
+    <div class="tk-plot" data-plot></div>
+    <details class="tk-table"><summary>{% t 'ftr_table' %}</summary><div data-table></div></details>
+  </section>
+
+  <section class="card tk-chart" data-chart="strength">
+    <div class="db-head"><h3>{% icon 'trophy' %} {% t 'ftr_strength' %}</h3><select data-picker aria-label="{% t 'exercise' %}"></select></div>
+    <div class="tk-plot" data-plot></div>
+    <details class="tk-table"><summary>{% t 'ftr_table' %}</summary><div data-table></div></details>
+  </section>
+
+  <section class="card tk-chart" data-chart="volume">
+    <div class="db-head"><h3>{% icon 'dumbbell' %} {% t 'ftr_volume' %}</h3></div>
+    <div class="tk-plot" data-plot></div>
+    <details class="tk-table"><summary>{% t 'ftr_table' %}</summary><div data-table></div></details>
+  </section>
+
+  <section class="card tk-chart" data-chart="activity">
+    <div class="db-head"><h3>{% icon 'calendar' %} {% t 'ftr_activity' %}</h3></div>
+    <div class="tk-legend" data-legend></div>
+    <div class="tk-plot" data-plot></div>
+    <details class="tk-table"><summary>{% t 'ftr_table' %}</summary><div data-table></div></details>
+  </section>
+
+  <section class="card tk-chart" data-chart="calories">
+    <div class="db-head"><h3>{% icon 'flame' %} {% t 'ftr_calories' %}</h3><span class="pill mute num" data-adherence></span></div>
+    <div class="tk-legend" data-legend></div>
+    <div class="tk-plot" data-plot></div>
+    <details class="tk-table"><summary>{% t 'ftr_table' %}</summary><div data-table></div></details>
+  </section>
+
+  <section class="card tk-compare" data-compare data-url="{{ compare_url }}">
+    <div class="db-head"><h3>{% icon 'target' %} {% t 'ftr_compare' %}</h3></div>
+    <div class="tk-cmp-form">
+      <label>{% t 'ftr_before' %}<input type="date" name="a" max="{{ today }}"></label>
+      <label>{% t 'ftr_after' %}<input type="date" name="b" max="{{ today }}" value="{{ today }}"></label>
+      <button type="button" class="btn primary small" data-cmp-go>{% t 'ftr_compare_go' %}</button>
+    </div>
+    <div class="tk-cmp-out" data-cmp-out aria-live="polite"></div>
+  </section>
+  {{ labels|json_script:"tkLabels" }}
+</div>

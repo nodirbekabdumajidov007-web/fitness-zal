@@ -1,0 +1,34 @@
+{% extends "gym/base.html" %}{% load gym_tags %}
+{% block title %}{{ member.full_name }} · {% t 'ftr_title' %}{% endblock %}
+{% block content %}
+<div class="eyebrow"><a href="{% url 'coach_client' member.pk %}">← {{ member.full_name }}</a></div>
+<section class="tl-hero">
+  <span class="eyebrow">{{ member.member_code }} · {% t 'ftr_readonly' %}</span>
+  <h1>{% icon 'trending-up' %} {% t 'ftr_title' %}</h1>
+</section>
+<div class="tk-kpis">
+  <div class="card"><small class="muted">{% t 'ftr_weight' %}</small><b class="num">{% if summary.weight %}{{ summary.weight }} kg{% else %}—{% endif %}</b></div>
+  <div class="card"><small class="muted">{% t 'bmi' %}</small><b class="num">{{ summary.bmi|default:"—" }}</b></div>
+  <div class="card"><small class="muted">{% t 'ftr_body_fat' %}</small><b class="num">{% if summary.body_fat %}{{ summary.body_fat }} %{% else %}—{% endif %}</b></div>
+  <div class="card"><small class="muted">{% t 'ftr_this_week' %}</small><b class="num">{{ summary.week_workouts }} <small>{% t 'ftr_workouts_n' %}</small></b></div>
+</div>
+{% include "gym/tracker/_goals.html" %}
+{% include "gym/tracker/_charts.html" %}
+<h3>{% t 'ftr_history' %}</h3>
+{% for s in sessions %}
+<article class="card tk-session">
+  <div class="db-head"><h3 class="num">{{ s.date|dmy }}</h3><span class="pill good num">{{ s.volume|floatformat:"-1" }} kg</span></div>
+  {% regroup s.sets.all by exercise as groups %}
+  {% for g in groups %}<div class="tk-ex"><b>{{ g.grouper }}</b> <span class="num muted">{% for st in g.list %}{{ st.reps }}×{{ st.weight|floatformat:"-1" }}{% if not forloop.last %} · {% endif %}{% endfor %}</span></div>{% endfor %}
+</article>
+{% empty %}<p class="muted">{% t 'ftr_no_sessions' %}</p>{% endfor %}
+{% if rows %}
+<h3>{% t 'ftr_history_body' %}</h3>
+<div class="tbl tk-hist"><table>
+  <thead><tr><th>{% t 'date' %}</th><th>{% t 'weight' %}</th><th>{% t 'bmi' %}</th><th>{% t 'ftr_m_waist' %}</th><th>{% t 'ftr_body_fat' %}</th><th>{% t 'ftr_resting_hr' %}</th></tr></thead>
+  <tbody>{% for r in rows %}<tr><td class="num">{{ r.l.date|dmy }}</td><td class="num">{{ r.l.weight }}</td><td class="num">{{ r.bmi|default:"—" }}</td>
+    <td class="num">{{ r.l.waist|default:"—" }}</td><td class="num">{{ r.l.body_fat|default:"—" }}</td><td class="num">{{ r.l.resting_hr|default:"—" }}</td></tr>{% endfor %}</tbody>
+</table></div>
+{% endif %}
+{% endblock %}
+{% block scripts %}<script src="{% vstatic 'js/tracker.js' %}"></script>{% endblock %}

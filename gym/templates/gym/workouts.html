@@ -28,6 +28,19 @@
             <span class="wo-sets" aria-hidden="true">{% for i in "x"|ljust:x.e.sets %}<i></i>{% endfor %}</span></span>
           {% if d.today %}<button class="wo-check" type="submit" aria-label="{% if x.done %}{% t 'done_mark' %}{% else %}{% t 'mark_done' %}{% endif %}">{% if x.done %}✓{% endif %}</button>{% endif %}
         </form>
+        {% if d.today %}
+        <details class="tk-sets" data-tk-sets data-name="{{ x.e.name }}" data-sets="{{ x.e.sets }}" data-reps="{{ x.e.reps }}">
+          <summary>{% t 'ftr_log_sets' %}{% if x.logged %} <span class="pill good num">{{ x.logged|length }}</span>{% endif %}</summary>
+          <form method="post" action="{% url 'workout_plan_log' x.e.pk %}" class="tk-setform">{% csrf_token %}
+            <div class="tk-setrows" data-rows>
+              {% for st in x.logged %}<div class="tk-setrow"><input type="hidden" name="name" value="{{ x.e.name }}"><span class="num">{{ forloop.counter }}</span>
+                <input name="reps" type="number" min="1" max="100" value="{{ st.reps }}" aria-label="{% t 'reps' %}"><input name="weight" inputmode="decimal" value="{{ st.weight|floatformat:'-1' }}" aria-label="kg">
+                <input name="rpe" inputmode="decimal" value="{{ st.rpe|floatformat:'-1' }}" placeholder="RPE" aria-label="RPE"><input name="snote" maxlength="120" value="{{ st.note }}" placeholder="{% t 'note' %}" aria-label="{% t 'note' %}"></div>{% endfor %}
+            </div>
+            <div class="tk-acts"><button type="button" class="btn small" data-add-set>＋ {% t 'ftr_add_set' %}</button><button class="btn small primary" type="submit">{% t 'save' %}</button></div>
+          </form>
+        </details>
+        {% endif %}
         {% endfor %}
       </section>
       {% endfor %}
@@ -43,6 +56,7 @@
     </aside>
   </div>
 
+  <p><a class="btn small pill" href="{% url 'workout_add' %}">＋ {% t 'ftr_add_workout' %}</a> <a class="btn small pill" href="{% url 'workouts_log' %}">{% t 'ftr_history' %}</a></p>
   {% if not from_trainer %}<form method="post" action="{% url 'stop_plan' %}" class="wo-stop">{% csrf_token %}<button class="btn small danger" type="submit" data-bin data-confirm="{% t 'sure' %}">{% t 'plan_stop' %}</button></form>{% endif %}
 {% else %}
   <section class="wo-empty card">
@@ -129,4 +143,4 @@
 </section>
 {% endif %}
 {% endblock %}
-{% block scripts %}<script src="{% vstatic 'js/workouts.js' %}"></script><script src="{% vstatic 'js/programs.js' %}"></script>{% endblock %}
+{% block scripts %}<script src="{% vstatic 'js/workouts.js' %}"></script><script src="{% vstatic 'js/tracker_sets.js' %}"></script><script src="{% vstatic 'js/programs.js' %}"></script>{% endblock %}

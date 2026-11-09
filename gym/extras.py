@@ -612,13 +612,13 @@ def anonymize_user(user):
     user.username, user.first_name, user.last_name = f"deleted{uid}", "Deleted", ""
     user.email = user.phone = None
     user.phone_verified = user.show_in_leaderboard = user.chat_visible = False
-    user.birth_date, user.goal, user.target_weight = None, "", None
+    user.birth_date, user.goal, user.target_weight, user.sex = None, "", None, ""
     user.telegram_chat_id, user.tg_link_code, user.staff_note, user.calendar_token = None, "", "", ""
     user.avatar = None
     user.is_active, user.deleted_at = False, timezone.now()
     user.set_unusable_password()
     user.save()
-    for rel in ("bodylogs", "records", "food_entries", "my_foods", "ai_messages", "notifications", "workout_plans", "water_logs", "waitlist",
+    for rel in ("bodylogs", "records", "workout_sessions", "tracker_goals", "food_entries", "my_foods", "ai_messages", "notifications", "workout_plans", "water_logs", "waitlist",
                 "trainer_reviews", "reviews", "guest_passes", "bookings"):
         getattr(user, rel).filter(**({"date__gte": timezone.localdate()} if rel == "bookings" else {})).delete()
     ChatMessage.objects.filter(sender=user).update(body="", image="", deleted=True)

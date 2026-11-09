@@ -14,7 +14,7 @@
       <span>{% if mem %}<b>✓</b>{% plan_name mem.plan %} · {{ mem.expires|dmy }}{% else %}<b>—</b>{% t 'no_membership' %}{% endif %}</span>
     </div>
   </div>
-  <div class="co-hero-acts"><a class="btn primary pill" href="{% url 'coach_plan' m.pk %}">{% icon 'trending-up' %} {% if plan %}{% t 'coach_edit_plan' %}{% else %}{% t 'coach_make_plan' %}{% endif %}</a>
+  <div class="co-hero-acts"><a class="btn pill" href="{% url 'coach_tracker' m.pk %}">{% icon 'scale' %} {% t 'ftr_title' %}</a><a class="btn primary pill" href="{% url 'coach_plan' m.pk %}">{% icon 'trending-up' %} {% if plan %}{% t 'coach_edit_plan' %}{% else %}{% t 'coach_make_plan' %}{% endif %}</a>
     <form method="post" action="{% url 'chat_start' m.pk %}">{% csrf_token %}<button class="btn pill frost-dark" type="submit">{% icon 'message' %} {% t 'chat' %}</button></form></div>
 </section>
 

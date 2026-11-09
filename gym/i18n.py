@@ -1257,6 +1257,95 @@ pwa_push_denied||Brauzer bildirishnomalarni bloklagan: brauzer sozlamalaridan ru
 pwa_push_unsupported||Bu brauzer push-bildirishnomalarni qo'llamaydi (iPhone'da avval ilovani bosh ekranga qo'shing).||Этот браузер не поддерживает push (на iPhone сначала добавьте приложение на главный экран).||This browser does not support push (on iPhone, add the app to your home screen first).
 pwa_push_err||Xatolik: qayta urinib ko'ring.||Ошибка: попробуйте ещё раз.||Something went wrong: try again.
 offline_card||A'zo kartam (QR)||Моя карта (QR)||My member card (QR)
+ftr_title||Fitnes treker||Фитнес-трекер||Fitness tracker
+ftr_sub||Vazn, tana o'lchamlari, mashg'ulotlar va maqsadlaringiz bir joyda. Ma'lumotlar faqat sizga ko'rinadi.||Вес, замеры тела, тренировки и цели в одном месте. Данные видны только вам.||Weight, body measurements, workouts and goals in one place. Only you can see your data.
+ftr_weight||Vazn||Вес||Weight
+ftr_this_week||Shu hafta||На этой неделе||This week
+ftr_workouts_n||ta mashg'ulot||тренировок||workouts
+ftr_add_workout||Mashg'ulot qo'shish||Добавить тренировку||Add workout
+ftr_history||Mashg'ulotlar tarixi||История тренировок||Workout history
+ftr_history_body||O'lchamlar tarixi||История замеров||Measurement history
+ftr_csv_body||o'lchamlar||замеры||measurements
+ftr_csv_workouts||mashg'ulotlar||тренировки||workouts
+ftr_quick_entry||Tez kiritish: bugungi o'lchamlar||Быстрый ввод: замеры за сегодня||Quick entry: today's measurements
+ftr_edit_entry||Yozuvni tahrirlash||Редактирование записи||Edit entry
+ftr_edit||Tahrirlash||Изменить||Edit
+ftr_sex||Jins||Пол||Sex
+ftr_sex_m||Erkak||Мужской||Male
+ftr_sex_f||Ayol||Женский||Female
+ftr_more||Qo'shimcha o'lchamlar (sm), tana yog'i, puls||Дополнительные замеры (см), жир, пульс||More measurements (cm), body fat, pulse
+ftr_m_waist||Bel (sm)||Талия (см)||Waist (cm)
+ftr_m_chest||Ko'krak (sm)||Грудь (см)||Chest (cm)
+ftr_m_hips||Son-dumba (sm)||Бёдра (см)||Hips (cm)
+ftr_m_neck||Bo'yin (sm)||Шея (см)||Neck (cm)
+ftr_m_arm||Qo'l, biceps (sm)||Рука, бицепс (см)||Arm, biceps (cm)
+ftr_m_thigh||Son (sm)||Бедро (см)||Thigh (cm)
+ftr_m_calf||Boldir (sm)||Голень (см)||Calf (cm)
+ftr_body_fat||Tana yog'i (%)||Жир тела (%)||Body fat (%)
+ftr_auto||bo'sh qolsa hisoblanadi||авто, если пусто||auto if empty
+ftr_resting_hr||Tinch puls||Пульс в покое||Resting pulse
+ftr_bf_hint||Tana yog'i bo'sh qolsa, jins, bo'y, bel va bo'yin (ayollarda son-dumba ham) kiritilganda AQSH dengiz floti formulasi bilan hisoblanadi.||Если жир не указан, он считается по формуле ВМС США при заданных поле, росте, талии и шее (у женщин ещё и бёдрах).||If body fat is empty it is estimated with the US Navy formula from sex, height, waist and neck (and hips for women).
+ftr_err_range||Qiymat ruxsat etilgan oraliqdan tashqarida yoki noto'g'ri||Значение вне допустимого диапазона или неверно||The value is out of range or invalid
+ftr_err_date||Sana noto'g'ri (kelajak sana bo'lmasin, muddat esa kelajakda bo'lsin)||Неверная дата (не в будущем; срок цели должен быть в будущем)||Invalid date (not in the future; a goal deadline must be in the future)
+ftr_err_notfound||Yozuv topilmadi||Запись не найдена||Entry not found
+ftr_err_set||Yondashuvlarni tekshiring: mashq nomi va takror (1-100) kerak, og'irlik 0-500 kg, RPE 1-10||Проверьте подходы: нужны название и повторы (1-100), вес 0-500 кг, RPE 1-10||Check the sets: a name and reps (1-100) are needed, weight 0-500 kg, RPE 1-10
+ftr_goals||Maqsadlar||Цели||Goals
+ftr_goal||Maqsad||Цель||Goal
+ftr_no_goals||Hali maqsad qo'yilmagan.||Целей пока нет.||No goals yet.
+ftr_goal_nodata||Maqsad qo'yildi. Progress uchun o'lcham kiriting.||Цель задана. Добавьте замер, чтобы увидеть прогресс.||Goal set. Add a measurement to see progress.
+ftr_set_goal||Maqsad qo'yish||Поставить цель||Set a goal
+ftr_goal_type||Maqsad turi||Тип цели||Goal type
+ftr_goal_metric||Ko'rsatkich||Показатель||Metric
+ftr_target||Maqsad qiymati||Целевое значение||Target value
+ftr_deadline||Muddat||Срок||Deadline
+ftr_remaining||Qoldi||Осталось||Remaining
+ftr_trend||Trend (so'nggi 4 hafta)||Тренд (4 недели)||Trend (last 4 weeks)
+ftr_week||hafta||неделя||week
+ftr_projected||Taxminiy sana||Прогноз даты||Projected date
+ftr_state_nodata||Ma'lumot yo'q||Нет данных||No data
+ftr_state_reached||Erishildi||Достигнуто||Reached
+ftr_state_on_track||Reja bo'yicha||По плану||On track
+ftr_state_off_track||Rejadan orqada||Отстаёте||Off track
+ftr_state_no_trend||Trend uchun ma'lumot kam||Мало данных для тренда||Not enough data for a trend
+ftr_period||Davr||Период||Period
+ftr_p_1m||1 oy||1 мес.||1 month
+ftr_p_3m||3 oy||3 мес.||3 months
+ftr_p_6m||6 oy||6 мес.||6 months
+ftr_p_1y||1 yil||1 год||1 year
+ftr_p_all||Hammasi||Всё||All
+ftr_ma7||7 kunlik o'rtacha||Среднее за 7 дней||7-day average
+ftr_projection||Prognoz||Прогноз||Projection
+ftr_measures||Tana o'lchamlari||Замеры тела||Body measurements
+ftr_strength||Kuch (taxminiy 1RM)||Сила (расчётный 1ПМ)||Strength (estimated 1RM)
+ftr_est1rm||Taxminiy 1RM||Расчётный 1ПМ||Estimated 1RM
+ftr_volume||Haftalik hajm (kg x takror)||Недельный объём (кг x повторы)||Weekly volume (kg x reps)
+ftr_volume_short||Hajm||Объём||Volume
+ftr_activity||Haftalik faollik||Недельная активность||Weekly activity
+ftr_workouts||Mashg'ulotlar||Тренировки||Workouts
+ftr_visits||Zalga tashriflar||Посещения зала||Gym visits
+ftr_calories||Kaloriya||Калории||Calories
+ftr_adherence||{pct}% kun me'yorda ({n}/{total})||{pct}% дней в норме ({n}/{total})||{pct}% of days on target ({n}/{total})
+ftr_streak||Ketma-ketlik: {d} kun, {w} hafta||Серия: {d} дн., {w} нед.||Streak: {d} days, {w} weeks
+ftr_table||Jadval||Таблица||Table
+ftr_no_data||Bu davr uchun ma'lumot yo'q||Нет данных за этот период||No data for this period
+ftr_date||Sana||Дата||Date
+ftr_value||Ko'rsatkich||Показатель||Metric
+ftr_diff||Farq||Разница||Difference
+ftr_compare||Oldin / keyin||До / после||Before / after
+ftr_before||Oldin (sana)||До (дата)||Before (date)
+ftr_after||Keyin (sana)||После (дата)||After (date)
+ftr_compare_go||Solishtirish||Сравнить||Compare
+ftr_pick_two||Ikkala sanani tanlang||Выберите обе даты||Pick both dates
+ftr_enter_weight||Vazn kiritish||Ввести вес||Enter weight
+ftr_log_sets||Yondashuvlarni yozish||Записать подходы||Log sets
+ftr_add_set||Yondashuv||Подход||Set
+ftr_add_exercise||Mashq qo'shish||Добавить упражнение||Add exercise
+ftr_add_help||Mashq nomini yozing (ro'yxatdan tanlash yoki o'zingiz yozish mumkin), so'ng har bir yondashuv uchun takror va og'irlikni kiriting.||Введите название упражнения (из списка или своё), затем повторы и вес для каждого подхода.||Type an exercise name (pick from the list or write your own), then reps and weight for each set.
+ftr_plan_day||Reja kuni (ixtiyoriy)||День плана (необязательно)||Plan day (optional)
+ftr_no_sessions||Hali mashg'ulot yozilmagan.||Тренировок пока нет.||No workouts logged yet.
+ftr_session_saved||Mashg'ulot saqlandi||Тренировка сохранена||Workout saved
+ftr_pr_toast||Yangi rekord: {exercise} - taxminiy 1RM {value} kg!||Новый рекорд: {exercise} - расчётный 1ПМ {value} кг!||New personal record: {exercise} - estimated 1RM {value} kg!
+ftr_readonly||faqat ko'rish||только просмотр||read only
 scan_session||Sessiya tugagan: sahifani yangilab, admin sifatida qayta kiring||Сессия истекла: обновите страницу и войдите снова как администратор||Session ended: reload the page and sign in again as admin
 """
 

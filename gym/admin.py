@@ -8,6 +8,7 @@ from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
 
 from . import extras, services, telegram
+from .models_tracker import TrackerGoal, WorkoutSession
 from .models import (Announcement, BodyLog, Booking, Category, ChatMessage, ChatReport, Exercise, GymClass, GymSettings, Membership, Order, OrderItem, Payment, PaymentCard, Plan,
                      AdminQuery, ClassWaitlist, EntryLog, FaqItem, GiftCertificate, GuestPass, LegalPage, MembershipFreeze, ReferralReward, TrainerReview,
                      AIMessage, FoodEntry, Notification, PersonalRecord, Product, PromoCode, PTSession, PushSubscription, Review, Trainer, User, UserFood, Visit, WorkoutPlan)
@@ -61,6 +62,34 @@ class BodyLogInline(admin.TabularInline):
     can_delete = False
 
 
+class WorkoutSessionInline(admin.TabularInline):
+    """The member's logged workouts (fitness tracker), read-only in the member card."""
+    model = WorkoutSession
+    fields = readonly_fields = ("date", "plan_day", "note", "volume")
+    extra = 0
+    can_delete = False
+    max_num = 0
+    ordering = ("-date",)
+    show_change_link = False
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related("sets")
+
+
+class TrackerGoalInline(admin.TabularInline):
+    model = TrackerGoal
+    extra = 0
+    can_delete = False
+    max_num = 0
+    fields = readonly_fields = ("kind", "metric", "target", "target_date", "start_value")
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = ("code", "username", "first_name", "last_name", "phone", "email", "state", "until", "created", "card")
@@ -71,7 +100,7 @@ class UserAdmin(admin.ModelAdmin):
     fieldsets = (
         ("Shaxsiy ma'lumotlar", {"fields": ("username", ("first_name", "last_name"), ("phone", "phone_verified"), "email")}),
         ("Holat", {"fields": ("is_active", ("chat_banned", "chat_visible"), "show_in_leaderboard", "staff_note")}),
-        ("Maqsad", {"fields": (("goal", "target_weight"), "birth_date")}),
+        ("Maqsad", {"fields": (("goal", "target_weight"), ("birth_date", "sex"))}),
         ("Huquqlar", {"fields": (("is_staff", "is_superuser"),)}),
         ("Taklif va Telegram", {"fields": (("referral_code", "referred_by", "referral_rewarded"), "telegram_chat_id"), "classes": ("collapse",)}),
         ("Tizim", {"fields": (("created", "last_login"),), "classes": ("collapse",)}),
@@ -86,7 +115,7 @@ class UserAdmin(admin.ModelAdmin):
         if "is_staff" in f:
             f["is_staff"].help_text = "Qabulxona va admin panelga kira oladi (parol oxiriga .admin)."
         return form
-    inlines = [MembershipInline, BodyLogInline]
+    inlines = [MembershipInline, BodyLogInline, TrackerGoalInline, WorkoutSessionInline]
     actions = ["message", "extend_30", "block", "unblock", "csv"]
     list_per_page = 40
 
@@ -713,7 +742,7 @@ class MembershipAdmin(admin.ModelAdmin):
 
 @admin.register(BodyLog)
 class BodyLogAdmin(admin.ModelAdmin):
-    list_display = ("user", "date", "weight", "height_cm", "note")
+    list_display = ("user", "date", "weight", "height_cm", "waist", "body_fat", "note")
     list_filter = ("date",)
     list_select_related = ("user",)
     search_fields = ("user__phone", "user__first_name", "user__last_name", "note")
@@ -935,3 +964,21 @@ class AdminQueryAdmin(admin.ModelAdmin):
 
     def has_change_permission(self, request, obj=None):
         return False
+
+
+@admin.register(WorkoutSession)
+class WorkoutSessionAdmin(admin.ModelAdmin):
+    list_display = ("user", "date", "plan_day", "note")
+    list_filter = ("date",)
+    list_select_related = ("user",)
+    search_fields = ("user__phone", "user__first_name", "user__last_name", "note")
+    raw_id_fields = ("user",)
+    date_hierarchy = "date"
+
+
+@admin.register(TrackerGoal)
+class TrackerGoalAdmin(admin.ModelAdmin):
+    list_display = ("user", "kind", "metric", "target", "target_date")
+    list_filter = ("kind",)
+    list_select_related = ("user",)
+    raw_id_fields = ("user",)

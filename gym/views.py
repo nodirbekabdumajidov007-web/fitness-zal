@@ -605,6 +605,8 @@ def dashboard(request):
         spark = " ".join(f"{round(i / (len(ws) - 1) * 100, 1)},{round(90 - (w - lo) / span * 80, 1)}" for i, w in enumerate(ws))
         w_change = round(ws[-1] - ws[0], 1)
     extras.run_daily()  # no cron on the free host: the first visit of the day sends the "membership ends soon" messages
+    from . import tracker
+    tk_sum = tracker.dashboard_summary(u)
     rewards = list(u.referral_rewards.all())
     nxt = u.bookings.filter(date__gte=today).select_related("gym_class").order_by("date", "gym_class__start_time").first()
     next_at = None
@@ -613,7 +615,7 @@ def dashboard(request):
         if next_at < now:
             next_at = None
     return render(request, "gym/dashboard.html", {
-        "heat": heat, "spark": spark, "w_change": w_change, "w_last": logs[-1].weight if logs else None,
+        "tk": tk_sum, "heat": heat, "spark": spark, "w_change": w_change, "w_last": logs[-1].weight if logs else None,
         "next_booking": nxt if next_at else None,
         "next_at": next_at.isoformat() if next_at else "", "crowd": crowd_level(), "stats_total": stats["total"],
         "m": m, "last": last, "upcoming": upcoming, "days_left": days_left, "pct": pct, "stats": stats, "notes": notes,
@@ -680,7 +682,9 @@ def workouts_view(request):
             week_total += len(exs)
             week_done += n_done
             if exs:
-                days.append({"wd": str(wd), "today": wd == today.weekday(), "ex": [{"e": e, "done": e.id in done_today} for e in exs]})
+                logged = _logged_sets(request.user, today, exs) if wd == today.weekday() else {}
+                days.append({"wd": str(wd), "today": wd == today.weekday(),
+                             "ex": [{"e": e, "done": e.id in done_today, "logged": logged.get(e.name.lower(), [])} for e in exs]})
         days.sort(key=lambda x: (not x["today"], (int(x["wd"]) - today.weekday()) % 7))  # today first, then the coming days
     from_trainer = bool(plan and plan.trainer_id)
     return render(request, "gym/workouts.html", {
@@ -688,6 +692,17 @@ def workouts_view(request):
         "week_pct": round(week_done / week_total * 100) if week_total else 0, "week_done": week_done, "week_total": week_total,
         "programs": _program_cards(request.user, plan, request.lang),
     })
+
+
+def _logged_sets(user, day, exercises):
+    """Sets the member already logged today for these plan exercises, by lower-cased exercise name."""
+    from .models_tracker import WorkoutSet
+    names = {e.name.lower() for e in exercises}
+    out = {}
+    for st in WorkoutSet.objects.filter(session__user=user, session__date=day).order_by("order", "id"):
+        if st.exercise.lower() in names:
+            out.setdefault(st.exercise.lower(), []).append(st)
+    return out
 
 
 def _program_cards(user, plan, lang="uz"):
@@ -1211,38 +1226,6 @@ def bmi_label(v):
     return None if v is None else "bmi_low" if v < 18.5 else "bmi_ok" if v < 25 else "bmi_high" if v < 30 else "bmi_obese"
 
 
-@login_required
-def progress_view(request):
-    last = request.user.bodylogs.exclude(height_cm=None).last()
-    form = BodyLogForm(request.POST or None, initial={"height_cm": last.height_cm if last else None})
-    if request.method == "POST" and form.is_valid():
-        log = form.save(commit=False)
-        log.user = request.user
-        log.save()
-        flash(request, messages.SUCCESS, "saved")
-        return redirect("progress")
-    logs = list(request.user.bodylogs.order_by("date", "id")[:120])
-    chart = None
-    if len(logs) >= 2:
-        W, H, P = 640, 220, 34
-        ws = [float(l.weight) for l in logs]
-        lo, hi = min(ws) - 1, max(ws) + 1
-        d0, d1 = logs[0].date.toordinal(), logs[-1].date.toordinal()
-        span = max(1, d1 - d0)
-        pts = [(P + (l.date.toordinal() - d0) / span * (W - 2 * P), H - P - (float(l.weight) - lo) / (hi - lo) * (H - 2 * P), l) for l in logs]
-        chart = {"w": W, "h": H, "points": " ".join(f"{x:.1f},{y:.1f}" for x, y, _ in pts), "dots": [(round(x, 1), round(y, 1), l) for x, y, l in pts],
-                 "lo": round(lo + 1, 1), "hi": round(hi - 1, 1), "y_lo": H - P, "y_hi": P, "delta": round(ws[-1] - ws[0], 1)}
-    rows = [{"l": l, "bmi": l.bmi, "label": bmi_label(l.bmi)} for l in reversed(logs)]
-    return render(request, "gym/progress.html", {"form": form, "chart": chart, "rows": rows})
-
-
-@require_POST
-@login_required
-def progress_delete(request, pk):
-    get_object_or_404(BodyLog, pk=pk, user=request.user).delete()
-    return redirect("progress")
-
-
 def reviews_view(request):
     approved = Review.objects.filter(approved=True).select_related("user")
     mine = request.user.reviews.first() if request.user.is_authenticated else None
@@ -1386,7 +1369,12 @@ def export_my_data(request):
         "payments": [{"id": p.pk, "amount": p.amount, "method": p.method, "status": p.status, "date": p.created.isoformat()} for p in u.payments.all()],
         "orders": [{"id": o.pk, "total": o.total, "status": o.status, "items": [[i.name, i.qty, i.price] for i in o.items.all()]} for o in u.orders.all()],
         "visits": [timezone.localtime(v.ts).isoformat() for v in u.visits.all()[:1000]],
-        "body": [{"date": b.date.isoformat(), "weight": float(b.weight), "height_cm": b.height_cm} for b in u.bodylogs.all()],
+        "body": [{"date": b.date.isoformat(), "weight": float(b.weight), "height_cm": b.height_cm,
+                  **{k: float(getattr(b, k)) for k in BodyLog.CIRCUMFERENCES + ["body_fat"] if getattr(b, k) is not None}, "resting_hr": b.resting_hr} for b in u.bodylogs.all()],
+        "workouts": [{"date": w.date.isoformat(), "plan_day": w.plan_day, "note": w.note,
+                      "sets": [{"exercise": x.exercise, "reps": x.reps, "weight": float(x.weight), "rpe": float(x.rpe) if x.rpe is not None else None} for x in w.sets.all()]}
+                     for w in u.workout_sessions.prefetch_related("sets")],
+        "goals": [{"kind": g.kind, "metric": g.metric, "target": float(g.target), "target_date": g.target_date.isoformat() if g.target_date else None} for g in u.tracker_goals.all()],
         "records": [{"lift": r.lift, "weight": float(r.weight), "reps": r.reps, "date": r.date.isoformat()} for r in u.records.all()],
     }
     resp = JsonResponse(data, json_dumps_params={"ensure_ascii": False, "indent": 2})

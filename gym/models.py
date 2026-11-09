@@ -89,6 +89,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     avatar = models.FileField("Profil rasmi (jpg, png, webp)", upload_to="avatars/", blank=True, validators=[validate_image])
     birth_date = models.DateField("Tug'ilgan kun", null=True, blank=True)
     goal = models.CharField("Maqsad", max_length=10, choices=GOALS, blank=True)
+    SEXES = [("m", "Erkak"), ("f", "Ayol")]
+    sex = models.CharField("Jins (tana yog'ini hisoblash uchun)", max_length=1, choices=SEXES, blank=True)
     target_weight = models.DecimalField("Maqsad vazni (kg)", max_digits=5, decimal_places=1, null=True, blank=True,
                                         validators=[MinValueValidator(Decimal("30")), MaxValueValidator(250)])
 
@@ -650,6 +652,18 @@ class BodyLog(models.Model):
     weight = models.DecimalField("Vazn (kg)", max_digits=5, decimal_places=1, validators=[MinValueValidator(Decimal("20")), MaxValueValidator(400)])
     height_cm = models.PositiveSmallIntegerField("Bo'y (sm)", null=True, blank=True, validators=[MinValueValidator(100), MaxValueValidator(250)])
     note = models.CharField("Izoh", max_length=120, blank=True)
+    # optional circumferences in cm, body fat in % and the resting pulse (the fitness tracker)
+    waist = models.DecimalField("Bel (sm)", max_digits=4, decimal_places=1, null=True, blank=True, validators=[MinValueValidator(Decimal("40")), MaxValueValidator(250)])
+    chest = models.DecimalField("Ko'krak (sm)", max_digits=4, decimal_places=1, null=True, blank=True, validators=[MinValueValidator(Decimal("50")), MaxValueValidator(250)])
+    hips = models.DecimalField("Son-dumba (sm)", max_digits=4, decimal_places=1, null=True, blank=True, validators=[MinValueValidator(Decimal("50")), MaxValueValidator(250)])
+    neck = models.DecimalField("Bo'yin (sm)", max_digits=4, decimal_places=1, null=True, blank=True, validators=[MinValueValidator(Decimal("20")), MaxValueValidator(80)])
+    arm = models.DecimalField("Qo'l, biceps (sm)", max_digits=4, decimal_places=1, null=True, blank=True, validators=[MinValueValidator(Decimal("10")), MaxValueValidator(80)])
+    thigh = models.DecimalField("Son (sm)", max_digits=4, decimal_places=1, null=True, blank=True, validators=[MinValueValidator(Decimal("25")), MaxValueValidator(130)])
+    calf = models.DecimalField("Boldir (sm)", max_digits=4, decimal_places=1, null=True, blank=True, validators=[MinValueValidator(Decimal("15")), MaxValueValidator(80)])
+    body_fat = models.DecimalField("Tana yog'i (%)", max_digits=4, decimal_places=1, null=True, blank=True, validators=[MinValueValidator(Decimal("2")), MaxValueValidator(75)])
+    resting_hr = models.PositiveSmallIntegerField("Tinch puls (urish/daqiqa)", null=True, blank=True, validators=[MinValueValidator(30), MaxValueValidator(220)])
+
+    CIRCUMFERENCES = ["waist", "chest", "hips", "neck", "arm", "thigh", "calf"]
 
     class Meta:
         ordering = ["date", "id"]
@@ -983,4 +997,5 @@ class UserFood(models.Model):
 
 
 from .models_extra import *  # noqa: E402,F401,F403  (the newer models live in models_extra.py; importing them here registers them with Django)
+from .models_tracker import *  # noqa: E402,F401,F403  (fitness tracker: workout sessions, sets, goals)
 from .models_instagram import *  # noqa: E402,F401,F403  (Instagram inbox models)

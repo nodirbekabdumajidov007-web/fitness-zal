@@ -1,0 +1,22 @@
+{% extends "gym/base.html" %}{% load gym_tags %}
+{% block title %}{% t 'ftr_history' %}{% endblock %}
+{% block content %}
+<section class="tl-hero">
+  <span class="eyebrow"><a href="{% url 'progress' %}">← {% t 'progress' %}</a></span>
+  <h1>{% icon 'dumbbell' %} {% t 'ftr_history' %}</h1>
+  <div class="tk-links"><a class="btn primary pill" href="{% url 'workout_add' %}">＋ {% t 'ftr_add_workout' %}</a>
+    <a class="btn small pill" href="{% url 'progress_export' %}?kind=workouts">{% icon 'download' %} CSV</a></div>
+</section>
+{% for it in items %}
+<article class="card tk-session">
+  <div class="db-head"><h3 class="num">{{ it.s.date|dmy }}{% if it.s.plan_day != None %} <span class="pill mute">{% with wd=it.s.plan_day|stringformat:"s" %}{% t 'weekday_'|add:wd %}{% endwith %}</span>{% endif %}</h3>
+    <span class="pill good num">{% t 'ftr_volume_short' %}: {{ it.volume|floatformat:"-1" }} kg</span></div>
+  {% if it.s.note %}<p class="muted">{{ it.s.note }}</p>{% endif %}
+  {% for g in it.groups %}
+  <div class="tk-ex"><b>{{ g.name }}</b>
+    <span class="num muted">{% for st in g.sets %}{{ st.reps }}×{{ st.weight|floatformat:"-1" }}{% if st.rpe %}@{{ st.rpe|floatformat:"-1" }}{% endif %}{% if not forloop.last %} · {% endif %}{% endfor %}</span></div>
+  {% endfor %}
+  <form method="post" action="{% url 'workout_delete' it.s.pk %}">{% csrf_token %}<button class="btn small danger" type="submit" data-bin data-confirm="{% t 'sure' %}">{% t 'delete' %}</button></form>
+</article>
+{% empty %}<p class="muted">{% t 'ftr_no_sessions' %}</p>{% endfor %}
+{% endblock %}

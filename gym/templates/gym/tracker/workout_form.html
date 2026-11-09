@@ -1,0 +1,32 @@
+{% extends "gym/base.html" %}{% load gym_tags %}
+{% block title %}{% t 'ftr_add_workout' %}{% endblock %}
+{% block content %}
+<section class="tl-hero">
+  <span class="eyebrow"><a href="{% url 'workouts_log' %}">← {% t 'ftr_history' %}</a></span>
+  <h1>{% icon 'dumbbell' %} {% t 'ftr_add_workout' %}</h1>
+  <p class="muted">{% t 'ftr_add_help' %}</p>
+</section>
+<form class="card tk-wform" method="post" data-wform data-suggest="{% url 'exercise_suggest' %}">
+  {% csrf_token %}
+  <div class="tk-grid">
+    <label>{% t 'date' %}<input type="date" name="date" max="{{ today }}" value="{{ posted.date|default:today }}"></label>
+    <label>{% t 'ftr_plan_day' %}<select name="plan_day"><option value="">—</option>{% for d in days %}<option value="{{ d }}"{% if posted.plan_day == d|stringformat:"s" %} selected{% endif %}>{% with wd=d|stringformat:"s" %}{% t 'weekday_'|add:wd %}{% endwith %}</option>{% endfor %}</select></label>
+    <label>{% t 'note' %}<input name="note" maxlength="200" value="{{ posted.note|default:'' }}"></label>
+  </div>
+  <div data-blocks></div>
+  <div class="tk-acts"><button type="button" class="btn pill" data-add-ex>＋ {% t 'ftr_add_exercise' %}</button></div>
+  <datalist id="tkExercises"></datalist>
+  <div><button class="btn primary" type="submit">{% t 'save' %}</button></div>
+  {% if posted_rows %}{{ posted_rows|json_script:"tkPosted" }}{% endif %}
+  <template data-tpl-block>
+    <fieldset class="tk-block"><legend class="sr-only">{% t 'exercise' %}</legend>
+      <div class="tk-blockhead"><input class="tk-exname" data-exname list="tkExercises" maxlength="80" placeholder="{% t 'exercise' %}" aria-label="{% t 'exercise' %}" autocomplete="off">
+        <button type="button" class="btn small danger" data-del-ex aria-label="{% t 'delete' %}">{% icon 'x' %}</button></div>
+      <div class="tk-sethead num"><span>#</span><span>{% t 'reps' %}</span><span>kg</span><span>RPE</span><span>{% t 'note' %}</span></div>
+      <div data-rows></div>
+      <button type="button" class="btn small" data-add-set>＋ {% t 'ftr_add_set' %}</button>
+    </fieldset>
+  </template>
+</form>
+{% endblock %}
+{% block scripts %}<script src="{% vstatic 'js/tracker_sets.js' %}"></script>{% endblock %}

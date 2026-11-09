@@ -82,12 +82,19 @@
   </section>
 
   <!-- weight trend -->
-  <a class="card db-tile db-weight" href="{% url 'progress' %}">
-    <div class="db-head"><h3>{% icon 'scale' %} {% t 'weight' %}</h3>{% if w_change is not None %}<span class="pill {% if w_change < 0 %}good{% elif w_change > 0 %}warn{% endif %} num">{% if w_change > 0 %}+{% endif %}{{ w_change }} kg</span>{% endif %}</div>
+  <section class="card db-tile db-weight">
+    <div class="db-head"><h3><a href="{% url 'progress' %}">{% icon 'scale' %} {% t 'weight' %}</a></h3>{% if w_change is not None %}<span class="pill {% if w_change < 0 %}good{% elif w_change > 0 %}warn{% endif %} num">{% if w_change > 0 %}+{% endif %}{{ w_change }} kg</span>{% endif %}</div>
     {% if spark %}<b class="db-num num">{{ w_last }} <small>kg</small></b>
       <svg class="spark" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="{{ spark }}" pathLength="100" vector-effect="non-scaling-stroke"/></svg>
     {% else %}<span class="muted">{% t 'weight_empty' %}</span>{% endif %}
-  </a>
+    {% with g=tk.goal %}{% if g and g.current is not None %}
+      <div class="tk-goalbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ g.pct }}" aria-label="{% t 'ftr_goal' %}"><i style="width:{{ g.pct }}%"></i></div>
+      <small class="muted num">{% t 'ftr_goal' %}: {{ g.target|floatformat:"-1" }} kg · {% t 'ftr_remaining' %} {{ g.remaining|floatformat:"-1" }} kg</small>
+    {% endif %}{% endwith %}
+    <small class="muted num">{% icon 'dumbbell' %} {% t 'ftr_this_week' %}: <b>{{ tk.week_workouts }}</b> {% t 'ftr_workouts_n' %}</small>
+    <form class="tk-quick" method="post" action="{% url 'progress_weight' %}">{% csrf_token %}<input type="hidden" name="next" value="{% url 'dashboard' %}">
+      <input name="weight" inputmode="decimal" placeholder="kg" aria-label="{% t 'weight' %}" required><button class="btn small primary" type="submit">{% t 'ftr_enter_weight' %}</button></form>
+  </section>
 
   <!-- today's workout -->
   <a class="card db-tile db-wo" href="{% url 'workouts' %}">

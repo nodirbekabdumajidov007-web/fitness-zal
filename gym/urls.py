@@ -6,6 +6,7 @@ from . import chat_views as c
 from . import desk
 from . import instagram_views
 from . import coach_views as coach
+from . import tracker_views as tk
 from . import pwa
 from . import views as v
 from . import views_extra as x
@@ -133,8 +134,22 @@ urlpatterns = [
     path("trainers/", v.trainers_view, name="trainers"),
     path("trainers/<int:pk>/pt/", v.pt_request, name="pt_request"),
     path("pt/<int:pk>/cancel/", v.pt_cancel, name="pt_cancel"),
-    path("progress/", v.progress_view, name="progress"),
-    path("progress/<int:pk>/delete/", v.progress_delete, name="progress_delete"),
+    path("progress/", tk.progress_view, name="progress"),
+    path("progress/<int:pk>/delete/", tk.progress_delete, name="progress_delete"),
+    path("progress/weight/", tk.progress_weight, name="progress_weight"),
+    path("progress/data/", tk.progress_data, name="progress_data"),
+    path("progress/compare/", tk.progress_compare, name="progress_compare"),
+    path("progress/export.csv", tk.progress_export, name="progress_export"),
+    path("progress/goal/", tk.goal_save, name="goal_save"),
+    path("progress/goal/<int:pk>/delete/", tk.goal_delete, name="goal_delete"),
+    path("progress/workouts/", tk.workouts_list, name="workouts_log"),
+    path("progress/workouts/add/", tk.workout_add, name="workout_add"),
+    path("progress/workouts/<int:pk>/delete/", tk.workout_delete, name="workout_delete"),
+    path("progress/exercises/", tk.exercise_suggest, name="exercise_suggest"),
+    path("workouts/<int:pk>/log/", tk.workout_plan_log, name="workout_plan_log"),
+    path("coach/client/<int:uid>/tracker/", tk.coach_tracker, name="coach_tracker"),
+    path("coach/client/<int:uid>/tracker/data/", tk.coach_tracker_data, name="coach_tracker_data"),
+    path("coach/client/<int:uid>/tracker/compare/", tk.coach_tracker_compare, name="coach_tracker_compare"),
     path("reviews/", v.reviews_view, name="reviews"),
     path("profile/", v.profile_view, name="profile"),
     # the front desk moved into the admin panel (/django-admin/desk/...): old addresses and bookmarks keep working
