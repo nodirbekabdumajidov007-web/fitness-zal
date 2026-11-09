@@ -7,6 +7,7 @@ import time
 from datetime import timedelta
 from unittest import mock
 
+from django.utils import timezone
 from django.core.cache import cache
 from django.core.management import call_command
 from django.test import Client, TestCase
@@ -24,7 +25,7 @@ class Base(TestCase):
         self.admin = User.objects.get(is_superuser=True)
         self.admin.set_password("AdminPass1")
         self.admin.save()
-        self.m = User.objects.create_user(phone="+998901112233", password=PW, first_name="Aziz", last_name="Karimov")
+        self.m = User.objects.create_user(phone="+998901112233", password=PW, first_name="Aziz", last_name="Karimov", consent_at=timezone.now())
         self.c = Client()
         self.c.post("/login/", {"phone": "901112233", "password": PW})
         self.p = Product.objects.filter(active=True, stock__gte=5).order_by("price").first()

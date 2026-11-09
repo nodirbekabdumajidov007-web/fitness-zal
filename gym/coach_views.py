@@ -17,6 +17,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
+from . import programs as P
 from . import services, telegram
 from .forms import normalize_phone
 from .models import Booking, GymClass, PersonalRecord, PTSession, Trainer, User, Visit, WorkoutPlan
@@ -181,8 +182,10 @@ def plan(request, uid):
         flash(request, messages.SUCCESS, "plan_saved")
         return redirect("coach_client", uid=u.pk)
     rows = [{"wd": e.weekday, "name": e.name, "sets": e.sets, "reps": e.reps, "note": e.note} for e in current.exercises.all()] if current else []
-    programs = {k: [{"wd": e[0], "name": e[1], "sets": e[2], "reps": e[3], "note": ""} for e in v["ex"]] for k, v in services.PROGRAMS.items()}
+    lang = request.lang
+    programs = {k: [{"wd": wd, "name": name, "sets": sets, "reps": reps, "note": ""} for wd, name, sets, reps, _rest in P.rows(v, lang)]
+                for k, v in P.PROGRAMS.items()}
     return render(request, "gym/coach/plan.html", {
         "t": t, "m": u, "current": current, "rows": rows or [{"wd": timezone.localdate().weekday(), "name": "", "sets": 3, "reps": "10", "note": ""}],
-        "programs": [{"key": k, "title": v["title"]} for k, v in services.PROGRAMS.items()], "program_rows": programs,
+        "programs": [{"key": k, "title": P.tr(v["title"], lang)} for k, v in P.PROGRAMS.items()], "program_rows": programs,
     })

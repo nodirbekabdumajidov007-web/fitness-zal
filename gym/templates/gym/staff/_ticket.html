@@ -22,6 +22,7 @@
     <div>
       <b>{% if entered %}✓ {% t 'tk_allowed' %}{% else %}✕ {% t 'tk_denied' %}{% endif %}</b>
       {% if not entered and reason %}<small>{% t reason %}</small>{% endif %}
+      {% if frozen_until %}<small>{% t 'frozen_until' %} <span class="num">{{ frozen_until|date:"d.m.Y" }}</span></small>{% endif %}
       {% if repeat_at %}<small>{% t 'tk_again' %} <span class="num">{{ repeat_at|date:"H:i" }}</span></small>{% endif %}
     </div>
     <span class="tk-stamp" aria-hidden="true">{% if entered %}{% t 'tk_stamp_ok' %}{% else %}{% t 'tk_stamp_no' %}{% endif %}</span>

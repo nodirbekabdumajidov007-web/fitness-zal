@@ -110,13 +110,8 @@ def send_reminders(now=None):
     now = now or timezone.now()
     days = GymSettings.load().reminder_days
     sent = {"membership": 0, "class": 0, "pt": 0}
-    for m in Membership.objects.filter(reminded=False, expires__gt=now, expires__lte=now + timedelta(days=days)).select_related("user"):
-        if m.user.memberships.filter(expires__gt=m.expires).exists():
-            continue  # a later membership already covers them
-        if notify_user(m.user, "tg_expiring", days=max(0, (m.expires - now).days), date=timezone.localtime(m.expires).strftime("%d.%m.%Y")):
-            m.reminded = True
-            m.save(update_fields=["reminded"])
-            sent["membership"] += 1
+    from . import extras
+    sent["membership"] = extras.send_expiry_reminders()["telegram"]  # 7/3/1 days before; the site inbox gets it too
     tomorrow = timezone.localtime(now).date() + timedelta(days=1)
     for b in Booking.objects.filter(date=tomorrow, reminded=False).select_related("user", "gym_class"):
         if notify_user(b.user, "tg_class_tomorrow", name=b.gym_class.name, time=b.gym_class.start_time.strftime("%H:%M")):

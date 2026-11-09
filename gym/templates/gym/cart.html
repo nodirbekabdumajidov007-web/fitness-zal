@@ -34,8 +34,9 @@
       <div class="co-line"><span class="muted">{% t 'dlv_fee' %}</span><b class="num" id="dlv-fee">{% t 'free' %}</b></div>
       {% endif %}
       <div class="co-line co-total"><span>{% t 'total' %}</span><b class="num" id="grand-total">{{ total|money }} <small>{% t 'price_unit' %}</small></b></div>
-      <label for="method">{% t 'pay_method' %}<select id="method" name="method">{% for mth in methods %}<option value="{{ mth }}">{% method_label mth %}</option>{% endfor %}</select></label>
+      {% if methods|length == 1 %}<div class="pay-one"><span class="muted">{% t 'pay_method' %}</span> <b>{% method_label methods.0 %}</b><input type="hidden" name="method" value="{{ methods.0 }}"></div>{% else %}<label for="method">{% t 'pay_method' %}<select id="method" name="method">{% for mth in methods %}<option value="{{ mth }}">{% method_label mth %}</option>{% endfor %}</select></label>{% endif %}
       {% if demo_on %}<div class="note">{% t 'demo_note' %}</div>{% endif %}
+      {% if user.is_authenticated and not user.consent_at %}{% include "gym/_consent.html" %}{% else %}<small class="muted">{% t 'consent_note' %}</small>{% endif %}
       <button class="btn primary" type="submit">{% t 'checkout' %}</button>
       <a class="muted" href="{% url 'shop' %}">← {% t 'continue_shopping' %}</a>
     </form>

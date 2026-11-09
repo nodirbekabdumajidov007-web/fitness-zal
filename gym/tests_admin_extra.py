@@ -102,11 +102,48 @@ class HomeAndGoogleTests(Base):
     def test_home_is_cinematic(self):
         r = Client().get("/")
         self.assertContains(r, 'class="cine"')
-        self.assertContains(r, "Kuch")  # the ticker under the hero (the giant outlined hero word is gone)
+        self.assertNotContains(r, "ticker")  # the repeated slogan ribbon is gone
+        self.assertNotContains(r, 'class="crowd')  # no crowd pill in the hero
+        self.assertEqual(r.content.decode().count('class="final-cta'), 1)  # exactly one closing CTA
+        self.assertContains(r, 'href="/register/')
+        self.assertEqual(r.content.decode().count("feat reveal\" href=\"/ai/"), 1)  # one assistant promo (the feature card)
+        self.assertNotContains(r, "paper-btn\" href=\"/ai/")
         self.assertNotContains(r, "cine-word")
         self.assertContains(r, "js/home.js")
         self.assertNotContains(r, "<video")  # no clip uploaded: animated photo instead
         self.assertEqual(Client().get("/hero/video/").status_code, 404)
+
+    def test_final_cta_depends_on_membership(self):
+        c = Client()
+        c.post("/login/", {"phone": "901112233", "password": PW})  # has an active membership
+        r = c.get("/")
+        self.assertEqual(r.content.decode().count('class="final-cta'), 1)
+        self.assertContains(r, 'href="/classes/')
+        other = User.objects.create_user(phone="+998935554433", password=PW, first_name="Vali", last_name="A")
+        c2 = Client()
+        c2.post("/login/", {"phone": "935554433", "password": PW})
+        r = c2.get("/")
+        self.assertEqual(r.content.decode().count('class="final-cta'), 1)
+        self.assertContains(r, "Abonement tanlash")
+
+    def test_reviews_empty_mini_full(self):
+        from .models import Review
+        r = Client().get("/reviews/")
+        self.assertEqual(r.context["rv_mode"], "empty")
+        self.assertContains(r, "Hali fikrlar yo&#x27;q") if "&#x27;" in r.content.decode() else self.assertContains(r, "Hali fikrlar yo'q")
+        self.assertNotContains(r, "rv-dist")
+        self.assertContains(r, 'name="comment"')
+        users = [User.objects.create_user(phone=f"+99890000000{i}", password=PW, first_name=f"U{i}") for i in range(3)]
+        for u in users[:2]:
+            Review.objects.create(user=u, rating=4, comment="ok", approved=True)
+        r = Client().get("/reviews/")
+        self.assertEqual(r.context["rv_mode"], "mini")
+        self.assertContains(r, "rv-mini")
+        self.assertNotContains(r, "rv-dist")
+        Review.objects.create(user=users[2], rating=5, comment="ok", approved=True)
+        r = Client().get("/reviews/")
+        self.assertEqual(r.context["rv_mode"], "full")
+        self.assertContains(r, "rv-dist")
 
     def test_client_id_from_settings_page(self):
         gs = GymSettings.load()
@@ -174,7 +211,7 @@ class HomeAndGoogleTests(Base):
         PaymentCard.objects.create(bank="Humo", number="4111111111111111", holder="TEST", is_primary=True)
         c = Client()
         c.post("/login/", {"phone": "901112233", "password": PW})
-        c.post("/plans/m1/buy/", {"method": "card"})
+        c.post("/plans/m1/buy/", {"method": "card", "consent": "1"})
         p = Payment.objects.filter(user=self.m, status="pending").latest("id")
         r = c.get(f"/pay/{p.pk}/")
         self.assertContains(r, 'class="bankcard humo"')

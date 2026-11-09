@@ -83,6 +83,13 @@
     <form method="post" action="{% url 'logout_others' %}" class="pf-row">{% csrf_token %}
       <span><b>{% t 'sessions_title' %}</b><small class="muted">{% t 'sessions_help' %}</small></span>
       <button class="btn small" type="submit" data-confirm="{% t 'sure' %}">{% t 'sessions_btn' %}</button></form>
+    {% if not user.is_staff %}<details class="pf-row" style="display:block"><summary><b>{% t 'del_title' %}</b></summary>
+      <form method="post" action="{% url 'account_delete' %}" class="grid" style="margin-top:8px">{% csrf_token %}
+        <small class="muted">{% t 'del_help' %}</small>
+        <label for="del-pw">{% if user.has_usable_password %}{% t 'password' %}{% else %}{% t 'del_type_code' %} {{ user.member_code }}{% endif %}<input id="del-pw" name="password" type="password" autocomplete="current-password" required></label>
+        <label class="consent"><input type="checkbox" name="sure" value="1" required><span>{% t 'del_sure' %}</span></label>
+        <button class="btn small danger" type="submit">{% t 'del_btn' %}</button>
+      </form></details>{% endif %}
     <div class="pf-row"><span><b>{% t 'export_title' %}</b><small class="muted">{% t 'export_help' %}</small></span>
       <a class="btn small" href="{% url 'export_data' %}">{% icon 'download' %} JSON</a></div>
   </section>

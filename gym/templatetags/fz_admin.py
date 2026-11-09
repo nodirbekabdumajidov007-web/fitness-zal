@@ -56,6 +56,9 @@ ICONS = {
     "send": '<path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/>',
     "download": '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5M12 15V3"/>',
     "alert": '<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>',
+    "gift": '<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"/>',
+    "snow": '<path d="M12 2v20M4.9 7l14.2 10M19.1 7 4.9 17M9 4l3 2 3-2M9 20l3-2 3 2"/>',
+    "help": _c(12, 12, 10) + '<path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/>',
     "dot": _c(12, 12, 3),
     "filter": '<path d="M22 3H2l8 9.5V19l4 2v-8.5z"/>',
     "note": '<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/>',
@@ -78,6 +81,8 @@ MODEL_ICONS = {
     "gymclass": "calendar", "booking": "check", "trainer": "dumbbell", "ptsession": "user-check", "workoutplan": "trend",
     "aimessage": "sparkles", "notification": "bell", "chatmessage": "chat", "chatreport": "flag", "chatblock": "ban",
     "announcement": "megaphone", "review": "star", "gymsettings": "settings",
+    "membershipfreeze": "snow", "guestpass": "user-check", "referralreward": "gift", "classwaitlist": "clock", "trainerreview": "star",
+    "giftcertificate": "gift", "entrylog": "door", "faqitem": "help", "legalpage": "note",
 }
 
 

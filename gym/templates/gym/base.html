@@ -82,7 +82,8 @@
     <div class="sb-grp">
       <h2 class="sb-cap">{% t 'nav_g_main' %}</h2>
       <a href="{% url 'home' %}"{% if p == '/' %} aria-current="page"{% endif %}>{% icon 'home' %}<span class="sb-lbl">{% t 'nav_home' %}</span></a>
-      {% if user.is_authenticated %}<a href="{% url 'dashboard' %}"{% if '/dashboard' in p %} aria-current="page"{% endif %}>{% icon 'activity' %}<span class="sb-lbl">{% t 'nav_dash' %}</span></a>
+      {% if user.is_authenticated %}<a href="{% url 'membership' %}"{% if '/membership' in p %} aria-current="page"{% endif %}>{% icon 'ticket' %}<span class="sb-lbl">{% t 'ms_title' %}</span></a>
+      <a href="{% url 'dashboard' %}"{% if '/dashboard' in p %} aria-current="page"{% endif %}>{% icon 'activity' %}<span class="sb-lbl">{% t 'nav_dash' %}</span></a>
       <a href="{% url 'card' %}"{% if '/card' in p %} aria-current="page"{% endif %}>{% icon 'credit-card' %}<span class="sb-lbl">{% t 'member_card' %}</span></a>{% endif %}
       <a href="{% url 'ai' %}"{% if '/ai/' in p %} aria-current="page"{% endif %}>{% icon 'sparkles' %}<span class="sb-lbl">{% t 'ai_coach' %}</span></a>
     </div>
@@ -90,7 +91,7 @@
       <h2 class="sb-cap">{% t 'nav_g_train' %}</h2>
       <a href="{% url 'plans' %}"{% if '/plans' in p %} aria-current="page"{% endif %}>{% icon 'ticket' %}<span class="sb-lbl">{% t 'nav_plans' %}</span></a>
       <a href="{% url 'classes' %}"{% if '/classes' in p %} aria-current="page"{% endif %}>{% icon 'calendar' %}<span class="sb-lbl">{% t 'nav_classes' %}</span></a>
-      <a href="{% url 'trainers' %}"{% if '/trainers' in p %} aria-current="page"{% endif %}>{% icon 'users' %}<span class="sb-lbl">{% t 'nav_trainers' %}</span></a>
+      {% if has_trainers %}<a href="{% url 'trainers' %}"{% if '/trainers' in p %} aria-current="page"{% endif %}>{% icon 'users' %}<span class="sb-lbl">{% t 'nav_trainers' %}</span></a>{% endif %}
       {% if user.is_authenticated %}<a href="{% url 'workouts' %}"{% if '/workouts' in p %} aria-current="page"{% endif %}>{% icon 'dumbbell' %}<span class="sb-lbl">{% t 'workouts' %}</span></a>
       <a href="{% url 'progress' %}"{% if '/progress' in p %} aria-current="page"{% endif %}>{% icon 'trending-up' %}<span class="sb-lbl">{% t 'nav_progress' %}</span></a>
       <a href="{% url 'records' %}"{% if '/records' in p %} aria-current="page"{% endif %}>{% icon 'trophy' %}<span class="sb-lbl">{% t 'records' %}</span></a>
@@ -107,6 +108,7 @@
       <h2 class="sb-cap">{% t 'nav_g_comm' %}</h2>
       {% if user.is_authenticated %}<a href="{% url 'chat' %}"{% if '/chat' in p %} aria-current="page"{% endif %}>{% icon 'message' %}<span class="sb-lbl">{% t 'chat' %}</span>{% if chat_unread %}<span class="badge">{{ chat_unread }}</span>{% endif %}</a>{% endif %}
       <a href="{% url 'reviews' %}"{% if '/reviews' in p %} aria-current="page"{% endif %}>{% icon 'star' %}<span class="sb-lbl">{% t 'nav_reviews' %}</span></a>
+      <a href="{% url 'faq' %}"{% if '/faq' in p %} aria-current="page"{% endif %}>{% icon 'message' %}<span class="sb-lbl">{% t 'faq_title' %}</span></a>
     </div>
     {% if is_trainer or admin_mode %}<div class="sb-grp">
       <h2 class="sb-cap">{% t 'nav_g_staff' %}</h2>
@@ -152,7 +154,7 @@
       <h3>{% t 'ft_gym' %}</h3>
       <a href="{% url 'plans' %}">{% t 'nav_plans' %}</a>
       <a href="{% url 'classes' %}">{% t 'nav_classes' %}</a>
-      <a href="{% url 'trainers' %}">{% t 'nav_trainers' %}</a>
+      {% if has_trainers %}<a href="{% url 'trainers' %}">{% t 'nav_trainers' %}</a>{% endif %}
       <a href="{% url 'shop' %}">{% t 'nav_shop' %}</a>
     </nav>
     <nav class="ft-col" aria-label="{% t 'ft_members' %}">
@@ -162,6 +164,10 @@
       <a href="{% url 'ai' %}">{% t 'ai_coach' %}</a>
       <a href="{% url 'tools' %}">{% t 'tools' %}</a>
       <a href="{% url 'reviews' %}">{% t 'nav_reviews' %}</a>
+      <a href="{% url 'faq' %}">{% t 'faq_title' %}</a>
+      <a href="{% url 'oferta' %}">{% t 'ft_oferta' %}</a>
+      <a href="{% url 'privacy' %}">{% t 'ft_privacy' %}</a>
+      <a href="{% url 'refund' %}">{% t 'ft_refund' %}</a>
     </nav>
     <section class="ft-col ft-contact">
       <h3>{% t 'ft_contact' %}</h3>

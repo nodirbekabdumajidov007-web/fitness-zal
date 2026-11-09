@@ -37,7 +37,7 @@ FOOD = [
      "A rough method: Mifflin-St Jeor BMR = 10 x weight(kg) + 6.25 x height(cm) - 5 x age + 5 (men) or - 161 (women), then multiply by an activity factor (1.2 almost sedentary, 1.4-1.55 moderately active). It is only a start; adjust after 2-3 weeks by how your weight moves. The Calculators page does it for you.",
      (("tools", "tools"),)),
     ("protein_need", "food",
-     "oqsil qancha kerak|kuniga qancha oqsil|oqsil me'yori|oqsil necha gramm|oqsilga ehtiyoj",
+     "oqsil qancha kerak|kuniga qancha oqsil|oqsil me'yori|oqsil necha gramm|oqsilga ehtiyoj|protein qancha kerak|protein miqdori|protein me'yori",
      "сколько белка нужно|белок в день|норма белка|сколько грамм белка|потребность в белке",
      "how much protein do i need|daily protein|protein intake|grams of protein|protein requirement",
      "Mashq qiladigan odam uchun taxminan tana vaznining har kilogrammiga 1,6-2,2 g oqsil (masalan 70 kg uchun ~110-155 g). Uni 3-5 ovqatga bo'lib iching. Manbalar: tuxum, tovuq, baliq, go'sht, tvorog, qatiq, dukkaklilar. Buyrak kasalligi bo'lsa, shifokor bilan maslahatlashing.",

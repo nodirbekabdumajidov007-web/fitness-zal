@@ -15,11 +15,12 @@
     <span class="trainer-img" data-px="14">{% if tr.image_src %}<img data-fallback="{% static 'img/trainer.svg' %}" src="{{ tr.image_src }}" alt="{{ tr.name }}" loading="lazy" referrerpolicy="no-referrer">{% else %}<img src="{% static 'img/trainer.svg' %}" alt="">{% endif %}</span>
     <span class="tc-body">
       <h3>{{ tr.name }}</h3>
+      {% if tr.rating_n %}<span class="rating-line"><b class="num">★ {{ tr.rating_avg|floatformat:1 }}</b> <span class="muted">({{ tr.rating_n }})</span></span>{% endif %}
       <span class="eyebrow">{{ tr.specialty }} · {{ tr.experience_years }} {% t 'years_exp' %}</span>
       {% if tr.bio %}<span class="muted tc-bio">{{ tr.bio|truncatechars:110 }}</span>{% endif %}
       <span class="tc-foot">{% if tr.pt_price %}<span class="num"><b>{{ tr.pt_price|money }}</b> {% t 'price_unit' %}</span>{% endif %}<span class="btn small primary">{% t 'trainer_open' %} →</span></span>
     </span>
   </a>
-  {% empty %}<div class="card muted">{% t 'none_yet' %}</div>{% endfor %}
+  {% empty %}<div class="card grid" style="text-align:center"><b>{% t 'trainers_empty' %}</b><span class="muted">{% t 'trainers_empty_sub' %}</span><a class="btn primary" href="{% url 'classes' %}">{% t 'nav_classes' %} →</a></div>{% endfor %}
 </div>
 {% endblock %}

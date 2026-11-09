@@ -6,6 +6,7 @@
   <div class="card stat"><span class="muted">{% t 'points' %}</span><b class="num">{{ points }}</b></div>
   <div class="card stat"><span class="muted">{% t 'visits_month' %}</span><b class="num">{{ stats.month }}</b></div>
   <div class="card stat"><span class="muted">{% t 'streak' %}</span><b class="num">{{ stats.streak }}</b></div>
+  <div class="card stat"><span class="muted">{% t 'wk_streak' %}</span><b class="num">{{ wk.weeks }}</b><small class="muted num">{% t 'wk_this' done=wk.this_week need=wk.need %}</small></div>
 </div>
 <p class="muted" style="margin:0">{% t 'points_help' %}</p>
 <div class="grid g3">
@@ -19,6 +20,11 @@
 </div>
 <section class="grid">
   <h3>{% t 'leaderboard' %}</h3>
+  <form method="post" action="{% url 'leaderboard_optin' %}" class="inline" style="align-items:center">{% csrf_token %}
+    <input type="hidden" name="on" value="{% if opted %}0{% else %}1{% endif %}">
+    <span class="muted">{% if opted %}{% t 'board_on' %}{% else %}{% t 'board_off' %}{% endif %}</span>
+    <button class="btn small{% if not opted %} primary{% endif %}" type="submit">{% if opted %}{% t 'board_leave' %}{% else %}{% t 'board_join' %}{% endif %}</button>
+  </form>
   {% if board %}<div class="tbl"><table>
     <thead><tr><th>#</th><th>{% t 'first_name' %}</th><th class="right">{% t 'visits_month' %}</th></tr></thead>
     <tbody>{% for r in board %}<tr {% if r.user_id == user.pk %}style="font-weight:700"{% endif %}><td class="num">{{ forloop.counter }}</td><td>{{ r.name }}</td><td class="right num">{{ r.visits }}</td></tr>{% endfor %}</tbody>

@@ -7,6 +7,7 @@
       <span class="eyebrow">{% now "l, d.m.Y" %} · <b class="num" data-clock>{% now "H:i" %}</b></span>
       <h1>{% t 'desk' %}</h1>
     </div>
+    <a class="dk-scan" href="{% url 'desk_classes' %}"><span>{% t 'dc_title' %}</span></a>
     <a class="dk-scan" href="{% url 'scan' %}">{% icon 'qr' %}<span>{% t 'scan' %}</span></a>
   </div>
   <div class="dk-kpis">
@@ -32,7 +33,7 @@
   {% for u in results %}
     <article class="card dk-person{% if not u.is_active %} blocked{% endif %}">
       <header><span class="dk-ava">{{ u.first_name|first|upper }}{{ u.last_name|first|upper }}</span>
-        <div><b>{{ u.full_name }}</b><small class="muted num">{{ u.member_code }} · {{ u.phone|default:u.email|default:"—" }}</small></div>
+        <div><b>{{ u.full_name }}</b><small class="muted num">{{ u.member_code }} · {{ u.phone|default:u.email|default:"—" }}</small><br><a class="muted" href="{% url 'admin:member' u.pk %}">{% t 'entry_title' %} →</a></div>
         {% if not u.is_active %}<span class="pill bad">{% t 'err_blocked' %}</span>{% elif u.mem %}<span class="pill good">{% plan_name u.mem.plan %} · {{ u.mem.expires|dmy }}</span>{% else %}<span class="pill mute">{% t 'no_membership' %}</span>{% endif %}
       </header>
       <div class="dk-acts">

@@ -49,9 +49,12 @@ def daily_target(user):
     return int(round(max(1200, tdee + adj), -1)), "profile"
 
 
-def day_summary(user, day):
-    """Everything the page draws for one day."""
+def day_summary(user, day, lang="uz"):
+    """Everything the page draws for one day. Each entry gets `.shown`: its food name in `lang` (entries store the Uzbek name; the
+    member's own foods and quick-add names are shown as typed)."""
     entries = list(user.food_entries.filter(date=day))
+    for e in entries:
+        e.shown = food_db.localize(e.name, lang)
     target, how = daily_target(user)
     tot = {"kcal": Decimal(0), "protein": Decimal(0), "fat": Decimal(0), "carbs": Decimal(0)}
     per_meal = {m: {"kcal": Decimal(0), "items": []} for m in MEALS}
@@ -170,10 +173,11 @@ def _amount_tokens(toks):
     return qs
 
 
-def parse_text(text, user=None):
-    """Free text -> [{idx, name, grams, kcal, protein, fat, carbs, mine}] for the foods it names (built-in database and the member's own foods),
+def parse_text(text, user=None, lang="uz"):
+    """Free text -> [{idx, name, stored, grams, kcal, protein, fat, carbs, mine}] for the foods it names (built-in database and the member's own foods),
     in the order they appear. A number before (or just after) a food is its amount: "200 g osh", "2 ta somsa", "osh 300 gramm";
-    with no amount a usual portion is used. `idx` is what calories_add takes as `food`."""
+    with no amount a usual portion is used. `idx` is what calories_add takes as `food`; `name` is shown in `lang`, `stored` is the (Uzbek) name
+    a diary entry keeps."""
     toks = [t.replace(",", ".") if t.endswith("%") else t for t in re.findall(r"\d+(?:[.,]\d+)?%?|[^\W\d_]+", _plain(text)[:300], re.UNICODE)]
     qs = _amount_tokens(toks)
     out = []
@@ -198,7 +202,7 @@ def parse_text(text, user=None):
             grams = f.default_grams
         grams = max(1, min(5000, int(round(grams))))
         kcal, p, fat, c = (float(x) for x in per_portion((f.name, f.kcal, f.p, f.f, f.c), grams))
-        out.append({"idx": f.as_dict()["id"], "name": f.name, "grams": grams, "kcal": kcal, "protein": p, "fat": fat, "carbs": c, "mine": f.mine})
+        out.append({"idx": f.as_dict()["id"], "name": f.label(lang), "stored": f.name, "grams": grams, "kcal": kcal, "protein": p, "fat": fat, "carbs": c, "mine": f.mine})
         if len(out) >= 12:
             break
     return out

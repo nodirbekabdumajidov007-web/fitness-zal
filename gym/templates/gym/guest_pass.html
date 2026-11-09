@@ -1,0 +1,16 @@
+{% extends "gym/base.html" %}{% load gym_tags %}
+{% block title %}{% t 'gp_title' %}{% endblock %}
+{% block content %}
+<section class="card grid" style="max-width:420px;margin-inline:auto;text-align:center">
+  <span class="eyebrow">Fitnes Zal</span>
+  <h2>{% t 'gp_title' %}</h2>
+  <p style="margin:0"><b>{{ gp.guest_name }}</b><br><span class="muted">{% t 'gp_invited_by' name=host.first_name|default:host.username %}</span></p>
+  <p class="num" style="margin:0;font-size:1.2rem"><b>{{ gp.date|dmy }}</b></p>
+  {% if gp.state == 'valid' or gp.state == 'today' %}
+  <div style="background:#fff;padding:8px;border-radius:12px;display:inline-block;margin-inline:auto">{{ qr }}</div>
+  <span class="muted">{% t 'gp_show_desk' %}</span>
+  {% else %}<div class="note warn">{% t 'gp_state_'|add:gp.state %}</div>{% endif %}
+  {% if gs.address %}<span class="muted">{{ gs.address }}</span>{% endif %}
+  <span class="muted num">{{ gs.open_time|hm }}–{{ gs.close_time|hm }} · +998 {{ gs.phone }}</span>
+</section>
+{% endblock %}

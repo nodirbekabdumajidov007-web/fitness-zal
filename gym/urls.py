@@ -4,6 +4,7 @@ from django.urls import path
 from . import chat_views as c
 from . import coach_views as coach
 from . import views as v
+from . import views_extra as x
 from . import voice
 
 urlpatterns = [
@@ -56,6 +57,7 @@ urlpatterns = [
     path("ai/plan/", v.ai_plan, name="ai_plan"),
     path("ai/clear/", v.ai_clear, name="ai_clear"),
     path("tools/", v.tools_view, name="tools"),
+    path("tools/save/", v.tools_save, name="tools_save"),
     path("inbox/", v.notifications_view, name="inbox"),
     path("profile/sessions/", v.logout_others, name="logout_others"),
     path("profile/export/", v.export_my_data, name="export_data"),
@@ -82,7 +84,31 @@ urlpatterns = [
     path("plans/", v.plans_view, name="plans"),
     path("plans/<slug:code>/buy/", v.buy_plan, name="buy_plan"),
     path("pay/click/", v.click_callback, name="click_callback"),
-    path("membership/freeze/", v.freeze_view, name="freeze"),
+    path("membership/", x.membership_view, name="membership"),
+    path("card/history/", x.entry_history_view, name="entry_history"),
+    path("membership/freeze/", x.freeze_view, name="freeze"),
+    path("membership/unfreeze/", x.unfreeze_view, name="unfreeze"),
+    path("renew/", x.renew_view, name="renew"),
+    path("guest/new/", x.guest_create, name="guest_create"),
+    path("guest/<int:pk>/cancel/", x.guest_cancel, name="guest_cancel"),
+    path("guest/<str:code>/", x.guest_public, name="guest_public"),
+    path("classes/<int:pk>/waitlist/", x.waitlist_join, name="waitlist_join"),
+    path("classes/<int:pk>/waitlist/leave/", x.waitlist_leave, name="waitlist_leave"),
+    path("staff/classes/", x.desk_classes, name="desk_classes"),
+    path("staff/booking/<int:pk>/<str:action>/", x.desk_booking_mark, name="desk_booking_mark"),
+    path("trainers/<int:pk>/rate/", x.trainer_rate, name="trainer_rate"),
+    path("leaderboard/join/", x.leaderboard_optin, name="leaderboard_optin"),
+    path("gift/", x.gift_view, name="gift"),
+    path("gift/buy/", x.gift_buy, name="gift_buy"),
+    path("gift/redeem/", x.gift_redeem, name="gift_redeem"),
+    path("bookings/<int:pk>/ics/", x.booking_ics, name="booking_ics"),
+    path("calendar/reset/", x.calendar_reset, name="calendar_reset"),
+    path("calendar/<str:token>.ics", x.calendar_feed, name="calendar_feed"),
+    path("faq/", x.faq_view, name="faq"),
+    path("oferta/", x.legal_view, {"slug": "oferta"}, name="oferta"),
+    path("privacy/", x.legal_view, {"slug": "privacy"}, name="privacy"),
+    path("refund/", x.legal_view, {"slug": "refund"}, name="refund"),
+    path("profile/delete/", x.account_delete, name="account_delete"),
     path("shop/", v.shop, name="shop"),
     path("cart/", v.cart_view, name="cart"),
     path("cart/add/<int:pid>/", v.cart_add, name="cart_add"),

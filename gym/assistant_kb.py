@@ -1,10 +1,18 @@
 """The assistant's knowledge base: the three row lists joined into one list of dicts.
 
 Rows live in assistant_kb_site.py (gym and website + personal + small talk), assistant_kb_train.py (training)
-and assistant_kb_food.py (nutrition). See assistant_kb_site.py for the row format.
+assistant_kb_food.py (nutrition) and the newer parts: _ex (exercises), _prog (programming, body parts), _health (recovery, health, mindset),
+_nutr (more nutrition), _site2 (site, page by page), _misc (small talk, myths). See assistant_kb_site.py for the row format.
 """
+from .assistant_kb_ex import EX
 from .assistant_kb_food import FOOD
+from .assistant_kb_health import HEALTH
+from .assistant_kb_misc import MISC
+from .assistant_kb_more import MORE
+from .assistant_kb_nutr import NUTR
+from .assistant_kb_prog import PROG
 from .assistant_kb_site import SITE
+from .assistant_kb_site2 import SITE2
 from .assistant_kb_train import TRAIN
 
 LANGS = ("uz", "ru", "en")
@@ -12,7 +20,7 @@ LANGS = ("uz", "ru", "en")
 
 def _build():
     out, seen = [], set()
-    for row in SITE + TRAIN + FOOD:
+    for row in SITE + TRAIN + FOOD + EX + PROG + HEALTH + NUTR + SITE2 + MISC + MORE:
         eid, topic, kw_uz, kw_ru, kw_en, a_uz, a_ru, a_en, links = row
         if eid in seen:
             raise ValueError(f"duplicate knowledge base id: {eid}")

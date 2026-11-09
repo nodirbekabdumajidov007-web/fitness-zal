@@ -7,8 +7,9 @@ from django.utils import timezone
 from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
 
-from . import services, telegram
+from . import extras, services, telegram
 from .models import (Announcement, BodyLog, Booking, Category, ChatMessage, ChatReport, Exercise, GymClass, GymSettings, Membership, Order, OrderItem, Payment, PaymentCard, Plan,
+                     ClassWaitlist, EntryLog, FaqItem, GiftCertificate, GuestPass, LegalPage, MembershipFreeze, ReferralReward, TrainerReview,
                      AIMessage, FoodEntry, Notification, PersonalRecord, Product, PromoCode, PTSession, Review, Trainer, User, UserFood, Visit, WorkoutPlan)
 
 
@@ -41,6 +42,17 @@ class MembershipInline(admin.TabularInline):
     model = Membership
     extra = 0
     fields = ("plan", "starts", "expires", "freeze_used", "frozen_until")
+
+
+class FreezeInline(admin.TabularInline):
+    model = MembershipFreeze
+    extra = 0
+    can_delete = False
+    fields = ("start_date", "end_date", "planned_days", "ended_early")
+    readonly_fields = fields
+
+    def has_add_permission(self, request, obj=None):
+        return False
 
 
 class BodyLogInline(admin.TabularInline):
@@ -306,8 +318,8 @@ class ProductAdmin(admin.ModelAdmin):
 class PlanAdmin(admin.ModelAdmin):
     search_fields = ("name", "code")
     list_filter = ("active",)
-    list_display = ("name", "code", "months", "price", "active", "order")
-    list_editable = ("price", "active", "order")
+    list_display = ("name", "code", "months", "price", "guest_passes", "active", "order")
+    list_editable = ("price", "guest_passes", "active", "order")
 
 
 @admin.register(PromoCode)
@@ -349,12 +361,23 @@ class GymClassAdmin(admin.ModelAdmin):
 
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
-    list_display = ("user", "gym_class", "date", "created")
-    list_filter = ("date", "gym_class")
+    list_display = ("user", "gym_class", "date", "no_show", "checked_in_at", "created")
+    list_filter = ("no_show", "date", "gym_class")
+    actions = ["mark_noshow", "mark_came"]
     list_select_related = ("user", "gym_class")
     search_fields = ("user__phone", "user__first_name", "user__last_name", "gym_class__name")
     raw_id_fields = ("user",)
     date_hierarchy = "date"
+
+    @admin.action(description="Kelmadi deb belgilash")
+    def mark_noshow(self, request, qs):
+        for b in qs:
+            extras.mark_booking(b, "noshow")
+
+    @admin.action(description="Keldi deb belgilash")
+    def mark_came(self, request, qs):
+        for b in qs:
+            extras.mark_booking(b, "came")
 
 
 @admin.register(Visit)
@@ -384,9 +407,10 @@ GOOGLE_HELP = mark_safe(
 class GymSettingsAdmin(admin.ModelAdmin):
     fieldsets = (
         ("Zal", {"fields": (("open_time", "close_time"), "phone", "address", "instagram", "telegram", "telegram_bot")}),
-        ("Bosh sahifa ko'rinishi", {"fields": ("hero_video", "hero_word")}),
+        ("Bosh sahifa ko'rinishi", {"fields": ("hero_video",)}),
         ("Kirish xavfsizligi", {"fields": ("google_client_id", "apple_client_id", "require_google", "login_sms_code", "require_phone_verify"), "description": GOOGLE_HELP}),
-        ("Abonement va bonuslar", {"fields": ("freeze_max_days", "reminder_days", "referral_bonus_days", "revenue_goal", "gym_capacity")}),
+        ("Abonement va bonuslar", {"fields": (("freeze_min_days", "freeze_max_days"), "class_cancel_hours", "reminder_email", "referral_bonus_days", "referral_newcomer_percent", "revenue_goal", "gym_capacity"),
+                                  "description": "Muzlatish: eng ko'p kun 0 bo'lsa, a'zolar muzlata olmaydi. Eslatmalar 7, 3 va 1 kun oldin avtomatik ketadi."}),
         ("Yetkazib berish", {"fields": ("delivery_on", ("delivery_fee", "free_delivery_from"), "delivery_area")}),
         ("Xaritada zal", {"fields": ("yandex_map_url", ("map_lat", "map_lng")),
                           "description": "Yandex Xaritada zalingizni oching → «Ulashish» → havolani nusxalab shu yerga qo'ying "
@@ -651,6 +675,16 @@ class MembershipAdmin(admin.ModelAdmin):
     search_fields = ("user__phone", "user__first_name", "user__last_name", "user__username")
     raw_id_fields = ("user",)  # a dropdown with every member would be slow and endless
     date_hierarchy = "expires"
+    inlines = [FreezeInline]
+    actions = ["end_freeze"]
+
+    @admin.action(description="Muzlatishni tugatish (ishlatilmagan kunlar qaytariladi)")
+    def end_freeze(self, request, qs):
+        n = 0
+        for m in qs:
+            for fr in m.freezes.all():
+                n += bool(extras.end_freeze_row(fr))
+        self.message_user(request, f"Tugatilgan muzlatishlar: {n}")
 
     @admin.display(description="Holat")
     def state(self, o):
@@ -687,3 +721,185 @@ class UserFoodAdmin(admin.ModelAdmin):
     list_select_related = ("user",)
     search_fields = ("name", "user__username", "user__first_name", "user__last_name")
     raw_id_fields = ("user",)
+
+
+# ---------------------------------------------------------------- retention features
+@admin.register(MembershipFreeze)
+class MembershipFreezeAdmin(admin.ModelAdmin):
+    list_display = ("member", "start_date", "end_date", "planned_days", "state_pill", "ended_early")
+    list_filter = ("ended_early", "start_date")
+    search_fields = ("membership__user__first_name", "membership__user__last_name", "membership__user__phone", "membership__user__username")
+    list_select_related = ("membership", "membership__user")
+    date_hierarchy = "start_date"
+
+    def has_add_permission(self, request):
+        return False  # freezes move the end date, so they are made by the member (or the membership action), never by hand
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    @admin.display(description="A'zo")
+    def member(self, o):
+        return o.membership.user
+
+    @admin.display(description="Holat")
+    def state_pill(self, o):
+        return badge({"active": "Faol", "scheduled": "Rejalashtirilgan", "done": "Tugagan", "cancelled": "Bekor"}[o.state], {"active": "#1f5bd6", "scheduled": "#b97d00"}.get(o.state, "#888"))
+
+
+@admin.register(GuestPass)
+class GuestPassAdmin(admin.ModelAdmin):
+    list_display = ("guest_name", "guest_phone", "owner", "date", "state_pill", "used_at", "checked_by")
+    list_filter = ("date", "used_at")
+    search_fields = ("guest_name", "guest_phone", "owner__first_name", "owner__last_name", "owner__phone")
+    list_select_related = ("owner", "checked_by")
+    raw_id_fields = ("owner", "membership", "checked_by")
+    actions = ["cancel_passes"]
+
+    @admin.display(description="Holat")
+    def state_pill(self, o):
+        return badge({"valid": "Amal qiladi", "today": "Bugun", "used": "Ishlatilgan", "expired": "Muddati o'tgan", "cancelled": "Bekor"}[o.state],
+                     {"valid": "#1d9a52", "today": "#1d9a52", "used": "#888"}.get(o.state, "#c0261a"))
+
+    @admin.action(description="Bekor qilish")
+    def cancel_passes(self, request, qs):
+        qs.filter(used_at__isnull=True, cancelled_at__isnull=True).update(cancelled_at=timezone.now())
+
+
+@admin.register(ReferralReward)
+class ReferralRewardAdmin(admin.ModelAdmin):
+    list_display = ("referrer", "referred", "days", "created")
+    list_select_related = ("referrer", "referred")
+    search_fields = ("referrer__first_name", "referrer__phone", "referred__first_name", "referred__phone")
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(ClassWaitlist)
+class ClassWaitlistAdmin(admin.ModelAdmin):
+    list_display = ("user", "gym_class", "date", "created")
+    list_filter = ("date", "gym_class")
+    list_select_related = ("user", "gym_class")
+    raw_id_fields = ("user",)
+
+
+@admin.register(TrainerReview)
+class TrainerReviewAdmin(admin.ModelAdmin):
+    list_display = ("trainer", "user", "rating", "short", "hidden", "updated")
+    list_filter = ("hidden", "rating", "trainer")
+    list_editable = ("hidden",)
+    list_select_related = ("trainer", "user")
+    search_fields = ("comment", "user__first_name", "user__last_name", "trainer__name")
+    actions = ["hide", "show"]
+
+    @admin.display(description="Fikr")
+    def short(self, o):
+        return o.comment[:60]
+
+    @admin.action(description="Yashirish (saytda ko'rinmaydi)")
+    def hide(self, request, qs):
+        qs.update(hidden=True)
+
+    @admin.action(description="Ko'rsatish")
+    def show(self, request, qs):
+        qs.update(hidden=False)
+
+
+@admin.register(GiftCertificate)
+class GiftCertificateAdmin(admin.ModelAdmin):
+    list_display = ("code", "what", "buyer", "expires", "state_pill", "redeemed_by", "redeemed_at")
+    list_filter = ("expires", "redeemed_at")
+    search_fields = ("code", "buyer__first_name", "buyer__phone", "redeemed_by__phone", "note")
+    list_select_related = ("plan", "buyer", "redeemed_by", "payment")
+    raw_id_fields = ("buyer", "redeemed_by", "payment")
+    fields = ("code", "plan", "amount", "expires", "note", "buyer", "payment", "redeemed_by", "redeemed_at")
+    readonly_fields = ("code",)
+
+    @admin.display(description="Nima uchun")
+    def what(self, o):
+        return o.plan.name if o.plan_id else f"{o.amount:,} so'm".replace(",", " ")
+
+    @admin.display(description="Holat")
+    def state_pill(self, o):
+        return badge({"valid": "Amal qiladi", "redeemed": "Ishlatilgan", "expired": "Muddati o'tgan", "unpaid": "To'lov kutilmoqda"}[o.state],
+                     {"valid": "#1d9a52", "unpaid": "#b97d00"}.get(o.state, "#888"))
+
+    def get_changeform_initial_data(self, request):
+        return {"expires": timezone.localdate() + timezone.timedelta(days=365)}
+
+    def save_model(self, request, obj, form, change):
+        if not obj.code:
+            obj.code = extras.new_gift_code()
+        super().save_model(request, obj, form, change)
+        self.message_user(request, f"Sertifikat kodi: {obj.code}", messages.SUCCESS)
+
+
+@admin.register(FaqItem)
+class FaqItemAdmin(admin.ModelAdmin):
+    list_display = ("question_uz", "order", "active")
+    list_editable = ("order", "active")
+    search_fields = ("question_uz", "question_ru", "question_en")
+    fieldsets = (("O'zbekcha", {"fields": ("question_uz", "answer_uz")}), ("Ruscha", {"fields": ("question_ru", "answer_ru")}),
+                 ("Inglizcha", {"fields": ("question_en", "answer_en")}), ("Ko'rinishi", {"fields": ("order", "active")}))
+
+    def render_change_form(self, request, context, *a, **kw):
+        messages.info(request, "Javobda {hours}, {phone}, {address}, {freeze_min}, {freeze_max}, {bonus}, {cancel_hours} yozsangiz, ular sozlamalardan avtomatik to'ldiriladi.")
+        return super().render_change_form(request, context, *a, **kw)
+
+
+@admin.register(LegalPage)
+class LegalPageAdmin(admin.ModelAdmin):
+    list_display = ("title_uz", "slug", "placeholders_left", "updated")
+    fieldsets = (("Sahifa", {"fields": ("slug",)}), ("O'zbekcha", {"fields": ("title_uz", "body_uz")}), ("Ruscha", {"fields": ("title_ru", "body_ru")}),
+                 ("Inglizcha", {"fields": ("title_en", "body_en")}))
+
+    @admin.display(description="To'ldirilmagan [JOYLAR]")
+    def placeholders_left(self, o):
+        left = o.placeholders()
+        return badge(f"{len(left)} ta", "#c0261a") if left else badge("Tayyor", "#1d9a52")
+
+    def _warn(self, request):
+        left = extras.legal_placeholders()
+        if left:
+            messages.warning(request, "DIQQAT: huquqiy matnlarda hali to'ldirilmagan joylar bor: " + ", ".join(left) +
+                             ". Haqiqiy kompaniya ma'lumotlari bilan almashtiring, aks holda sayt oferta va maxfiylik siyosatida shablon matnni ko'rsatadi. Yurist ko'rigidan o'tkazing.")
+
+    def changelist_view(self, request, extra_context=None):
+        self._warn(request)
+        return super().changelist_view(request, extra_context)
+
+    def render_change_form(self, request, context, *a, **kw):
+        self._warn(request)
+        return super().render_change_form(request, context, *a, **kw)
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(EntryLog)
+class EntryLogAdmin(admin.ModelAdmin):
+    list_display = ("ts", "who", "method", "result_pill", "reason", "staff")
+    list_filter = ("result", "method", "reason", "ts")
+    search_fields = ("user__first_name", "user__last_name", "user__phone", "user__username", "guest_pass__guest_name")
+    list_select_related = ("user", "staff", "guest_pass")
+    date_hierarchy = "ts"
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    @admin.display(description="Kim")
+    def who(self, o):
+        if o.guest_pass_id:
+            return f"Mehmon: {o.guest_pass.guest_name} ({o.user})"
+        return o.user or "—"
+
+    @admin.display(description="Natija", ordering="result")
+    def result_pill(self, o):
+        return badge(o.get_result_display(), {"ok": "#1d9a52", "repeat": "#1f5bd6"}.get(o.result, "#c0261a"))

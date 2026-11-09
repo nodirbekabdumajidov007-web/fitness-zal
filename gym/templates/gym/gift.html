@@ -1,0 +1,28 @@
+{% extends "gym/base.html" %}{% load gym_tags %}
+{% block title %}{% t 'gift_title' %}{% endblock %}
+{% block content %}
+<h2>{% icon 'gift' %} {% t 'gift_title' %}</h2>
+<div class="grid g2" style="align-items:start">
+  <form class="card grid" method="post" action="{% url 'gift_buy' %}">{% csrf_token %}
+    <h3>{% t 'gift_buy_title' %}</h3>
+    <p class="muted" style="margin:0">{% t 'gift_buy_help' min=min|money max=max|money %}</p>
+    <label for="gf-plan">{% t 'gift_for_plan' %}
+      <select id="gf-plan" name="plan"><option value="">— {% t 'gift_or_amount' %} —</option>{% for p in plans %}<option value="{{ p.code }}">{% plan_name p %} · {{ p.price|money }} {% t 'price_unit' %}</option>{% endfor %}</select></label>
+    <label for="gf-amount">{% t 'gift_amount_label' %}<input id="gf-amount" name="amount" type="number" min="{{ min }}" max="{{ max }}" step="1000" inputmode="numeric"></label>
+    {% if methods|length == 1 %}<div class="pay-one"><span class="muted">{% t 'pay_method' %}</span> <b>{% method_label methods.0 %}</b><input type="hidden" name="method" value="{{ methods.0 }}"></div>{% else %}<label for="gf-method">{% t 'pay_method' %}<select id="gf-method" name="method">{% for mth in methods %}<option value="{{ mth }}">{% method_label mth %}</option>{% endfor %}</select></label>{% endif %}
+    {% if not user.consent_at %}{% include "gym/_consent.html" %}{% else %}<small class="muted">{% t 'consent_note' %}</small>{% endif %}
+    <button class="btn primary" type="submit">{% t 'buy' %}</button>
+  </form>
+  <div class="grid" style="align-content:start">
+    <form class="card grid" method="post" action="{% url 'gift_redeem' %}">{% csrf_token %}
+      <h3>{% t 'gift_redeem_title' %}</h3>
+      <label for="gf-code">{% t 'gift_code' %}<input id="gf-code" name="code" maxlength="20" autocomplete="off" placeholder="GC-XXXXXXXX" style="text-transform:uppercase"></label>
+      <button class="btn" type="submit">{% t 'gift_redeem_btn' %}</button>
+    </form>
+    {% if gifts %}<div class="card grid"><h3>{% t 'gift_mine' %}</h3>
+      {% for x in gifts %}<div class="cls"><span><b class="num">{{ x.g.code }}</b><br><span class="muted">{% if x.g.plan %}{% plan_name x.g.plan %}{% else %}{{ x.g.amount|money }} {% t 'price_unit' %}{% endif %} · {% t 'gift_until' %} <span class="num">{{ x.g.expires|dmy }}</span></span></span>
+        <span class="pill {% if x.state == 'valid' %}good{% elif x.state == 'unpaid' %}warn{% else %}mute{% endif %}">{% t 'gift_state_'|add:x.state %}</span></div>{% endfor %}
+    </div>{% endif %}
+  </div>
+</div>
+{% endblock %}

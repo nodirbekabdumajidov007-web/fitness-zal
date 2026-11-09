@@ -87,6 +87,21 @@ class CoachPanelTests(Base):
         Booking.objects.create(user=self.m, gym_class=cls, date=timezone.localdate())
         self.assertEqual(c.get(f"/coach/client/{self.m.pk}/").status_code, 200)
 
+    def test_plan_builder_programs_follow_the_coach_language(self):
+        import json
+        from . import programs
+        c = self.coach()
+        c.post("/coach/client/add/", {"q": f"FZ-{self.stranger.pk:04d}"})
+        for lang in ("uz", "ru", "en"):
+            c.cookies["fz_lang"] = lang
+            r = c.get(f"/coach/plan/{self.stranger.pk}/")
+            self.assertEqual(r.status_code, 200)
+            self.assertEqual([p["title"] for p in r.context["programs"]], [programs.tr(p["title"], lang) for p in programs.PROGRAMS.values()])
+            rows = r.context["program_rows"]["home"]
+            self.assertEqual([x["name"] for x in rows], [row[1] for row in programs.rows(programs.PROGRAMS["home"], lang)])
+            self.assertEqual(set(rows[0]), {"wd", "name", "sets", "reps", "note"})
+            json.dumps(r.context["program_rows"])
+
     def test_add_client_and_build_plan(self):
         c = self.coach()
         r = c.post("/coach/client/add/", {"q": f"FZ-{self.stranger.pk:04d}"})

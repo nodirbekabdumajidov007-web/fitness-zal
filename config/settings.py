@@ -118,6 +118,8 @@ SESSION_COOKIE_AGE = 7 * 86400
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = "same-origin"
 X_FRAME_OPTIONS = "DENY"
+# Real visitor address (rate limits): read X-Forwarded-For when a proxy of ours sets it. gym/net.py also turns this on by itself on Render (RENDER env).
+TRUST_PROXY_HEADERS = os.environ.get("FZ_TRUST_PROXY", "0") == "1"
 if SECURE and not DEBUG:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SECURE_SSL_REDIRECT = os.environ.get("DJANGO_SSL_REDIRECT", "1") == "1"
@@ -126,7 +128,7 @@ if SECURE and not DEBUG:
 # app settings
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "").strip()
 # Demo "Payme/Click/Uzum" buttons mark a payment as paid without any money moving. They exist only for development (DEBUG on) unless forced.
-ALLOW_DEMO_PAYMENTS = os.environ.get("FZ_ALLOW_DEMO", "1" if DEBUG else "0") == "1"
+ALLOW_DEMO_PAYMENTS = DEBUG and os.environ.get("FZ_ALLOW_DEMO", "1") == "1"  # never in production: DEBUG off means no demo gateways, whatever the env says
 
 # uploads (product/trainer photos, lesson and hero videos, chat photos) are served through views, never from a public folder
 MEDIA_ROOT = Path(os.environ.get("FZ_MEDIA_DIR", BASE_DIR / "media"))

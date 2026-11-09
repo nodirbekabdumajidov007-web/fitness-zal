@@ -2,39 +2,33 @@
 {% block title %}{% t 'nav_plans' %}{% endblock %}
 {% block content %}
 <h2>{% t 'nav_plans' %}</h2>
+{% if renew %}<div class="note info">{% t 'renew_note' %}</div>{% endif %}
+{% if welcome_pct %}<div class="note info">{% t 'welcome_disc' pct=welcome_pct %}</div>{% endif %}
 <div class="grid g3">
   {% for p in plans %}
-  <form class="card plan lift" method="post" action="{% url 'buy_plan' p.code %}">
+  <form id="plan-{{ p.code }}" class="card plan lift{% if renew == p.code %} renew-hl{% endif %}" method="post" action="{% url 'buy_plan' p.code %}">
     {% csrf_token %}
     <div class="eyebrow">{% t 'months_n' n=p.months %}</div>
     <h3>{% plan_name p %}</h3>
     <div class="price num">{{ p.price|money }} <small>{% t 'price_unit' %}</small></div>
     <ul class="perks">{% plan_perks p as perks %}{% for x in perks %}<li>{{ x }}</li>{% endfor %}</ul>
-    <fieldset class="paytiles"><legend>{% t 'pay_method' %}</legend>
-      {% for x in pay_tiles %}<label class="ptile {{ x.brand }}{% if not x.ok %} off{% endif %}">
-        <input type="radio" name="method"{% if x.ok %} value="{{ x.value }}"{% if forloop.first %} checked{% endif %}{% else %} disabled{% endif %}>
+    <fieldset class="paytiles{% if pay_tiles|length == 1 %} single{% endif %}"><legend>{% t 'pay_method' %}</legend>
+      {% for x in pay_tiles %}<label class="ptile {{ x.brand }}">
+        <input type="radio" name="method" value="{{ x.value }}" {% if forloop.first %}checked{% endif %}>
         <span class="pt-logo" aria-hidden="true">{% if x.brand == 'cash' %}{% icon 'banknote' %}{% elif x.brand == 'payme' %}<b>payme</b>{% elif x.brand == 'click' %}<b>click</b>{% elif x.brand == 'uzum' %}<b>uzum</b>{% else %}{% icon 'credit-card' %}{% endif %}</span>
         <span class="pt-txt"><b>{% if x.brand == 'cash' %}{% t 'cash' %}{% elif x.brand == 'card' %}{% t 'card_transfer' %}{% else %}{{ x.value }}{% endif %}</b>
-          <small>{% if not x.ok %}{% t 'pay_soon_tile' %}{% elif x.brand == 'cash' %}{% t 'pay_cash_sub' %}{% elif x.brand == 'card' %}{% t 'pay_card_sub' %}{% else %}{% t 'pay_online_sub' %}{% endif %}</small></span>
+          <small>{% if x.brand == 'cash' %}{% t 'pay_cash_sub' %}{% elif x.brand == 'card' %}{% t 'pay_card_sub' %}{% else %}{% t 'pay_online_sub' %}{% endif %}</small></span>
         <i class="pt-tick" aria-hidden="true"></i>
       </label>{% endfor %}
     </fieldset>
     <label for="p_{{ p.code }}">{% t 'promo' %}<input id="p_{{ p.code }}" name="promo" maxlength="20" autocomplete="off" placeholder="{% t 'promo_ph' %}"></label>
-    <button class="btn primary" type="submit">{% t 'buy' %}</button>
+    <label for="g_{{ p.code }}">{% t 'gift_code' %}<input id="g_{{ p.code }}" name="gift" maxlength="20" autocomplete="off" placeholder="GC-XXXXXXXX"></label>
+    {% if need_consent %}{% include "gym/_consent.html" %}{% else %}<small class="muted">{% t 'consent_note' %}</small>{% endif %}
+    <button class="btn primary" type="submit">{% if renew == p.code %}{% t 'renew_btn' %}{% else %}{% t 'buy' %}{% endif %}</button>
   </form>
   {% endfor %}
 </div>
 {% if demo_on %}<div class="note">{% t 'demo_note' %}</div>{% endif %}
 
-{% if user.is_authenticated and m and not m.freeze_used and not m.is_frozen and freeze_options %}
-<form class="card grid" method="post" action="{% url 'freeze' %}">
-  {% csrf_token %}
-  <h3>{% t 'freeze' %}</h3>
-  <p class="muted" style="margin:0">{% t 'freeze_help' max=max_freeze %}</p>
-  <div class="inline">
-    <label for="fd">{% t 'freeze_days' %}<select id="fd" name="days">{% for d in freeze_options %}<option value="{{ d }}">{{ d }}</option>{% endfor %}</select></label>
-    <button class="btn" type="submit" data-confirm="{% t 'confirm' %}">{% t 'freeze_do' %}</button>
-  </div>
-</form>
-{% endif %}
+{% if user.is_authenticated %}<p><a href="{% url 'membership' %}">{% t 'ms_title' %} →</a> · <a href="{% url 'gift' %}">{% t 'gift_title' %} →</a></p>{% endif %}
 {% endblock %}

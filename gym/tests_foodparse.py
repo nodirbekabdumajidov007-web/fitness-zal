@@ -69,7 +69,20 @@ class FoodParseTests(SimpleTestCase):
         self.assertEqual(names("kefir yog'siz"), ["Kefir (yog'siz)"])
 
     def test_every_food_is_found_by_its_own_name(self):
-        """Typing the full name of any of the ~600 foods must find that food (and never a second variant next to it, unless the row lists only
-        its own aliases)."""
+        """Typing the full name of any of the ~600 foods must find that food."""
         missed = [f.name for f in food_db.FOODS_DB if str(f.id) not in [x["idx"] for x in calories.parse_text(f.name)]]
         self.assertEqual(missed, [])
+
+    def test_full_name_gives_exactly_that_food(self):
+        """...and nothing next to it: the note in the brackets must not pick a second food ("Shirchoy (sho'rva)" is not also a "Sho'rva")."""
+        extra = {f.name: names(f.name) for f in food_db.FOODS_DB if names(f.name) != [f.name]}
+        self.assertEqual(extra, {})
+
+    def test_shirchoy_full_name_does_not_also_match_shorva(self):
+        self.assertEqual(names("Shirchoy (sho'rva)"), ["Shirchoy (sho'rva)"])
+        self.assertEqual(names("shirchoy shorva"), ["Shirchoy (sho'rva)"])
+        self.assertEqual(names("shirchoy"), ["Shirchoy (sho'rva)"])
+        self.assertEqual(names("200 g shirchoy (sho'rva)"), ["Shirchoy (sho'rva)"])
+        self.assertEqual(calories.parse_text("Shirchoy (sho'rva)")[0]["grams"], 300)
+        self.assertEqual(names("sho'rva"), ["Sho'rva"])  # the plain soup is still found on its own
+        self.assertEqual(names("shirchoy va sho'rva"), ["Shirchoy (sho'rva)", "Sho'rva"])  # and two real dishes in one sentence still give two

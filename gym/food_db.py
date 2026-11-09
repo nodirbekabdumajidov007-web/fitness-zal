@@ -8,6 +8,7 @@ import re
 
 from .food_data1 import RAW as _RAW1
 from .food_data2 import RAW as _RAW2
+from .food_names import NAMES as _NAMES
 
 _APOS = "ʻʼ’‘`´'"
 _NOT_WORD = re.compile(r"[^\w%]+", re.UNICODE)
@@ -37,8 +38,14 @@ class Food:
     def default_grams(self):
         return self.portion or self.piece or 100
 
-    def as_dict(self):
-        return {"id": ("u%d" % self.id) if self.mine else str(self.id), "name": self.name, "kcal": _n(self.kcal), "p": _n(self.p), "f": _n(self.f), "c": _n(self.c),
+    def label(self, lang="uz"):
+        """The name to show in `lang` (uz / ru / en): the explicit Russian / English name of a built-in food, else the Uzbek one.
+        A member's own food always keeps the name the member typed."""
+        tr = None if self.mine or lang not in ("ru", "en") else _NAMES.get(self.name)
+        return (tr[0] if lang == "ru" else tr[1]) if tr else self.name
+
+    def as_dict(self, lang="uz"):
+        return {"id": ("u%d" % self.id) if self.mine else str(self.id), "name": self.label(lang), "kcal": _n(self.kcal), "p": _n(self.p), "f": _n(self.f), "c": _n(self.c),
                 "portion": self.default_grams, "piece": self.piece, "mine": self.mine}
 
 
@@ -79,9 +86,12 @@ def _load():
     foods = []
     for name, k, p, f, c, piece, portion, base, inner, listed, only_listed in rows:
         auto = [x for x in [base] + inner if x]
-        search = list(dict.fromkeys([plain(name)] + auto + listed))
+        shown = [plain(x) for x in _NAMES.get(name, ()) if plain(x)]  # the displayed ru / en names must find their own food too
+        search = list(dict.fromkeys([plain(name)] + auto + listed + shown))
         if only_listed:
-            parse, weak = list(dict.fromkeys(listed)), frozenset()
+            # the whole name ("Shirchoy (sho'rva)" -> "shirchoy shorva") also counts: being the longest phrase it takes both words, so the
+            # note in the brackets cannot pick another food on its own ("Sho'rva")
+            parse, weak = list(dict.fromkeys(listed + ([plain(name)] if inner else []))), frozenset()
         else:
             # "pizza margarita", "margarita pizza", "xom guruch", "guruch xom": the base word together with a note of the brackets
             combos = []
@@ -97,6 +107,13 @@ def _load():
 
 
 FOODS_DB = _load()
+BY_NAME = {f.name: f for f in FOODS_DB}
+
+
+def localize(name, lang="uz"):
+    """The stored (Uzbek) name of a diary entry in the viewer's language; anything that is not a built-in food (own foods, quick add) is returned as is."""
+    f = BY_NAME.get(name)
+    return f.label(lang) if f else name
 
 
 # ------------------------------------------------------------------------------------------------ search

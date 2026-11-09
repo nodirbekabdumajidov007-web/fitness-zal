@@ -1,0 +1,72 @@
+{% extends "gym/base.html" %}{% load gym_tags %}
+{% block title %}{% t 'ms_title' %}{% endblock %}
+{% block content %}
+<h2>{% t 'ms_title' %}</h2>
+
+<section class="card grid">
+  <div class="inline" style="align-items:center;justify-content:space-between">
+    <div><span class="eyebrow">{% t 'membership' %}</span>
+      <div class="big">{% if m %}{% plan_name m.plan %}{% else %}{% t 'no_membership' %}{% endif %}</div>
+      {% if m %}<span class="muted num">{% t 'until' %} {{ m.expires|dmy }}</span>{% endif %}</div>
+    {% if renew_plan %}<a class="btn primary pill" href="{% url 'renew' %}">{% t 'renew_btn' %}{% if renew_plan %} · {% plan_name renew_plan %}{% endif %}</a>{% endif %}
+  </div>
+</section>
+
+<section class="card grid" id="freeze">
+  <h3>{% t 'freeze' %}</h3>
+  {% if not fz.enabled %}<p class="muted" style="margin:0">{% t 'freeze_off' %}</p>
+  {% else %}
+  <p class="muted" style="margin:0">{% t 'freeze_rules' min=fz.min max=fz.max %}</p>
+  {% if fz.m %}<div class="bar"><i style="width:{% widthratio fz.used fz.max 100 %}%"></i></div>
+  <span class="muted num">{% t 'freeze_used_left' used=fz.used left=fz.left %}</span>{% endif %}
+  {% if fz.current %}
+    <div class="note warn">{% t 'freeze_active_now' until=fz.current.end_date|dmy %}</div>
+    <form method="post" action="{% url 'unfreeze' %}">{% csrf_token %}<button class="btn" type="submit" data-confirm="{% t 'sure' %}">{% t 'unfreeze_btn' %}</button></form>
+  {% elif fz.scheduled %}
+    <div class="note info">{% t 'freeze_scheduled' start=fz.scheduled.start_date|dmy until=fz.scheduled.end_date|dmy %}</div>
+    <form method="post" action="{% url 'unfreeze' %}">{% csrf_token %}<button class="btn" type="submit" data-confirm="{% t 'sure' %}">{% t 'freeze_cancel_btn' %}</button></form>
+  {% elif fz.can %}
+    <form method="post" action="{% url 'freeze' %}" class="grid g3">{% csrf_token %}
+      <label for="fz-days">{% t 'freeze_days' %}<input id="fz-days" name="days" type="number" min="{{ fz.min }}" max="{{ fz.left }}" value="{{ fz.min }}" required></label>
+      <label for="fz-start">{% t 'freeze_start' %}<input id="fz-start" name="start" type="date" min="{{ today|date:'Y-m-d' }}" max="{{ last_day|date:'Y-m-d' }}" value="{{ today|date:'Y-m-d' }}"></label>
+      <button class="btn primary" type="submit" data-confirm="{% t 'confirm' %}">{% t 'freeze_do' %}</button>
+    </form>
+  {% else %}<p class="muted" style="margin:0">{% t fz.reason %}</p>{% endif %}
+  {% endif %}
+  {% if freezes %}<div class="tbl"><table><thead><tr><th>{% t 'freeze_start' %}</th><th>{% t 'freeze_end' %}</th><th class="right">{% t 'freeze_days' %}</th></tr></thead>
+    <tbody>{% for f in freezes %}<tr><td class="num">{{ f.start_date|dmy }}</td><td class="num">{{ f.end_date|dmy }}</td><td class="right num">{{ f.days }}</td></tr>{% endfor %}</tbody></table></div>{% endif %}
+</section>
+
+<section class="card grid" id="guests">
+  <h3>{% t 'gp_title' %}</h3>
+  {% if g_allowed %}
+  <p class="muted" style="margin:0">{% t 'gp_help' left=g_left total=g_allowed %}</p>
+  {% if g_left %}
+  <form method="post" action="{% url 'guest_create' %}" class="grid g3">{% csrf_token %}
+    <label for="gp-name">{% t 'gp_name_label' %}<input id="gp-name" name="name" maxlength="60" required></label>
+    <label for="gp-phone">{% t 'phone' %}<input id="gp-phone" name="phone" inputmode="tel" placeholder="+998 90 123 45 67" maxlength="20"></label>
+    <label for="gp-date">{% t 'gp_date' %}<input id="gp-date" name="date" type="date" min="{{ today|date:'Y-m-d' }}" max="{{ last_day|date:'Y-m-d' }}" value="{{ today|date:'Y-m-d' }}" required></label>
+    <button class="btn primary" type="submit">{% t 'gp_create' %}</button>
+  </form>{% endif %}
+  {% else %}<p class="muted" style="margin:0">{% t 'gp_not_in_plan' %}</p>{% endif %}
+  {% for x in passes %}
+  <div class="cls"><span><b>{{ x.gp.guest_name }}</b> <span class="muted num">· {{ x.gp.date|dmy }}</span><br>
+    <span class="pill {% if x.gp.state == 'valid' or x.gp.state == 'today' %}good{% elif x.gp.state == 'used' %}mute{% else %}bad{% endif %}">{% t 'gp_state_'|add:x.gp.state %}</span></span>
+    <span class="inline" style="flex:none;align-items:center">
+      {% if x.gp.state == 'valid' or x.gp.state == 'today' %}
+      <input id="gp-{{ x.gp.pk }}" value="{{ x.url }}" readonly style="max-width:11rem" aria-label="{% t 'gp_link' %}">
+      <button class="btn small" type="button" data-copy="gp-{{ x.gp.pk }}" data-done="{% t 'copied' %}">{% t 'copy' %}</button>
+      <a class="btn small" href="{{ x.url }}" target="_blank" rel="noopener">QR</a>
+      <form method="post" action="{% url 'guest_cancel' x.gp.pk %}">{% csrf_token %}<button class="btn small danger" type="submit" data-confirm="{% t 'sure' %}">{% t 'cancel_booking' %}</button></form>
+      {% endif %}
+    </span></div>
+  {% endfor %}
+</section>
+
+<section class="card grid" id="invite">
+  <h3>{% icon 'gift' %} {% t 'invite' %}</h3>
+  <p class="muted" style="margin:0">{% t 'invite_help' days=bonus_days %}</p>
+  <div class="inline"><input id="ref-link" value="{{ referral_url }}" readonly aria-label="{% t 'invite' %}"><button class="btn" type="button" data-copy="ref-link" data-done="{% t 'copied' %}">{% t 'copy' %}</button></div>
+  <span class="muted num">{% t 'invited_n' n=invited ok=rewarded %} · {% t 'ref_earned' days=earned_days %}</span>
+</section>
+{% endblock %}

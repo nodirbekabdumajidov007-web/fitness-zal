@@ -8,6 +8,7 @@
     <h1>{{ user.first_name }} {{ user.last_name }}</h1>
     <div class="db-quick">
       <a href="{% url 'card' %}"><i>▣</i>{% t 'member_card' %}</a>
+      <a href="{% url 'entry_history' %}"><i>{% icon 'clock' %}</i>{% t 'entry_title' %}</a>
       <a href="{% url 'classes' %}"><i>{% icon 'calendar' %}</i>{% t 'nav_classes' %}</a>
       <a href="{% url 'workouts' %}"><i>{% icon 'trending-up' %}</i>{% t 'workouts' %}</a>
       <a href="{% url 'shop' %}"><i>{% icon 'cart' %}</i>{% t 'nav_shop' %}</a>
@@ -32,7 +33,8 @@
       <div class="db-mem-acts">
         {% if m %}<span class="pill {% if m.is_frozen %}warn{% else %}good{% endif %}">{% if m.is_frozen %}{% t 'frozen' %}{% else %}{% t 'active' %}{% endif %}</span>{% elif last %}<span class="pill bad">{% t 'expired' %}</span>{% endif %}
         <form method="post" action="{% url 'checkin' %}">{% csrf_token %}<button class="btn primary pulse pill" type="submit" {% if stats.today or not can_enter %}disabled{% endif %}>{% if stats.today %}✓ {% t 'checked_in' %}{% else %}{% t 'checkin' %}{% endif %}</button></form>
-        {% if not m %}<a class="btn pill" href="{% url 'plans' %}">{% t 'buy' %}</a>{% endif %}
+        {% if show_renew and renew_plan %}<a class="btn pill primary" href="{% url 'renew' %}">{% t 'renew_btn' %}</a>{% elif not m %}<a class="btn pill" href="{% url 'plans' %}">{% t 'buy' %}</a>{% endif %}
+        <a class="btn pill" href="{% url 'membership' %}">{% t 'ms_title' %}</a>
       </div>
     </div>
   </section>
@@ -41,6 +43,11 @@
     <span class="db-flame{% if stats.streak %} lit{% endif %}" aria-hidden="true">{% icon 'flame' %}</span>
     <b class="db-num num" data-count="{{ stats.streak }}">{{ stats.streak }}</b>
     <span class="muted">{% t 'streak' %}</span>
+  </section>
+
+  <section class="card db-tile db-wstreak">
+    <span class="muted">{% t 'wk_streak' %}</span><b class="db-num num">{{ wk.weeks }}</b>
+    <span class="muted num">{% t 'wk_this' done=wk.this_week need=wk.need %}</span>
   </section>
 
   <section class="card db-tile db-stat">
@@ -102,7 +109,7 @@
   </section>
 
   <section class="card db-tile db-invite">
-    <div class="db-head"><h3>{% icon 'gift' %} {% t 'invite' %}</h3><span class="muted num">{% t 'invited_n' n=referred ok=referred_ok %}</span></div>
+    <div class="db-head"><h3>{% icon 'gift' %} {% t 'invite' %}</h3><span class="muted num">{% t 'invited_n' n=referred ok=referred_ok %} · {% t 'ref_earned' days=earned_days %}</span></div>
     <p class="muted" style="margin:0">{% t 'invite_help' days=bonus_days %}</p>
     <div class="inline"><input id="ref-link" value="{{ referral_url }}" readonly aria-label="{% t 'invite' %}"><button class="btn" type="button" data-copy="ref-link" data-done="{% t 'copied' %}">{% t 'copy' %}</button></div>
   </section>
@@ -110,6 +117,7 @@
   <nav class="db-links">
     <a class="card lift" href="{% url 'ai' %}"><i>✦</i><b>{% t 'ai_coach' %}</b><span class="muted">{% t 'ai_coach_sub' %}</span></a>
     <a class="card lift" href="{% url 'orders' %}"><i>{% icon 'cart' %}</i><b>{% t 'orders' %}</b><span class="muted">{% t 'nav_shop' %}</span></a>
+    <a class="card lift" href="{% url 'gift' %}"><i>{% icon 'gift' %}</i><b>{% t 'gift_title' %}</b><span class="muted">{% t 'gift_sub' %}</span></a>
     <a class="card lift" href="{% url 'payments' %}"><i>{% icon 'credit-card' %}</i><b>{% t 'payments' %}</b><span class="muted">{% t 'receipt' %}</span></a>
   </nav>
 </div>

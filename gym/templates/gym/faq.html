@@ -1,0 +1,12 @@
+{% extends "gym/base.html" %}{% load gym_tags %}
+{% block title %}{% t 'faq_title' %}{% endblock %}
+{% block content %}
+<h2>{% t 'faq_title' %}</h2>
+<p class="muted" style="margin:0">{% t 'faq_sub' %}</p>
+<div class="faq">
+  {% for it in items %}
+  <details class="card faq-item"><summary>{{ it.q }}</summary><p>{{ it.a|linebreaksbr }}</p></details>
+  {% empty %}<div class="card muted">{% t 'none_yet' %}</div>{% endfor %}
+</div>
+<p class="muted">{% t 'faq_more' %} <a href="tel:+998{{ gs.phone|cut:' ' }}">+998 {{ gs.phone }}</a></p>
+{% endblock %}

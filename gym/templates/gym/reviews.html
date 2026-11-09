@@ -5,13 +5,19 @@
   <div><span class="eyebrow">Fitnes Zal</span><h1>{% t 'reviews' %}</h1><p class="muted">{% t 'reviews_sub' %}</p></div>
 </div>
 
-<div class="rv-top">
+<div class="rv-top rv-m-{{ rv_mode }}">
+  {% if rv_mode == "full" %}
   <section class="card rv-score">
-    <div class="rv-big"><b class="num">{% if agg.n %}{{ agg.a|floatformat:1 }}{% else %}—{% endif %}</b>
-      <span class="stars lg">{% if agg.n %}{{ agg.a|floatformat:0|add:0|stars }}{% else %}☆☆☆☆☆{% endif %}</span>
+    <div class="rv-big"><b class="num">{{ agg.a|floatformat:1 }}</b>
+      <span class="stars lg">{{ agg.a|floatformat:0|add:0|stars }}</span>
       <small class="muted">{% t 'reviews_count' n=agg.n %}</small></div>
     <ul class="rv-dist">{% for d in dist %}<li><span class="num">{{ d.stars }} ★</span><span class="bar"><i style="width:{{ d.pct }}%"></i></span><span class="num muted">{{ d.n }}</span></li>{% endfor %}</ul>
   </section>
+  {% elif rv_mode == "mini" %}
+  <p class="rv-mini"><b class="num">{{ agg.a|floatformat:1 }}</b><span class="stars">{{ agg.a|floatformat:0|add:0|stars }}</span><span class="muted">{% t 'reviews_count' n=agg.n %}</span></p>
+  {% else %}
+  <section class="card rv-empty-lite"><span aria-hidden="true">{% icon 'message' %}</span><div><b>{% t 'rv_empty_title' %}</b><small class="muted">{% t 'rv_empty_sub' %}</small></div><a class="btn pill" href="#id_comment">{% t 'rv_write_btn' %}</a></section>
+  {% endif %}
 
   <form class="card grid rv-form" method="post">
     {% csrf_token %}
@@ -28,14 +34,12 @@
   </form>
 </div>
 
-<div class="rv-grid">
+{% if reviews %}<div class="rv-grid">
   {% for r in reviews %}
   <article class="card rv-card">
     <header><span class="rv-ava">{{ r.user.first_name|first|upper }}</span><span><b>{{ r.user.first_name }}</b><small class="muted">{{ r.created|dmy }}</small></span><span class="stars">{{ r.rating|stars }}</span></header>
     {% if r.comment %}<p>{{ r.comment }}</p>{% endif %}
   </article>
-  {% empty %}
-  <div class="card rv-empty"><span>{% icon 'message' %}</span><b>{% t 'none_yet' %}</b><small class="muted">{% t 'review_first' %}</small></div>
   {% endfor %}
-</div>
+</div>{% endif %}
 {% endblock %}

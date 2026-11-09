@@ -114,7 +114,7 @@
         <span class="num"><b>{{ m.kcal }}</b> <small class="muted">/ {% t 'cal_plan_of' n=m.planned %}</small></span></div>
       <div class="cal-bar"><i style="width:{{ m.pct }}%"></i></div>
       <ul class="cal-items">
-        {% for e in m.items %}<li><span><b>{{ e.name }}</b><small class="muted num">{{ e.grams }} g · {% t 'cal_protein' %} {{ e.protein|floatformat:0 }} · {% t 'cal_fat' %} {{ e.fat|floatformat:0 }} · {% t 'cal_carbs' %} {{ e.carbs|floatformat:0 }}</small></span>
+        {% for e in m.items %}<li><span><b>{{ e.shown }}</b><small class="muted num">{{ e.grams }} g · {% t 'cal_protein' %} {{ e.protein|floatformat:0 }} · {% t 'cal_fat' %} {{ e.fat|floatformat:0 }} · {% t 'cal_carbs' %} {{ e.carbs|floatformat:0 }}</small></span>
           <span class="cal-kc num">{{ e.kcal|floatformat:0 }}</span>
           <form method="post" action="{% url 'calories_delete' e.pk %}">{% csrf_token %}<button class="cal-x" type="submit" aria-label="{% t 'cal_remove' %}" title="{% t 'cal_remove' %}">×</button></form></li>{% endfor %}
       </ul>

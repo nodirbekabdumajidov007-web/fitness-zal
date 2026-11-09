@@ -45,6 +45,7 @@
     <div class="fz-panel"><h3>Abonementlar tarixi</h3><p class="sub">&nbsp;</p>
       <ul class="fz-list">{% for x in memberships %}<li><span>{{ x.plan.name }}</span><span>{{ x.starts|date:"d.m.y" }} → <b>{{ x.expires|date:"d.m.y" }}</b>{% if x.freeze_used %} <span class="fz-pill">muzlatilgan</span>{% endif %}</span></li>{% empty %}<li class="fz-empty">Yo'q</li>{% endfor %}</ul></div>
     <div class="fz-panel"><h3>Oxirgi tashriflar</h3><p class="sub">&nbsp;</p>
+      <ul class="fz-list">{% for e in entries %}<li><span>{{ e.get_method_display }}{% if e.result == 'rejected' %} · {{ e.get_reason_display }}{% endif %}</span><b>{{ e.ts|date:"d.m.Y H:i" }} · {{ e.get_result_display }}</b></li>{% endfor %}</ul>
       <ul class="fz-list">{% for v in visits %}<li><span>{{ v.ts|date:"l" }}</span><b>{{ v.ts|date:"d.m.Y H:i" }}</b></li>{% empty %}<li class="fz-empty">Hali kelmagan</li>{% endfor %}</ul></div>
     <div class="fz-panel"><h3>Buyurtmalar</h3><p class="sub">Do'kon</p>
       <ul class="fz-list">{% for o in orders %}<li><a href="{% url 'admin:gym_order_change' o.pk %}">#{{ o.pk }} · {% for it in o.items.all %}{{ it.name }}×{{ it.qty }}{% if not forloop.last %}, {% endif %}{% endfor %}</a><span><b>{{ o.total|money }}</b> <span class="fz-pill">{{ o.get_status_display }}</span></span></li>{% empty %}<li class="fz-empty">Yo'q</li>{% endfor %}</ul></div>

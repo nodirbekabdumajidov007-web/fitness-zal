@@ -92,6 +92,11 @@ def kpi_data(now, revenue_month):
     ]
 
 
+def extras_legal_left():
+    from . import extras
+    return extras.legal_placeholders()
+
+
 def low_stock_rows():
     from . import services
     from .models import GymSettings, Product
@@ -149,6 +154,7 @@ def extra_stats(now, today, revenue_month):
         {"ok": sms.real_backend(), "name": "Haqiqiy SMS (Eskiz)", "hint": "Hozir kodlar ekranda ko'rsatiladi" if settings.DEBUG else "SMS_BACKEND=eskiz kerak", "url": ""},
         {"ok": telegram.enabled(), "name": "Telegram bot", "hint": "TELEGRAM_BOT_TOKEN: eslatma va xabarlar uchun", "url": ""},
         {"ok": click.enabled(), "name": "Click to'lovlari", "hint": "Onlayn to'lov uchun Click shartnomasi", "url": ""},
+        {"ok": not extras_legal_left(), "name": "Huquqiy matnlar (oferta, maxfiylik)", "hint": "[YURIDIK NOM], [STIR] kabi joylarni haqiqiy ma'lumot bilan almashtiring", "url": reverse("admin:gym_legalpage_changelist")},
         {"ok": bool(gs.hero_video), "name": "Bosh sahifa videosi", "hint": "Sozlamalarda video yuklang", "url": reverse("admin:gym_gymsettings_change", args=[gs.pk])},
         {"ok": bool(gs.map_embed()), "name": "Xaritada zal", "hint": "Yandex Xarita havolasini sozlamalarga qo'ying", "url": reverse("admin:gym_gymsettings_change", args=[gs.pk])},
     ]
@@ -176,7 +182,7 @@ def extra_stats(now, today, revenue_month):
 def member_data(user):
     from django.db.models import Sum as S
     from . import services
-    from .models import Booking, Membership, Order, Payment, PTSession, Visit
+    from .models import Booking, EntryLog, Membership, Order, Payment, PTSession, Visit
     now = timezone.now()
     ms = Membership.objects.filter(user=user).select_related("plan")
     active = ms.filter(starts__lte=now, expires__gt=now).first()
@@ -195,6 +201,7 @@ def member_data(user):
         "days_left": (active.expires - now).days if active else 0,
         "memberships": ms[:10], "payments": Payment.objects.filter(user=user).select_related("plan")[:10],
         "orders": Order.objects.filter(user=user).prefetch_related("items")[:8],
+        "entries": EntryLog.objects.filter(user=user).select_related("staff")[:15],
         "visits": visits[:10], "visits_total": visits.count(), "visits_30": visits.filter(ts__gte=month_ago).count(),
         "spent": Payment.objects.filter(user=user, status="paid").aggregate(s=S("amount"))["s"] or 0,
         "bookings": Booking.objects.filter(user=user, date__gte=timezone.localdate()).select_related("gym_class")[:6],
@@ -327,15 +334,22 @@ NAV = [
                 ("Hisobotlar", "chart", "view:reports", "gym.view_payment", None),
                 ("Abonement turlari", "list", "model:plan", None, None),
                 ("Promokodlar", "tag", "model:promocode", None, None),
-                ("To'lov kartalari", "wallet", "model:paymentcard", None, None)]),
+                ("To'lov kartalari", "wallet", "model:paymentcard", None, None),
+                ("Sovg'a sertifikatlari", "gift", "model:giftcertificate", None, None)]),
     ("A'zolar", [("Foydalanuvchilar", "users", "model:user", None, None),
                  ("Abonementlar", "ticket", "model:membership", None, None),
                  ("Tashriflar", "login", "model:visit", None, None),
+                 ("Kirish tarixi", "door", "model:entrylog", None, None),
+                 ("Muzlatishlar", "snow", "model:membershipfreeze", None, None),
+                 ("Mehmon taklifnomalari", "user-check", "model:guestpass", None, None),
+                 ("Taklif bonuslari", "gift", "model:referralreward", None, None),
                  ("Shaxsiy xabar", "mail", "view:message", "gym.view_user", None),
                  ("E'lon yuborish", "megaphone", "view:broadcast", "gym.add_announcement", None)]),
     ("Zal", [("Haftalik jadval", "calendar", "view:schedule", "gym.view_gymclass", None),
              ("Mashg'ulotlar", "calendar", "model:gymclass", None, None),
              ("Bronlar", "check", "model:booking", None, None),
+             ("Navbat (kutish ro'yxati)", "clock", "model:classwaitlist", None, None),
+             ("Murabbiy baholari", "star", "model:trainerreview", None, None),
              ("Murabbiylar", "dumbbell", "model:trainer", None, None),
              ("Shaxsiy mashg'ulotlar", "user-check", "model:ptsession", None, "pt"),
              ("Mashq rejalari", "trend", "model:workoutplan", None, None),
@@ -344,6 +358,8 @@ NAV = [
     ("Do'kon", [("Mahsulotlar", "package", "model:product", None, None),
                 ("Buyurtmalar", "bag", "model:order", None, "orders"),
                 ("Kategoriyalar", "folder", "model:category", None, None)]),
+    ("Kontent va huquqiy", [("Savol-javob (FAQ)", "help", "model:faqitem", None, None),
+                            ("Huquqiy sahifalar", "note", "model:legalpage", None, None)]),
     ("Chat va xavfsizlik", [("Shikoyatlar", "flag", "model:chatreport", None, "reports"),
                             ("Chat xabarlari", "chat", "model:chatmessage", None, None),
                             ("Bloklangan a'zolar", "ban", "model:user?is_active__exact=0", None, None)]),

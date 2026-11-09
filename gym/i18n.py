@@ -41,7 +41,7 @@ err_rate||Juda ko'p urinish. 10 daqiqadan keyin qayta urining||Слишком м
 err_stock||Omborda yetarli mahsulot yo'q||Недостаточно товара на складе||Not enough stock
 err_method||Bu to'lov usuli hozir ishlamaydi||Этот способ оплаты сейчас недоступен||This payment method is unavailable
 err_member||Avval faol abonement kerak||Сначала нужен активный абонемент||You need an active membership first
-err_frozen||Abonement muzlatilgan||Абонемент заморожен||Your membership is frozen
+err_frozen||Abonement muzlatilgan: muzlatish tugaguncha zalga kirish yopiq||Абонемент заморожен: вход закрыт до конца заморозки||Your membership is frozen: entry is closed until the freeze ends
 err_google||Google akkauntni tekshirib bo'lmadi||Не удалось проверить аккаунт Google||Could not verify the Google account
 promo_bad||Promokod noto'g'ri yoki muddati o'tgan||Промокод неверный или просрочен||Promo code is invalid or expired
 cart_bad||Savatdagi mahsulot topilmadi||Товар из корзины не найден||A cart item was not found
@@ -92,7 +92,7 @@ freeze||Abonementni muzlatish||Заморозка абонемента||Freeze m
 freeze_help||Bir marta, {max} kungacha. Muddat shuncha kunga uzayadi.||Один раз, до {max} дн. Срок продлится на столько же дней.||Once, up to {max} days. Your end date moves by the same number of days.
 freeze_do||Muzlatish||Заморозить||Freeze
 freeze_days||Kunlar||Дни||Days
-freeze_ok||Abonement muzlatildi.||Абонемент заморожен.||Membership frozen.
+freeze_ok||Abonement muzlatildi: {until} kuni qaytasiz.||Абонемент заморожен: вы вернётесь {until}.||Membership frozen: you are back on {until}.
 freeze_fail||Muzlatib bo'lmadi (allaqachon ishlatilgan yoki abonement yo'q).||Не удалось заморозить (уже использовано или нет абонемента).||Could not freeze (already used, or no membership).
 frozen_until||Muzlatish tugaydi:||Заморозка до:||Frozen until:
 shop||Do'kon||Магазин||Shop
@@ -1048,6 +1048,193 @@ cal_edit||Tahrirlash||Изменить||Edit
 cal_quick||Tezkor qo'shish (saqlamasdan)||Быстро добавить (без сохранения)||Quick add (not saved)
 cal_quick_hint||Faqat nom va kiritgan miqdoringiz uchun kaloriya. Keyingi safar uchun saqlanmaydi.||Только название и калории на введённое количество. На будущее не сохраняется.||Just a name and the calories for the amount you entered. It is not kept for next time.
 cal_confirm_del||Ovqat o'chirilsinmi?||Удалить еду?||Delete this food?
+tl_save||Natijani saqlash||Сохранить результат||Save result
+tl_save_help||Vazn va bo'yingiz bugungi o'lchov sifatida, tanlangan maqsad profilingizga yoziladi.||Вес и рост запишутся как сегодняшний замер, а выбранная цель — в профиль.||Your weight and height are saved as today's measurement and the chosen goal goes to your profile.
+tl_save_login||Saqlash uchun kiring||Войдите, чтобы сохранить||Sign in to save
+tl_save_bad||Vazn (30–250 kg) va bo'y (120–230 sm) to'g'ri kiritilishi kerak||Укажите корректные вес (30–250 кг) и рост (120–230 см)||Enter a valid weight (30–250 kg) and height (120–230 cm)
+tl_saved_new||Saqlandi: bugungi o'lchovingiz profilingizga qo'shildi||Сохранено: сегодняшний замер добавлен в профиль||Saved: today's measurement was added to your profile
+tl_saved_upd||Yangilandi: bugungi o'lchovingiz yangilandi||Обновлено: сегодняшний замер изменён||Updated: today's measurement was changed
+ms_title||Mening abonementim||Мой абонемент||My membership
+renew_btn||Uzaytirish||Продлить||Renew
+renew_note||Tanlangan abonementni shu yerdan uzaytiring: to'lov usulini belgilab «Uzaytirish»ni bosing.||Продлите выбранный абонемент здесь: выберите способ оплаты и нажмите «Продлить».||Renew the selected membership here: pick a payment method and press Renew.
+welcome_disc||Taklif orqali kelganingiz uchun birinchi abonementga {pct}% chegirma avtomatik qo'llanadi.||Как приглашённому вам автоматически даётся скидка {pct}% на первый абонемент.||As an invited friend you get {pct}% off your first membership automatically.
+freeze_off||Muzlatish hozir o'chirilgan.||Заморозка сейчас отключена.||Freezing is switched off.
+freeze_no_member||Muzlatish uchun faol abonement kerak.||Для заморозки нужен активный абонемент.||You need an active membership to freeze.
+freeze_busy||Muzlatish allaqachon faol yoki rejalashtirilgan.||Заморозка уже действует или запланирована.||A freeze is already active or scheduled.
+freeze_none_left||Bu abonement uchun muzlatish kunlari qolmagan.||Дни заморозки для этого абонемента закончились.||No freeze days are left for this membership.
+freeze_bad_date||Sana noto'g'ri: bugundan abonement tugashigacha bo'lgan kunni tanlang.||Неверная дата: выберите день от сегодня до конца абонемента.||Wrong date: pick a day between today and the end of the membership.
+freeze_min||Bir martada kamida {min} kun muzlatish kerak.||Заморозить нужно минимум на {min} дн.||A freeze must be at least {min} days.
+freeze_too_long||Bu abonement uchun yana {left} kun muzlatish mumkin.||Для этого абонемента можно заморозить ещё {left} дн.||You can freeze {left} more days on this membership.
+freeze_rules||Bir martada kamida {min} kun, bitta abonement uchun jami {max} kungacha. Tugash sanasi shuncha kunga suriladi; muzlatish davrida zalga kirib bo'lmaydi.||Минимум {min} дн. за раз, всего до {max} дн. на абонемент. Дата окончания сдвигается на столько же; во время заморозки вход закрыт.||At least {min} days at a time, up to {max} days per membership. The end date moves by the same amount; you cannot enter while frozen.
+freeze_used_left||Ishlatilgan: {used} kun, qolgan: {left} kun||Использовано: {used} дн., осталось: {left} дн.||Used: {used} days, left: {left} days
+freeze_active_now||Abonement muzlatilgan. {until} kuni qaytasiz.||Абонемент заморожен. Вы вернётесь {until}.||Membership is frozen. You are back on {until}.
+freeze_scheduled||Muzlatish rejalashtirilgan: {start} dan {until} gacha.||Заморозка запланирована: с {start} до {until}.||Freeze scheduled: from {start} until {until}.
+unfreeze_btn||Muzlatishni tugatish||Завершить заморозку||End freeze
+freeze_cancel_btn||Rejalashtirilgan muzlatishni bekor qilish||Отменить запланированную заморозку||Cancel the scheduled freeze
+freeze_start||Boshlanish sanasi||Дата начала||Start date
+freeze_end||Tugash sanasi||Дата окончания||End date
+freeze_ok_future||Muzlatish {date} dan {until} gacha rejalashtirildi.||Заморозка запланирована с {date} до {until}.||Freeze scheduled from {date} until {until}.
+unfreeze_ok||Muzlatish tugadi. Ishlatilmagan {n} kun abonementga qaytarildi.||Заморозка завершена. Неиспользованные {n} дн. возвращены.||Freeze ended. {n} unused days were returned.
+unfreeze_none||Tugatiladigan muzlatish yo'q.||Нет заморозки для завершения.||There is no freeze to end.
+scan_frozen||Abonement muzlatilgan: {date} gacha kirish yopiq||Абонемент заморожен: вход закрыт до {date}||Membership frozen: entry closed until {date}
+rem_title||Abonementingiz {days} kundan keyin tugaydi||Абонемент закончится через {days} дн.||Your membership ends in {days} days
+rem_title_today||Abonementingiz bugun tugaydi||Абонемент заканчивается сегодня||Your membership ends today
+rem_body||«{plan}» abonementi {date} da tugaydi. Bir bosishda uzaytiring: {link}||Абонемент «{plan}» заканчивается {date}. Продлите в один клик: {link}||Your «{plan}» membership ends on {date}. Renew in one click: {link}
+gp_title||Mehmon taklifnomasi||Гостевое приглашение||Guest pass
+gp_help||Qolgan taklifnomalar: {left} / {total}. Do'stingiz ismini va sanani kiriting, havolani unga yuboring.||Осталось приглашений: {left} / {total}. Укажите имя друга и дату, отправьте ему ссылку.||Passes left: {left} / {total}. Enter your friend's name and a date, then send them the link.
+gp_name_label||Do'stingiz ismi||Имя друга||Friend's name
+gp_date||Sana||Дата||Date
+gp_create||Taklifnoma yaratish||Создать приглашение||Create pass
+gp_not_in_plan||Joriy abonementingizda mehmon taklifnomalari yo'q.||В вашем абонементе нет гостевых приглашений.||Your membership has no guest passes.
+gp_link||Havola||Ссылка||Link
+gp_state_valid||Amal qiladi||Действует||Valid
+gp_state_today||Bugun amal qiladi||Действует сегодня||Valid today
+gp_state_used||Ishlatilgan||Использовано||Used
+gp_state_expired||Muddati o'tgan||Просрочено||Expired
+gp_state_cancelled||Bekor qilingan||Отменено||Cancelled
+gp_invited_by||{name} sizni zalga taklif qildi||{name} приглашает вас в зал||{name} invites you to the gym
+gp_show_desk||QR-kodni qabulxonada ko'rsating. U bir marta ishlaydi.||Покажите QR-код на ресепшене. Он действует один раз.||Show the QR code at the front desk. It works once.
+gp_guest||Mehmon||Гость||Guest
+gp_host||Taklif qildi||Пригласил||Invited by
+gp_created||Taklifnoma yaratildi. Havolani do'stingizga yuboring.||Приглашение создано. Отправьте ссылку другу.||Pass created. Send the link to your friend.
+gp_cancelled_ok||Taklifnoma bekor qilindi.||Приглашение отменено.||Pass cancelled.
+gp_no_member||Taklifnoma uchun faol abonement kerak.||Для приглашения нужен активный абонемент.||An active membership is needed for a guest pass.
+gp_none_left||Bu abonement uchun taklifnomalar tugagan.||Приглашения по этому абонементу закончились.||No guest passes left on this membership.
+gp_name||Do'stingiz ismini kiriting.||Укажите имя друга.||Enter your friend's name.
+gp_bad_date||Sana noto'g'ri: bugundan abonement tugashigacha tanlang.||Неверная дата: выберите от сегодня до конца абонемента.||Wrong date: choose between today and the end of the membership.
+gp_cancelled||Taklifnoma bekor qilingan||Приглашение отменено||Pass was cancelled
+gp_used||Taklifnoma allaqachon ishlatilgan||Приглашение уже использовано||Pass already used
+gp_expired||Taklifnoma muddati o'tgan||Срок приглашения истёк||Pass has expired
+gp_early||Taklifnoma boshqa kunga berilgan||Приглашение выдано на другую дату||Pass is for a later date
+gp_owner_out||Taklif qilgan a'zoning abonementi hozir amal qilmaydi||Абонемент пригласившего сейчас не действует||The inviting member's membership is not active now
+gp_ok||Mehmon kirishi belgilandi||Вход гостя отмечен||Guest entry recorded
+gp_guest_of||Mehmon · {name}||Гость · {name}||Guest of {name}
+ref_earned||Olingan bonus: {days} kun||Получено бонусных дней: {days}||Bonus earned: {days} days
+ref_reward_title||Do'stingiz abonement oldi: +{days} kun||Друг купил абонемент: +{days} дн.||Your friend joined: +{days} days
+ref_reward_body||{name} sizning havolangiz orqali birinchi abonementini oldi. Hisobingizga {days} bonus kun qo'shildi.||{name} купил(а) первый абонемент по вашей ссылке. На ваш счёт добавлено {days} бонусных дн.||{name} bought a first membership with your link. {days} bonus days were added.
+book_limited||Oxirgi 30 kunda {n} marta kelmagansiz, shu sababli bir vaqtda faqat 1 ta bron qila olasiz.||За 30 дней {n} неявок, поэтому одновременно доступна только 1 запись.||You missed {n} classes in 30 days, so you can hold only 1 booking at a time.
+noshow_limited||Oxirgi 30 kunda {n} marta kelmagansiz: hozircha bir vaqtda faqat 1 ta bron qila olasiz. Cheklov vaqt o'tishi bilan o'zi olinadi.||За 30 дней {n} неявок: пока доступна только 1 запись одновременно. Ограничение снимется само.||{n} no-shows in 30 days: for now only 1 booking at a time. The limit lifts by itself.
+cancel_late||Bekor qilib bo'lmaydi: mashg'ulotga {hours} soatdan kam qoldi.||Отменить нельзя: до занятия меньше {hours} ч.||Cannot cancel: less than {hours} hours to the class.
+cancel_late_hint||Bekor qilish: boshlanishidan {hours} soat oldingacha||Отмена возможна за {hours} ч. до начала||Cancel up to {hours} h before the start
+wl_join||Navbatga turish||Встать в очередь||Join waitlist
+wl_leave||Navbatdan chiqish||Выйти из очереди||Leave waitlist
+wl_pos||Navbat: {n}-o'rin||Очередь: место {n}||Waitlist: #{n}
+wl_waiting_n||Navbatda: {n}||В очереди: {n}||Waiting: {n}
+wl_joined||Navbatga turdingiz: {n}-o'rin. Joy bo'shasa avtomatik yozilasiz.||Вы в очереди: место {n}. При освобождении места запишем автоматически.||You are on the waitlist: #{n}. You will be booked automatically when a seat frees up.
+wl_left||Navbatdan chiqdingiz.||Вы вышли из очереди.||You left the waitlist.
+wl_seats||Joy bor: to'g'ridan-to'g'ri bron qiling.||Есть места: запишитесь напрямую.||There are seats: book directly.
+wl_booked_title||Navbat yetdi: joy sizga bron qilindi||Ваша очередь: место забронировано||Your turn: a seat was booked
+wl_booked_body||«{name}», {date} soat {time}. Bekor qilmoqchi bo'lsangiz, «Mashg'ulotlar» sahifasidan qiling.||«{name}», {date} в {time}. Отменить можно на странице «Занятия».||«{name}», {date} at {time}. You can cancel on the Classes page.
+dc_title||Bugungi mashg'ulotlar: kim keldi||Сегодняшние занятия: кто пришёл||Today's classes: who came
+dc_came||Keldi||Пришёл||Came
+dc_noshow||Kelmadi||Не пришёл||No-show
+dc_not_started||Mashg'ulot hali boshlanmagan||Занятие ещё не началось||The class has not started yet
+cal_title||Kalendarga qo'shish||Добавить в календарь||Add to calendar
+cal_help||Shaxsiy havolaga obuna bo'ling: bron qilingan mashg'ulotlar telefoningiz kalendarida o'zi paydo bo'ladi. Havolani hech kimga bermang.||Подпишитесь на личную ссылку: записанные занятия появятся в календаре телефона сами. Не делитесь ссылкой.||Subscribe to your personal link and booked classes appear in your phone calendar. Do not share the link.
+cal_reset||Havolani yangilash (eskisi ishlamaydi)||Обновить ссылку (старая перестанет работать)||Reset link (the old one stops working)
+cal_reset_ok||Kalendar havolasi yangilandi.||Ссылка календаря обновлена.||Calendar link reset.
+cal_add||Kalendarga yuklab olish||Скачать в календарь||Download to calendar
+tr_reviews||Murabbiy baholari||Оценки тренера||Trainer ratings
+tr_rate_label||Baho||Оценка||Rating
+tr_comment||Fikringiz (ixtiyoriy)||Ваш отзыв (по желанию)||Your comment (optional)
+tr_rate_send||Baholash||Оценить||Rate
+tr_rate_edit||Bahoni yangilash||Обновить оценку||Update rating
+tr_rate_only_trained||Faqat shu murabbiy bilan mashq qilgan yoki uning darsiga kelgan a'zolar baholay oladi.||Оценить могут только те, кто занимался с тренером или был на его занятии.||Only members who trained with this trainer or attended their class can rate.
+tr_rate_bad||Baho 1 dan 5 gacha bo'lishi kerak.||Оценка должна быть от 1 до 5.||The rating must be from 1 to 5.
+tr_rate_not_allowed||Baholash uchun murabbiy bilan shaxsiy mashg'ulot yoki uning darsiga kelgan bo'lishingiz kerak.||Чтобы оценить, нужно позаниматься с тренером или прийти на его занятие.||To rate, you need a completed session or class with this trainer.
+tr_rate_ok||Rahmat! Bahoyingiz saqlandi.||Спасибо! Оценка сохранена.||Thanks! Your rating was saved.
+wk_streak||Haftalik seriya (haftasiga 2+ tashrif)||Недельная серия (2+ визита в неделю)||Weekly streak (2+ visits a week)
+wk_this||Shu hafta: {done} / {need}||Эта неделя: {done} / {need}||This week: {done} / {need}
+board_on||Siz oylik reytingdasiz (faqat ism va familiya bosh harfi ko'rinadi).||Вы в месячном рейтинге (видны имя и первая буква фамилии).||You are on the monthly leaderboard (first name and last initial shown).
+board_off||Reyting ixtiyoriy: qo'shilmaguningizcha siz ko'rinmaysiz.||Рейтинг добровольный: пока не вступите, вас не видно.||The leaderboard is opt-in: you stay hidden until you join.
+board_join||Reytingga qo'shilish||Вступить в рейтинг||Join leaderboard
+board_leave||Reytingdan chiqish||Выйти из рейтинга||Leave leaderboard
+board_joined||Reytingga qo'shildingiz.||Вы вступили в рейтинг.||You joined the leaderboard.
+board_left||Reytingdan chiqdingiz.||Вы вышли из рейтинга.||You left the leaderboard.
+gift_title||Sovg'a sertifikati||Подарочный сертификат||Gift certificate
+gift_sub||Abonement yoki summa sovg'a qiling||Подарите абонемент или сумму||Gift a membership or an amount
+gift_buy_title||Sertifikat sotib olish||Купить сертификат||Buy a certificate
+gift_buy_help||Abonement tanlang yoki {min}–{max} so'm oralig'ida summa kiriting. Kod bir marta ishlaydi, muddati 1 yil. Summa abonement narxidan oshsa, qoldig'i qaytarilmaydi.||Выберите абонемент или сумму от {min} до {max} сум. Код одноразовый, срок 1 год. Если сумма больше цены абонемента, остаток не возвращается.||Pick a membership or an amount between {min} and {max} UZS. The code works once and lasts 1 year. If it exceeds the membership price the rest is not refunded.
+gift_for_plan||Abonement uchun||На абонемент||For a membership
+gift_or_amount||yoki summa kiriting||или введите сумму||or enter an amount
+gift_amount_label||Summa (so'm)||Сумма (сум)||Amount (UZS)
+gift_redeem_title||Kodni ishlatish||Активировать код||Redeem a code
+gift_code||Sovg'a kodi||Код подарка||Gift code
+gift_redeem_btn||Ishlatish||Активировать||Redeem
+gift_mine||Men sotib olgan sertifikatlar||Купленные мной сертификаты||Certificates I bought
+gift_until||muddati||действует до||valid until
+gift_state_valid||Amal qiladi||Действует||Valid
+gift_state_unpaid||To'lov kutilmoqda||Ожидает оплаты||Awaiting payment
+gift_state_redeemed||Ishlatilgan||Использован||Redeemed
+gift_state_expired||Muddati o'tgan||Просрочен||Expired
+gift_pay||Sovg'a sertifikati||Подарочный сертификат||Gift certificate
+gift_amount||Summa {min}–{max} so'm oralig'ida bo'lishi yoki abonement tanlanishi kerak.||Укажите сумму в допустимых пределах или выберите абонемент.||Enter an amount within the allowed range or choose a membership.
+gift_bad||Sertifikat kodi topilmadi||Код сертификата не найден||Certificate code not found
+gift_used||Sertifikat allaqachon ishlatilgan||Сертификат уже использован||Certificate already used
+gift_expired||Sertifikat muddati o'tgan||Срок сертификата истёк||Certificate expired
+gift_unpaid||Sertifikat uchun to'lov hali tasdiqlanmagan||Оплата сертификата ещё не подтверждена||The certificate payment is not confirmed yet
+gift_plan||Bu sertifikat boshqa abonement uchun||Этот сертификат на другой абонемент||This certificate is for a different membership
+gift_amount_checkout||Bu summaviy sertifikat: abonement olayotganda «Sovg'a kodi» maydoniga kiriting.||Это сертификат на сумму: введите его в поле «Код подарка» при покупке.||This is an amount certificate: enter it in the Gift code box when buying.
+gift_amount_ok||Kod to'g'ri: {amount} so'm chegirma. Abonement olayotganda «Sovg'a kodi» maydoniga {code} ni kiriting.||Код верный: скидка {amount} сум. Введите {code} в поле «Код подарка» при покупке.||Code is valid: {amount} UZS off. Enter {code} in the Gift code box when buying.
+gift_redeemed||Sertifikat ishlatildi: abonement faollashdi.||Сертификат использован: абонемент активирован.||Certificate redeemed: membership activated.
+gift_bought||Sertifikat tayyor: kodni pastdagi ro'yxatda ko'rasiz.||Сертификат готов: код в списке ниже.||Certificate ready: find the code in the list below.
+gift_bought_pending||To'lov tasdiqlangach sertifikat kodi ishlaydi.||Код сертификата заработает после подтверждения оплаты.||The code works once the payment is confirmed.
+faq_title||Savol-javob||Вопросы и ответы||FAQ
+faq_sub||Eng ko'p beriladigan savollar||Самые частые вопросы||The questions we hear most
+faq_more||Javob topmadingizmi? Qo'ng'iroq qiling:||Не нашли ответ? Позвоните:||Did not find an answer? Call:
+legal_updated||Yangilangan||Обновлено||Updated
+ft_oferta||Ommaviy oferta||Публичная оферта||Public offer
+ft_privacy||Maxfiylik siyosati||Политика конфиденциальности||Privacy policy
+ft_refund||Qaytarish qoidalari||Правила возврата||Refund rules
+consent_pre||Men||Я принимаю||I accept the
+consent_and||va||и||and
+consent_post||bilan tanishdim va roziman||и согласен(на) на обработку данных||and agree to the processing of my data
+consent_note||To'lov qilish bilan siz ommaviy oferta va maxfiylik siyosatiga roziligingizni tasdiqlaysiz.||Оплачивая, вы подтверждаете согласие с офертой и политикой конфиденциальности.||By paying you confirm you accept the public offer and privacy policy.
+err_consent||Davom etish uchun «Ommaviy oferta va maxfiylik siyosatiga roziman» belgisini qo'ying.||Для продолжения отметьте согласие с офертой и политикой конфиденциальности.||To continue, tick the box accepting the public offer and privacy policy.
+del_title||Akkauntni o'chirish||Удалить аккаунт||Delete my account
+del_help||Akkaunt o'chiriladi, shaxsiy ma'lumotlaringiz (ism, telefon, e-mail, rasm, o'lchamlar, yozuvlar) o'chiriladi. To'lovlar va buyurtmalar hisob-kitob uchun shaxssiz saqlanadi. Bu amalni qaytarib bo'lmaydi.||Аккаунт будет закрыт, личные данные (имя, телефон, e-mail, фото, замеры, записи) удалятся. Платежи и заказы хранятся обезличенно для учёта. Это нельзя отменить.||Your account is closed and personal data (name, phone, e-mail, photo, measurements, entries) is erased. Payments and orders are kept anonymised for the books. This cannot be undone.
+del_type_code||Tasdiqlash uchun a'zo kodingizni yozing:||Для подтверждения введите код участника:||To confirm, type your member code:
+del_sure||Akkauntim o'chirilishini tushunaman va roziman||Я понимаю, что аккаунт будет удалён||I understand my account will be deleted
+del_btn||Akkauntni o'chirish||Удалить аккаунт||Delete account
+del_wrong||Parol noto'g'ri yoki tasdiq belgisi qo'yilmagan.||Неверный пароль или не отмечено подтверждение.||Wrong password or confirmation not ticked.
+del_staff||Xodim va admin akkauntini bu yerdan o'chirib bo'lmaydi.||Аккаунт сотрудника или админа нельзя удалить здесь.||Staff and admin accounts cannot be deleted here.
+del_done||Akkaunt o'chirildi. Xayr!||Аккаунт удалён. До свидания!||Account deleted. Goodbye!
+entry_title||Kirish tarixi||История входов||Entry history
+entry_month||Shu oyda kirishlar||Входов в этом месяце||Entries this month
+entry_total||Jami kirishlar||Всего входов||Total entries
+entry_time||Vaqt||Время||Time
+entry_method||Usul||Способ||Method
+entry_repeat||shu kuni qayta||повторно в этот день||again the same day
+entry_m_qr||QR-kod||QR-код||QR code
+entry_m_manual||Qabulxonada||На ресепшене||At the desk
+entry_m_self||Kabinetda belgilangan||Отмечено в кабинете||Checked in online
+entry_m_guest||Mehmon taklifnomasi||Гостевое приглашение||Guest pass
+entry_m_old||Eski yozuv||Старая запись||Earlier record
+trainers_empty||Murabbiylar ro'yxati tez orada paydo bo'ladi||Список тренеров скоро появится||The trainer list is coming soon
+trainers_empty_sub||Hozircha faol murabbiy yo'q. Guruh mashg'ulotlari jadvalini ko'rishingiz mumkin.||Пока нет активных тренеров. Можно посмотреть расписание групповых занятий.||No active trainers yet. You can still see the group class schedule.
+rv_empty_title||Hali fikrlar yo'q||Отзывов пока нет||No reviews yet
+rv_empty_sub||Birinchi bo'lib fikr qoldiring — pastdagi shaklga yozing.||Оставьте первый отзыв — заполните форму рядом.||Be the first to share your thoughts — use the form.
+rv_write_btn||Fikr qoldirish||Оставить отзыв||Leave a review
+rv_avg_inline||O'rtacha baho||Средняя оценка||Average rating
+home_final_title||Mashqni bugun boshlang||Начните тренировки сегодня||Start training today
+choose_plan||Abonement tanlash||Выбрать абонемент||Choose a membership
+classes_schedule||Mashg'ulotlar jadvali||Расписание занятий||Class schedule
+tl_tabs_aria||Kalkulyator bo'limlari||Разделы калькуляторов||Calculator sections
+tl_tab_body||Tana tahlili||Анализ тела||Body analysis
+tl_tab_food||Ovqatlanish||Питание||Nutrition
+tl_tab_train||Mashg'ulot||Тренировка||Training
+tl_yrs||yosh||лет||yrs
+tl_cm||sm||см||cm
+tl_how||Qanday hisoblanadi?||Как это считается?||How is it calculated?
+tl_ideal_t||Ideal vazn oralig'i||Идеальный вес||Ideal weight range
+tl_target||Maqsad kaloriyasi||Целевые калории||Target calories
+tl_disc_body||Natijalar taxminiy: BMI (JSST), tana yog'i (US Navy) va ideal vazn (Devine) formulalariga asoslangan va haqiqiy ko'rsatkichlardan farq qilishi mumkin. Kasallik yoki homiladorlik bo'lsa, shifokor bilan maslahatlashing.||Результаты приблизительные: они основаны на формулах ИМТ (ВОЗ), жира в теле (US Navy) и идеального веса (Девайн) и могут отличаться от реальных показателей. При болезнях или беременности проконсультируйтесь с врачом.||Results are estimates based on the BMI (WHO), body fat (US Navy) and ideal weight (Devine) formulas and may differ from your real values. If you have a medical condition or are pregnant, consult a doctor.
+tl_disc_food||Natijalar taxminiy: Mifflin–St Jeor formulasi, faollik koeffitsientlari va 1 kg yog' ≈ 7700 kkal qoidasiga asoslangan, haqiqiy ehtiyojdan farq qilishi mumkin. Kasallik yoki homiladorlik bo'lsa, shifokor bilan maslahatlashing.||Результаты приблизительные: они основаны на формуле Миффлина — Сан-Жеора, коэффициентах активности и правиле 1 кг жира ≈ 7700 ккал и могут отличаться от реальной потребности. При болезнях или беременности проконсультируйтесь с врачом.||Results are estimates based on the Mifflin–St Jeor formula, activity multipliers and the 1 kg of fat ≈ 7700 kcal rule, and may differ from your real needs. If you have a medical condition or are pregnant, consult a doctor.
+tl_disc_train||Natijalar taxminiy: 1RM Epley va Brzycki, maksimal puls Tanaka, zonalar Karvonen formulalariga asoslangan va haqiqiy ko'rsatkichlardan farq qilishi mumkin. Yurak kasalligi yoki homiladorlikda, og'ir yuklamadan oldin shifokor bilan maslahatlashing.||Результаты приблизительные: 1ПМ считается по формулам Эпли и Бжицки, максимальный пульс — по Танака, зоны — по Карвонену, и они могут отличаться от реальных значений. При болезнях сердца или беременности перед нагрузкой проконсультируйтесь с врачом.||Results are estimates based on the Epley and Brzycki (1RM), Tanaka (max heart rate) and Karvonen (zones) formulas and may differ from your real values. With a heart condition or pregnancy, consult a doctor before heavy training.
+tl_how_ideal||Devine formulasi: erkaklar uchun 50 kg, ayollar uchun 45,5 kg, bo'yi 152,4 sm (60 dyuym) dan oshgan har dyuym uchun +2,3 kg. Oraliq shu qiymatning ±10% i.||Формула Девайна: 50 кг для мужчин и 45,5 кг для женщин плюс 2,3 кг за каждый дюйм роста сверх 152,4 см (60 дюймов). Диапазон — это значение ±10%.||Devine formula: 50 kg for men or 45.5 kg for women, plus 2.3 kg for every inch of height above 152.4 cm (60 in). The range is that value ±10%.
+tl_how_bf||US Navy usuli bo'yin, bel (ayollarda son ham) va bo'yingizning logarifmlaridan foydalanadi. Yog'siz massa = vazn × (1 − yog' ulushi).||Метод US Navy использует логарифмы обхвата шеи, талии (у женщин и бёдер) и роста. Сухая масса = вес × (1 − доля жира).||The US Navy method uses logarithms of your neck, waist (and hip for women) and height. Lean mass = weight × (1 − body-fat share).
+tl_how_macro||Avval oqsil (kg ga 1,8–2,2 g) va yog' (kg ga 0,8–1,0 g) belgilanadi, qolgan kaloriya uglevodga ketadi. 1 g oqsil va uglevod = 4 kkal, 1 g yog' = 9 kkal.||Сначала задаются белки (1,8–2,2 г на кг) и жиры (0,8–1,0 г на кг), остальные калории идут на углеводы. 1 г белка и углеводов = 4 ккал, 1 г жира = 9 ккал.||Protein (1.8–2.2 g per kg) and fat (0.8–1.0 g per kg) are set first and the remaining calories go to carbs. 1 g of protein or carbs = 4 kcal, 1 g of fat = 9 kcal.
+tl_hr_how||Zonalar maksimal pulsning foizi (yoki tinch pulsni kiritsangiz, zaxira puls foizi) sifatida hisoblanadi.||Зоны считаются как процент от максимального пульса (или от резерва пульса, если указан пульс покоя).||Zones are a percentage of your max heart rate (or of your heart-rate reserve if you enter a resting rate).
 scan_session||Sessiya tugagan: sahifani yangilab, admin sifatida qayta kiring||Сессия истекла: обновите страницу и войдите снова как администратор||Session ended: reload the page and sign in again as admin
 """
 

@@ -35,7 +35,7 @@ class SmokeTests(TestCase):
         self.admin.save()
         PaymentCard.objects.create(bank="Uzcard", number="4111111111111111", holder="TEST", is_primary=True)
         self.member = Client()
-        self.member.post("/register/", {"first_name": "Aziz", "last_name": "Karimov", "phone": "90 111 22 33", "password": "secret12", "username": "u" + "".join(ch for ch in str("90 111 22 33") if ch.isdigit()), "email": "u" + "".join(ch for ch in str("90 111 22 33") if ch.isdigit()) + "@test.uz", "password2": "secret12"})
+        self.member.post("/register/", {"first_name": "Aziz", "last_name": "Karimov", "phone": "90 111 22 33", "password": "secret12", "username": "u" + "".join(ch for ch in str("90 111 22 33") if ch.isdigit()), "email": "u" + "".join(ch for ch in str("90 111 22 33") if ch.isdigit()) + "@test.uz", "consent": "1", "password2": "secret12"})
         self.u = User.objects.get(phone="+998901112233")
         other = User.objects.create_user(phone="+998935556677", password="secret12", first_name="Bek", last_name="Z")
         now = timezone.now()
@@ -78,6 +78,8 @@ class SmokeTests(TestCase):
             "start_program": {"key": "beginner"}, "coach_pt": {"pk": self.pt.pk, "action": "confirm"},
             "coach_client": {"uid": self.other.pk}, "coach_plan": {"uid": self.other.pk},
             "pw_confirm": {"uidb64": "MQ", "token": "set-password"},
+            "guest_public": {"code": "GP-1-abcdef123456"}, "calendar_feed": {"token": "x" * 32}, "desk_booking_mark": {"pk": 1, "action": "reset"},
+            "guest_cancel": {"pk": 1}, "waitlist_join": {"pk": self.cls.pk}, "waitlist_leave": {"pk": self.cls.pk}, "trainer_rate": {"pk": self.trainer.pk}, "booking_ics": {"pk": self.booking.pk},
         }
         if name in objs:
             return objs[name]

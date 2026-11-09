@@ -37,6 +37,7 @@ class RegisterForm(forms.Form):
     first_name = forms.CharField(max_length=40, strip=True, required=False)
     last_name = forms.CharField(max_length=40, strip=True, required=False)
     phone = forms.CharField(max_length=20, required=False)
+    consent = forms.BooleanField(error_messages={"required": "err_consent"})
 
     def clean_username(self):
         u = self.cleaned_data["username"]

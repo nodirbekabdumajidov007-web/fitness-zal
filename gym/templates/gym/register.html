@@ -32,6 +32,8 @@
       <label for="id_phone">{% t 'phone' %}<div class="phone"><span>+998</span><input id="id_phone" name="phone" inputmode="numeric" autocomplete="tel-national" placeholder="XX XXX XX XX" maxlength="17" value="{{ form.phone.value|default:'' }}" data-phone></div></label>
       {% for e in form.phone.errors %}<span class="field-err">{% t e %}</span>{% endfor %}
     </div></details>
+    {% include "gym/_consent.html" %}
+    {% for e in form.consent.errors %}<span class="field-err">{% t e %}</span>{% endfor %}
     <button class="btn primary portal" type="submit"><span>{% t 'register' %}</span></button>
     {% if sms_on %}<span class="muted">{% icon 'smartphone' %} {% t 'sms_login_note' %}</span>{% endif %}
     <div class="sep">{% t 'or_continue' %}</div>

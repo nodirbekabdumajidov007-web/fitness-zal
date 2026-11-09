@@ -2,6 +2,12 @@
 {% block title %}{% t 'classes' %}{% endblock %}
 {% block content %}
 <h2>{% t 'classes' %}</h2>
+{% if limited %}<div class="note warn">{% t 'noshow_limited' n=noshows %}</div>{% endif %}
+{% if cal_url %}<details class="card"><summary>{% icon 'calendar' %} {% t 'cal_title' %}</summary>
+  <p class="muted">{% t 'cal_help' %}</p>
+  <div class="inline"><input id="cal-url" value="{{ cal_url }}" readonly aria-label="{% t 'cal_title' %}"><button class="btn" type="button" data-copy="cal-url" data-done="{% t 'copied' %}">{% t 'copy' %}</button></div>
+  <form method="post" action="{% url 'calendar_reset' %}" style="margin-top:8px">{% csrf_token %}<button class="btn small" type="submit" data-confirm="{% t 'sure' %}">{% t 'cal_reset' %}</button></form>
+</details>{% endif %}
 {% for wd, rows in by_day %}
 <section class="day">
   <div class="eyebrow">{% t 'weekday_'|add:wd %}</div>
@@ -12,6 +18,12 @@
     <span class="inline" style="flex:none;align-items:center">
       <span class="pill {% if r.left %}good{% else %}bad{% endif %}">{% if r.left %}{% t 'seats_left' n=r.left %}{% else %}{% t 'full' %}{% endif %}</span>
       {% if r.booked %}<span class="pill mute">{% t 'booked' %}</span>
+        <a class="btn small" href="{% url 'booking_ics' r.b.pk %}" title="{% t 'cal_add' %}">{% icon 'calendar' %} .ics</a>
+        {% if r.can_cancel %}<form method="post" action="{% url 'cancel_booking' r.b.pk %}">{% csrf_token %}<input type="hidden" name="back" value="/classes/"><button class="btn small danger" type="submit" data-confirm="{% t 'sure' %}">{% t 'cancel_booking' %}</button></form>
+        {% else %}<span class="muted" style="font-size:.8rem">{% t 'cancel_late_hint' hours=cancel_hours %}</span>{% endif %}
+      {% elif not r.left and user.is_authenticated %}
+        {% if r.pos %}<span class="pill warn">{% t 'wl_pos' n=r.pos %}</span><form method="post" action="{% url 'waitlist_leave' r.c.pk %}">{% csrf_token %}<button class="btn small" type="submit">{% t 'wl_leave' %}</button></form>
+        {% else %}<form method="post" action="{% url 'waitlist_join' r.c.pk %}">{% csrf_token %}<button class="btn small primary" type="submit">{% t 'wl_join' %}</button></form>{% endif %}
       {% else %}<form method="post" action="{% url 'book_class' r.c.pk %}">{% csrf_token %}<button class="btn small primary" type="submit" {% if not r.left %}disabled{% endif %}>{% t 'book' %}</button></form>{% endif %}
     </span>
   </div>

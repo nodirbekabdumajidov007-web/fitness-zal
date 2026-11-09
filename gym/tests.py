@@ -30,7 +30,7 @@ class Base(TestCase):
 
     def member(self, phone="+998901112233", first="Aziz"):
         c = Client()
-        r = c.post("/register/", {"first_name": first, "last_name": "Karimov", "phone": phone[4:], "password": PW, "username": "u" + "".join(ch for ch in str(phone[4:]) if ch.isdigit()), "email": "u" + "".join(ch for ch in str(phone[4:]) if ch.isdigit()) + "@test.uz", "password2": PW})
+        r = c.post("/register/", {"first_name": first, "last_name": "Karimov", "phone": phone[4:], "password": PW, "username": "u" + "".join(ch for ch in str(phone[4:]) if ch.isdigit()), "email": "u" + "".join(ch for ch in str(phone[4:]) if ch.isdigit()) + "@test.uz", "consent": "1", "password2": PW})
         self.assertEqual(r.status_code, 302, r.content[:300])
         return c, User.objects.get(phone=phone)
 
@@ -45,9 +45,9 @@ class AuthTests(Base):
     def test_register_login_and_validation(self):
         c, u = self.member()
         self.assertTrue(c.get("/dashboard/").status_code == 200)
-        bad = Client().post("/register/", {"first_name": "X", "last_name": "Y", "phone": "901112233", "password": PW, "username": "u" + "".join(ch for ch in str("901112233") if ch.isdigit()), "email": "u" + "".join(ch for ch in str("901112233") if ch.isdigit()) + "@test.uz", "password2": PW})
+        bad = Client().post("/register/", {"first_name": "X", "last_name": "Y", "phone": "901112233", "password": PW, "username": "u" + "".join(ch for ch in str("901112233") if ch.isdigit()), "email": "u" + "".join(ch for ch in str("901112233") if ch.isdigit()) + "@test.uz", "consent": "1", "password2": PW})
         self.assertContains(bad, "field-err")  # duplicate phone
-        self.assertContains(Client().post("/register/", {"first_name": "X", "last_name": "Y", "phone": "123", "password": PW, "username": "u" + "".join(ch for ch in str("123") if ch.isdigit()), "email": "u" + "".join(ch for ch in str("123") if ch.isdigit()) + "@test.uz", "password2": PW}), "field-err")
+        self.assertContains(Client().post("/register/", {"first_name": "X", "last_name": "Y", "phone": "123", "password": PW, "username": "u" + "".join(ch for ch in str("123") if ch.isdigit()), "email": "u" + "".join(ch for ch in str("123") if ch.isdigit()) + "@test.uz", "consent": "1", "password2": PW}), "field-err")
         self.assertContains(Client().post("/login/", {"phone": "901112233", "password": "wrong"}), "field-err")
         self.assertEqual(Client().post("/login/", {"phone": "+998 90 111 22 33", "password": PW}).status_code, 302)
 

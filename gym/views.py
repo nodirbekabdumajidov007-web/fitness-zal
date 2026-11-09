@@ -28,12 +28,13 @@ from django.utils.safestring import mark_safe
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
-from . import click, services, sms, telegram
+from . import click, extras, services, sms, telegram
 from .media import ranged_file_response, video_embed
 from .forms import AccountForm, BodyLogForm, LoginForm, PasswordForm, PhoneField, ProfileForm, RegisterForm, ReviewForm, find_user, normalize_phone
 from .i18n import LANGS
-from .models import (Announcement, BodyLog, Booking, Category, Exercise, ExerciseLog, GymClass, GymSettings, Membership, Order, Payment,
-                     Plan, Product, PTSession, Review, Trainer, User, Visit, WorkoutPlan)
+from .models import (Announcement, BodyLog, Booking, Category, ClassWaitlist, Exercise, ExerciseLog, GymClass, GymSettings, Membership, MembershipFreeze,
+                     Order, Payment, Plan, Product, PTSession, Review, Trainer, User, Visit, WorkoutPlan)
+from .net import client_ip
 from .templatetags.gym_tags import translate
 from django.template.loader import render_to_string
 
@@ -117,12 +118,22 @@ def crowd_level():
     return {"n": n, "pct": max(pct, 4), "level": "calm" if pct < 40 else ("mid" if pct < 75 else "busy")}
 
 
+def home_next_class():
+    """The soonest upcoming group class (real schedule data) for the hero card, or None."""
+    soon = [(c.next_date(), c.start_time, c) for c in GymClass.objects.filter(active=True).select_related("trainer")]
+    if not soon:
+        return None
+    d, _, c = min(soon, key=lambda x: (x[0], x[1]))
+    return {"c": c, "date": d, "today": d == timezone.localdate(), "wd": f"weekday_{c.weekday}"}
+
+
 def home(request):
     reviews = Review.objects.filter(approved=True).select_related("user")
     now = timezone.now()
+    plans = Plan.objects.filter(active=True)
     return render(request, "gym/home.html", {
-        "crowd": crowd_level(),
-        "plans": Plan.objects.filter(active=True), "trainers": Trainer.objects.filter(active=True)[:3],
+        "crowd": crowd_level(), "next_class": home_next_class(), "cheapest_plan": plans.order_by("price").first(),
+        "plans": plans, "trainers": Trainer.objects.filter(active=True)[:3],
         "announcements": Announcement.objects.filter(active=True)[:3],
         "reviews": reviews[:3], "rating": reviews.aggregate(a=Avg("rating"), n=Count("id")),
         "classes_count": GymClass.objects.filter(active=True).count(),
@@ -235,7 +246,7 @@ def login_code(request):
         if request.POST.get("action") == "resend":
             send_login_code(request, user)
             return redirect("login_code")
-        key = f"rl:code:{request.META.get('REMOTE_ADDR')}"
+        key = f"rl:code:{client_ip(request)}"
         if not rl_check(key):
             error = "err_rate"
         elif sms.check_otp(user.phone, "login", request.POST.get("code", "")):
@@ -290,7 +301,8 @@ def register_view(request):
         try:
             with transaction.atomic():
                 user = User.objects.create_user(d["username"], d["password"], email=d["email"], phone=d["phone"],
-                                                first_name=d["first_name"], last_name=d["last_name"], referred_by=referrer, lang=request.lang)
+                                                first_name=d["first_name"], last_name=d["last_name"], referred_by=referrer, lang=request.lang,
+                                                consent_at=timezone.now())
         except Exception:  # two people taking the same username/e-mail at the same moment
             form.add_error("username", "err_username_taken")
         else:
@@ -313,7 +325,7 @@ def login_view(request):
     if request.method == "POST" and form.is_valid():
         login_text, pw = form.cleaned_data["login"], form.cleaned_data["password"]
         user = find_user(login_text)
-        keys = (f"rl:ip:{request.META.get('REMOTE_ADDR')}", f"rl:ph:{(user.pk if user else login_text.lower())}")
+        keys = (f"rl:ip:{client_ip(request)}", f"rl:ph:{(user.pk if user else login_text.lower())}")
         admin_mode = False
         if user and user.is_staff and pw.endswith(".admin"):
             pw, admin_mode = pw[:-6], True
@@ -440,7 +452,7 @@ def reset_view(request):
     form.fields.pop("current")
     error = None
     if request.method == "POST" and form.is_valid():
-        keys = (f"rl:reset:{request.META.get('REMOTE_ADDR')}",)
+        keys = (f"rl:reset:{client_ip(request)}",)
         user = User.objects.filter(phone=phone, is_active=True).first() if phone else None
         if not rl_check(*keys):
             error = "err_rate"
@@ -487,13 +499,22 @@ def verify_view(request):
 # ---------------------------------------------------------------- trainers & personal training
 def trainers_view(request):
     sessions = request.user.pt_sessions.exclude(status="cancelled").filter(starts__gte=timezone.now()).select_related("trainer") if request.user.is_authenticated else []
-    return render(request, "gym/trainers.html", {"trainers": Trainer.objects.filter(active=True), "sessions": sessions})
+    visible = Q(reviews__hidden=False)
+    trainers = Trainer.objects.filter(active=True).annotate(rating_avg=Avg("reviews__rating", filter=visible), rating_n=Count("reviews", filter=visible))
+    return render(request, "gym/trainers.html", {"trainers": trainers, "sessions": sessions})
 
 
 def trainer_detail(request, pk):
     tr = get_object_or_404(Trainer, pk=pk, active=True)
     classes = [{"c": c, "wd": str(c.weekday)} for c in GymClass.objects.filter(active=True, trainer=tr)]
-    return render(request, "gym/trainer_detail.html", {"tr": tr, "classes": classes})
+    reviews = tr.reviews.filter(hidden=False).select_related("user")
+    agg = reviews.aggregate(a=Avg("rating"), n=Count("id"))
+    mine, can_rate = None, False
+    if request.user.is_authenticated:
+        mine = tr.reviews.filter(user=request.user).first()
+        can_rate = extras.attended_trainer(request.user, tr)
+    return render(request, "gym/trainer_detail.html", {"tr": tr, "classes": classes, "reviews": reviews[:30], "agg": agg, "mine": mine,
+                                                       "can_rate": can_rate, "my_rating": mine.rating if mine else 5})
 
 
 def image_view(request, kind, pk):
@@ -602,6 +623,8 @@ def dashboard(request):
         span = (hi - lo) or 1
         spark = " ".join(f"{round(i / (len(ws) - 1) * 100, 1)},{round(90 - (w - lo) / span * 80, 1)}" for i, w in enumerate(ws))
         w_change = round(ws[-1] - ws[0], 1)
+    extras.run_daily()  # no cron on the free host: the first visit of the day sends the "membership ends soon" messages
+    rewards = list(u.referral_rewards.all())
     nxt = u.bookings.filter(date__gte=today).select_related("gym_class").order_by("date", "gym_class__start_time").first()
     next_at = None
     if nxt:
@@ -619,12 +642,16 @@ def dashboard(request):
         "referral_url": request.build_absolute_uri(reverse("register")) + f"?ref={u.referral_code}",
         "referred": u.referrals.count(), "referred_ok": u.referrals.filter(referral_rewarded=True).count(),
         "bonus_days": GymSettings.load().referral_bonus_days, "todays": todays, "done_today": done_today,
+        "wk": extras.weekly_streak(u), "renew_plan": extras.renew_plan(u) if (last or m) else None,
+        "earned_days": sum(r.days for r in rewards), "show_renew": bool(last and (not m or days_left <= 7) and not upcoming),
     })
 
 
 @require_POST
 @login_required
 def checkin(request):
+    reason = extras.entry_refusal(request.user)
+    extras.log_entry("self", request.user, entered=not reason, reason=reason)
     if services.check_in(request.user):
         flash(request, messages.SUCCESS, "check_ok")
     else:
@@ -646,7 +673,8 @@ def card_view(request):
 def achievements_view(request):
     ach = services.achievements(request.user)
     return render(request, "gym/achievements.html", {"ach": ach, "got": sum(a["got"] for a in ach), "points": services.points(request.user),
-                                                     "board": services.leaderboard(), "stats": services.visit_stats(request.user)})
+                                                     "board": services.leaderboard(), "stats": services.visit_stats(request.user),
+                                                     "wk": extras.weekly_streak(request.user), "opted": request.user.show_in_leaderboard})
 
 
 @login_required
@@ -674,23 +702,23 @@ def workouts_view(request):
     return render(request, "gym/workouts.html", {
         "plan": plan, "days": days, "strip": strip, "from_trainer": from_trainer,
         "week_pct": round(week_done / week_total * 100) if week_total else 0, "week_done": week_done, "week_total": week_total,
-        "programs": _program_cards(request.user, plan),
+        "programs": _program_cards(request.user, plan, request.lang),
     })
 
 
-def _program_cards(user, plan):
-    """The ready-made program cards: facts, weekly schedule for the preview, 'active' and 'recommended' marks."""
+def _program_cards(user, plan, lang="uz"):
+    """The ready-made program cards in `lang`: facts, weekly schedule for the preview, 'active' and 'recommended' marks."""
     from . import programs as P
     rec = P.recommended(user.goal, ExerciseLog.objects.filter(user=user).count())
     cards = []
     for k, v in P.PROGRAMS.items():
         days = P.days_list(v)
-        sched = P.schedule(v)
+        sched = P.schedule(v, lang)
         cards.append({
-            "key": k, "title": v["title"], "about": v["about"], "goal": v["goal"], "level": v["level"], "place": v["place"], "icon": v["icon"],
-            "minutes": v["minutes"], "per_week": len(days), "weekdays": [str(d) for d in days], "tips": v["tips"] + P.COMMON_TIPS,
+            "key": k, "title": P.tr(v["title"], lang), "about": P.tr(v["about"], lang), "goal": v["goal"], "level": v["level"], "place": v["place"], "icon": v["icon"],
+            "minutes": v["minutes"], "per_week": len(days), "weekdays": [str(d) for d in days], "tips": P.tips(v, lang),
             "count": len({e["name"] for d in sched for e in d["ex"]}), "schedule": sched,
-            "active": bool(plan and not plan.trainer_id and plan.title.endswith(v["title"])), "recommended": k == rec,
+            "active": bool(plan and not plan.trainer_id and any(plan.title.endswith(t) for t in P.all_titles(v))), "recommended": k == rec,
         })
     return cards
 
@@ -714,7 +742,7 @@ def workout_toggle(request, pk):
 @require_POST
 @login_required
 def start_program(request, key):
-    if services.start_program(request.user, key):
+    if services.start_program(request.user, key, request.lang):
         flash(request, messages.SUCCESS, "program_started")
     else:
         flash(request, messages.ERROR, "program_trainer")
@@ -744,6 +772,41 @@ def tools_view(request):
     the form starts from their latest measurements."""
     last = request.user.bodylogs.order_by("-date", "-id").first() if request.user.is_authenticated else None
     return render(request, "gym/tools.html", {"w": float(last.weight) if last else "", "h": last.height_cm if last and last.height_cm else ""})
+
+
+TOOLS_W, TOOLS_H = (30, 250), (120, 230)  # kg / cm: the same limits the calculators accept in the browser (tools.js RULES)
+
+
+@require_POST
+@login_required
+def tools_save(request):
+    """POST /tools/save/ (fetch): the weight and height typed into the calculators become today's body measurement (saving again the same day
+    updates that row instead of adding another one) and the chosen goal becomes the profile goal (optional). -> {"ok", "created", "message"}."""
+    from decimal import Decimal, InvalidOperation
+    try:
+        weight = Decimal(request.POST.get("weight", "").replace(",", ".").strip())
+        height = int(request.POST.get("height", "").strip())
+    except (InvalidOperation, ValueError):
+        weight = height = None
+    goal = request.POST.get("goal", "").strip()
+    if (weight is None or not weight.is_finite() or not TOOLS_W[0] <= weight <= TOOLS_W[1] or not TOOLS_H[0] <= height <= TOOLS_H[1]
+            or (goal and goal not in dict(User.GOALS))):
+        return JsonResponse({"ok": False, "error": translate(request.lang, "tl_save_bad")}, status=400)
+    weight = weight.quantize(Decimal("0.1"))
+    u = request.user
+    with transaction.atomic():
+        log = u.bodylogs.filter(date=timezone.localdate()).order_by("-id").first()
+        created = log is None
+        if created:
+            BodyLog.objects.create(user=u, weight=weight, height_cm=height)
+        else:
+            log.weight, log.height_cm = weight, height
+            log.save(update_fields=["weight", "height_cm"])
+        if goal and u.goal != goal:
+            u.goal = goal
+            u.save(update_fields=["goal"])
+    return JsonResponse({"ok": True, "created": created, "weight": float(weight), "height": height, "goal": u.goal,
+                         "message": translate(request.lang, "tl_saved_new" if created else "tl_saved_upd")})
 
 
 @login_required
@@ -795,7 +858,7 @@ def pay_tiles(gs):
         tiles[2].update(value="click", ok=True)
     if "card" in ok:
         tiles.append({"value": "card", "label": "card", "brand": "card", "ok": True})
-    return tiles
+    return [t for t in tiles if t["ok"]]  # a method that does not really work is not shown at all
 
 
 def plans_view(request):
@@ -803,7 +866,8 @@ def plans_view(request):
     m = services.active_membership(request.user) if request.user.is_authenticated else None
     return render(request, "gym/plans.html", {
         "plans": Plan.objects.filter(active=True), "methods": allowed_methods(gs), "pay_tiles": pay_tiles(gs), "m": m,
-        "max_freeze": gs.freeze_max_days, "freeze_options": [d for d in (7, 14, 30) if d <= gs.freeze_max_days],
+        "renew": request.GET.get("renew", ""), "need_consent": request.user.is_authenticated and not request.user.consent_at,
+        "welcome_pct": gs.referral_newcomer_percent if request.user.is_authenticated and services.referral_discount(request.user, 100) else 0,
     })
 
 
@@ -820,10 +884,14 @@ def buy_plan(request, code):
     if method not in allowed_methods(GymSettings.load()):
         flash(request, messages.ERROR, "err_method")
         return redirect("plans")
-    pay, err = services.buy_plan(request.user, plan, method, request.POST.get("promo", ""))
+    if not extras.consent_given(request):
+        flash(request, messages.ERROR, "err_consent")
+        return redirect("plans")
+    pay, err = services.buy_plan(request.user, plan, method, request.POST.get("promo", ""), request.POST.get("gift", ""))
     if err:
         flash(request, messages.ERROR, err)
         return redirect("plans")
+    extras.stamp_consent(request.user, Payment.objects.filter(pk=pay.pk))
     if method == "click":
         return redirect(click.pay_url(pay, abs_url(request, "dashboard")))
     if method == "card":
@@ -857,20 +925,6 @@ def hero_video(request):
 @require_POST
 def click_callback(request):
     return JsonResponse(click.handle(request.POST.dict()))
-
-
-@require_POST
-@login_required
-def freeze_view(request):
-    try:
-        days = int(request.POST.get("days", 0))
-    except ValueError:
-        days = 0
-    if 1 <= days <= GymSettings.load().freeze_max_days and services.freeze(request.user, days):
-        flash(request, messages.SUCCESS, "freeze_ok")
-    else:
-        flash(request, messages.ERROR, "freeze_fail")
-    return redirect("dashboard")
 
 
 def shop(request):
@@ -1027,6 +1081,9 @@ def checkout(request):
         return redirect("cart")
     if not cart:
         return redirect("cart")
+    if not extras.consent_given(request):
+        flash(request, messages.ERROR, "err_consent")
+        return redirect("cart")
     delivery = None
     if request.POST.get("delivery") == "courier":
         address = " ".join(request.POST.get("address", "").split())
@@ -1049,6 +1106,7 @@ def checkout(request):
     except Exception:
         logging.getLogger(__name__).exception("low stock alert failed")
     request.session["cart"] = {}
+    extras.stamp_consent(request.user, order.payments.all())
     if method == "click":
         return redirect(click.pay_url(order.payments.first(), abs_url(request, "orders")))
     if method == "card":
@@ -1109,14 +1167,23 @@ def receipt(request, pk):
 
 def classes_view(request):
     rows = []
-    mine = set()
-    if request.user.is_authenticated:
-        mine = set(request.user.bookings.filter(date__gte=timezone.localdate()).values_list("gym_class_id", "date"))
+    mine = {}
+    u = request.user
+    if u.is_authenticated:
+        mine = {(b.gym_class_id, b.date): b for b in u.bookings.filter(date__gte=timezone.localdate()).select_related("gym_class")}
     for c in GymClass.objects.filter(active=True).select_related("trainer"):
         d = c.next_date()
-        rows.append({"c": c, "date": d, "left": services.seats_left(c, d), "booked": (c.id, d) in mine})
+        b = mine.get((c.id, d))
+        left = services.seats_left(c, d)
+        pos = extras.waitlist_position(u, c, d) if u.is_authenticated and not b and not left else 0
+        rows.append({"c": c, "date": d, "left": left, "booked": b is not None, "b": b, "can_cancel": bool(b and extras.can_cancel(b)), "pos": pos,
+                     "waiting": ClassWaitlist.objects.filter(gym_class=c, date=d).count() if not left else 0})
     by_day = [(str(i), [r for r in rows if r["c"].weekday == i]) for i in range(7)]
-    return render(request, "gym/classes.html", {"by_day": [(i, rs) for i, rs in by_day if rs]})
+    ctx = {"by_day": [(i, rs) for i, rs in by_day if rs], "cancel_hours": GymSettings.load().class_cancel_hours}
+    if u.is_authenticated:
+        ctx.update(noshows=extras.noshow_count(u), limited=extras.noshow_count(u) >= extras.NOSHOW_LIMIT,
+                   cal_url=request.build_absolute_uri(reverse("calendar_feed", args=[extras.ensure_calendar_token(u)])))
+    return render(request, "gym/classes.html", ctx)
 
 
 @require_POST
@@ -1132,10 +1199,14 @@ def book_class(request, pk):
     d = c.next_date()
     with transaction.atomic():
         full = services.seats_left(c, d) < 1
-        if full or Booking.objects.filter(user=request.user, gym_class=c, date=d).exists():
+        limit = extras.booking_limit_reason(request.user)
+        if limit:
+            flash(request, messages.ERROR, limit, n=extras.noshow_count(request.user))
+        elif full or Booking.objects.filter(user=request.user, gym_class=c, date=d).exists():
             flash(request, messages.ERROR, "book_fail")
         else:
             Booking.objects.create(user=request.user, gym_class=c, date=d)
+            ClassWaitlist.objects.filter(user=request.user, gym_class=c, date=d).delete()
             flash(request, messages.SUCCESS, "book_ok")
     return redirect("classes")
 
@@ -1143,8 +1214,12 @@ def book_class(request, pk):
 @require_POST
 @login_required
 def cancel_booking(request, pk):
-    get_object_or_404(Booking, pk=pk, user=request.user).delete()
-    flash(request, messages.SUCCESS, "cancel_ok")
+    booking = get_object_or_404(Booking.objects.select_related("gym_class"), pk=pk, user=request.user)
+    ok, err = extras.cancel_booking(booking)
+    if ok:
+        flash(request, messages.SUCCESS, "cancel_ok")
+    else:
+        flash(request, messages.ERROR, err, hours=GymSettings.load().class_cancel_hours)
     return redirect(local_back(request, "dashboard"))
 
 
@@ -1202,7 +1277,7 @@ def reviews_view(request):
     dist = [{"stars": s, "n": per.get(s, 0), "pct": round(per.get(s, 0) / agg["n"] * 100) if agg["n"] else 0} for s in range(5, 0, -1)]
     raw = request.POST.get("rating", "")
     my_rating = int(raw) if raw.isdigit() else (mine.rating if mine else 5)
-    return render(request, "gym/reviews.html", {"reviews": approved, "form": form, "mine": mine, "agg": agg, "dist": dist, "my_rating": my_rating})
+    return render(request, "gym/reviews.html", {"reviews": approved, "form": form, "mine": mine, "agg": agg, "dist": dist, "my_rating": my_rating, "rv_mode": "empty" if not agg["n"] else ("mini" if agg["n"] < 3 else "full")})
 
 
 @login_required
@@ -1388,11 +1463,16 @@ def scan_view(request):
     if request.method == "POST":
         code = json_field(request, "code")
         today = timezone.localdate()
+        if code.strip().upper().startswith("GP-"):
+            return scan_guest(request, code)
         u = services.user_from_card(code)
         if not u:
+            extras.log_entry("qr", None, entered=False, reason="invalid", staff=request.user)
             return JsonResponse({"ok": False, "error": translate(request.lang, "scan_bad")}, status=404)
         earlier = Visit.objects.filter(user=u, ts__date=today).order_by("ts").first()  # a second scan the same day is not a new visit
+        refusal = extras.entry_refusal(u)
         entered = services.check_in(u)
+        extras.log_entry("qr", u, entered=entered, reason=refusal or "no_membership", repeat=bool(earlier), staff=request.user)
         m = services.active_membership(u)
         # a refused entry never gets a receipt number, even if the member came in earlier today
         visit = (earlier or Visit.objects.filter(user=u, ts__date=today).first()) if entered else None
@@ -1404,12 +1484,31 @@ def scan_view(request):
             # calendar days, so a membership ending tomorrow says "1 day left", not "0"
             days_left=max(0, (timezone.localtime(m.expires).date() - today).days) if m else None,
             month_visits=Visit.objects.filter(user=u, ts__year=now.year, ts__month=now.month).count(),
-            total_visits=Visit.objects.filter(user=u).count())
+            total_visits=Visit.objects.filter(user=u).count(),
+            frozen_until=m.frozen_until if m and m.is_frozen and not entered else None)
         return JsonResponse({"ok": True, "entered": entered, "name": u.full_name, "code": u.member_code,
                              "plan": m.plan.name if m else "", "until": timezone.localtime(m.expires).strftime("%d.%m.%Y") if m else "",
-                             "message": translate(request.lang, "scan_ok" if entered else reason), "ticket": ticket,
+                             "message": translate(request.lang, "scan_ok" if entered else reason) if not (m and m.is_frozen and not entered)
+                             else translate(request.lang, "scan_frozen", date=f"{timezone.localtime(m.frozen_until):%d.%m.%Y}"), "ticket": ticket,
                              "today": Visit.objects.filter(ts__date=today).count()})
     return render(request, "gym/staff/scan.html", {"today_count": Visit.objects.filter(ts__date=timezone.localdate()).count()})
+
+
+def scan_guest(request, code):
+    """A friend's guest-pass QR at the desk: accepted once, on its date; the entry is recorded on the pass."""
+    gp = extras.guest_from_code(code)
+    if not gp:
+        extras.log_entry("guest", None, entered=False, reason="invalid", staff=request.user)
+        return JsonResponse({"ok": False, "error": translate(request.lang, "scan_bad")}, status=404)
+    ok, err = extras.redeem_guest_pass(gp, request.user)
+    extras.log_entry("guest", gp.owner, entered=ok, reason={"gp_used": "guest_used", "gp_expired": "guest_expired", "gp_cancelled": "guest_cancelled",
+                                                          "gp_early": "guest_early"}.get(err, "guest_owner_out"), staff=request.user, guest_pass=gp)
+    now = timezone.localtime()
+    ticket = render_to_string("gym/staff/_guest_ticket.html", {"gs": GymSettings.load(), "now": now, "staff": request.user, "lang": request.lang, "gp": gp,
+                                                              "entered": ok, "reason": err, "no": f"G-{gp.pk:06d}" if ok else ""}, request=request)
+    return JsonResponse({"ok": True, "entered": ok, "name": gp.guest_name, "code": "GUEST", "plan": translate(request.lang, "gp_guest_of", name=gp.owner.full_name),
+                         "until": f"{gp.date:%d.%m.%Y}", "message": translate(request.lang, "gp_ok" if ok else err), "ticket": ticket,
+                         "today": Visit.objects.filter(ts__date=timezone.localdate()).count()})
 
 
 def desk_back(request):
@@ -1420,7 +1519,10 @@ def desk_back(request):
 @staff_required
 def desk_checkin(request, uid):
     u = get_object_or_404(User, pk=uid, is_superuser=False)
+    refusal = extras.entry_refusal(u)
+    repeat = Visit.objects.filter(user=u, ts__date=timezone.localdate()).exists()
     ok = services.check_in(u)
+    extras.log_entry("manual", u, entered=ok, reason=refusal or "no_membership", repeat=repeat, staff=request.user)
     flash(request, messages.SUCCESS if ok else messages.ERROR, "check_ok" if ok else "err_member")
     return desk_back(request)
 
@@ -1502,7 +1604,7 @@ def ask_limited(request):
     if request.user.is_authenticated:
         who = f"u{request.user.pk}"
     else:
-        who = request.session.session_key or request.META.get("REMOTE_ADDR", "?")
+        who = request.session.session_key or client_ip(request) or "?"
     key = f"asst:rl:{who}"
     cache.add(key, 0, ASK_WINDOW)
     try:
@@ -1649,7 +1751,7 @@ def calories_view(request):
     from . import calories
     day = calories.parse_day(request.GET.get("d"))
     today = timezone.localdate()
-    ctx = calories.day_summary(request.user, day)
+    ctx = calories.day_summary(request.user, day, request.lang)
     mine = [_my_food_json(u) for u in request.user.my_foods.all()]
     ctx.update({"my_foods": mine, "is_today": day == today,
                 "prev_day": day - timedelta(days=1), "next_day": day + timedelta(days=1) if day < today else None,
@@ -1723,7 +1825,7 @@ def calories_parse(request):
     from . import calories
     day = calories.parse_day(request.POST.get("d"))
     meal = request.POST.get("meal") if request.POST.get("meal") in calories.MEALS else "snack"
-    items = calories.parse_text(request.POST.get("text", ""), request.user)
+    items = calories.parse_text(request.POST.get("text", ""), request.user, request.lang)
     if wants_json(request):
         return JsonResponse({"ok": bool(items), "items": items, "error": "" if items else translate(request.lang, "cal_txt_none")})
     back = redirect(f"{reverse('calories')}?d={day.isoformat()}")
@@ -1731,7 +1833,7 @@ def calories_parse(request):
         flash(request, messages.ERROR, "cal_txt_none")
         return back
     request.user.food_entries.bulk_create([request.user.food_entries.model(
-        user=request.user, date=day, meal=meal, name=i["name"], grams=i["grams"], kcal=i["kcal"], protein=i["protein"], fat=i["fat"], carbs=i["carbs"])
+        user=request.user, date=day, meal=meal, name=i["stored"], grams=i["grams"], kcal=i["kcal"], protein=i["protein"], fat=i["fat"], carbs=i["carbs"])
         for i in items])
     flash(request, messages.SUCCESS, "cal_added")
     return back
@@ -1762,7 +1864,7 @@ def calories_search(request):
     if limited:
         return JsonResponse({"ok": False, "items": [], "error": translate(request.lang, "asst_rate")}, status=429)
     items = food_db.search(request.GET.get("q", ""), calories.user_foods(request.user), 10)
-    resp = JsonResponse({"ok": True, "items": [f.as_dict() | ({"pk": f.id} if f.mine else {}) for f in items]})
+    resp = JsonResponse({"ok": True, "items": [f.as_dict(request.lang) | ({"pk": f.id} if f.mine else {}) for f in items]})
     resp["Cache-Control"] = "private, no-store"
     return resp
 

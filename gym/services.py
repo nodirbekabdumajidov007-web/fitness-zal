@@ -9,7 +9,8 @@ from django.db.models import Count, F
 from django.utils import timezone
 
 from . import telegram
-from .models import (BodyLog, Booking, GymSettings, Membership, Order, Payment, PaymentCard, Plan, Product, PromoCode, Review, User, Visit)
+from .templatetags.gym_tags import translate
+from .models import (BodyLog, Booking, GymSettings, Membership, Order, Payment, PaymentCard, Plan, Product, PromoCode, ReferralReward, Review, User, Visit)
 
 OFFLINE_METHODS = ("cash", "click", "card")  # not marked paid on the spot: cash and card transfers wait for staff, click for the gateway callback
 CARD_HOLD_HOURS = 24  # an unpaid card transfer is cancelled after this long, which also releases the reserved stock
@@ -56,13 +57,12 @@ extend_member = grant_days
 
 
 def add_membership(user, plan):
-    """Stacks on top of existing coverage, so buying early never wastes days. The first ever purchase rewards a referral."""
-    first = not user.memberships.exists()
+    """Stacks on top of existing coverage, so buying early never wastes days. The first PAID plan purchase rewards a referral."""
     now = timezone.now()
     last = user.memberships.order_by("-expires").first()
     start = max(now, last.expires) if last else now
     m = Membership.objects.create(user=user, plan=plan, starts=start, expires=start + timedelta(days=30 * plan.months))
-    if first:
+    if user.referred_by_id and not user.referral_rewarded and Payment.objects.filter(user=user, kind="plan", status=Payment.Status.PAID, amount__gt=0).exists():
         reward_referral(user)
     return m
 
@@ -77,31 +77,29 @@ def seats_left(gym_class, date):
 
 
 def reward_referral(user):
-    if user.referred_by_id and not user.referral_rewarded:
-        bonus = GymSettings.load().referral_bonus_days
-        if bonus:
-            grant_days(user.referred_by, bonus)
-            grant_days(user, bonus)
-        user.referral_rewarded = True
-        user.save(update_fields=["referral_rewarded"])
+    """The referrer gets the bonus days once for each invited member who paid for a first membership (the newcomer gets them too).
+    Anti-abuse: one reward per invited account (ReferralReward is unique per person), never for yourself, only for a paid purchase, only to an active referrer."""
+    referrer = user.referred_by
+    if not referrer or user.referral_rewarded or referrer.pk == user.pk:
+        return False
+    user.referral_rewarded = True
+    user.save(update_fields=["referral_rewarded"])
+    bonus = GymSettings.load().referral_bonus_days
+    if not referrer.is_active or ReferralReward.objects.filter(referred=user).exists():
+        return False
+    ReferralReward.objects.create(referrer=referrer, referred=user, days=bonus)
+    if bonus:
+        grant_days(referrer, bonus)
+        grant_days(user, bonus)
+        notify(referrer, translate(referrer.lang or "uz", "ref_reward_title", days=bonus),
+               translate(referrer.lang or "uz", "ref_reward_body", name=user.first_name or user.username, days=bonus))
+    return True
 
 
 def freeze(user, days):
-    """Pauses the active membership: all coverage from now on shifts forward by `days`; check-in is blocked meanwhile."""
-    m = active_membership(user)
-    if not m or m.freeze_used or m.is_frozen:
-        return False
-    delta = timedelta(days=days)
-    with transaction.atomic():
-        for other in user.memberships.filter(expires__gt=timezone.now()):
-            other.expires += delta
-            if other.starts > timezone.now():
-                other.starts += delta
-            other.save(update_fields=["expires", "starts"])
-        m.refresh_from_db()
-        m.freeze_used, m.frozen_until = True, timezone.now() + delta
-        m.save(update_fields=["freeze_used", "frozen_until"])
-    return True
+    """Freezes the active membership for `days` days from today (the old one-click entry; the full rules live in extras.start_freeze)."""
+    from . import extras
+    return extras.start_freeze(user, days)[0] is not None
 
 
 def can_enter(user):
@@ -292,16 +290,19 @@ PROGRAMS = {k: _flat_program(p) for k, p in _programs.PROGRAMS.items()}
 
 
 @transaction.atomic
-def start_program(user, key):
-    """Gives the member a ready-made plan. A plan from a trainer always wins, so it is never replaced here."""
+def start_program(user, key, lang="uz"):
+    """Gives the member a ready-made plan, written in `lang` (title, description, exercise names and rests are stored in the language the member
+    uses when starting it). A plan from a trainer always wins, so it is never replaced here."""
     from .models import Exercise, WorkoutPlan
-    prog = PROGRAMS.get(key)
+    prog = _programs.PROGRAMS.get(key)
     if not prog or user.workout_plans.filter(active=True, trainer__isnull=False).exists():
         return None
+    lang = lang if lang in _programs.LANGS else "uz"
+    rest_word = _programs.rest_label(lang)
     user.workout_plans.filter(active=True).update(active=False)
-    plan = WorkoutPlan.objects.create(user=user, title=prog["title"], notes=prog["about"], active=True)
-    plan.exercises.bulk_create([Exercise(plan=plan, weekday=wd, name=name, sets=sets, reps=reps, order=i, note=f"Dam: {rest}" if rest else "")
-                                for i, (wd, name, sets, reps, rest) in enumerate(prog["rows"])])
+    plan = WorkoutPlan.objects.create(user=user, title=_programs.tr(prog["title"], lang), notes=_programs.tr(prog["about"], lang), active=True)
+    plan.exercises.bulk_create([Exercise(plan=plan, weekday=wd, name=name, sets=sets, reps=reps, order=i, note=f"{rest_word}: {rest}" if rest else "")
+                                for i, (wd, name, sets, reps, rest) in enumerate(_programs.rows(prog, lang))])
     return plan
 
 
@@ -317,27 +318,64 @@ def check_promo(code, price):
     return promo, price * promo.percent // 100, None
 
 
+def referral_discount(user, plan_price):
+    """The optional welcome discount of an invited friend on the first paid membership (GymSettings.referral_newcomer_percent)."""
+    pct = GymSettings.load().referral_newcomer_percent
+    if not pct or not user.referred_by_id or user.referral_rewarded:
+        return 0
+    if Payment.objects.filter(user=user, kind="plan", status__in=(Payment.Status.PAID, Payment.Status.PENDING), amount__gt=0).exists():
+        return 0
+    return plan_price * pct // 100
+
+
 @transaction.atomic
-def buy_plan(user, plan, method, promo_code=""):
-    """Cash waits for staff, Click for its callback; demo gateways are marked paid straight away (no real gateway behind them)."""
+def buy_plan(user, plan, method, promo_code="", gift_code=""):
+    """Cash waits for staff, Click for its callback; demo gateways are marked paid straight away (no real gateway behind them).
+    A gift certificate covers a plan fully (plan certificate) or takes its sum off the price; a promo code and the welcome discount come first."""
+    from . import extras
     card = current_card() if method == "card" else None
     if method == "card" and not card:
         return None, "err_method"
     promo, discount, err = check_promo(promo_code, plan.price)
     if err:
         return None, err
+    label = promo.code if promo else ""
+    if not promo:
+        discount = referral_discount(user, plan.price)
+        label = "REFERRAL" if discount else ""
+    gift = None
+    if (gift_code or "").strip():
+        gift = extras.find_gift(gift_code)
+        gerr = extras.gift_error(gift, plan)
+        if gerr:
+            return None, gerr
+    price = plan.price - discount
+    gift_cut = 0
+    if gift:
+        gift_cut = price if gift.plan_id else min(gift.amount, price)
+        if not GiftCertificateQS(gift.pk).update(redeemed_at=timezone.now(), redeemed_by=user):
+            return None, "gift_used"
     if promo:
         updated = PromoCode.objects.filter(pk=promo.pk).exclude(max_uses__isnull=False, used__gte=F("max_uses")).update(used=F("used") + 1)
         if not updated:
+            transaction.set_rollback(True)
             return None, "promo_bad"
+    amount = price - gift_cut
+    if amount <= 0:
+        method, card = "gift", None  # nothing left to pay: the certificate covered it
     paid = method not in OFFLINE_METHODS
-    pay = Payment.objects.create(user=user, kind="plan", plan=plan, amount=plan.price - discount, discount=discount,
-                                 promo=promo.code if promo else "", method=method,
+    pay = Payment.objects.create(user=user, kind="plan", plan=plan, amount=amount, discount=plan.price - amount,
+                                 promo=label, method=method, gift_code=gift.code if gift else "",
                                  pay_card=card, card_last4=card.last4 if card else "",
                                  status=Payment.Status.PAID if paid else Payment.Status.PENDING)
     if paid:
         add_membership(user, plan)
     return pay, None
+
+
+def GiftCertificateQS(pk):
+    from .models import GiftCertificate
+    return GiftCertificate.objects.filter(pk=pk, redeemed_at__isnull=True)
 
 
 @transaction.atomic
@@ -368,6 +406,9 @@ def cancel_payment(payment, notify=False):
         order.save(update_fields=["status"])
     if payment.promo and payment.kind == "plan":
         PromoCode.objects.filter(code=payment.promo, used__gt=0).update(used=F("used") - 1)
+    if payment.gift_code:
+        from . import extras
+        extras.release_gift(payment)
     if notify and payment.user:
         telegram.notify_user(payment.user, "tg_payment_rejected", ref=payment.reference)
     return True

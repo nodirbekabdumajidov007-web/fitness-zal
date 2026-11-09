@@ -22,6 +22,7 @@
     <span style="color:#111">{{ user.full_name }}</span>
     {% if m %}<span class="pill good">{% plan_name m.plan %} · {% t 'until' %} {{ m.expires|dmy }}</span>{% else %}<span class="pill bad">{% t 'no_membership' %}</span>{% endif %}
     <span class="muted" style="font-size:.85rem">{% t 'card_help' %}</span>
+    <a class="btn small" href="{% url 'entry_history' %}">{% t 'entry_title' %} →</a>
   </div>
 </div>
 {% endblock %}

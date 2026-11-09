@@ -1,0 +1,21 @@
+{% extends "gym/base.html" %}{% load gym_tags %}
+{% block title %}{% t 'entry_title' %}{% endblock %}
+{% block content %}
+<div class="eyebrow"><a href="{% url 'card' %}">{% t 'member_card' %}</a></div>
+<h2>{% t 'entry_title' %}</h2>
+<div class="grid g2">
+  <div class="card stat"><span class="muted">{% t 'entry_month' %}</span><b class="num">{{ month }}</b></div>
+  <div class="card stat"><span class="muted">{% t 'entry_total' %}</span><b class="num">{{ total }}</b></div>
+</div>
+{% if page.object_list %}
+<div class="tbl"><table>
+  <thead><tr><th>{% t 'gp_date' %}</th><th>{% t 'entry_time' %}</th><th>{% t 'entry_method' %}</th></tr></thead>
+  <tbody>{% for e in page.object_list %}<tr><td class="num">{{ e.ts|dmy }}</td><td class="num">{{ e.ts|date:"H:i" }}</td><td>{% t 'entry_m_'|add:e.method %}{% if e.result == 'repeat' %} <span class="muted">· {% t 'entry_repeat' %}</span>{% endif %}</td></tr>{% endfor %}</tbody>
+</table></div>
+{% if page.paginator.num_pages > 1 %}<nav class="pager inline" aria-label="pages">
+  {% if page.has_previous %}<a class="btn small" href="?page={{ page.previous_page_number }}">←</a>{% endif %}
+  <span class="muted num">{{ page.number }} / {{ page.paginator.num_pages }}</span>
+  {% if page.has_next %}<a class="btn small" href="?page={{ page.next_page_number }}">→</a>{% endif %}
+</nav>{% endif %}
+{% else %}<div class="card muted">{% t 'none_yet' %}</div>{% endif %}
+{% endblock %}

@@ -130,11 +130,13 @@ class MiscUiTests(TestCase):
         self.assertIn("end-lat=41.311081&end-lon=69.240562", gs.routes()["taxi"])
         self.assertContains(self.client.get("/"), "Yandex Go")
 
-    def test_plans_tiles_cash_only_marks_rest_soon(self):
+    def test_plans_tiles_show_only_working_methods(self):
         Plan.objects.create(code="m1", name="1 oy", months=1, price=100000)
         r = self.client.get(reverse("plans"))
-        self.assertContains(r, 'class="paytiles"')
-        self.assertContains(r, "tez orada")
+        self.assertContains(r, 'class="paytiles single"')  # cash is the only working method: one clear option
+        self.assertNotContains(r, "tez orada")
+        self.assertNotContains(r, "Payme")
+        self.assertNotContains(r, "Uzum")
 
     def test_home_has_no_announcements_or_trainer_cards(self):
         Announcement.objects.create(title="Yangilik", body="Birinchi qator", pinned=True)
@@ -348,3 +350,95 @@ class UserFoodTests(TestCase):
         from django.contrib import admin
         from .models import UserFood
         self.assertIn(UserFood, admin.site._registry)
+
+
+class FoodNamesLanguageTests(TestCase):
+    """Built-in foods are shown in the site language (search, diary, free-text preview); own foods keep their name; Uzbek is the fallback."""
+
+    def setUp(self):
+        from django.core.cache import cache
+        cache.clear()
+        GymSettings.load()
+        GymSettings.objects.get(pk=1).save()
+        self.u = User.objects.create_user(username="fn", email="fn@x.uz", password="pw12345678")
+        self.client.force_login(self.u)
+        self.fetch = {"headers": {"X-Requested-With": "fetch"}}
+
+    def lang(self, code):
+        self.client.cookies["fz_lang"] = code
+
+    def search(self, q):
+        return self.client.get(reverse("calories_search"), {"q": q}).json()["items"]
+
+    def test_every_food_has_ru_and_en_names(self):
+        from . import food_db, food_names
+        uz = {f.name for f in food_db.FOODS_DB}
+        self.assertEqual(sorted(uz - set(food_names.NAMES)), [], "a built-in food has no ru / en name in gym/food_names.py")
+        self.assertEqual(sorted(set(food_names.NAMES) - uz), [], "food_names.py names a food that is not in the data files")
+        for name, (ru, en) in food_names.NAMES.items():
+            self.assertTrue(ru and en, name)
+            self.assertEqual(ru.count("("), ru.count(")"), name)
+            self.assertEqual(en.count("("), en.count(")"), name)
+            self.assertTrue(any("а" <= ch.lower() <= "я" or ch in "ёЁ" for ch in ru), f"{name}: the Russian name has no Cyrillic letters")
+        for lang, i in (("ru", 0), ("en", 1)):
+            shown = [v[i] for v in food_names.NAMES.values()]
+            self.assertEqual(len(shown), len(set(shown)), f"two foods share a {lang} display name")
+
+    def test_label_and_fallback(self):
+        from . import food_db
+        osh = food_db.FOODS_DB[0]
+        self.assertEqual((osh.label("uz"), osh.label("ru"), osh.label("en")), ("Osh (palov)", "Плов (ош)", "Plov (pilaf)"))
+        self.assertEqual(osh.label("de"), "Osh (palov)")  # unknown language: Uzbek
+        mine = food_db.Food(7, "Osh (palov)", 100, 1, 1, 1, 0, 100, ("osh",), ("osh",), mine=True)
+        self.assertEqual(mine.label("ru"), "Osh (palov)")
+        self.assertEqual(food_db.localize("Osh (palov)", "en"), "Plov (pilaf)")
+        self.assertEqual(food_db.localize("Uy burgeri", "ru"), "Uy burgeri")  # not a built-in food: as typed
+        self.assertEqual(food_db.localize("Osh (palov)", "uz"), "Osh (palov)")
+
+    def test_search_results_follow_the_language(self):
+        self.assertEqual(self.search("plov")[0]["name"], "Osh (palov)")  # no cookie: Uzbek
+        self.lang("ru")
+        first = self.search("plov")[0]
+        self.assertEqual(first["name"], "Плов (ош)")
+        self.assertEqual(first["id"], "0")  # the id never changes with the language
+        self.lang("en")
+        self.assertEqual(self.search("plov")[0]["name"], "Plov (pilaf)")
+        self.assertEqual(self.search("Chicken breast (cooked)")[0]["name"], "Chicken breast (cooked)")  # the shown name finds its own food
+        self.lang("ru")
+        self.assertEqual(self.search("Куриная грудка (варёная)")[0]["name"], "Куриная грудка (варёная)")
+
+    def test_own_food_keeps_its_name_in_every_language(self):
+        from .models import UserFood
+        UserFood.objects.create(user=self.u, name="Dadam oshi", kcal=180, portion_g=300)
+        for code in ("uz", "ru", "en"):
+            self.lang(code)
+            mine = [i for i in self.search("dadam") if i.get("mine")]
+            self.assertEqual([i["name"] for i in mine], ["Dadam oshi"], code)
+            self.assertEqual(calories.parse_text("dadam oshi", self.u, code)[0]["name"], "Dadam oshi")
+
+    def test_diary_entry_shows_the_viewers_language(self):
+        from . import food_db
+        idx = next(f.id for f in food_db.FOODS_DB if f.name == "Borsch")
+        self.client.post(reverse("calories_add"), {"food": idx, "grams": 300, "meal": "lunch"})
+        self.client.post(reverse("calories_add"), {"name": "Uy burgeri", "grams": 150, "kcal": "420", "meal": "dinner"})
+        self.assertEqual(FoodEntry.objects.get(name="Borsch").name, "Borsch")  # stored once, in the canonical (Uzbek) name
+        for code, shown in (("uz", "Borsch"), ("ru", "Борщ"), ("en", "Borscht")):
+            self.lang(code)
+            html = self.client.get(reverse("calories")).content.decode()
+            self.assertIn(f"<b>{shown}</b>", html, code)
+            self.assertIn("<b>Uy burgeri</b>", html, code)  # quick-add names are shown as typed
+        self.lang("ru")
+        s = calories.day_summary(self.u, timezone.localdate(), "ru")
+        self.assertEqual([e.shown for e in s["entries"]], ["Борщ", "Uy burgeri"])
+        self.assertEqual(calories.day_summary(self.u, timezone.localdate())["entries"][0].shown, "Borsch")
+
+    def test_parse_preview_follows_the_language_and_the_entry_is_stored_in_uzbek(self):
+        self.lang("en")
+        r = self.client.post(reverse("calories_parse"), {"text": "borsch 300 g"}, **self.fetch).json()
+        self.assertEqual((r["items"][0]["name"], r["items"][0]["stored"]), ("Borscht", "Borsch"))
+        self.lang("ru")
+        r = self.client.post(reverse("calories_parse"), {"text": "borsch 300 g"}, **self.fetch).json()
+        self.assertEqual(r["items"][0]["name"], "Борщ")
+        # without JavaScript the recognised foods are saved at once, under the canonical name
+        self.client.post(reverse("calories_parse"), {"text": "borsch 300 g"})
+        self.assertEqual(list(FoodEntry.objects.values_list("name", flat=True)), ["Borsch"])

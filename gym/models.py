@@ -77,7 +77,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     referral_rewarded = models.BooleanField("Taklif bonusi berilgan", default=False, editable=False)
     telegram_chat_id = models.BigIntegerField("Telegram chat", null=True, blank=True, editable=False)
     tg_link_code = models.CharField(max_length=12, blank=True, editable=False)
-    show_in_leaderboard = models.BooleanField("Reytingda ko'rinsin", default=True)
+    show_in_leaderboard = models.BooleanField("Oylik reytingda ko'rinsin", default=False,
+                                              help_text="Faqat a'zoning o'z roziligi bilan: ism va familiya bosh harfi ko'rinadi.")
+    consent_at = models.DateTimeField("Oferta va maxfiylik siyosatiga rozilik vaqti", null=True, blank=True, editable=False)
+    deleted_at = models.DateTimeField("Akkaunt o'chirilgan vaqt", null=True, blank=True, editable=False)
+    calendar_token = models.CharField(max_length=40, blank=True, editable=False, db_index=True)
     chat_visible = models.BooleanField("Chatda qidiruvda ko'rinsin", default=True)
     chat_banned = models.BooleanField("Chatda yozishdan chetlatilgan", default=False)
     last_seen = models.DateTimeField("Oxirgi faollik (chat)", null=True, blank=True, editable=False)
@@ -142,7 +146,13 @@ class GymSettings(models.Model):
     telegram = models.URLField("Telegram havola", default="https://t.me/+998908775505",
                                validators=[RegexValidator(r"^https://(t\.me|telegram\.me)/", "Faqat https://t.me/... havolasi")])
     address = models.CharField("Manzil", max_length=200, blank=True)
-    freeze_max_days = models.PositiveSmallIntegerField("Muzlatish: eng ko'p kun", default=14)
+    freeze_min_days = models.PositiveSmallIntegerField("Muzlatish: bir martada eng kam kun", default=7)
+    freeze_max_days = models.PositiveSmallIntegerField("Muzlatish: bitta abonement uchun jami eng ko'p kun (0 = o'chirilgan)", default=30)
+    class_cancel_hours = models.PositiveSmallIntegerField("Bronni bekor qilish: mashg'ulotdan necha soat oldin gacha", default=2)
+    reminder_email = models.BooleanField("Abonement eslatmasi e-mail orqali ham yuborilsin", default=False,
+                                         help_text="Eslatma 7, 3 va 1 kun oldin saytdagi xabar va (ulangan bo'lsa) Telegram orqali boradi.")
+    referral_newcomer_percent = models.PositiveSmallIntegerField("Taklif qilingan do'stga birinchi xarid chegirmasi (%)", default=0,
+                                                                 validators=[MaxValueValidator(100)], help_text="0 = chegirma yo'q (faqat bonus kunlar).")
     demo_payments = models.BooleanField("Sinov to'lovlari (Payme/Click/Uzum) yoqilgan", default=False,
                                         help_text="Faqat sinash uchun: tanlansa to'lov pulsiz 'to'landi' bo'ladi. Internetda (DEBUG=0) bu hech qachon ishlamaydi.")
     referral_bonus_days = models.PositiveSmallIntegerField("Do'st taklif qilish: bonus kunlar", default=7,
@@ -178,7 +188,6 @@ class GymSettings(models.Model):
                                                     help_text="Bosh sahifadagi «Hozir zal: bo'sh / o'rtacha / gavjum» o'lchagichi uchun.")
     apple_client_id = models.CharField("Apple Services ID (iCloud bilan kirish)", max_length=120, blank=True,
                                        help_text="Apple Developer → Identifiers → Services ID (masalan uz.fitneszal.web). Faqat https domenda ishlaydi.")
-    hero_word = models.CharField("Bosh sahifadagi ulkan so'z", max_length=12, default="KUCH", help_text="Video ortida turadigan katta harflar.")
     telegram_bot = models.CharField("Telegram bot (username, @siz)", max_length=40, blank=True)
 
     class Meta:
@@ -256,6 +265,8 @@ class Plan(models.Model):
     perks = models.TextField("Imkoniyatlar (har qatorda bittadan)", blank=True)
     active = models.BooleanField("Sotuvda", default=True)
     order = models.PositiveSmallIntegerField("Tartib", default=0)
+    guest_passes = models.PositiveSmallIntegerField("Mehmon taklifnomalari (har abonementga)", default=0,
+                                                    help_text="A'zo shu abonement davrida do'stini necha marta bepul olib kela olishi. 0 = yo'q.")
 
     class Meta:
         ordering = ["order", "id"]
@@ -289,7 +300,13 @@ class Membership(models.Model):
 
     @property
     def is_frozen(self):
-        return bool(self.frozen_until and self.frozen_until > timezone.now())
+        """Inside a freeze period right now (see MembershipFreeze). Memberships frozen the old way (no period rows) fall back to frozen_until."""
+        if not self.pk:
+            return False
+        today = timezone.localdate()
+        if self.freezes.filter(start_date__lte=today, end_date__gt=today).exists():
+            return True
+        return bool(self.frozen_until and self.frozen_until > timezone.now() and not self.freezes.exists())
 
 
 class PromoCode(models.Model):
@@ -486,7 +503,7 @@ class Payment(models.Model):
         CANCELLED = "cancelled", "Bekor qilingan"
 
     user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL, related_name="payments")
-    kind = models.CharField("Turi", max_length=8)  # plan | shop
+    kind = models.CharField("Turi", max_length=8)  # plan | shop | gift
     plan = models.ForeignKey(Plan, null=True, blank=True, on_delete=models.SET_NULL)
     order = models.ForeignKey(Order, null=True, blank=True, on_delete=models.SET_NULL, related_name="payments")
     amount = models.BigIntegerField("Summa")
@@ -499,6 +516,8 @@ class Payment(models.Model):
     card_last4 = models.CharField("Karta oxirgi 4 raqami", max_length=4, blank=True)
     sender_last4 = models.CharField("Jo'natuvchi kartasi (oxirgi 4)", max_length=4, blank=True)
     proof_at = models.DateTimeField("A'zo to'lov qildim degan vaqt", null=True, blank=True)
+    gift_code = models.CharField("Sovg'a sertifikati", max_length=20, blank=True)
+    consent_at = models.DateTimeField("Oferta va maxfiylikka rozilik vaqti", null=True, blank=True)
     created = models.DateTimeField("Sana", auto_now_add=True)
 
     class Meta:
@@ -576,6 +595,8 @@ class Booking(models.Model):
     gym_class = models.ForeignKey(GymClass, on_delete=models.CASCADE, related_name="bookings")
     date = models.DateField("Sana")
     reminded = models.BooleanField(default=False, editable=False)
+    no_show = models.BooleanField("Kelmadi", default=False)
+    checked_in_at = models.DateTimeField("Qabulxonada belgilandi", null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -930,3 +951,6 @@ class UserFood(models.Model):
 
     def __str__(self):
         return self.name
+
+
+from .models_extra import *  # noqa: E402,F401,F403  (the newer models live in models_extra.py; importing them here registers them with Django)

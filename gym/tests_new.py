@@ -23,7 +23,7 @@ class Base(TestCase):
         self.admin.save()
 
     def register(self, client=None, **over):
-        data = {"username": "aziz_k", "email": "aziz@example.com", "password": PW, "password2": PW}
+        data = {"username": "aziz_k", "email": "aziz@example.com", "password": PW, "password2": PW, "consent": "1"}
         data.update(over)
         return (client or Client()).post("/register/", data)
 

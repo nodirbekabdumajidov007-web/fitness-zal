@@ -1,0 +1,21 @@
+{% load gym_tags %}<article class="tk {% if entered %}ok{% else %}no{% endif %}" aria-label="{% t 'tk_title' %}">
+  <header class="tk-head">
+    <b class="tk-brand">FITNES<i>.</i>ZAL</b>
+    {% if gs.address %}<small>{{ gs.address }}</small>{% endif %}
+    <small>+998 {{ gs.phone }}</small>
+  </header>
+  <div class="tk-title"><span>{% t 'gp_title' %}</span>{% if no %}<b class="num"># {{ no }}</b>{% endif %}</div>
+  <dl class="tk-rows">
+    <div><dt>{% t 'tk_date' %}</dt><dd class="num">{{ now|date:"d.m.Y" }} · {{ now|date:"H:i:s" }}</dd></div>
+    <div><dt>{% t 'gp_guest' %}</dt><dd><b>{{ gp.guest_name }}</b></dd></div>
+    <div><dt>{% t 'gp_host' %}</dt><dd>{{ gp.owner.full_name }} ({{ gp.owner.member_code }})</dd></div>
+    <div><dt>{% t 'gp_date' %}</dt><dd class="num">{{ gp.date|date:"d.m.Y" }}</dd></div>
+  </dl>
+  <hr>
+  <div class="tk-status">
+    <div><b>{% if entered %}✓ {% t 'tk_allowed' %}{% else %}✕ {% t 'tk_denied' %}{% endif %}</b>
+      {% if not entered and reason %}<small>{% t reason %}</small>{% endif %}</div>
+    <span class="tk-stamp" aria-hidden="true">{% if entered %}{% t 'tk_stamp_ok' %}{% else %}{% t 'tk_stamp_no' %}{% endif %}</span>
+  </div>
+  <footer class="tk-foot"><small>{% t 'tk_staff' %}: {{ staff.first_name|default:"Admin" }}</small></footer>
+</article>

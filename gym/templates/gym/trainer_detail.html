@@ -12,6 +12,17 @@
     {% if classes %}<div class="card grid"><b>{% t 'trainer_classes' %}</b>
       {% for x in classes %}<div class="cls"><span>{{ x.c.name }}</span><span class="muted num">{% t 'weekday_'|add:x.wd %} · {{ x.c.start_time|hm }}</span></div>{% endfor %}
       <a href="{% url 'classes' %}">{% t 'nav_classes' %} →</a></div>{% endif %}
+    <section class="card grid" id="reviews">
+      <h3>{% t 'tr_reviews' %}{% if agg.n %} · <span class="num">★ {{ agg.a|floatformat:1 }}</span> <span class="muted">({{ agg.n }})</span>{% endif %}</h3>
+      {% for r in reviews %}<div><b>{{ r.user.first_name|default:r.user.username }}</b> <span class="num">{{ r.rating }}/5</span><div class="muted">{{ r.comment }}</div></div>{% empty %}<span class="muted">{% t 'none_yet' %}</span>{% endfor %}
+      {% if can_rate %}
+      <form method="post" action="{% url 'trainer_rate' tr.pk %}" class="grid">{% csrf_token %}
+        <label for="tr-rating">{% t 'tr_rate_label' %}<select id="tr-rating" name="rating">{% for i in "54321" %}<option value="{{ i }}"{% if i|add:0 == my_rating %} selected{% endif %}>{{ i }} ★</option>{% endfor %}</select></label>
+        <label for="tr-comment">{% t 'tr_comment' %}<textarea id="tr-comment" name="comment" maxlength="500" rows="3">{{ mine.comment }}</textarea></label>
+        <button class="btn primary" type="submit">{% if mine %}{% t 'tr_rate_edit' %}{% else %}{% t 'tr_rate_send' %}{% endif %}</button>
+      </form>
+      {% elif user.is_authenticated %}<small class="muted">{% t 'tr_rate_only_trained' %}</small>{% endif %}
+    </section>
     {% if user.is_authenticated %}
     <form class="card grid" method="post" action="{% url 'pt_request' tr.pk %}">
       {% csrf_token %}<input type="hidden" name="back" value="{{ request.path }}">

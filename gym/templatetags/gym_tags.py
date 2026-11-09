@@ -37,7 +37,7 @@ def plan_perks(context, plan):
 
 @register.simple_tag(takes_context=True)
 def method_label(context, method):
-    key = {"cash": "cash", "click": "click_online", "card": "card_transfer"}.get(method)
+    key = {"cash": "cash", "click": "click_online", "card": "card_transfer", "gift": "gift_pay"}.get(method)
     return translate(context.get("lang", "uz"), key) if key else method
 
 
@@ -205,3 +205,38 @@ def voice_config(context):
     """Settings and strings for the voice assistant (rendered with |json_script, never as inline JavaScript)."""
     from .. import voice
     return voice.config(context["request"])
+
+
+@register.filter
+def legal_text(text):
+    """Plain legal text -> HTML: "# " heading, "- " list item, blank line = new paragraph. Escaped first; [PLACEHOLDERS] are highlighted."""
+    import re
+    from django.utils.html import escape
+    out, items, para = [], [], []
+
+    def flush():
+        nonlocal items, para
+        if items:
+            out.append("<ul>" + "".join(f"<li>{i}</li>" for i in items) + "</ul>")
+        if para:
+            out.append("<p>" + "<br>".join(para) + "</p>")
+        items, para = [], []
+
+    for raw in (text or "").splitlines():
+        line = escape(raw.strip())
+        line = re.sub(r"\[([A-Z\u0410-\u042f\u04010-9'`\u2019 ]{3,40})\]", r'<mark class="ph">[\1]</mark>', line)
+        if not line:
+            flush()
+        elif line.startswith("# "):
+            flush()
+            out.append(f"<h2>{line[2:]}</h2>")
+        elif line.startswith("- "):
+            if para:
+                flush()
+            items.append(line[2:])
+        else:
+            if items:
+                flush()
+            para.append(line)
+    flush()
+    return mark_safe("".join(out))

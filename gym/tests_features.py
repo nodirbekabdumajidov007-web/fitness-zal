@@ -30,7 +30,7 @@ class Base(TestCase):
     def member(self, phone="+998901112233", first="Aziz", ref=None):
         c = Client()
         url = "/register/" + (f"?ref={ref}" if ref else "")
-        r = c.post(url, {"first_name": first, "last_name": "Karimov", "phone": phone[4:], "password": PW, "username": "u" + phone[4:], "email": "u" + phone[4:] + "@test.uz", "password2": PW})
+        r = c.post(url, {"first_name": first, "last_name": "Karimov", "phone": phone[4:], "password": PW, "username": "u" + phone[4:], "email": "u" + phone[4:] + "@test.uz", "password2": PW, "consent": "1"})
         self.assertEqual(r.status_code, 302, r.content[:200])
         return c, User.objects.get(phone=phone)
 
@@ -118,6 +118,8 @@ class AchievementTests(Base):
         self.assertTrue(ach["visits_1"]["got"])
         self.assertFalse(ach["visits_10"]["got"])
         self.assertEqual(services.points(u), 10)
+        self.assertEqual(services.leaderboard(), [])  # opt-in: hidden until the member joins
+        User.objects.filter(pk=u.pk).update(show_in_leaderboard=True)
         self.assertEqual(services.leaderboard()[0]["name"], "Aziz K.")
         self.assertEqual(c.get("/achievements/").status_code, 200)
         c.post("/profile/", {"form": "profile", "first_name": "Aziz", "last_name": "Karimov", "phone": "90 111 22 33"})  # checkbox absent = opt out
