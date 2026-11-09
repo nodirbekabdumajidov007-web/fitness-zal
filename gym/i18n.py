@@ -1235,6 +1235,28 @@ tl_how_ideal||Devine formulasi: erkaklar uchun 50 kg, ayollar uchun 45,5 kg, bo'
 tl_how_bf||US Navy usuli bo'yin, bel (ayollarda son ham) va bo'yingizning logarifmlaridan foydalanadi. Yog'siz massa = vazn × (1 − yog' ulushi).||Метод US Navy использует логарифмы обхвата шеи, талии (у женщин и бёдер) и роста. Сухая масса = вес × (1 − доля жира).||The US Navy method uses logarithms of your neck, waist (and hip for women) and height. Lean mass = weight × (1 − body-fat share).
 tl_how_macro||Avval oqsil (kg ga 1,8–2,2 g) va yog' (kg ga 0,8–1,0 g) belgilanadi, qolgan kaloriya uglevodga ketadi. 1 g oqsil va uglevod = 4 kkal, 1 g yog' = 9 kkal.||Сначала задаются белки (1,8–2,2 г на кг) и жиры (0,8–1,0 г на кг), остальные калории идут на углеводы. 1 г белка и углеводов = 4 ккал, 1 г жира = 9 ккал.||Protein (1.8–2.2 g per kg) and fat (0.8–1.0 g per kg) are set first and the remaining calories go to carbs. 1 g of protein or carbs = 4 kcal, 1 g of fat = 9 kcal.
 tl_hr_how||Zonalar maksimal pulsning foizi (yoki tinch pulsni kiritsangiz, zaxira puls foizi) sifatida hisoblanadi.||Зоны считаются как процент от максимального пульса (или от резерва пульса, если указан пульс покоя).||Zones are a percentage of your max heart rate (or of your heart-rate reserve if you enter a resting rate).
+pwa_install||Ilovani o'rnatish||Установить приложение||Install the app
+pwa_install_sub||Bosh ekranda tez ochiladi, a'zo kartasi internetsiz ham ishlaydi.||Открывается с главного экрана, карта участника работает и без интернета.||Opens from your home screen; your member card works offline too.
+pwa_later||Keyinroq||Позже||Not now
+pwa_close||Yopish||Закрыть||Close
+pwa_ios_title||iPhone'ga o'rnatish||Установка на iPhone||Install on iPhone
+pwa_ios_1||Safari pastidagi «Ulashish» tugmasini bosing (kvadrat va yuqoriga strelka).||Нажмите кнопку «Поделиться» внизу Safari (квадрат со стрелкой вверх).||Tap the Share button at the bottom of Safari (the square with an arrow).
+pwa_ios_2||Pastga aylantirib «Uy ekraniga qo'shish» ni tanlang.||Прокрутите вниз и выберите «На экран Домой».||Scroll down and choose “Add to Home Screen”.
+pwa_ios_3||«Qo'shish» ni bosing: ilova bosh ekranda paydo bo'ladi.||Нажмите «Добавить»: приложение появится на главном экране.||Tap “Add”: the app appears on your home screen.
+pwa_ios_note||Faqat Safari brauzerida ishlaydi.||Работает только в браузере Safari.||Works in Safari only.
+pwa_update||Yangi versiya tayyor||Доступна новая версия||A new version is ready
+pwa_update_btn||Yangilash||Обновить||Update
+pwa_offline_banner||Internet yo'q||Нет интернета||You're offline
+pwa_push_title||Bildirishnomalar||Уведомления||Notifications
+pwa_push_sub||Abonement tugashi, xabarlar va buyurtma holati haqida shu qurilmaga xabar yuboramiz.||Будем присылать на это устройство напоминания об абонементе, сообщения и статус заказа.||We will notify this device about your plan, messages and order status.
+pwa_push_on||Yoqish||Включить||Turn on
+pwa_push_off||O'chirish||Выключить||Turn off
+pwa_push_enabled||Bu qurilmada yoqilgan||Включены на этом устройстве||On for this device
+pwa_push_disabled||Bu qurilmada o'chiq||Выключены на этом устройстве||Off for this device
+pwa_push_denied||Brauzer bildirishnomalarni bloklagan: brauzer sozlamalaridan ruxsat bering.||Браузер заблокировал уведомления: разрешите их в настройках браузера.||Notifications are blocked: allow them in your browser settings.
+pwa_push_unsupported||Bu brauzer push-bildirishnomalarni qo'llamaydi (iPhone'da avval ilovani bosh ekranga qo'shing).||Этот браузер не поддерживает push (на iPhone сначала добавьте приложение на главный экран).||This browser does not support push (on iPhone, add the app to your home screen first).
+pwa_push_err||Xatolik: qayta urinib ko'ring.||Ошибка: попробуйте ещё раз.||Something went wrong: try again.
+offline_card||A'zo kartam (QR)||Моя карта (QR)||My member card (QR)
 scan_session||Sessiya tugagan: sahifani yangilab, admin sifatida qayta kiring||Сессия истекла: обновите страницу и войдите снова как администратор||Session ended: reload the page and sign in again as admin
 """
 

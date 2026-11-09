@@ -8,9 +8,17 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
 <link rel="stylesheet" href="{% vstatic 'css/app.css' %}">
 <link rel="manifest" href="{% url 'manifest' %}">
-<meta name="theme-color" content="#d6301f">
+<meta name="theme-color" content="#eef0f2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#101318" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Fitnes Zal">
+<link rel="icon" href="{% static 'img/favicon.ico' %}" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon-32.png' %}">
+<link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/favicon-16.png' %}">
 <link rel="icon" type="image/png" sizes="192x192" href="{% static 'img/icon-192.png' %}">
-<link rel="apple-touch-icon" href="{% static 'img/icon-192.png' %}">
+<link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-icon.png' %}">
 <script src="{% vstatic 'js/theme.js' %}"></script>
 </head>
 <body class="{% block bodyclass %}{% endblock %}">
@@ -55,11 +63,12 @@
               <a role="menuitem" href="{% url 'orders' %}"><svg class="um-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>{% t 'orders' %}</a>
               <a role="menuitem" href="{% url 'account' %}"><svg class="um-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>{% t 'acc_title' %}</a>
             </div>
+            <div class="um-group" data-pwa-install hidden><a role="menuitem" href="#" data-pwa-install-btn>{% icon 'download' 'um-ico' %}{% t 'pwa_install' %}</a></div>
             {% if is_trainer or admin_mode %}<div class="um-group">
               {% if is_trainer %}<a role="menuitem" href="{% url 'coach' %}"><svg class="um-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12M4 9v6M20 9v6M2 11v2M22 11v2"/></svg>{% t 'coach_panel' %}</a>{% endif %}
               {% if admin_mode %}<a role="menuitem" href="/django-admin/"><svg class="um-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg>{% t 'nav_admin' %}</a>{% endif %}
             </div>{% endif %}
-            <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="um-out" type="submit" role="menuitem"><svg class="um-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 12H4M8 8l-4 4 4 4"/><path d="M13 4h6v16h-6"/></svg>{% t 'logout' %}</button></form>
+            <form method="post" action="{% url 'logout' %}" data-pwa-logout>{% csrf_token %}<button class="um-out" type="submit" role="menuitem"><svg class="um-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 12H4M8 8l-4 4 4 4"/><path d="M13 4h6v16h-6"/></svg>{% t 'logout' %}</button></form>
           </div>
         </details>
       {% else %}
@@ -114,6 +123,9 @@
       {% if is_trainer %}<a class="nav-coach" href="{% url 'coach' %}"{% if '/coach' in p %} aria-current="page"{% endif %}>{% icon 'clipboard' %}<span class="sb-lbl">{% t 'coach_panel' %}</span></a>{% endif %}
       {% if admin_mode %}<a href="/django-admin/">{% icon 'shield' %}<span class="sb-lbl">{% t 'nav_admin' %}</span></a>{% endif %}
     </div>{% endif %}
+    <div class="sb-grp" data-pwa-install hidden>
+      <a href="#" data-pwa-install-btn>{% icon 'download' %}<span class="sb-lbl">{% t 'pwa_install' %}</span></a>
+    </div>
   </nav>
   <button type="button" class="sb-collapse" id="sb-collapse" aria-pressed="false">{% icon 'chevrons-left' %}<span class="sb-lbl">{% t 'nav_collapse' %}</span></button>
 </aside>
@@ -191,6 +203,8 @@
 <script src="{% vstatic 'js/app.js' %}"></script>
 <script src="{% vstatic 'js/voice.js' %}" defer></script>
 <script src="{% vstatic 'js/cart.js' %}"></script>
+{% include "gym/_pwa.html" %}
+<script src="{% vstatic 'js/pwa.js' %}" defer></script>
 {% block scripts %}{% endblock %}
 </body>
 </html>

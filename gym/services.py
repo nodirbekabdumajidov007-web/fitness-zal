@@ -219,18 +219,21 @@ def send_welcome_email(user, request=None):
     return send_email(user, "Fitnes Zal'ga xush kelibsiz!", body)
 
 
-def notify(user, title, body="", sender=None, telegram_too=True, sms_too=False, email_too=False):
+def notify(user, title, body="", sender=None, telegram_too=True, sms_too=False, email_too=False, push_too=True, url="/inbox/"):
     """A message in the member's inbox on the site, optionally also by Telegram, SMS and e-mail. Returns which channels went out."""
     from . import sms
     from .models import Notification
     Notification.objects.create(user=user, sender=sender, title=title[:120], body=body[:2000])
-    sent = {"site": True, "tg": False, "sms": False, "email": False}
+    sent = {"site": True, "tg": False, "sms": False, "email": False, "push": False}
     if telegram_too and user.telegram_chat_id and telegram.enabled():
         sent["tg"] = bool(telegram.send(user.telegram_chat_id, f"{title}\n\n{body}".strip()))
     if sms_too and user.phone:
         sent["sms"] = sms.send_sms(user.phone, f"Fitnes Zal: {title}. {body}"[:320])
     if email_too:
         sent["email"] = send_email(user, f"Fitnes Zal: {title}", f"{body}\n\n— Fitnes Zal" if body else title)
+    if push_too:  # Web Push to the devices where the member switched notifications on (no-op without VAPID keys / subscriptions)
+        from . import pwa
+        sent["push"] = bool(pwa.push_user(user, title, body, url))
     return sent
 
 

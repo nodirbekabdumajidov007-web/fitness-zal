@@ -48,8 +48,14 @@ def alert_admin(text):
 
 
 def notify_user(user, key, **kw):
+    text = translate(user.lang or "uz", key, **kw)
+    try:  # the same event also reaches the member's phone as a Web Push
+        from . import pwa
+        pwa.push_user(user, "Fitnes Zal", text, "/orders/" if "order" in key else "/inbox/")
+    except Exception:
+        pass
     if user.telegram_chat_id and enabled():
-        send(user.telegram_chat_id, translate(user.lang or "uz", key, **kw))
+        send(user.telegram_chat_id, text)
         return True
     return False
 

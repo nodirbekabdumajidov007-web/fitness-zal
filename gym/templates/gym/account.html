@@ -59,6 +59,12 @@
       <div class="acc-wide acc-actions"><button class="btn primary pill" type="submit">{% icon 'save' %} {% t 'save' %}</button></div>
     </form>
   </section>
+  {% if push_vapid %}<section class="acc-card pwa-push" data-push data-key="{{ push_vapid }}" hidden>
+    <h2>{% t 'pwa_push_title' %}</h2>
+    <p class="muted">{% t 'pwa_push_sub' %}</p>
+    <p class="pwa-push-state" data-push-state role="status"></p>
+    <div class="acc-actions"><button class="btn pill" type="button" data-push-btn>{% icon 'bell' %} <span data-push-label>{% t 'pwa_push_on' %}</span></button></div>
+  </section>{% endif %}
 </div>
 {% endblock %}
 {% block scripts %}<script src="{% vstatic 'js/profile.js' %}"></script>{% endblock %}

@@ -10,7 +10,7 @@ from django.utils.safestring import mark_safe
 from . import extras, services, telegram
 from .models import (Announcement, BodyLog, Booking, Category, ChatMessage, ChatReport, Exercise, GymClass, GymSettings, Membership, Order, OrderItem, Payment, PaymentCard, Plan,
                      AdminQuery, ClassWaitlist, EntryLog, FaqItem, GiftCertificate, GuestPass, LegalPage, MembershipFreeze, ReferralReward, TrainerReview,
-                     AIMessage, FoodEntry, Notification, PersonalRecord, Product, PromoCode, PTSession, Review, Trainer, User, UserFood, Visit, WorkoutPlan)
+                     AIMessage, FoodEntry, Notification, PersonalRecord, Product, PromoCode, PTSession, PushSubscription, Review, Trainer, User, UserFood, Visit, WorkoutPlan)
 
 
 def export_csv(modeladmin, request, queryset, fields, name):
@@ -612,6 +612,21 @@ class NotificationAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return False  # new messages are written on the «Shaxsiy xabar» page, which also sends Telegram/SMS
+
+
+@admin.register(PushSubscription)
+class PushSubscriptionAdmin(admin.ModelAdmin):
+    list_display = ("user", "created", "user_agent")
+    list_select_related = ("user",)
+    search_fields = ("user__phone", "user__first_name", "user__last_name", "user_agent")
+    raw_id_fields = ("user",)
+    exclude = ("endpoint", "p256dh", "auth")  # the keys are secrets of the device: never shown
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
 
 
 @admin.register(PersonalRecord)

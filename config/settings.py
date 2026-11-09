@@ -126,6 +126,13 @@ if SECURE and not DEBUG:
     SECURE_HSTS_SECONDS = 31536000
 
 # app settings
+# Web Push (VAPID): generate a pair with `python manage.py generate_vapid`, then put the values in the host's environment (never in git).
+VAPID_PUBLIC_KEY = os.environ.get("VAPID_PUBLIC_KEY", "").strip()
+VAPID_PRIVATE_KEY = os.environ.get("VAPID_PRIVATE_KEY", "").strip()
+VAPID_SUBJECT = os.environ.get("VAPID_SUBJECT", "").strip() or "mailto:noreply@fitneszal.uz"
+# Google Play (Trusted Web Activity): served at /.well-known/assetlinks.json, empty list while unset
+ANDROID_PACKAGE_NAME = os.environ.get("ANDROID_PACKAGE_NAME", "").strip()
+ANDROID_SHA256_FINGERPRINTS = os.environ.get("ANDROID_SHA256_FINGERPRINTS", "").strip()  # comma-separated
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "").strip()
 # Demo "Payme/Click/Uzum" buttons mark a payment as paid without any money moving. They exist only for development (DEBUG on) unless forced.
 ALLOW_DEMO_PAYMENTS = DEBUG and os.environ.get("FZ_ALLOW_DEMO", "1") == "1"  # never in production: DEBUG off means no demo gateways, whatever the env says

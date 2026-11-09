@@ -26,6 +26,16 @@ services:
         sync: false
       - key: EMAIL_HOST_PASSWORD    # for Gmail: an App Password (Google account -> Security -> App passwords), not the normal password
         sync: false
+      - key: VAPID_PUBLIC_KEY       # Web Push: `python manage.py generate_vapid` prints both keys
+        sync: false
+      - key: VAPID_PRIVATE_KEY
+        sync: false
+      - key: VAPID_SUBJECT          # optional, e.g. mailto:you@example.com
+        sync: false
+      - key: ANDROID_PACKAGE_NAME   # Google Play app id, e.g. uz.fitneszal.app (docs/ANDROID.md)
+        sync: false
+      - key: ANDROID_SHA256_FINGERPRINTS   # comma-separated SHA-256 signing fingerprints (docs/ANDROID.md)
+        sync: false
       - key: PYTHON_VERSION
         value: "3.12.7"
 

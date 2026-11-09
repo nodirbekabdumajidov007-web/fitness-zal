@@ -128,6 +128,8 @@ def home_next_class():
 
 
 def home(request):
+    if request.GET.get("source") == "pwa" and request.user.is_authenticated:  # launched from the home-screen icon
+        return redirect("dashboard")
     reviews = Review.objects.filter(approved=True).select_related("user")
     now = timezone.now()
     plans = Plan.objects.filter(active=True)
@@ -153,27 +155,6 @@ def healthz(request):
     with connection.cursor() as c:
         c.execute("select 1")
     return HttpResponse("ok", content_type="text/plain")
-
-
-def offline(request):
-    return render(request, "gym/offline.html")
-
-
-def manifest(request):
-    icons = [{"src": f"{dj.STATIC_URL.rstrip('/')}/img/icon-{s}.png", "sizes": f"{s}x{s}", "type": "image/png", "purpose": p} for s in (192, 512) for p in ("any", "maskable")]
-    return JsonResponse({"name": "Fitnes Zal", "short_name": "Fitnes Zal", "start_url": "/dashboard/", "scope": "/", "display": "standalone",
-                         "background_color": "#101318", "theme_color": "#d6301f", "lang": request.lang, "icons": icons}, content_type="application/manifest+json")
-
-
-def service_worker(request):
-    path = finders.find("js/sw.js")
-    if not path:
-        raise Http404()
-    with open(path, encoding="utf-8") as f:
-        resp = HttpResponse(f.read(), content_type="application/javascript")
-    resp["Service-Worker-Allowed"] = "/"
-    resp["Cache-Control"] = "no-cache"
-    return resp
 
 
 # ---------------------------------------------------------------- sign-in: first factor (password or Google), then an SMS code
@@ -666,7 +647,10 @@ def card_view(request):
     q = segno.make(code, error="m")
     svg = q.svg_inline(scale=7, border=2, dark="#111111", light="#ffffff")
     modules = ",".join("".join("1" if v else "0" for v in row) for row in q.matrix)  # for the 3D view: one string per row
-    return render(request, "gym/card.html", {"qr": mark_safe(svg), "code": code, "m": services.active_membership(request.user), "modules": modules})
+    resp = render(request, "gym/card.html", {"qr": mark_safe(svg), "code": code, "m": services.active_membership(request.user), "modules": modules})
+    resp["X-FZ-Offline"] = "card"  # the service worker keeps only responses with this marker (member card + QR for the gym door)
+    resp["Cache-Control"] = "private, no-cache"
+    return resp
 
 
 @login_required

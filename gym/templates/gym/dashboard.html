@@ -1,6 +1,12 @@
-{% extends "gym/base.html" %}{% load gym_tags %}
+{% extends "gym/base.html" %}{% load static gym_tags %}
 {% block title %}{% t 'nav_dash' %}{% endblock %}
 {% block content %}
+<div class="pwa-banner" data-pwa-banner data-pwa-install hidden>
+  <img src="{% static 'img/icon-96.png' %}" alt="" width="44" height="44">
+  <div><b>{% t 'pwa_install' %}</b><span>{% t 'pwa_install_sub' %}</span></div>
+  <button type="button" class="btn small primary" data-pwa-install-btn>{% t 'pwa_install' %}</button>
+  <button type="button" class="pwa-x" data-pwa-dismiss aria-label="{% t 'pwa_later' %}">{% icon 'x' %}</button>
+</div>
 <section class="db-hero">
   <span class="db-ava" aria-hidden="true">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
   <div class="db-who">

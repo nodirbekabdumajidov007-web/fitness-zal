@@ -94,6 +94,8 @@ Sinov (Payme/Click/Uzum "to'landi") tugmalari faqat `DJANGO_DEBUG=1` bo'lganda v
 | Zaxira | Baza nusxasi | `python manage.py backup_db` (oxirgi 14 tasi saqlanadi). PostgreSQL uchun `pg_dump` kerak |
 | Loglar | Xatolarni kuzatish | `FZ_LOG_DIR=logs` fayl yozadi. Telegram sozlangan bo'lsa server xatolari admin chatga ketadi |
 
+Ilova (PWA) va push: `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` (`python manage.py generate_vapid` yangi juftlik chiqaradi; faqat serverning environment'iga qo'ying, gitga yozmang), `VAPID_SUBJECT` (ixtiyoriy). Google Play: `ANDROID_PACKAGE_NAME`, `ANDROID_SHA256_FINGERPRINTS`: `docs/ANDROID.md` ga qarang. Kalitlar bo'lmasa push tugmasi ko'rinmaydi, sayt odatdagidek ishlaydi.
+
 Boshqa o'zgaruvchilar: `DJANGO_DEBUG` (internetda `0`), `DJANGO_SECRET_KEY`, `DJANGO_ALLOWED_HOSTS`, `DATABASE_URL`, `FZ_ADMIN_PASSWORD`, `FZ_SECURE_COOKIE`.
 
 ## Nima sinalgan va nima sinalmagan

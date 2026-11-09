@@ -1,6 +1,7 @@
 from django.conf import settings as dj
 from django.utils import timezone
 
+from . import pwa
 from .models import GymSettings
 
 
@@ -47,5 +48,5 @@ def gym(request):
     return {"has_trainers": has_trainers, "lang": getattr(request, "lang", "uz"), "is_trainer": is_trainer, "my_membership": my_membership, "inbox_unread": inbox_unread, "gs": s, "is_open": is_open, "cart_count": sum(cart.values()), "chat_unread": chat_unread,
             "demo_on": bool(s.demo_payments and dj.ALLOW_DEMO_PAYMENTS),
             "admin_mode": bool(request.user.is_authenticated and request.user.is_staff and request.session.get("admin_mode")),
-            "google_client_id": s.google_id(), "apple_client_id": s.apple_id(),
+            "push_vapid": (dj.VAPID_PUBLIC_KEY if pwa.push_enabled() else ""), "google_client_id": s.google_id(), "apple_client_id": s.apple_id(),
             "langs": (("uz", "O'zbekcha"), ("ru", "Русский"), ("en", "English"))}

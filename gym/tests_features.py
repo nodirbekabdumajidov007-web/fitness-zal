@@ -356,7 +356,7 @@ class PwaAndOpsTests(Base):
         m = c.get("/manifest.webmanifest")
         self.assertEqual(m["Content-Type"], "application/manifest+json")
         data = m.json()
-        self.assertEqual((data["display"], data["start_url"]), ("standalone", "/dashboard/"))
+        self.assertEqual((data["display"], data["start_url"]), ("standalone", "/?source=pwa"))
         from django.contrib.staticfiles import finders
         for icon in data["icons"]:
             self.assertTrue(finders.find(icon["src"].replace("/static/", "", 1)), icon["src"])  # static files are served only in DEBUG, so check the file exists

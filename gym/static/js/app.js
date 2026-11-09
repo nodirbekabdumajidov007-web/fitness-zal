@@ -179,8 +179,7 @@ document.addEventListener('DOMContentLoaded', function () {
     pxBoxes.forEach(function (b) { pxo.observe(b); });
   } else pxBoxes.forEach(reveal);
 
-  // installable app: register the service worker
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(function () {});
+  // the service worker is registered by pwa.js (install prompt, update toast, offline banner, push)
 
   // a little celebration after anything that went well (order placed, payment reported, class booked, welcome...)
   function confetti() {

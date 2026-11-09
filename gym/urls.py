@@ -1,9 +1,11 @@
 from django.contrib.auth import views as auth_views
 from django.urls import path
+from django.views.generic import RedirectView
 
 from . import chat_views as c
 from . import desk
 from . import coach_views as coach
+from . import pwa
 from . import views as v
 from . import views_extra as x
 from . import voice
@@ -20,9 +22,13 @@ urlpatterns = [
     path("calories/foods/<int:pk>/delete/", v.calories_food_delete, name="calories_food_delete"),
     path("healthz", v.healthz),
     path("voice/info/", voice.info, name="voice_info"),
-    path("manifest.webmanifest", v.manifest, name="manifest"),
-    path("sw.js", v.service_worker, name="sw"),
-    path("offline/", v.offline, name="offline"),
+    path("manifest.webmanifest", pwa.manifest, name="manifest"),
+    path("sw.js", pwa.service_worker, name="sw"),
+    path("offline/", pwa.offline, name="offline"),
+    path(".well-known/assetlinks.json", pwa.assetlinks, name="assetlinks"),
+    path("favicon.ico", RedirectView.as_view(url="/static/img/favicon.ico", permanent=False)),
+    path("push/subscribe/", pwa.push_subscribe, name="push_subscribe"),
+    path("push/unsubscribe/", pwa.push_unsubscribe, name="push_unsubscribe"),
     path("hero/video/", v.hero_video, name="hero_video"),
     path("register/", v.register_view, name="register"),
     path("login/", v.login_view, name="login"),

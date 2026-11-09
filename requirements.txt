@@ -5,3 +5,4 @@ uvicorn>=0.30
 websockets>=12
 cloudinary>=1.40
 django-cloudinary-storage>=0.3
+pywebpush>=2.0

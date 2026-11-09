@@ -1,0 +1,16 @@
+{% load gym_tags %}{# strings for pwa.js (toasts are built by the script) + the iPhone "Add to Home Screen" sheet #}
+<div id="pwa-i18n" hidden data-update="{% t 'pwa_update' %}" data-update-btn="{% t 'pwa_update_btn' %}" data-offline="{% t 'pwa_offline_banner' %}"
+     data-push-on="{% t 'pwa_push_on' %}" data-push-off="{% t 'pwa_push_off' %}" data-push-enabled="{% t 'pwa_push_enabled' %}" data-push-inactive="{% t 'pwa_push_disabled' %}"
+     data-push-denied="{% t 'pwa_push_denied' %}" data-push-unsupported="{% t 'pwa_push_unsupported' %}" data-push-err="{% t 'pwa_push_err' %}"></div>
+<div class="pwa-sheet" data-pwa-ios hidden role="dialog" aria-modal="true" aria-labelledby="pwa-ios-h">
+  <div class="pwa-sheet-card">
+    <h2 id="pwa-ios-h">{% t 'pwa_ios_title' %}</h2>
+    <ol>
+      <li>{% t 'pwa_ios_1' %}</li>
+      <li>{% t 'pwa_ios_2' %}</li>
+      <li>{% t 'pwa_ios_3' %}</li>
+    </ol>
+    <p class="muted">{% t 'pwa_ios_note' %}</p>
+    <button type="button" class="btn primary" data-pwa-close>{% t 'pwa_close' %}</button>
+  </div>
+</div>

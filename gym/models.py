@@ -805,6 +805,23 @@ class Notification(models.Model):
         return self.title
 
 
+class PushSubscription(models.Model):
+    """One browser/device that agreed to receive Web Push notifications (the Push API's subscription: endpoint + two keys)."""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="push_subscriptions")
+    endpoint = models.CharField(max_length=600, unique=True)
+    p256dh = models.CharField(max_length=255)
+    auth = models.CharField(max_length=100)
+    created = models.DateTimeField(auto_now_add=True)
+    user_agent = models.CharField(max_length=300, blank=True)
+
+    class Meta:
+        ordering = ["-created"]
+        verbose_name, verbose_name_plural = "Push obuna", "Push obunalar"
+
+    def __str__(self):
+        return f"{self.user} · {self.endpoint[:40]}"
+
+
 class PersonalRecord(models.Model):
     """A member's best lift on a day; the estimated one-rep max (Epley) lets different rep counts be compared."""
     LIFTS = [("bench", "Jim yotib itarish (Bench press)"), ("squat", "O'tirib turish (Squat)"), ("deadlift", "Stanovoy (Deadlift)"),

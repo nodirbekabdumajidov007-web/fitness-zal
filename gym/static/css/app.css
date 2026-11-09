@@ -2307,3 +2307,31 @@ mark.ph{background:rgba(255,193,7,.28);color:inherit;border-radius:4px;padding:0
   .messenger{height:calc(100dvh - 150px - var(--tbh,0px));min-height:360px}
 }
 .m-compose{padding-bottom:max(10px,env(safe-area-inset-bottom,0px))}
+
+/* ---------- PWA: install banner, update toast, offline bar, iPhone sheet, push card, standalone polish */
+[data-pwa-install][hidden],.sb-grp[data-pwa-install][hidden],.um-group[data-pwa-install][hidden],.pwa-sheet[hidden]{display:none!important}
+header.top{padding-top:env(safe-area-inset-top,0px)}
+html{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+html.pwa-standalone,html.pwa-standalone body{overscroll-behavior-y:none}
+.pwa-banner{display:flex;align-items:center;gap:12px;margin:0 0 16px;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:14px}
+.pwa-banner img{border-radius:10px;flex:none}
+.pwa-banner div{display:grid;gap:2px;min-width:0;flex:1}
+.pwa-banner b{font-size:.95rem}
+.pwa-banner span{color:var(--muted);font-size:.84rem}
+.pwa-x{flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;border:0;background:transparent;color:var(--muted);cursor:pointer}
+.pwa-x:hover{background:var(--bg);color:var(--ink)}
+.pwa-x .ico{width:18px;height:18px}
+@media (max-width:560px){.pwa-banner{flex-wrap:wrap}.pwa-banner div{flex-basis:calc(100% - 100px)}.pwa-banner .btn{order:3;margin-left:56px}}
+.pwa-toast{position:fixed;left:50%;bottom:calc(20px + var(--tbh,0px));transform:translateX(-50%);z-index:80;display:flex;align-items:center;gap:12px;
+  width:max-content;max-width:min(92vw,460px);padding:10px 12px 10px 16px;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.35);font-size:.92rem}
+.pwa-offline{position:fixed;left:0;right:0;top:0;z-index:85;padding:calc(6px + env(safe-area-inset-top,0px)) 12px 6px;text-align:center;background:var(--bad);color:#fff;font-size:.85rem;font-weight:600}
+.pwa-sheet{position:fixed;inset:0;z-index:95;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.55)}
+.pwa-sheet-card{width:min(480px,100%);max-height:90vh;overflow:auto;background:var(--surface);color:var(--ink);border-radius:20px 20px 0 0;padding:22px 20px calc(22px + env(safe-area-inset-bottom,0px));display:grid;gap:12px}
+.pwa-sheet-card h2{margin:0;font-size:1.2rem}
+.pwa-sheet-card ol{margin:0;padding-left:1.2em;display:grid;gap:8px}
+.pwa-sheet-card p{margin:0;font-size:.85rem}
+@media (min-width:700px){.pwa-sheet{align-items:center}.pwa-sheet-card{border-radius:20px}}
+.pwa-push{margin-top:16px}
+.pwa-push h2{margin:0 0 6px}
+.pwa-push-state{margin:8px 0;font-weight:600}
+@media (display-mode:standalone){.pwa-banner{display:none}}

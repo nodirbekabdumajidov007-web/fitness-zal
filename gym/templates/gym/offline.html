@@ -1,5 +1,45 @@
-{% extends "gym/base.html" %}{% load gym_tags %}
-{% block title %}Offline{% endblock %}
-{% block content %}
-<div class="card grid" style="max-width:460px;margin-inline:auto"><h2>{% t 'offline_title' %}</h2><p class="muted" style="margin:0">{% t 'offline_text' %}</p><a class="btn primary" href="/">{% t 'retry' %}</a></div>
-{% endblock %}
+{% load static gym_tags %}<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Offline · Fitnes Zal</title>
+<meta name="theme-color" content="#101318">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon-32.png' %}">
+<link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
+<style>
+  /* self-contained on purpose: this page is kept by the service worker and must look right with no network at all */
+  :root{color-scheme:dark;--bg:#101318;--surface:#181c23;--ink:#eef0f3;--muted:#9aa3b0;--line:#2a303a;--accent:#f0503d}
+  @media (prefers-color-scheme:light){:root{color-scheme:light;--bg:#eef0f2;--surface:#fff;--ink:#14181f;--muted:#5b6370;--line:#d5d9df;--accent:#d6301f}}
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  body{display:grid;place-items:center;min-height:100vh;min-height:100dvh;padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+  main{width:100%;max-width:440px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:28px 24px;text-align:center;display:grid;gap:14px;justify-items:center}
+  img{width:72px;height:auto;border-radius:14px}
+  h1{margin:0;font-size:1.5rem;letter-spacing:.01em}
+  p{margin:0;color:var(--muted)}
+  .btn{display:inline-block;min-height:44px;padding:10px 20px;border-radius:12px;border:1px solid var(--line);background:transparent;color:var(--ink);font:inherit;font-weight:600;text-decoration:none;cursor:pointer}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+  [data-l]{display:none}[data-l="uz"]{display:block}
+  .js [data-l]{display:none}.js [data-l].on{display:block}
+  .js .row [data-l].on{display:inline-block}
+  [hidden]{display:none!important}
+</style>
+<script src="{% static 'js/offline.js' %}" defer></script>
+</head>
+<body>
+<main>
+  <img src="{% static 'img/icon-192.png' %}" alt="" width="72" height="72">
+  <h1 data-l="uz">Internet yo'q</h1><h1 data-l="ru">Нет интернета</h1><h1 data-l="en">You're offline</h1>
+  <p data-l="uz">Aloqa tiklangach sahifa o'zi ochiladi. A'zo kartangiz (QR) avval ochilgan bo'lsa, internetsiz ham ko'rinadi.</p>
+  <p data-l="ru">Страница откроется, когда появится связь. Карта участника (QR), если вы открывали её раньше, доступна и без интернета.</p>
+  <p data-l="en">The page will work again once you're back online. Your member card (QR) is available offline if you opened it before.</p>
+  <div class="row">
+    <button class="btn primary" type="button" id="retry"><span data-l="uz">Qayta urinish</span><span data-l="ru">Повторить</span><span data-l="en">Try again</span></button>
+    <a class="btn" id="card" href="/card/" hidden><span data-l="uz">A'zo kartam (QR)</span><span data-l="ru">Моя карта (QR)</span><span data-l="en">My member card (QR)</span></a>
+  </div>
+</main>
+</body>
+</html>
