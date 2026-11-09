@@ -4,6 +4,7 @@ from django.views.generic import RedirectView
 
 from . import chat_views as c
 from . import desk
+from . import instagram_views
 from . import coach_views as coach
 from . import pwa
 from . import views as v
@@ -21,6 +22,7 @@ urlpatterns = [
     path("calories/foods/save/", v.calories_food_save, name="calories_food_save"),
     path("calories/foods/<int:pk>/delete/", v.calories_food_delete, name="calories_food_delete"),
     path("healthz", v.healthz),
+    path("webhooks/instagram/", instagram_views.webhook, name="instagram_webhook"),
     path("voice/info/", voice.info, name="voice_info"),
     path("manifest.webmanifest", pwa.manifest, name="manifest"),
     path("sw.js", pwa.service_worker, name="sw"),

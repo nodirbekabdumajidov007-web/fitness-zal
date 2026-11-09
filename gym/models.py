@@ -190,6 +190,10 @@ class GymSettings(models.Model):
     apple_client_id = models.CharField("Apple Services ID (iCloud bilan kirish)", max_length=120, blank=True,
                                        help_text="Apple Developer → Identifiers → Services ID (masalan uz.fitneszal.web). Faqat https domenda ishlaydi.")
     telegram_bot = models.CharField("Telegram bot (username, @siz)", max_length=40, blank=True)
+    ig_auto_reply = models.BooleanField("Instagram Direct: bot avtomatik javob bersin", default=True,
+                                        help_text="O'chirilsa, xabarlar baribir panelda ko'rinadi, lekin bot jim turadi.")
+    ig_staff_pause_hours = models.PositiveSmallIntegerField("Instagram: xodim javob bergach bot necha soat jim tursin", default=12,
+                                                            validators=[MaxValueValidator(720)])
 
     class Meta:
         verbose_name = verbose_name_plural = "Zal sozlamalari"
@@ -979,3 +983,4 @@ class UserFood(models.Model):
 
 
 from .models_extra import *  # noqa: E402,F401,F403  (the newer models live in models_extra.py; importing them here registers them with Django)
+from .models_instagram import *  # noqa: E402,F401,F403  (Instagram inbox models)

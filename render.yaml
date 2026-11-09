@@ -36,6 +36,16 @@ services:
         sync: false
       - key: ANDROID_SHA256_FINGERPRINTS   # comma-separated SHA-256 signing fingerprints (docs/ANDROID.md)
         sync: false
+      - key: IG_APP_SECRET          # Instagram Direct bot (docs/INSTAGRAM.md): Meta app -> App settings -> Basic -> App secret
+        sync: false
+      - key: IG_VERIFY_TOKEN        # any long random text you invent; the same text goes into the Meta webhook form
+        sync: false
+      - key: IG_ACCESS_TOKEN        # long-lived Instagram user token (refreshed automatically afterwards)
+        sync: false
+      - key: IG_ACCOUNT_ID          # optional: your Instagram user id
+        sync: false
+      - key: IG_API_VERSION         # Graph API version
+        value: "v27.0"
       - key: PYTHON_VERSION
         value: "3.12.7"
 

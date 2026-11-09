@@ -1,0 +1,63 @@
+{% extends "admin/base_site.html" %}{% load gym_tags fz_admin %}
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url 'admin:index' %}">Bosh sahifa</a> › <a href="{% url 'admin:ig_inbox' %}">Instagram xabarlari</a> › {{ t.display_name }}</div>{% endblock %}
+{% block content %}
+<div class="fz-wrap">
+  <div class="ig-grid">
+    <section class="nb ig-chat">
+      <header class="ig-head">
+        {% if t.profile_pic_url %}<img class="ig-ava" src="{{ t.profile_pic_url }}" alt="" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'ig-ava',textContent:'{{ t.initials|escapejs }}'}))">
+        {% else %}<span class="ig-ava">{{ t.initials }}</span>{% endif %}
+        <div><b>{{ t.display_name }}</b>{% if t.username %} <small>@{{ t.username }}</small>{% endif %}</div>
+        <span class="ig-badges">
+          {% if t.needs_human %}<span class="fz-pill red">Javob kerak</span>{% endif %}
+          {% if paused %}<span class="fz-pill gold">bot jim</span>{% else %}<span class="fz-pill green">bot yoqiq</span>{% endif %}
+          {% if open %}<span class="fz-pill">oyna: {{ left_txt }}</span>{% else %}<span class="fz-pill red">24 soat o'tgan</span>{% endif %}
+        </span>
+      </header>
+      <div class="ig-msgs" id="ig-msgs">
+        {% for m in msgs %}
+        <div class="ig-b {{ m.kind }} {{ m.direction }}{% if not m.sent_ok %} failed{% endif %}">
+          <small class="ig-who">{% if m.kind == 'user' %}{{ t.display_name }}{% elif m.kind == 'bot' %}Bot{% elif m.kind == 'staff' %}Xodim{% if m.author %} · {{ m.author.first_name|default:m.author.username }}{% endif %}{% else %}Xodim (Instagram ilovasi){% endif %}</small>
+          {% if m.text %}<p>{{ m.text }}</p>{% endif %}
+          {% for a in m.attachments %}<p class="ig-att">{% if a.safe %}<a href="{{ a.url }}" target="_blank" rel="noopener noreferrer">[{{ a.type }}]</a>{% else %}[{{ a.type }}]{% endif %}</p>{% endfor %}
+          <time>{{ m.created|date:"d.m H:i" }}</time>
+          {% if not m.sent_ok %}<span class="ig-err">Yuborilmadi: {{ m.error|default:"xato" }}</span>{% endif %}
+        </div>
+        {% empty %}<p class="fz-empty">Xabarlar yo'q.</p>{% endfor %}
+      </div>
+      <form method="post" action="{% url 'admin:ig_reply' t.pk %}" class="ig-reply">{% csrf_token %}
+        {% if not configured %}<p class="ig-note">Instagram sozlanmagan: yuborib bo'lmaydi.</p>
+        {% elif not open %}<p class="ig-note">Foydalanuvchining oxirgi xabaridan 24 soatdan ko'p o'tgan. Instagram qoidasiga ko'ra u yana yozmaguncha xabar yuborib bo'lmaydi.</p>{% endif %}
+        <textarea name="text" rows="3" maxlength="2000" placeholder="Javob yozing…"{% if not open or not configured %} disabled{% endif %} required></textarea>
+        <button type="submit"{% if not open or not configured %} disabled{% endif %}>Yuborish</button>
+      </form>
+    </section>
+
+    <aside class="ig-side-col">
+      <section class="nb"><header><small>Amallar</small></header>
+        {% if t.auto_reply_paused or paused %}
+        <form method="post" action="{% url 'admin:ig_action' t.pk 'resume' %}" class="ig-act">{% csrf_token %}<button type="submit">Botni qayta yoqish</button></form>
+        {% endif %}
+        {% if not t.auto_reply_paused %}
+        <form method="post" action="{% url 'admin:ig_action' t.pk 'pause' %}" class="ig-act">{% csrf_token %}<button type="submit">Botni to'xtatish (shu suhbatda)</button></form>
+        {% endif %}
+        <form method="post" action="{% url 'admin:ig_action' t.pk 'resolve' %}" class="ig-act">{% csrf_token %}<button type="submit">Hal qilindi</button></form>
+        <form method="post" action="{% url 'admin:ig_action' t.pk 'profile' %}" class="ig-act">{% csrf_token %}<button type="submit">Profilni yangilash</button></form>
+        {% if t.bot_paused_until and paused and not t.auto_reply_paused %}<small>Xodim javob bergani uchun bot {{ t.bot_paused_until|date:"d.m H:i" }} gacha jim.</small>{% endif %}
+      </section>
+      <section class="nb"><header><small>A'zo</small></header>
+        {% if t.member %}
+          <p><a href="{% url 'admin:member' t.member_id %}">{{ t.member.full_name }}</a> <small>{{ t.member.member_code }}</small></p>
+          <form method="post" action="{% url 'admin:ig_action' t.pk 'unlink' %}" class="ig-act">{% csrf_token %}<button type="submit">Bog'lanishni olib tashlash</button></form>
+        {% else %}
+          {% if guess %}<p class="ig-note">Mos a'zo: <a href="{% url 'admin:member' guess.pk %}">{{ guess.full_name }}</a> (login @{{ guess.username }})</p>{% endif %}
+          <form method="post" action="{% url 'admin:ig_action' t.pk 'link' %}" class="ig-link">{% csrf_token %}
+            <input name="member" value="{% if guess %}{{ guess.username }}{% endif %}" placeholder="Telefon, login yoki FZ-0001" autocomplete="off"><button type="submit">Bog'lash</button></form>
+          <small>Bog'langan a'zoga bot abonement va kaloriya haqidagi shaxsiy savollarga ham javob beradi.</small>
+        {% endif %}
+      </section>
+    </aside>
+  </div>
+</div>
+<script>var b=document.getElementById('ig-msgs');if(b){b.scrollTop=b.scrollHeight}</script>
+{% endblock %}

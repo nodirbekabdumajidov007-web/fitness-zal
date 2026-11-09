@@ -419,6 +419,8 @@ class GymSettingsAdmin(admin.ModelAdmin):
         ("Ombor ogohlantirishi (SMS)", {"fields": ("low_stock_threshold", "alert_phone"),
                                         "description": "Mahsulot shu sondan kam qolsa, adminga SMS, Telegram va saytdagi xabar boradi: nima tugagani va nechta olib kelish kerakligi. "
                                                        "Har mahsulot uchun kuniga bir marta."}),
+        ("Instagram Direct bot", {"fields": ("ig_auto_reply", "ig_staff_pause_hours"),
+                                  "description": "Ulash bo'yicha qo'llanma: docs/INSTAGRAM.md. Xabarlar «Mijozlar bilan aloqa → Instagram xabarlari» bo'limida."}),
         ("Sinov", {"fields": ("demo_payments",), "classes": ("collapse",)}),
     )
 

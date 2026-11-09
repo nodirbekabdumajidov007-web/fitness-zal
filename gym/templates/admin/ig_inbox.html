@@ -1,0 +1,65 @@
+{% extends "admin/base_site.html" %}{% load gym_tags fz_admin %}
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url 'admin:index' %}">Bosh sahifa</a> › Instagram xabarlari</div>{% endblock %}
+{% block content %}
+<div class="fz-wrap">
+  <section class="fz-hero fz-hero-slim">
+    <div><span class="fz-eyebrow">Mijozlar bilan aloqa</span><h2>Instagram xabarlari</h2>
+      <p>Instagram Direct'dagi savollarga bot avtomatik javob beradi. Bot bilmagan savollar «Javob kerak» deb belgilanadi, ularga shu yerdan o'zingiz yozasiz.</p>
+      <div class="fz-actions"><a href="{% url 'admin:gym_gymsettings_changelist' %}">{% aicon 'settings' %} Bot sozlamalari</a></div></div>
+  </section>
+
+  <section class="nb ig-status">
+    <header><small>Ulanish holati</small>
+      {% if st.configured %}<span class="fz-pill green">Ulangan</span>{% else %}<span class="fz-pill gold">Sozlanmagan</span>{% endif %}</header>
+    <ul class="ig-kv">
+      <li><span>Webhook manzili (Meta'ga qo'ying)</span><code>{{ st.webhook_url }}</code></li>
+      <li><span>IG_APP_SECRET</span>{% if st.has_secret %}<b class="ig-ok">bor</b>{% else %}<b class="ig-no">yo'q</b>{% endif %}</li>
+      <li><span>IG_VERIFY_TOKEN</span>{% if st.has_verify %}<b class="ig-ok">bor</b>{% else %}<b class="ig-no">yo'q</b>{% endif %}</li>
+      <li><span>Access token</span>{% if st.has_token %}<b class="ig-ok">bor</b> <small>{{ st.token_masked }}</small>{% else %}<b class="ig-no">yo'q</b>{% endif %}</li>
+      <li><span>API versiyasi</span><b>{{ st.version }}</b>{% if st.account_id %} <small>· akkaunt {{ st.account_id }}</small>{% endif %}</li>
+      <li><span>Token amal qilish muddati</span><b>{% if st.expires_at %}{{ st.expires_at|date:"d.m.Y" }}{% else %}noma'lum (yangilanganda aniqlanadi){% endif %}</b></li>
+      <li><span>Oxirgi webhook</span><b>{% if st.last_webhook %}{{ st.last_webhook|date:"d.m.Y H:i" }}{% else %}hali kelmagan{% endif %}</b></li>
+      {% if st.last_error %}<li><span>Token yangilash xatosi</span><b class="ig-no">{{ st.last_error }}</b></li>{% endif %}
+    </ul>
+    {% if not st.configured %}
+    <div class="ig-guide"><b>Ulash tartibi</b>
+      <ol>
+        <li>Instagram akkauntni «Professional» qiling va «Allow access to messages» ni yoqing.</li>
+        <li>Meta Developers'da ilova yarating (Instagram → API setup with Instagram login), token va App Secret oling.</li>
+        <li>Render → Environment'ga <code>IG_APP_SECRET</code>, <code>IG_VERIFY_TOKEN</code> (o'zingiz o'ylab topgan uzun matn) va <code>IG_ACCESS_TOKEN</code> ni kiriting.</li>
+        <li>Meta'da webhook manzili sifatida yuqoridagi havolani va shu verify token'ni yozing, so'ng Render Shell'da <code>python manage.py ig_subscribe</code> ni ishga tushiring.</li>
+      </ol>
+      <p>To'liq qo'llanma: <code>docs/INSTAGRAM.md</code></p></div>
+    {% else %}
+    <form method="post" action="{% url 'admin:ig_test' %}" class="ig-test">{% csrf_token %}
+      <button type="submit"{% if not has_threads %} disabled title="Avval kimdir yozishi kerak"{% endif %}>Test yuborish</button>
+      <small>{% if has_threads %}Eng oxirgi suhbatga qisqa xabar ketadi (24 soatlik oyna ochiq bo'lsa).{% else %}Hali suhbat yo'q: Instagram'dan akkauntingizga biror xabar yozing.{% endif %}</small>
+    </form>
+    {% endif %}
+  </section>
+
+  <nav class="ig-tabs" aria-label="Filtr">
+    {% for k, name in filters %}<a href="?f={{ k }}"{% if flt == k %} class="on"{% endif %}>{{ name }}
+      <i>{% if k == 'human' %}{{ n_human }}{% elif k == 'unread' %}{{ n_unread }}{% else %}{{ n_all }}{% endif %}</i></a>{% endfor %}
+    <form method="get" class="ig-find"><input type="hidden" name="f" value="{{ flt }}"><input name="q" value="{{ q }}" placeholder="Ism yoki @username" autocomplete="off"></form>
+  </nav>
+
+  <section class="nb ig-list">
+    {% for r in rows %}{% with t=r.t %}
+    <a class="ig-row{% if t.unread %} unread{% endif %}" href="{% url 'admin:ig_thread' t.pk %}">
+      {% if t.profile_pic_url %}<img class="ig-ava" src="{{ t.profile_pic_url }}" alt="" referrerpolicy="no-referrer" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'ig-ava',textContent:'{{ t.initials|escapejs }}'}))">
+      {% else %}<span class="ig-ava">{{ t.initials }}</span>{% endif %}
+      <span class="ig-main"><b>{{ t.display_name }}</b>{% if t.username and t.name %} <small>@{{ t.username }}</small>{% endif %}
+        <span class="ig-prev">{% if r.last %}{% if r.last.direction == 'out' %}Siz: {% endif %}{{ r.last.text|default:"[ilova]"|truncatechars:80 }}{% else %}—{% endif %}</span></span>
+      <span class="ig-side"><time>{{ t.last_message_at|date:"d.m H:i" }}</time>
+        <span class="ig-badges">
+          {% if t.needs_human %}<span class="fz-pill red">Javob kerak</span>{% endif %}
+          {% if t.unread %}<span class="fz-pill green">{{ t.unread }} yangi</span>{% endif %}
+          {% if not r.open %}<span class="fz-pill">24 soat o'tgan</span>{% endif %}
+          {% if r.paused %}<span class="fz-pill gold">bot jim</span>{% endif %}
+        </span></span>
+    </a>{% endwith %}
+    {% empty %}<p class="fz-empty">{% if has_threads %}Bu filtrda suhbat yo'q.{% else %}Hali xabar kelmagan.{% endif %}</p>{% endfor %}
+  </section>
+</div>
+{% endblock %}
