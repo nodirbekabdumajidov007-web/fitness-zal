@@ -21,7 +21,7 @@ class RetentionBase(Base):
         return Membership.objects.create(user=user, plan=Plan.objects.get(code=plan), starts=now - timedelta(days=1), expires=now + timedelta(days=days))
 
     def scan(self, staff, code):
-        r = staff.post("/staff/scan/", data=json.dumps({"code": code}), content_type="application/json")
+        r = staff.post("/django-admin/desk/scan/", data=json.dumps({"code": code}), content_type="application/json")
         return r.status_code, r.json()
 
 
@@ -247,10 +247,10 @@ class ClassTests(RetentionBase):
         self.assertContains(c.get("/classes/"), "alert" if False else "warn")
         st = self.staff()
         b = Booking.objects.filter(user=u, date__gte=today).get()
-        self.assertEqual(st.post(f"/staff/booking/{b.pk}/noshow/").status_code, 302)
+        self.assertEqual(st.post(f"/django-admin/desk/booking/{b.pk}/noshow/").status_code, 200)
         b.refresh_from_db()
         self.assertTrue(b.no_show)
-        self.assertEqual(st.get("/staff/classes/").status_code, 200)
+        self.assertEqual(st.get("/django-admin/desk/classes/").status_code, 200)
 
 
 class TrainerRatingTests(RetentionBase):
@@ -515,7 +515,7 @@ class EntryHistoryTests(RetentionBase):
         self.scan(st, "GP-1-badbadbadbad")
         got = list(EntryLog.objects.filter(method="guest").order_by("id").values_list("result", "reason"))
         self.assertEqual(got, [("ok", ""), ("rejected", "guest_used"), ("rejected", "invalid")])
-        st.post(f"/staff/checkin/{u.pk}/")
+        st.post(f"/django-admin/desk/checkin/{u.pk}/")
         self.assertTrue(EntryLog.objects.filter(method="manual", user=u).exists())
         c.post("/checkin/")
         self.assertTrue(EntryLog.objects.filter(method="self", user=u).exists())

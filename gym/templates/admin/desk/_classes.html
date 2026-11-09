@@ -1,0 +1,18 @@
+{% load gym_tags fz_admin %}
+{% for r in ctx.classes %}
+<section class="dk-class">
+  <header><b>{{ r.c.name }} <span class="num dk-sub">· {{ r.c.start_time|hm }}</span></b>
+    <span class="dk-sub num">{{ r.bookings|length }} / {{ r.c.capacity }}{% if r.waiting %} · navbatda {{ r.waiting }}{% endif %}</span></header>
+  <ul class="dk-list">
+  {% for b in r.bookings %}
+    <li><span>{{ b.user.full_name }} <span class="dk-sub num">{{ b.user.member_code }}</span>
+      {% if b.no_show %}<span class="dk-st bad">Kelmadi</span>{% elif b.checked_in_at %}<span class="dk-st good">Keldi</span>{% endif %}</span>
+      <span class="dk-row-acts">
+        <button type="button" class="dk-btn sm primary" data-act="post" data-url="{% url 'admin:desk_booking_mark' b.pk 'came' %}">Keldi</button>
+        <button type="button" class="dk-btn sm danger" data-act="post" data-url="{% url 'admin:desk_booking_mark' b.pk 'noshow' %}"{% if not r.started %} disabled title="Mashg'ulot hali boshlanmagan"{% endif %}>Kelmadi</button>
+        <button type="button" class="dk-btn sm ghost" data-act="post" data-url="{% url 'admin:desk_booking_mark' b.pk 'reset' %}" aria-label="Belgini tozalash" title="Belgini tozalash">{% aicon 'refresh' %}</button>
+      </span></li>
+  {% empty %}<li class="dk-empty-li">Hali bron yo'q</li>{% endfor %}
+  </ul>
+</section>
+{% empty %}<p class="dk-empty">{% aicon 'calendar' %}Bugun mashg'ulot yo'q</p>{% endfor %}

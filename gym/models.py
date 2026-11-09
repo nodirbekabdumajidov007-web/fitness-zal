@@ -518,6 +518,8 @@ class Payment(models.Model):
     proof_at = models.DateTimeField("A'zo to'lov qildim degan vaqt", null=True, blank=True)
     gift_code = models.CharField("Sovg'a sertifikati", max_length=20, blank=True)
     consent_at = models.DateTimeField("Oferta va maxfiylikka rozilik vaqti", null=True, blank=True)
+    staff = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name="+", editable=False,
+                              verbose_name="Kim rasmiylashtirdi (qabulxona)")
     created = models.DateTimeField("Sana", auto_now_add=True)
 
     class Meta:

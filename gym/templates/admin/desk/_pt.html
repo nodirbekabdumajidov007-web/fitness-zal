@@ -1,0 +1,11 @@
+{% load gym_tags fz_admin %}
+<div class="dk-cards">
+{% for s in ctx.pt_requests %}
+  <article class="dk-card">
+    <header><span class="dk-ava">{% aicon 'user-check' %}</span><div><b>{{ s.user.full_name }} → {{ s.trainer.name }}</b><small class="num">{{ s.starts|dmyhm }}</small></div></header>
+    {% if s.note %}<p class="dk-sub">{{ s.note }}</p>{% endif %}
+    <div class="dk-row-acts"><button type="button" class="dk-btn sm primary" data-act="post" data-url="{% url 'admin:desk_pt' s.pk 'confirm' %}">{% aicon 'tick' %}Tasdiqlash</button>
+      <button type="button" class="dk-btn sm danger" data-act="post" data-url="{% url 'admin:desk_pt' s.pk 'cancel' %}" data-confirm="So'rov bekor qilinsinmi?">Bekor qilish</button></div>
+  </article>
+{% empty %}<p class="dk-empty">{% aicon 'check' %}Yangi PT so'rovi yo'q</p>{% endfor %}
+</div>

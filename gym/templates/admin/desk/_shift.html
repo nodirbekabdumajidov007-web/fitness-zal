@@ -1,0 +1,12 @@
+{% load gym_tags fz_admin %}
+<div class="dk-shift-total"><small>Bugungi tushum</small><b class="num">{{ s.total|money }}</b><small>so'm · {{ s.count }} ta to'lov</small></div>
+<ul class="dk-list">
+  {% for r in s.by_method %}<li><span>{{ r.label }} <span class="dk-sub num">· {{ r.n }} ta</span></span><b class="num">{{ r.sum|money }}</b></li>{% empty %}<li class="dk-empty-li">Hali to'lov yo'q</li>{% endfor %}
+</ul>
+<dl class="dk-stats">
+  <div><dt>Sotilgan abonement</dt><dd class="num">{{ s.sold }}</dd></div>
+  <div><dt>Kirishlar</dt><dd class="num">{{ s.entries }}</dd></div>
+  <div><dt>Mehmonlar</dt><dd class="num">{{ s.guest_entries }}</dd></div>
+  <div><dt>Rad etilgan</dt><dd class="num">{{ s.rejected }}</dd></div>
+  <div class="wide"><dt>Siz rasmiylashtirgan</dt><dd class="num">{{ s.mine|money }} so'm · {{ s.mine_n }} ta</dd></div>
+</dl>

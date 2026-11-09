@@ -1,0 +1,36 @@
+{% load gym_tags fz_admin %}<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Smena hisoboti {{ s.day|date:"d.m.Y" }} | Fitnes Zal</title>
+<link rel="stylesheet" href="{% vstatic 'css/desk.css' %}">
+</head>
+<body class="dk-doc">
+<main class="dk-paper wide">
+  <header class="dk-paper-head">
+    <b class="dk-brand">FITNES<i>.</i>ZAL</b>
+    <h1>Smena hisoboti</h1>
+    <p><span class="num">{{ s.day|date:"d.m.Y" }}</span> · tuzildi <span class="num">{{ now|date:"H:i" }}</span> · {{ staff.full_name|default:staff.username }}</p>
+  </header>
+  <div class="dk-shift-total"><small>Jami tushum</small><b class="num">{{ s.total|money }}</b><small>so'm · {{ s.count }} ta to'lov</small></div>
+  <table class="dk-table">
+    <thead><tr><th>To'lov usuli</th><th class="r">Soni</th><th class="r">Summa, so'm</th></tr></thead>
+    <tbody>{% for r in s.by_method %}<tr><td>{{ r.label }}</td><td class="r num">{{ r.n }}</td><td class="r num">{{ r.sum|money }}</td></tr>{% empty %}<tr><td colspan="3">To'lov bo'lmagan</td></tr>{% endfor %}</tbody>
+    <tfoot><tr><th>Jami</th><th class="r num">{{ s.count }}</th><th class="r num">{{ s.total|money }}</th></tr></tfoot>
+  </table>
+  <dl class="dk-stats">
+    <div><dt>Sotilgan abonementlar</dt><dd class="num">{{ s.sold }} ta · {{ s.sold_sum|money }} so'm</dd></div>
+    <div><dt>Naqd pul kassada</dt><dd class="num">{{ s.cash|money }} so'm</dd></div>
+    <div><dt>Kirishlar</dt><dd class="num">{{ s.entries }}</dd></div>
+    <div><dt>Mehmonlar kirishi</dt><dd class="num">{{ s.guest_entries }}</dd></div>
+    <div><dt>Rad etilgan urinishlar</dt><dd class="num">{{ s.rejected }}</dd></div>
+    <div><dt>{{ staff.first_name|default:staff.username }} rasmiylashtirgan</dt><dd class="num">{{ s.mine|money }} so'm · {{ s.mine_n }} ta</dd></div>
+  </dl>
+  {% if s.by_staff %}<h3>Xodimlar bo'yicha</h3>
+  <table class="dk-table"><tbody>{% for r in s.by_staff %}<tr><td>{{ r.name }}</td><td class="r num">{{ r.n }} ta</td><td class="r num">{{ r.sum|money }}</td></tr>{% endfor %}</tbody></table>{% endif %}
+  <p class="dk-sign">Topshirdi: ____________ &nbsp; Qabul qildi: ____________</p>
+  <p class="dk-actions noprint"><button type="button" class="dk-btn primary" onclick="window.print()">{% aicon 'printer' %}Chop etish</button> <a class="dk-btn" href="{% url 'admin:desk' %}">Qabulxonaga qaytish</a>
+    <a class="dk-btn ghost" href="?d={{ s.day|date:'Y-m-d' }}">Yangilash</a></p>
+</main>
+</body>
+</html>

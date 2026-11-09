@@ -1,0 +1,7 @@
+{% load gym_tags fz_admin %}
+<div class="dk-newcard">
+  <div class="dk-qr" data-qr>{{ qr }}</div>
+  <div><h4>{{ u.full_name }}</h4><p class="dk-sub"><span class="num">{{ u.member_code }}</span> · <span class="num">{{ u.phone }}</span></p>
+    {% if pay %}<p class="dk-note good">{% aicon 'tick' %}{{ pay.plan.name }} sotildi · <span class="num">{{ pay.amount|money }}</span> so'm</p>{% endif %}
+    <p class="dk-sub">Bu QR a'zo kartasi: kirishda skanerlanadi. Parolni a'zo «Parolni unutdim» orqali telefoni bilan o'rnatadi.</p></div>
+</div>

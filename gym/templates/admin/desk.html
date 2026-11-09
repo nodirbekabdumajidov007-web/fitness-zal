@@ -1,0 +1,123 @@
+{% extends "admin/base_site.html" %}{% load gym_tags fz_admin %}
+{% block extrahead %}{{ block.super }}<link rel="stylesheet" href="{% vstatic 'css/desk.css' %}">{% endblock %}
+{% block content_title %}{% endblock %}
+{% block bodyclass %}dk-body{% endblock %}
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url 'admin:index' %}">Bosh sahifa</a><span class="sep" aria-hidden="true">/</span><span class="here">Qabulxona</span></div>{% endblock %}
+{% block content %}
+<div class="dk" id="dk" data-urls='{"search":"{% url 'admin:desk_search' %}","today":"{% url 'admin:desk_today' %}","member":"{% url 'admin:desk_member' 0 %}","scan":"{% url 'admin:desk_scan' %}","guest":"{% url 'admin:desk_guest' %}","newMember":"{% url 'admin:desk_new_member' %}"}' data-q="{{ q }}">
+
+  <section class="dk-top">
+    <div>
+      <span class="dk-eyebrow">{% now "l, d.m.Y" %} · <b class="num" data-clock>{% now "H:i" %}</b></span>
+      <h2>Qabulxona</h2>
+    </div>
+    <div class="dk-kpis">
+      <button type="button" class="dk-kpi" data-goto="visits">{% aicon 'door' %}<b class="num" data-count="visits">{{ counts.visits }}</b><span>Bugungi kirish</span></button>
+      <button type="button" class="dk-kpi{% if counts.pay %} hot{% endif %}" data-goto="pay">{% aicon 'card' %}<b class="num" data-count="pay">{{ counts.pay }}</b><span>Kutayotgan to'lov</span></button>
+      <button type="button" class="dk-kpi{% if counts.orders %} hot{% endif %}" data-goto="orders">{% aicon 'bag' %}<b class="num" data-count="orders">{{ counts.orders }}</b><span>Buyurtma</span></button>
+      <div class="dk-kpi crowd {{ crowd.level }}" data-crowd>{% aicon 'users' %}<b class="num" data-crowd-n>{{ crowd.n }}</b><span>Zalda (2 soat)</span><i class="dk-crowd-bar"><u style="width:{{ crowd.pct }}%"></u></i></div>
+    </div>
+  </section>
+
+  <div class="dk-banner" id="dk-banner" role="status" aria-live="assertive" hidden>
+    <span class="dk-banner-ico" aria-hidden="true"></span>
+    <div class="dk-banner-txt"><b data-b="title"></b><strong data-b="name"></strong><span data-b="sub"></span></div>
+    <button type="button" class="dk-banner-x" data-banner-close aria-label="Yopish">{% aicon 'x' %}</button>
+  </div>
+
+  <div class="dk-grid">
+    <div class="dk-main">
+      <section class="dk-card-lg dk-find" aria-label="A'zoni qidirish">
+        <div class="dk-search">
+          {% aicon 'search' %}
+          <input id="dk-q" type="search" autocomplete="off" spellcheck="false" autofocus value="{{ q }}" placeholder="Ism, telefon, FZ-0012 yoki QR matni…" aria-label="A'zoni qidirish" role="combobox" aria-expanded="false" aria-controls="dk-results" aria-autocomplete="list">
+          <kbd aria-hidden="true">/</kbd>
+        </div>
+        <p class="dk-hint"><kbd>/</kbd> qidiruv · <kbd>↑</kbd><kbd>↓</kbd> tanlash · <kbd>Enter</kbd> ochish · <kbd>Esc</kbd> tozalash</p>
+        <ul id="dk-results" class="dk-results" role="listbox" aria-label="Natijalar" hidden></ul>
+        <div class="dk-guestres" id="dk-guestres" hidden></div>
+      </section>
+
+      <section id="dk-member" class="dk-member" aria-live="polite">
+        <div class="dk-placeholder">{% aicon 'user' %}<p>A'zoni qidiring yoki QR kartasini skanerlang.<br><small>Natija shu yerda ochiladi: kirgizish, abonement sotish, uzaytirish, muzlatish.</small></p></div>
+      </section>
+
+      <section class="dk-card-lg dk-today" id="dk-today">
+        <header class="dk-today-head"><h3>Bugun</h3><span class="dk-sub" id="dk-stamp" aria-live="off"></span></header>
+        <nav class="dk-tabs" role="tablist" aria-label="Bugungi ishlar" data-tabs>
+          {% for key, label, icon in tabs %}<button type="button" role="tab" id="tab-{{ key }}" aria-selected="false" aria-controls="panel-{{ key }}" data-tab="{{ key }}">{% aicon icon %}<span>{{ label }}</span><i class="dk-n" data-tabcount="{{ key }}">{% if key == 'pay' %}{{ counts.pay }}{% elif key == 'orders' %}{{ counts.orders }}{% elif key == 'pt' %}{{ counts.pt }}{% elif key == 'classes' %}{{ counts.classes }}{% elif key == 'guests' %}{{ counts.guests }}{% else %}{{ counts.visits }}{% endif %}</i></button>{% endfor %}
+        </nav>
+        <div class="dk-panels">
+          <div class="dk-panel" role="tabpanel" id="panel-pay" aria-labelledby="tab-pay" data-panel="pay" data-hash="{{ frags.pay.hash }}">{{ frags.pay.html }}</div>
+          <div class="dk-panel" role="tabpanel" id="panel-orders" aria-labelledby="tab-orders" data-panel="orders" data-hash="{{ frags.orders.hash }}" hidden>{{ frags.orders.html }}</div>
+          <div class="dk-panel" role="tabpanel" id="panel-pt" aria-labelledby="tab-pt" data-panel="pt" data-hash="{{ frags.pt.hash }}" hidden>{{ frags.pt.html }}</div>
+          <div class="dk-panel" role="tabpanel" id="panel-classes" aria-labelledby="tab-classes" data-panel="classes" data-hash="{{ frags.classes.hash }}" hidden>{{ frags.classes.html }}</div>
+          <div class="dk-panel" role="tabpanel" id="panel-guests" aria-labelledby="tab-guests" data-panel="guests" data-hash="{{ frags.guests.hash }}" hidden>{{ frags.guests.html }}</div>
+          <div class="dk-panel" role="tabpanel" id="panel-visits" aria-labelledby="tab-visits" data-panel="visits" data-hash="{{ frags.visits.hash }}" hidden>{{ frags.visits.html }}</div>
+        </div>
+      </section>
+    </div>
+
+    <aside class="dk-side">
+      <section class="dk-card-lg dk-tools" aria-label="Asboblar">
+        <nav class="dk-tabs sm" role="tablist" aria-label="Asboblar" data-tools>
+          <button type="button" role="tab" aria-selected="true" data-tool="scan">{% aicon 'scan' %}<span>Skaner</span></button>
+          <button type="button" role="tab" aria-selected="false" data-tool="new">{% aicon 'user-plus' %}<span>Yangi a'zo</span></button>
+          <button type="button" role="tab" aria-selected="false" data-tool="guest">{% aicon 'gift' %}<span>Mehmon</span></button>
+        </nav>
+
+        <div class="dk-tool" data-toolpanel="scan">
+          <div class="dk-cam" id="dk-cam"><video id="scan-video" playsinline muted></video><span class="dk-frame" aria-hidden="true"><i></i><i></i><i></i><i></i></span><p class="dk-cam-off">Kamera o'chiq</p></div>
+          <div class="dk-row">
+            <button type="button" class="dk-btn primary" id="scan-start">{% aicon 'camera' %}Kamerani yoqish</button>
+            <button type="button" class="dk-btn ghost" id="dk-sound" aria-pressed="true" title="Ovoz va tebranish">{% aicon 'volume' %}<span>Ovoz</span></button>
+            <a class="dk-btn ghost" href="{% url 'admin:desk_scan' %}">{% aicon 'scan' %}To'liq ekran</a>
+          </div>
+          <p class="dk-sub" id="scan-support"></p>
+          <label class="dk-lbl">QR matni (USB skaner yoki qo'lda)
+            <input id="scan-code" autocomplete="off" placeholder="FZ:12:abcdef123456" inputmode="text"></label>
+        </div>
+
+        <form class="dk-tool" data-toolpanel="new" id="dk-newform" novalidate hidden>
+          <label class="dk-lbl">Ism<input name="first_name" maxlength="40" required autocomplete="off"><em class="dk-err" data-err="first_name"></em></label>
+          <label class="dk-lbl">Familiya<input name="last_name" maxlength="40" autocomplete="off"></label>
+          <label class="dk-lbl">Telefon<input name="phone" inputmode="tel" placeholder="90 123 45 67" autocomplete="off" required><em class="dk-err" data-err="phone"></em></label>
+          <label class="dk-lbl">Abonement (ixtiyoriy)
+            <select name="plan"><option value="">Abonementsiz</option>{% for p in plans %}<option value="{{ p.code }}">{{ p.name }} · {{ p.price|money }} so'm</option>{% endfor %}</select></label>
+          <div data-newsale hidden>
+            <fieldset class="dk-seg" aria-label="To'lov usuli"><label><input type="radio" name="method" value="cash" checked><span>Naqd pul</span></label><label><input type="radio" name="method" value="card"><span>Karta o'tkazmasi</span></label></fieldset>
+            <label class="dk-chk"><input type="checkbox" name="consent"><span>A'zo oferta va maxfiylik siyosatiga rozilik berdi (qabulxonada)</span></label><em class="dk-err" data-err="consent"></em>
+          </div>
+          <button type="submit" class="dk-btn primary">{% aicon 'user-plus' %}Ro'yxatga olish</button>
+          <p class="dk-err" data-err="_" role="alert"></p>
+          <div id="dk-newres" hidden></div>
+        </form>
+
+        <div class="dk-tool" data-toolpanel="guest" hidden>
+          <form id="dk-guestform" novalidate>
+            <label class="dk-lbl">Mehmon taklifnomasi kodi
+              <input name="code" autocomplete="off" placeholder="GP-12-abcdef123456"></label>
+            <button type="submit" class="dk-btn primary">{% aicon 'search' %}Tekshirish</button>
+          </form>
+          <div id="dk-guestout" class="dk-guestout" hidden></div>
+        </div>
+      </section>
+
+      <section class="dk-card-lg dk-shift" aria-label="Smena hisoboti">
+        <header class="dk-today-head"><h3>Smena hisoboti</h3><a class="dk-btn sm ghost" href="{% url 'admin:desk_shift' %}" target="_blank" rel="noopener">{% aicon 'printer' %}Chop etish</a></header>
+        <div id="dk-shift">{{ summary_html }}</div>
+      </section>
+
+      <nav class="dk-links" aria-label="Boshqa sahifalar">
+        <a href="{% url 'admin:desk_classes' %}">{% aicon 'calendar' %}Mashg'ulotlar davomati</a>
+        <a href="{% url 'admin:cash' %}">{% aicon 'wallet' %}Kassa hisoboti</a>
+        <a href="{% url 'admin:gym_entrylog_changelist' %}">{% aicon 'door' %}Kirish tarixi</a>
+      </nav>
+    </aside>
+  </div>
+  <div class="dk-toasts" id="dk-toasts" aria-live="polite"></div>
+  <div hidden id="dk-ticket-wrap" class="dk-ticket-wrap"></div>
+</div>
+<script src="{% vstatic 'js/scan.js' %}"></script>
+<script src="{% vstatic 'js/desk.js' %}"></script>
+{% endblock %}

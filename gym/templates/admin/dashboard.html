@@ -7,7 +7,7 @@
     <div>
       <span class="fz-eyebrow">{% now "l, d.m.Y" %}</span>
       <h2>{{ greeting }}, {{ user.first_name|default:"admin" }}!</h2>
-      <nav class="fz-qa" aria-label="Tezkor amallar"><a class="red" href="/staff/">{% aicon 'desk' %}Qabulxona</a><a href="/staff/scan/">{% aicon 'scan' %}QR skaner</a><a href="{% url 'admin:cash' %}">{% aicon 'wallet' %}Kassa</a><a href="{% url 'admin:broadcast' %}">{% aicon 'megaphone' %}E'lon</a><a href="{% url 'admin:message' %}">{% aicon 'mail' %}Shaxsiy xabar</a><a href="{% url 'admin:reports' %}">{% aicon 'chart' %}Hisobotlar</a><a href="{% url 'admin:schedule' %}">{% aicon 'calendar' %}Jadval</a></nav>
+      <nav class="fz-qa" aria-label="Tezkor amallar"><a class="red" href="{% url 'admin:desk' %}">{% aicon 'desk' %}Qabulxona</a><a href="{% url 'admin:desk_scan' %}">{% aicon 'scan' %}QR skaner</a><a href="{% url 'admin:cash' %}">{% aicon 'wallet' %}Kassa</a><a href="{% url 'admin:broadcast' %}">{% aicon 'megaphone' %}E'lon</a><a href="{% url 'admin:message' %}">{% aicon 'mail' %}Shaxsiy xabar</a><a href="{% url 'admin:reports' %}">{% aicon 'chart' %}Hisobotlar</a><a href="{% url 'admin:schedule' %}">{% aicon 'calendar' %}Jadval</a></nav>
     </div>
     <span class="fz-live" title="Har 20 soniyada yangilanadi"><i></i>LIVE <time data-live="time">{% now "H:i:s" %}</time></span>
   </section>
@@ -49,7 +49,7 @@
     </section>
 
     <section class="nb b-members">
-      <header><small>A'zolar</small><a class="nb-add" href="/staff/" title="Qabulxonada abonement sotish" aria-label="Qabulxonada abonement sotish">{% aicon 'plus' %}</a></header>
+      <header><small>A'zolar</small><a class="nb-add" href="{% url 'admin:desk' %}" title="Qabulxonada abonement sotish" aria-label="Qabulxonada abonement sotish">{% aicon 'plus' %}</a></header>
       <b class="nb-big" data-count="{{ members }}">{{ members }}</b>
       <div class="mini-bars">{% for s in signups %}<i style="--h:{{ s.h }}" title="{{ s.label }}-kun: {{ s.v }} ta yangi"></i>{% endfor %}</div>
       <p class="nb-sub">7 kunda <b>+{{ signups_week }}</b> yangi · faol abonement: <b>{{ active_members }}</b></p>

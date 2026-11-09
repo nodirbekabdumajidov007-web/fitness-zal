@@ -1,0 +1,15 @@
+{% load gym_tags fz_admin %}
+<div class="dk-cards">
+{% for p in ctx.pending %}
+  <article class="dk-card">
+    <header><span class="dk-ava">{% if p.user %}{{ p.user.first_name|slice:":1"|upper }}{{ p.user.last_name|slice:":1"|upper }}{% else %}?{% endif %}</span>
+      <div><b>{% if p.user %}<a href="#" data-open-member="{{ p.user.pk }}">{{ p.user.full_name }}</a>{% else %}—{% endif %}</b><small class="num">{{ p.created|dmyhm }} · {{ p.reference }}</small></div>
+      <b class="dk-amount num">{{ p.amount|money }}</b></header>
+    <div class="dk-chips"><span class="dk-st mute">{% if p.plan %}{{ p.plan.name }}{% else %}{{ p.kind }}{% endif %}</span><span class="dk-st info">{{ p.method_label }}</span>
+      {% if p.method == 'card' %}{% if p.proof_at %}<span class="dk-st good">O'tkazdim: ••••{{ p.sender_last4 }}</span>{% else %}<span class="dk-st warn">Hali xabar bermagan</span>{% endif %}{% endif %}</div>
+    {% if p.method == 'card' %}<small class="dk-sub num">Qaysi kartaga: ••••{{ p.card_last4 }}{% if p.proof_at %} · {{ p.proof_at|dmyhm }}{% endif %}</small>{% endif %}
+    <div class="dk-row-acts"><button type="button" class="dk-btn sm primary" data-act="post" data-url="{% url 'admin:desk_confirm' p.pk %}" data-confirm="Pul qabul qilinganini tasdiqlaysizmi?">{% aicon 'tick' %}Tasdiqlash</button>
+      <button type="button" class="dk-btn sm danger" data-act="post" data-url="{% url 'admin:desk_reject' p.pk %}" data-confirm="To'lov rad etilsinmi?">Rad etish</button></div>
+  </article>
+{% empty %}<p class="dk-empty">{% aicon 'check' %}Kutayotgan to'lov yo'q</p>{% endfor %}
+</div>

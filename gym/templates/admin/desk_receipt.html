@@ -1,0 +1,30 @@
+{% load gym_tags fz_admin %}<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chek {{ p.reference }} | Fitnes Zal</title>
+<link rel="stylesheet" href="{% vstatic 'css/desk.css' %}">
+</head>
+<body class="dk-doc">
+<main class="dk-paper">
+  <header class="dk-paper-head">
+    <b class="dk-brand">FITNES<i>.</i>ZAL</b>
+    {% if gs.address %}<p>{{ gs.address }}</p>{% endif %}<p>+998 {{ gs.phone }}</p>
+    <h1>To'lov cheki</h1>
+  </header>
+  <dl class="dk-rows">
+    <div><dt>Chek raqami</dt><dd class="num">{{ p.reference }}</dd></div>
+    <div><dt>Sana</dt><dd class="num">{{ p.created|dmyhm }}</dd></div>
+    <div><dt>A'zo</dt><dd>{{ p.user.full_name }} <span class="num">({{ p.user.member_code }})</span></dd></div>
+    <div><dt>Abonement</dt><dd>{{ p.plan.name }}</dd></div>
+    {% if m %}<div><dt>Amal qiladi</dt><dd class="num">{{ m.starts|dmy }} – {{ m.expires|dmy }}</dd></div>{% endif %}
+    <div><dt>To'lov usuli</dt><dd>{{ method_label }}</dd></div>
+    <div class="total"><dt>Jami</dt><dd class="num">{{ p.amount|money }} so'm</dd></div>
+    <div><dt>Rozilik</dt><dd>{% if p.consent_at %}Oferta va maxfiylikka rozilik qabulxonada olingan ({{ p.consent_at|dmyhm }}){% else %}—{% endif %}</dd></div>
+    <div><dt>Xodim</dt><dd>{{ p.staff.full_name|default:"—" }}</dd></div>
+  </dl>
+  <p class="dk-thanks">Rahmat! Mashg'ulotlaringiz samarali bo'lsin.</p>
+  <p class="dk-actions noprint"><button type="button" class="dk-btn primary" onclick="window.print()">{% aicon 'printer' %}Chop etish</button> <a class="dk-btn" href="{% url 'admin:desk' %}">Qabulxonaga qaytish</a></p>
+</main>
+</body>
+</html>

@@ -141,27 +141,6 @@ def waitlist_leave(request, pk):
     return redirect("classes")
 
 
-# staff: who came to today's classes
-@staff_required
-def desk_classes(request):
-    today = timezone.localdate()
-    rows = []
-    for c in GymClass.objects.filter(active=True, weekday=today.weekday()).select_related("trainer"):
-        bookings = list(Booking.objects.filter(gym_class=c, date=today).select_related("user").order_by("user__first_name"))
-        rows.append({"c": c, "bookings": bookings, "started": extras.class_start(c, today) <= timezone.now(),
-                     "waiting": ClassWaitlist.objects.filter(gym_class=c, date=today).count()})
-    return render(request, "gym/staff/classes.html", {"rows": rows, "today": today})
-
-
-@require_POST
-@staff_required
-def desk_booking_mark(request, pk, action):
-    b = get_object_or_404(Booking, pk=pk)
-    if extras.mark_booking(b, action):
-        flash(request, messages.SUCCESS, "done_ok")
-    return redirect("desk_classes")
-
-
 # ---------------------------------------------------------------- 6. trainer rating
 @require_POST
 @login_required

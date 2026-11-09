@@ -2,6 +2,7 @@ from django.contrib.auth import views as auth_views
 from django.urls import path
 
 from . import chat_views as c
+from . import desk
 from . import coach_views as coach
 from . import views as v
 from . import views_extra as x
@@ -94,8 +95,6 @@ urlpatterns = [
     path("guest/<str:code>/", x.guest_public, name="guest_public"),
     path("classes/<int:pk>/waitlist/", x.waitlist_join, name="waitlist_join"),
     path("classes/<int:pk>/waitlist/leave/", x.waitlist_leave, name="waitlist_leave"),
-    path("staff/classes/", x.desk_classes, name="desk_classes"),
-    path("staff/booking/<int:pk>/<str:action>/", x.desk_booking_mark, name="desk_booking_mark"),
     path("trainers/<int:pk>/rate/", x.trainer_rate, name="trainer_rate"),
     path("leaderboard/join/", x.leaderboard_optin, name="leaderboard_optin"),
     path("gift/", x.gift_view, name="gift"),
@@ -130,15 +129,8 @@ urlpatterns = [
     path("progress/<int:pk>/delete/", v.progress_delete, name="progress_delete"),
     path("reviews/", v.reviews_view, name="reviews"),
     path("profile/", v.profile_view, name="profile"),
-    path("staff/", v.desk, name="desk"),
-    path("staff/scan/", v.scan_view, name="scan"),
-    path("staff/checkin/<int:uid>/", v.desk_checkin, name="desk_checkin"),
-    path("staff/sell/<int:uid>/", v.desk_sell, name="desk_sell"),
-    path("staff/confirm/<int:pid>/", v.desk_confirm, name="desk_confirm"),
-    path("staff/reject/<int:pid>/", v.desk_reject, name="desk_reject"),
-    path("staff/handover/<int:oid>/", v.desk_handover, name="desk_handover"),
-    path("staff/ship/<int:oid>/", v.desk_ship, name="desk_ship"),
+    # the front desk moved into the admin panel (/django-admin/desk/...): old addresses and bookmarks keep working
+    path("staff/", desk.legacy_redirect, name="staff_redirect_home"),
+    path("staff/<path:rest>", desk.legacy_redirect, name="staff_redirect"),
     path("auth/apple/", v.apple_login, name="apple_login"),
-    path("staff/block/<int:uid>/", v.desk_block, name="desk_block"),
-    path("staff/pt/<int:pk>/<str:action>/", v.desk_pt, name="desk_pt"),
 ]

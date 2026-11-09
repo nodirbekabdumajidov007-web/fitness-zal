@@ -379,11 +379,13 @@ def GiftCertificateQS(pk):
 
 
 @transaction.atomic
-def confirm_payment(payment):
+def confirm_payment(payment, staff=None):
     if payment.status != Payment.Status.PENDING:
         return False
     payment.status = Payment.Status.PAID
-    payment.save(update_fields=["status"])
+    if staff is not None:
+        payment.staff = staff  # audit trail: who approved it at the desk
+    payment.save(update_fields=["status", "staff"] if staff is not None else ["status"])
     if payment.kind == "plan" and payment.user and payment.plan:
         add_membership(payment.user, payment.plan)
     if payment.user:
@@ -392,12 +394,14 @@ def confirm_payment(payment):
 
 
 @transaction.atomic
-def cancel_payment(payment, notify=False):
+def cancel_payment(payment, notify=False, staff=None):
     """Cancels an unpaid payment. For shop orders the reserved stock goes back; a used promo code is released."""
     if payment.status != Payment.Status.PENDING:
         return False
     payment.status = Payment.Status.CANCELLED
-    payment.save(update_fields=["status"])
+    if staff is not None:
+        payment.staff = staff
+    payment.save(update_fields=["status", "staff"] if staff is not None else ["status"])
     order = payment.order
     if order and order.status == Order.Status.NEW:
         for it in order.items.exclude(product=None):

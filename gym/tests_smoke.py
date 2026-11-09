@@ -71,14 +71,13 @@ class SmokeTests(TestCase):
             "progress_delete": {"pk": self.log.pk}, "workout_toggle": {"pk": self.ex.pk}, "lesson": {"pk": self.lesson.pk},
             "lesson_video": {"pk": self.lesson.pk}, "chat_room": {"pk": self.room.pk}, "chat_send": {"pk": self.room.pk},
             "chat_poll": {"pk": self.room.pk}, "chat_delete": {"pk": self.msg.pk}, "chat_report": {"pk": self.msg.pk},
-            "desk_pt": {"pk": self.pt.pk, "action": "confirm"}, "desk_confirm": {"pid": self.card_pay.pk}, "desk_reject": {"pid": self.card_pay.pk},
-            "desk_handover": {"oid": self.order.pk},
+            "staff_redirect": {"rest": "scan/"},
             "image": {"kind": "product", "pk": Product.objects.first().pk}, "product": {"pk": Product.objects.first().pk},
             "trainer": {"pk": self.trainer.pk},
             "start_program": {"key": "beginner"}, "coach_pt": {"pk": self.pt.pk, "action": "confirm"},
             "coach_client": {"uid": self.other.pk}, "coach_plan": {"uid": self.other.pk},
             "pw_confirm": {"uidb64": "MQ", "token": "set-password"},
-            "guest_public": {"code": "GP-1-abcdef123456"}, "calendar_feed": {"token": "x" * 32}, "desk_booking_mark": {"pk": 1, "action": "reset"},
+            "guest_public": {"code": "GP-1-abcdef123456"}, "calendar_feed": {"token": "x" * 32},
             "guest_cancel": {"pk": 1}, "waitlist_join": {"pk": self.cls.pk}, "waitlist_leave": {"pk": self.cls.pk}, "trainer_rate": {"pk": self.trainer.pk}, "booking_ics": {"pk": self.booking.pk},
         }
         if name in objs:
@@ -103,8 +102,8 @@ class SmokeTests(TestCase):
                 self.check(client, url, who)
             seen += 1
         self.assertGreater(seen, 50)
-        for extra in ("/training/?day=3&level=advanced", "/shop/?q=suv", "/chat/?q=bek", f"/staff/?q={self.u.member_code}",
-                      "/staff/?q=FZ", "/plans/", "/dashboard/"):
+        for extra in ("/training/?day=3&level=advanced", "/shop/?q=suv", "/chat/?q=bek", f"/django-admin/desk/?q={self.u.member_code}",
+                      "/django-admin/desk/?q=FZ", "/plans/", "/dashboard/"):
             for who, client in clients.items():
                 self.check(client, extra, who)
 

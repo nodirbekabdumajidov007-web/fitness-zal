@@ -1,0 +1,17 @@
+{% extends "admin/base_site.html" %}{% load gym_tags fz_admin %}
+{% block extrahead %}{{ block.super }}<link rel="stylesheet" href="{% vstatic 'css/desk.css' %}">{% endblock %}
+{% block content_title %}{% endblock %}
+{% block bodyclass %}dk-body{% endblock %}
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url 'admin:index' %}">Bosh sahifa</a><span class="sep" aria-hidden="true">/</span><a href="{% url 'admin:desk' %}">Qabulxona</a><span class="sep" aria-hidden="true">/</span><span class="here">Davomat</span></div>{% endblock %}
+{% block content %}
+<div class="dk" id="dk-classes">
+  <section class="dk-top">
+    <div><span class="dk-eyebrow">{{ ctx.today|date:"l, d.m.Y" }}</span><h2>Mashg'ulotlar davomati</h2></div>
+    <a class="dk-btn" href="{% url 'admin:desk' %}">{% aicon 'left' %}Qabulxonaga</a>
+  </section>
+  <section class="dk-card-lg" id="dk-classes-body" data-reload>{% include "admin/desk/_classes.html" %}</section>
+  <div class="dk-toasts" id="dk-toasts" aria-live="polite"></div>
+</div>
+<script src="{% vstatic 'js/scan.js' %}"></script>
+<script src="{% vstatic 'js/desk.js' %}"></script>
+{% endblock %}

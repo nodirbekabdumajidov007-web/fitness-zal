@@ -18,7 +18,7 @@ PUBLIC = ["/", "/plans/", "/shop/", "/classes/", "/trainers/", "/tools/", "/ai/"
           "/refund/", "/login/", "/register/", "/password/email/"]
 MEMBER = ["/dashboard/", "/account/", "/profile/", "/card/", "/membership/", "/calories/", "/workouts/", "/achievements/",
           "/payments/", "/orders/", "/cart/", "/chat/", "/inbox/", "/gift/"]
-STAFF = ["/staff/", "/staff/scan/", "/staff/classes/", "/django-admin/", "/django-admin/reports/", "/django-admin/gym/user/",
+STAFF = ["/django-admin/desk/", "/django-admin/desk/scan/", "/django-admin/desk/classes/", "/django-admin/", "/django-admin/reports/", "/django-admin/gym/user/",
          "/django-admin/gym/payment/", "/django-admin/gym/product/", "/django-admin/gym/user/1/change/"]
 
 

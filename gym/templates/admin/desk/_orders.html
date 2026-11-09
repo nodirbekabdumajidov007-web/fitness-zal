@@ -1,0 +1,16 @@
+{% load gym_tags fz_admin %}
+<div class="dk-cards">
+{% for o in ctx.orders %}
+  <article class="dk-card">
+    <header><span class="dk-ava">{% if o.delivery == 'courier' %}{% aicon 'truck' %}{% else %}{% aicon 'bag' %}{% endif %}</span>
+      <div><b>#{{ o.pk }} · {{ o.user.full_name|default:"—" }}</b><small class="num">{{ o.created|dmyhm }}</small></div><b class="dk-amount num">{{ o.total|money }}</b></header>
+    <ul class="dk-items">{% for it in o.items.all %}<li><span>{{ it.name }}</span><b class="num">× {{ it.qty }}</b></li>{% endfor %}</ul>
+    {% if o.delivery == 'courier' %}<p class="dk-sub">{{ o.address }} · <a href="tel:{{ o.delivery_phone }}" class="num">{{ o.delivery_phone }}</a>{% if o.delivery_note %} · {{ o.delivery_note }}{% endif %}</p>
+      <span class="dk-st {% if o.status == 'shipping' %}good{% else %}warn{% endif %}">{% if o.status == 'shipping' %}Yo'lda{% else %}Kuryer yetkazadi{% endif %}</span>{% endif %}
+    <div class="dk-row-acts">
+      {% if o.delivery == 'courier' and o.status == 'new' %}<button type="button" class="dk-btn sm" data-act="post" data-url="{% url 'admin:desk_ship' o.pk %}">{% aicon 'truck' %}Yo'lga chiqarish</button>{% endif %}
+      <button type="button" class="dk-btn sm primary" data-act="post" data-url="{% url 'admin:desk_handover' o.pk %}" data-confirm="Buyurtma topshirildimi?">{% aicon 'tick' %}{% if o.delivery == 'courier' %}Yetkazildi{% else %}Topshirish{% endif %}</button>
+    </div>
+  </article>
+{% empty %}<p class="dk-empty">{% aicon 'check' %}Topshiriladigan buyurtma yo'q</p>{% endfor %}
+</div>

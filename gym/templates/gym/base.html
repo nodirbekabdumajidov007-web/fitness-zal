@@ -57,8 +57,7 @@
             </div>
             {% if is_trainer or admin_mode %}<div class="um-group">
               {% if is_trainer %}<a role="menuitem" href="{% url 'coach' %}"><svg class="um-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12M4 9v6M20 9v6M2 11v2M22 11v2"/></svg>{% t 'coach_panel' %}</a>{% endif %}
-              {% if admin_mode %}<a role="menuitem" href="{% url 'desk' %}"><svg class="um-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>{% t 'nav_desk' %}</a>
-              <a role="menuitem" href="/django-admin/"><svg class="um-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg>{% t 'nav_admin' %}</a>{% endif %}
+              {% if admin_mode %}<a role="menuitem" href="/django-admin/"><svg class="um-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg>{% t 'nav_admin' %}</a>{% endif %}
             </div>{% endif %}
             <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="um-out" type="submit" role="menuitem"><svg class="um-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 12H4M8 8l-4 4 4 4"/><path d="M13 4h6v16h-6"/></svg>{% t 'logout' %}</button></form>
           </div>
@@ -113,8 +112,7 @@
     {% if is_trainer or admin_mode %}<div class="sb-grp">
       <h2 class="sb-cap">{% t 'nav_g_staff' %}</h2>
       {% if is_trainer %}<a class="nav-coach" href="{% url 'coach' %}"{% if '/coach' in p %} aria-current="page"{% endif %}>{% icon 'clipboard' %}<span class="sb-lbl">{% t 'coach_panel' %}</span></a>{% endif %}
-      {% if admin_mode %}<a href="{% url 'desk' %}"{% if '/staff' in p %} aria-current="page"{% endif %}>{% icon 'monitor' %}<span class="sb-lbl">{% t 'nav_desk' %}</span></a>
-      <a href="/django-admin/">{% icon 'shield' %}<span class="sb-lbl">{% t 'nav_admin' %}</span></a>{% endif %}
+      {% if admin_mode %}<a href="/django-admin/">{% icon 'shield' %}<span class="sb-lbl">{% t 'nav_admin' %}</span></a>{% endif %}
     </div>{% endif %}
   </nav>
   <button type="button" class="sb-collapse" id="sb-collapse" aria-pressed="false">{% icon 'chevrons-left' %}<span class="sb-lbl">{% t 'nav_collapse' %}</span></button>

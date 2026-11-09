@@ -198,7 +198,7 @@ class ProfileTests(Base):
 
 class ScanTicketTests(Base):
     def scan(self, code):
-        return self.staff.post("/staff/scan/", json.dumps({"code": code}), content_type="application/json")
+        return self.staff.post("/django-admin/desk/scan/", json.dumps({"code": code}), content_type="application/json")
 
     def test_entry_prints_a_receipt(self):
         now = timezone.now()
@@ -225,7 +225,7 @@ class ScanTicketTests(Base):
         self.assertNotIn("tk-bar", d["ticket"])  # no number for a refused entry
 
     def test_scanner_page(self):
-        r = self.staff.get("/staff/scan/")
+        r = self.staff.get("/django-admin/desk/scan/")
         self.assertContains(r, "sc-printer")
         self.assertContains(r, 'id="sc-print"')
 

@@ -77,14 +77,14 @@ class AuthTests(Base):
     def test_staff_area_needs_admin_suffix(self):
         c, _ = self.member()
         self.assertEqual(c.get("/django-admin/").status_code, 404)  # a member cannot even see it exists
-        self.assertEqual(c.get("/staff/").status_code, 404)
+        self.assertEqual(c.get("/django-admin/desk/").status_code, 404)
         plain = Client()
         plain.post("/login/", {"login": "admin1", "password": "AdminPass1"})
         self.assertEqual(plain.get("/django-admin/")["Location"], "/login/?need_admin=1")
-        self.assertEqual(Client().get("/staff/").status_code, 302)
+        self.assertEqual(Client().get("/django-admin/desk/").status_code, 302)
         a = self.staff()
         self.assertEqual(a.get("/django-admin/").status_code, 200)
-        self.assertEqual(a.get("/staff/").status_code, 200)
+        self.assertEqual(a.get("/django-admin/desk/").status_code, 200)
         m = Client()  # a member cannot gain staff rights with the suffix
         self.assertContains(m.post("/login/", {"phone": "901112233", "password": PW + ".admin"}), "field-err") if User.objects.filter(phone="+998901112233").exists() else None
 
@@ -199,15 +199,15 @@ class StaffAndAdminTests(Base):
         c, u = self.member()
         c.post("/plans/m3/buy/", {"method": "cash"})
         a = self.staff()
-        self.assertContains(a.get("/staff/?q=" + u.member_code), u.first_name)
+        self.assertContains(a.get("/django-admin/desk/search/?q=" + u.member_code), u.first_name)
         pid = Payment.objects.get().pk
-        a.post(f"/staff/confirm/{pid}/")
+        a.post(f"/django-admin/desk/confirm/{pid}/")
         self.assertTrue(services.active_membership(u))
-        a.post(f"/staff/checkin/{u.pk}/")
+        a.post(f"/django-admin/desk/checkin/{u.pk}/")
         self.assertEqual(u.visits.count(), 1)
-        a.post(f"/staff/sell/{u.pk}/", {"plan": "m1"})
+        a.post(f"/django-admin/desk/sell/{u.pk}/", {"plan": "m1"})
         self.assertEqual(Membership.objects.filter(user=u).count(), 2)
-        a.post(f"/staff/block/{u.pk}/")
+        a.post(f"/django-admin/desk/block/{u.pk}/")
         u.refresh_from_db()
         self.assertFalse(u.is_active)
         self.assertEqual(c.get("/dashboard/").status_code, 302)  # blocked sessions end

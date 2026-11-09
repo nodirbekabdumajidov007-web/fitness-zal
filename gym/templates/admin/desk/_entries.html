@@ -1,0 +1,9 @@
+{% load gym_tags fz_admin %}
+<ul class="dk-list dk-entries">
+{% for e in ctx.entries %}
+  <li><span><span class="dk-dot {% if e.result == 'rejected' %}bad{% elif e.result == 'repeat' %}mute{% else %}good{% endif %}"></span>
+    {% if e.guest_pass and e.method == 'guest' %}<b>{{ e.guest_pass.guest_name }}</b> <span class="dk-sub">(mehmon)</span>{% elif e.user %}<a href="#" data-open-member="{{ e.user.pk }}"><b>{{ e.user.full_name }}</b></a> <span class="dk-sub num">{{ e.user.member_code }}</span>{% else %}<b>Noma'lum kod</b>{% endif %}
+    {% if e.result == 'rejected' %}<span class="dk-st bad">{{ e.reason_label|default:"Rad etildi" }}</span>{% elif e.result == 'repeat' %}<span class="dk-st mute">Qayta</span>{% endif %}</span>
+    <span class="dk-sub">{{ e.get_method_display }}{% if e.staff %} · {{ e.staff.first_name|default:e.staff.username }}{% endif %} · <time class="num">{{ e.ts|date:"H:i" }}</time></span></li>
+{% empty %}<li class="dk-empty-li">Bugun hali kirish bo'lmagan</li>{% endfor %}
+</ul>

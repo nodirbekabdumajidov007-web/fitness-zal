@@ -82,8 +82,8 @@ class CardPaymentFlowTests(CardBase):
         self.assertEqual((pay.sender_last4, bool(pay.proof_at), pay.status), ("9999", True, "pending"))
         self.assertFalse(Membership.objects.exists())
         a = self.staff()
-        self.assertContains(a.get("/staff/"), "9999")  # staff see the sender card and the reference
-        a.post(f"/staff/confirm/{pay.pk}/")
+        self.assertContains(a.get("/django-admin/desk/"), "9999")  # staff see the sender card and the reference
+        a.post(f"/django-admin/desk/confirm/{pay.pk}/")
         pay.refresh_from_db()
         self.assertEqual(pay.status, "paid")
         self.assertTrue(services.active_membership(u))
@@ -158,7 +158,7 @@ class CardShopTests(CardBase):
         suv.refresh_from_db()
         self.assertEqual(suv.stock, before - 4)
         a = self.staff()
-        a.post(f"/staff/reject/{pay.pk}/")
+        a.post(f"/django-admin/desk/reject/{pay.pk}/")
         pay.refresh_from_db()
         suv.refresh_from_db()
         self.assertEqual((pay.status, suv.stock, Order.objects.get().status), ("cancelled", before, "cancelled"))

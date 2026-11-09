@@ -1,0 +1,75 @@
+{% load gym_tags fz_admin %}
+<article class="dk-mem" data-member="{{ u.pk }}">
+  <header class="dk-mem-head">
+    <span class="dk-ava lg" aria-hidden="true">{{ initials }}</span>
+    <div class="dk-mem-id">
+      <h3>{{ u.full_name }}</h3>
+      <p class="dk-meta"><span class="num">{{ u.member_code }}</span>{% if u.phone %}<a href="tel:{{ u.phone }}" class="num">{% aicon 'phone' %}{{ u.phone }}</a>{% endif %}<span>A'zo bo'lgan: {{ u.created|dmy }}</span></p>
+    </div>
+    <span class="dk-st {{ st.tone }}">{{ st.label }}</span>
+  </header>
+
+  <section class="dk-plan" aria-label="Abonement">
+    {% if st.m %}
+      <div class="dk-plan-row"><b>{{ st.m.plan.name }}</b><span class="num">{{ st.m.starts|dmy }} – {{ st.m.expires|dmy }}</span></div>
+      <div class="dk-bar {{ st.tone }}" role="img" aria-label="{{ st.days_left }} kun qoldi"><i style="width:{{ st.pct }}%"></i></div>
+      <p class="dk-sub"><b class="num">{{ st.days_left }}</b> kun qoldi{% if st.key == 'expiring' %} · tez orada tugaydi{% endif %}</p>
+    {% elif st.last %}
+      <div class="dk-plan-row"><b>{{ st.last.plan.name }}</b><span class="num">tugagan: {{ st.last.expires|dmy }}</span></div>
+      <div class="dk-bar bad" aria-hidden="true"><i style="width:3%"></i></div>
+    {% else %}
+      <p class="dk-sub">Bu a'zo hali abonement olmagan.</p>
+    {% endif %}
+    {% if freeze.current %}<p class="dk-note info">{% aicon 'snow' %}Muzlatilgan: <span class="num">{{ freeze.current.start_date|dmy }} – {{ freeze.current.end_date|dmy }}</span> (shu kuni qaytadi)</p>
+    {% elif freeze.scheduled %}<p class="dk-note info">{% aicon 'snow' %}Muzlatish rejalangan: <span class="num">{{ freeze.scheduled.start_date|dmy }}</span> dan</p>
+    {% elif freeze.m and freeze.enabled %}<p class="dk-sub">Muzlatish: <b class="num">{{ freeze.left }}</b> kun qoldi (jami {{ freeze.max }}, kamida {{ freeze.min }})</p>{% endif %}
+    {% if not can_enter %}<p class="dk-note bad">{% aicon 'alert' %}Hozir kira olmaydi{% if refusal %}: {{ refusal }}{% endif %}</p>{% endif %}
+    {% if today_in %}<p class="dk-note good">{% aicon 'check' %}Bugun allaqachon kirgan</p>{% endif %}
+  </section>
+
+  <div class="dk-acts">
+    <button type="button" class="dk-btn primary lg" data-act="post" data-url="{% url 'admin:desk_checkin' u.pk %}">{% aicon 'door' %}Kirgizish</button>
+    <button type="button" class="dk-btn" data-open="sell" data-plan="">{% aicon 'ticket' %}Abonement sotish</button>
+    {% if st.last and renew %}<button type="button" class="dk-btn" data-open="sell" data-plan="{{ renew.code }}">{% aicon 'refresh' %}Uzaytirish</button>{% endif %}
+    {% if freeze.current or freeze.scheduled %}<button type="button" class="dk-btn" data-act="post" data-url="{% url 'admin:desk_unfreeze' u.pk %}" data-confirm="Muzlatishni tugatib, a'zoni qaytaraylikmi?">{% aicon 'snow' %}Muzlatishni ochish</button>
+    {% elif freeze.can %}<button type="button" class="dk-btn" data-open="freeze">{% aicon 'snow' %}Muzlatish</button>{% endif %}
+    <a class="dk-btn ghost" href="{% url 'admin:member' u.pk %}">{% aicon 'user' %}To'liq kartochka</a>
+    <button type="button" class="dk-btn ghost danger" data-act="post" data-url="{% url 'admin:desk_block' u.pk %}" data-confirm="{% if u.is_active %}Akkaunt bloklansinmi?{% else %}Akkaunt ochilsinmi?{% endif %}">{% aicon 'ban' %}{% if u.is_active %}Bloklash{% else %}Blokdan chiqarish{% endif %}</button>
+  </div>
+
+  <form class="dk-form" data-form="sell" data-url="{% url 'admin:desk_sell' u.pk %}" hidden>
+    <h4>Abonement sotish</h4>
+    <label>Abonement turi
+      <select name="plan" required>{% for p in plans %}<option value="{{ p.code }}">{{ p.name }} · {{ p.price|money }} so'm</option>{% endfor %}</select></label>
+    <fieldset class="dk-seg" aria-label="To'lov usuli">
+      {% for code, label in methods %}<label><input type="radio" name="method" value="{{ code }}"{% if forloop.first %} checked{% endif %}><span>{{ label }}</span></label>{% endfor %}
+    </fieldset>
+    {% if not u.consent_at %}<label class="dk-chk"><input type="checkbox" name="consent" required><span>A'zo oferta va maxfiylik siyosatiga rozilik berdi (qabulxonada, og'zaki yoki imzo bilan)</span></label>{% else %}<input type="hidden" name="consent" value="1">{% endif %}
+    <div class="dk-form-acts"><button type="submit" class="dk-btn primary">{% aicon 'tick' %}Sotish va chek</button><button type="button" class="dk-btn ghost" data-close>Bekor</button></div>
+  </form>
+
+  <form class="dk-form" data-form="freeze" data-url="{% url 'admin:desk_freeze' u.pk %}" hidden>
+    <h4>Muzlatish</h4>
+    <fieldset class="dk-seg" aria-label="Necha kun">
+      {% for d in freeze_days %}{% if d <= freeze.left and d >= freeze.min %}<label><input type="radio" name="days" value="{{ d }}"{% if forloop.first %} checked{% endif %}><span>{{ d }} kun</span></label>{% endif %}{% endfor %}
+      <label><input type="radio" name="days" value="{{ freeze.left }}"><span>Hammasi ({{ freeze.left }})</span></label>
+    </fieldset>
+    <div class="dk-form-acts"><button type="submit" class="dk-btn primary">{% aicon 'snow' %}Muzlatish</button><button type="button" class="dk-btn ghost" data-close>Bekor</button></div>
+  </form>
+
+  {% if pending %}
+  <section class="dk-sec"><h4>Tasdiq kutayotgan to'lovlar</h4>
+    <ul class="dk-list">{% for p in pending %}<li><span>{% if p.plan %}{{ p.plan.name }}{% else %}{{ p.kind }}{% endif %} · <span class="num">{{ p.created|dmyhm }}</span></span>
+      <b class="num">{{ p.amount|money }}</b>
+      <span class="dk-row-acts"><button type="button" class="dk-btn sm primary" data-act="post" data-url="{% url 'admin:desk_confirm' p.pk %}" data-confirm="Pul qabul qilinganini tasdiqlaysizmi?" data-reload-member>Tasdiqlash</button>
+        <button type="button" class="dk-btn sm danger" data-act="post" data-url="{% url 'admin:desk_reject' p.pk %}" data-confirm="To'lov rad etilsinmi?" data-reload-member>Rad</button></span></li>{% endfor %}</ul></section>
+  {% endif %}
+
+  <div class="dk-two">
+    <section class="dk-sec"><h4>Oxirgi kirishlar <small class="num">bu oy {{ month_visits }} · jami {{ total_visits }}</small></h4>
+      <ul class="dk-list">{% for e in recent %}<li><span><span class="dk-dot {% if e.result == 'rejected' %}bad{% else %}good{% endif %}"></span>{{ e.get_result_display }}{% if e.reason %} · {{ e.get_reason_display }}{% endif %}</span><time class="num">{{ e.ts|dmyhm }}</time></li>
+        {% empty %}<li class="dk-empty-li">Hali kirmagan</li>{% endfor %}</ul></section>
+    <section class="dk-sec"><h4>Xodim izohi</h4>
+      {% if u.staff_note %}<p class="dk-notes">{{ u.staff_note|linebreaksbr }}</p>{% else %}<p class="dk-sub">Izoh yo'q. <a href="{% url 'admin:gym_user_change' u.pk %}">Izoh qo'shish</a></p>{% endif %}</section>
+  </div>
+</article>

@@ -1,0 +1,8 @@
+{% load gym_tags fz_admin %}
+<ul class="dk-list">
+{% for g in ctx.guests %}
+  <li><span><b>{{ g.guest_name }}</b> <span class="dk-sub">· {{ g.owner.full_name }} ({{ g.owner.member_code }}){% if g.guest_phone %} · <span class="num">{{ g.guest_phone }}</span>{% endif %}</span>
+    {% if g.used_at %}<span class="dk-st good">Kirgan {{ g.used_at|date:"H:i" }}</span>{% else %}<span class="dk-st warn">Kutilmoqda</span>{% endif %}</span>
+    {% if not g.used_at %}<button type="button" class="dk-btn sm primary" data-guest-id="{{ g.pk }}">{% aicon 'door' %}Kiritish</button>{% endif %}</li>
+{% empty %}<li class="dk-empty-li">Bugunga mehmon taklifnomasi yo'q</li>{% endfor %}
+</ul>

@@ -9,7 +9,7 @@
         <span class="fz-eyebrow">{{ m.member_code }} · a'zo {{ m.created|date:"d.m.Y" }} dan</span>
         <h2>{{ m.first_name }} {{ m.last_name }} {% if not m.is_active %} <span class="fz-pill red">Bloklangan</span>{% endif %}</h2>
         <p>{% if m.phone %}<a href="tel:{{ m.phone }}">{{ m.phone }}</a>{% if m.phone_verified %} <span class="fz-pill green">tasdiqlangan</span>{% endif %}{% endif %}{% if m.email %} · {{ m.email }}{% endif %}{% if m.telegram_chat_id %} · Telegram ulangan{% endif %}{% if referrals %} · {{ referrals }} ta do'st taklif qilgan{% endif %}</p>
-        <div class="fz-actions"><a class="red" href="/staff/?q={{ m.phone|default:m.member_code|urlencode }}">Qabulxonada ochish</a><a href="{% url 'admin:gym_user_change' m.pk %}">Tahrirlash / +30 kun</a><a href="{% url 'admin:gym_payment_changelist' %}?q={{ m.phone|default:''|urlencode }}">To'lovlari</a><a href="{% url 'admin:message' %}?ids={{ m.pk }}">Xabar yozish</a></div>
+        <div class="fz-actions"><a class="red" href="{% url 'admin:desk' %}?q={{ m.phone|default:m.member_code|urlencode }}">Qabulxonada ochish</a><a href="{% url 'admin:gym_user_change' m.pk %}">Tahrirlash / +30 kun</a><a href="{% url 'admin:gym_payment_changelist' %}?q={{ m.phone|default:''|urlencode }}">To'lovlari</a><a href="{% url 'admin:message' %}?ids={{ m.pk }}">Xabar yozish</a></div>
         {% if m.staff_note %}<p class="fz-note">{% aicon 'note' 'inl' %} {{ m.staff_note }}</p>{% endif %}
       </div>
     </div>

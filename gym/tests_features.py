@@ -78,7 +78,7 @@ class CardAndScanTests(Base):
 
     def test_scan_checks_in_and_needs_staff(self):
         c, u = self.member()
-        post = lambda cl, code: cl.post("/staff/scan/", json.dumps({"code": code}), content_type="application/json")
+        post = lambda cl, code: cl.post("/django-admin/desk/scan/", json.dumps({"code": code}), content_type="application/json")
         self.assertEqual(post(c, services.card_token(u)).status_code, 404)  # a member cannot use the scanner
         a = self.staff()
         r = post(a, services.card_token(u))
@@ -88,8 +88,8 @@ class CardAndScanTests(Base):
         self.assertTrue(r.json()["entered"])
         self.assertEqual(Visit.objects.filter(user=u).count(), 1)
         self.assertEqual(post(a, "FZ:1:bad").status_code, 404)
-        self.assertEqual(a.get("/staff/scan/").status_code, 200)
-        self.assertContains(a.get("/staff/?q=" + services.card_token(u)), u.first_name)  # desk search accepts the QR text
+        self.assertEqual(a.get("/django-admin/desk/scan/").status_code, 200)
+        self.assertContains(a.get("/django-admin/desk/search/?q=" + services.card_token(u)), u.first_name)  # desk search accepts the QR text
 
 
 class WorkoutTests(Base):
@@ -324,7 +324,7 @@ class PersonalTrainingTests(Base):
         self.assertEqual(s.status, "requested")
         a = self.staff()
         with mock.patch.object(telegram, "notify_user") as notify:
-            a.post(f"/staff/pt/{s.pk}/confirm/")
+            a.post(f"/django-admin/desk/pt/{s.pk}/confirm/")
         s.refresh_from_db()
         self.assertEqual(s.status, "confirmed")
         notify.assert_called_once()

@@ -327,8 +327,9 @@ SECTIONS = [  # the sidebar groups the gym's many tables by job instead of one l
 # staff member may open are shown, and nothing here points at a page that does not exist.
 NAV = [
     ("Asosiy", [("Bosh sahifa", "home", "view:index", None, None),
-                ("Qabulxona", "desk", "/staff/", None, None),
-                ("QR skaner", "scan", "/staff/scan/", None, None)]),
+                ("Qabulxona", "desk", "view:desk", None, "desk"),
+                ("QR skaner", "scan", "view:desk_scan", None, None),
+                ("Davomat", "check", "view:desk_classes", None, None)]),
     ("Moliya", [("Kassa", "wallet", "view:cash", "gym.view_payment", None),
                 ("To'lovlar", "card", "model:payment", None, "payments"),
                 ("Hisobotlar", "chart", "view:reports", "gym.view_payment", None),
@@ -381,6 +382,7 @@ def nav_badges():
         got = {"payments": Payment.objects.filter(status="pending").count(), "orders": Order.objects.filter(status="new").count(),
                "reports": ChatReport.objects.filter(resolved=False).count(),
                "pt": PTSession.objects.filter(status="requested", starts__gte=now).count()}
+        got["desk"] = got["payments"] + got["orders"] + got["pt"]  # everything that waits for the front desk
         cache.set("fz_nav_badges", got, 20)
     return got
 
@@ -440,7 +442,7 @@ class GymAdminSite(admin.AdminSite):
                     on = active_for(name, by_model[name]["admin_url"], query)
                 elif target.startswith("view:"):
                     url = reverse("admin:" + target[5:])
-                    on = path == url if target == "view:index" else path.startswith(url)
+                    on = path == url if target in ("view:index", "view:desk") else path.startswith(url)
                 else:
                     url, on = target, False
                 if query:
@@ -494,7 +496,8 @@ class GymAdminSite(admin.AdminSite):
         return super().index(request, extra)
 
     def get_urls(self):
-        return [path("reports/", self.gated(self.reports_view, VIEW_PERMS["reports"]), name="reports"),
+        from .desk import desk_urls
+        return desk_urls(self) + [path("reports/", self.gated(self.reports_view, VIEW_PERMS["reports"]), name="reports"),
                 path("reports/csv/", self.gated(self.reports_csv, VIEW_PERMS["reports_csv"]), name="reports_csv"),
                 path("search/", self.gated(self.search_view, VIEW_PERMS["search"]), name="search"),
                 path("member/<int:pk>/", self.gated(self.member_view, VIEW_PERMS["member"]), name="member"),

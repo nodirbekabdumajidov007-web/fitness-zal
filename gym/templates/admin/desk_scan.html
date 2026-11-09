@@ -1,0 +1,33 @@
+{% extends "admin/base_site.html" %}{% load gym_tags fz_admin %}
+{% block extrahead %}{{ block.super }}<link rel="stylesheet" href="{% vstatic 'css/desk.css' %}">{% endblock %}
+{% block content_title %}{% endblock %}
+{% block bodyclass %}dk-body scan-page{% endblock %}
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url 'admin:index' %}">Bosh sahifa</a><span class="sep" aria-hidden="true">/</span><a href="{% url 'admin:desk' %}">Qabulxona</a><span class="sep" aria-hidden="true">/</span><span class="here">QR skaner</span></div>{% endblock %}
+{% block content %}
+<div class="dk" id="scan-page" data-url="{% url 'admin:desk_scan' %}">
+  <section class="dk-top">
+    <div><span class="dk-eyebrow">Qabulxona</span><h2>QR skaner</h2></div>
+    <span class="dk-pill-count"><b class="num" id="sc-today">{{ today_count }}</b> bugungi kirish</span>
+  </section>
+  <div class="dk-banner sc-banner" id="sc-banner" role="status" aria-live="assertive" hidden>
+    <span class="dk-banner-ico" aria-hidden="true"></span>
+    <div class="dk-banner-txt"><b data-b="title"></b><strong data-b="name"></strong><span data-b="sub"></span></div>
+  </div>
+  <div class="sc-grid">
+    <section class="dk-card-lg sc-cam noprint">
+      <div class="dk-cam big" id="dk-cam"><video id="scan-video" playsinline muted></video><span class="dk-frame" aria-hidden="true"><i></i><i></i><i></i><i></i></span><p class="dk-cam-off">Kamera o'chiq</p></div>
+      <div class="dk-row"><button class="dk-btn primary" type="button" id="scan-start">{% aicon 'camera' %}Kamerani yoqish</button></div>
+      <p class="dk-sub" id="scan-support"></p>
+      <label class="dk-lbl">QR matni (USB skaner yoki qo'lda)<input id="scan-code" autocomplete="off" placeholder="FZ:12:abcdef123456" autofocus></label>
+      <p class="dk-sub">A'zoning QR kartasi yoki mehmon taklifnomasi QR kodi (GP-...) qabul qilinadi. Har skanerlash kirishlar tarixiga yoziladi.</p>
+      <div class="sc-log" id="sc-log" hidden><h3>Oxirgi skanerlar</h3><ol></ol></div>
+    </section>
+    <section class="sc-printer" aria-live="polite">
+      <div class="sc-slot noprint" aria-hidden="true"><span class="sc-led" id="sc-led"></span></div>
+      <div class="sc-paper dk-ticket" id="scan-result"><p class="sc-wait noprint">Skanerlashni kutyapman…</p></div>
+      <button class="dk-btn noprint" type="button" id="sc-print" hidden>{% aicon 'printer' %}Chek chop etish</button>
+    </section>
+  </div>
+</div>
+<script src="{% vstatic 'js/scan.js' %}"></script>
+{% endblock %}

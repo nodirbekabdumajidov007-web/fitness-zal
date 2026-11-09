@@ -11,9 +11,6 @@
 
   <div class="wrap cine-inner">
     <div class="cine-copy">
-      <div class="cine-badges">
-        <span class="cine-eyebrow"><i class="dot{% if not is_open %} off{% endif %}"></i>{% if is_open %}{% t 'open' %}{% else %}{% t 'closed' %}{% endif %} · <b class="num">{{ gs.open_time|hm }}–{{ gs.close_time|hm }}</b></span>
-      </div>
       <h1 class="cine-title" data-split>{% t 'tag' %}</h1>
       <p class="cine-sub">{% t 'tag_sub' %}</p>
       <div class="cine-cta">

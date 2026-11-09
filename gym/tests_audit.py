@@ -111,13 +111,13 @@ class LoginAndAdminPolishTests(AuditBase):
     def test_owner_card_prints_a_receipt_and_blocked_member_is_refused(self):
         now = timezone.now()
         Membership.objects.create(user=self.admin, plan=Plan.objects.get(code="m1"), starts=now - timedelta(days=1), expires=now + timedelta(days=9))
-        r = self.staff.post("/staff/scan/", json.dumps({"code": services.card_token(self.admin)}), content_type="application/json")
+        r = self.staff.post("/django-admin/desk/scan/", json.dumps({"code": services.card_token(self.admin)}), content_type="application/json")
         self.assertEqual(r.status_code, 200)
         self.assertTrue(r.json()["entered"])
         self.assertIn("V-", r.json()["ticket"])
         self.m.is_active = False
         self.m.save()
-        r = self.staff.post("/staff/scan/", json.dumps({"code": services.card_token(self.m)}), content_type="application/json")
+        r = self.staff.post("/django-admin/desk/scan/", json.dumps({"code": services.card_token(self.m)}), content_type="application/json")
         self.assertFalse(r.json()["entered"])  # a paid membership does not let a blocked account in
         from django.utils.html import escape
         self.assertIn(escape(T["uz"]["err_blocked"]), r.json()["ticket"])
@@ -188,7 +188,7 @@ class AdminResetOnDeployTests(AuditBase):
 class ReceiptStatesTests(AuditBase):
     def scan(self, code, lang="uz"):
         self.staff.cookies["fz_lang"] = lang
-        r = self.staff.post("/staff/scan/", json.dumps({"code": code}), content_type="application/json")
+        r = self.staff.post("/django-admin/desk/scan/", json.dumps({"code": code}), content_type="application/json")
         return r, (r.json() if r.get("Content-Type", "").startswith("application/json") else {})
 
     def ticket_clean(self, d, label):
@@ -257,9 +257,9 @@ class ReceiptStatesTests(AuditBase):
 
     def test_bad_input(self):
         for body in ("", "{}", "[]", '{"code": null}', '{"code": 5}', '{"code": ["FZ:1:x"]}', "not json"):
-            r = self.staff.post("/staff/scan/", body, content_type="application/json")
+            r = self.staff.post("/django-admin/desk/scan/", body, content_type="application/json")
             self.assertIn(r.status_code, (404,), body)
         self.assertEqual(self.scan("FZ:1:bad")[0].status_code, 404)
 
     def test_scanner_page_is_clean(self):
-        self.page_ok(self.staff, "/staff/scan/", "staff")
+        self.page_ok(self.staff, "/django-admin/desk/scan/", "staff")
