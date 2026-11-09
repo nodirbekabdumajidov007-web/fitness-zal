@@ -1,0 +1,62 @@
+{% extends "admin/base_site.html" %}{% load gym_tags fz_admin %}
+{% block extrahead %}{{ block.super }}
+<link rel="stylesheet" href="{% vstatic 'css/analytics.css' %}">
+<script src="{% vstatic 'js/analytics.js' %}" defer></script>
+{% endblock %}
+{% block bodyclass %}fz-analytics{% endblock %}
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url 'admin:index' %}">Bosh sahifa</a> › AI Analitika</div>{% endblock %}
+{% block content_title %}{% endblock %}
+{% block content %}
+<div class="an" id="an" data-base="{% url 'admin:analytics_api' 'all' %}" data-csv="{% url 'admin:analytics_csv' %}" data-remind="{% url 'admin:analytics_remind' %}" data-page="{% url 'admin:analytics' %}">
+  {% csrf_token %}
+  <header class="an-head">
+    <div class="an-title">
+      <span class="an-eyebrow">{% aicon 'sparkles' %} AI Analitika</span>
+      <h1>Zal ko'rsatkichlari</h1>
+      <p id="an-range" aria-live="polite">{{ period.label }} · oldingi davr bilan solishtirma</p>
+    </div>
+    <div class="an-tools">
+      <div class="an-seg" role="group" aria-label="Davrni tanlang">
+        {% for pr in period.presets %}<a href="?period={{ pr.key }}" data-period="{{ pr.key }}"{% if pr.key == period.key %} class="on" aria-current="true"{% endif %}>{{ pr.label }}</a>{% endfor %}
+        <button type="button" data-custom-toggle aria-expanded="false"{% if period.key == 'custom' %} class="on"{% endif %}>Boshqa</button>
+      </div>
+      <form class="an-custom" id="an-custom" hidden>
+        <label>Dan <input type="date" name="from" value="{{ period.start }}" max="{% now 'Y-m-d' %}" required></label>
+        <label>Gacha <input type="date" name="to" value="{{ period.end }}" max="{% now 'Y-m-d' %}" required></label>
+        <button type="submit" class="an-btn primary">Ko'rsatish</button>
+      </form>
+      <a class="an-btn" id="an-csv" href="{% url 'admin:analytics_csv' %}?period={{ period.key }}{% if period.key == 'custom' %}&from={{ period.start }}&to={{ period.end }}{% endif %}">{% aicon 'download' %} CSV eksport</a>
+      <button type="button" class="an-btn primary" data-fz-ai-open>{% aicon 'sparkles' %} AI yordamchi</button>
+    </div>
+  </header>
+
+  <div class="an-alert" id="an-error" role="alert" hidden></div>
+  <noscript><p class="an-alert">Analitika sahifasi ishlashi uchun JavaScript kerak.</p></noscript>
+
+  <section aria-labelledby="an-h-insights">
+    <h2 class="an-h" id="an-h-insights">Aqlli xulosalar</h2>
+    <div class="an-insights" id="an-insights"></div>
+  </section>
+
+  <section aria-labelledby="an-h-kpi">
+    <h2 class="an-h" id="an-h-kpi">Asosiy ko'rsatkichlar</h2>
+    <div class="an-kpis" id="an-kpis"></div>
+  </section>
+
+  <div class="an-grid">
+    <article class="an-card span8" id="c-revenue"><header><h3>Tushum dinamikasi</h3><p class="an-sub">Abonement va do'kon, to'langan to'lovlar</p></header><div class="an-body"></div></article>
+    <article class="an-card span4" id="c-plans"><header><h3>Abonementlar turi bo'yicha</h3><p class="an-sub">Davrda boshlangan abonementlar</p></header><div class="an-body"></div></article>
+    <article class="an-card span4" id="c-methods"><header><h3>To'lov usullari</h3><p class="an-sub">Summasi bo'yicha</p></header><div class="an-body"></div></article>
+    <article class="an-card span4" id="c-weekday"><header><h3>Hafta kunlari bo'yicha tashrif</h3><p class="an-sub">Qaysi kunlar gavjum</p></header><div class="an-body"></div></article>
+    <article class="an-card span4" id="c-members"><header><h3>Yangi a'zolar</h3><p class="an-sub">Ro'yxatdan o'tganlar dinamikasi</p></header><div class="an-body"></div></article>
+    <article class="an-card span12" id="c-heat"><header><h3>Tashriflar: soat × hafta kuni</h3><p class="an-sub">To'q rang — gavjum vaqt</p></header><div class="an-body"></div></article>
+    <article class="an-card span6" id="c-products"><header><h3>Eng ko'p sotilgan mahsulotlar</h3><p class="an-sub">Tushum bo'yicha</p></header><div class="an-body"></div></article>
+    <article class="an-card span6" id="c-stock"><header><h3>Tugayotgan mahsulotlar</h3><p class="an-sub">Ombor qoldig'i ogohlantirish chegarasida yoki undan kam</p></header><div class="an-body"></div></article>
+    <article class="an-card span12" id="c-expiring"><header><h3>7 kunda tugaydigan abonementlar</h3><p class="an-sub">Eslatma yuborsangiz, uzaytirish ehtimoli oshadi</p></header><div class="an-body"></div></article>
+  </div>
+
+  <div class="an-toast" id="an-toast" role="status" aria-live="polite" hidden></div>
+</div>
+{{ data|json_script:"an-data" }}
+{{ period|json_script:"an-period" }}
+{% endblock %}

@@ -6,7 +6,7 @@ from django.utils import timezone
 
 from .models import GymClass, Membership, Payment, Plan, Trainer, User
 
-__all__ = ["MembershipFreeze", "ExpiryReminder", "GuestPass", "ReferralReward", "ClassWaitlist", "TrainerReview", "GiftCertificate", "FaqItem", "LegalPage", "EntryLog"]
+__all__ = ["MembershipFreeze", "ExpiryReminder", "GuestPass", "ReferralReward", "ClassWaitlist", "TrainerReview", "GiftCertificate", "FaqItem", "LegalPage", "EntryLog", "AdminQuery"]
 
 
 class MembershipFreeze(models.Model):
@@ -246,3 +246,19 @@ class EntryLog(models.Model):
 
     def __str__(self):
         return f"{self.user or self.guest_pass or '?'} · {self.get_result_display()}"
+
+
+class AdminQuery(models.Model):
+    """A question typed into the admin's AI assistant, kept only to improve it: the text (long digit runs masked) and which intent matched."""
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name="+", verbose_name="Kim so'radi")
+    text = models.CharField("Savol", max_length=200)
+    intent = models.CharField("Aniqlangan maqsad", max_length=40, blank=True)
+    matched = models.BooleanField("Tushunildi", default=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created", "-id"]
+        verbose_name, verbose_name_plural = "AI savol", "AI savollar"
+
+    def __str__(self):
+        return f"{self.text[:40]} → {self.intent or '?'}"

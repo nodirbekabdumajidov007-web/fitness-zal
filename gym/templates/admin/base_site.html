@@ -4,7 +4,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800;900&family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
 <script src="{% vstatic 'js/admin.js' %}" defer></script>
+{% if fz_ai %}<link rel="stylesheet" href="{% vstatic 'css/ai_panel.css' %}"><script src="{% vstatic 'js/ai_panel.js' %}" defer></script>{% endif %}
 {% endblock %}
+{% block extrabody %}{{ block.super }}{% if fz_ai and not is_popup %}{% include "admin/_ai_panel.html" %}{% endif %}{% endblock %}
 {% block responsive %}{{ block.super }}
 <link rel="stylesheet" href="{% vstatic 'css/admin.css' %}">{# after Django's responsive.css, so our rules win at equal weight #}
 {% endblock %}

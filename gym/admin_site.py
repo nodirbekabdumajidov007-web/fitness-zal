@@ -328,6 +328,7 @@ SECTIONS = [  # the sidebar groups the gym's many tables by job instead of one l
 NAV = [
     ("Asosiy", [("Bosh sahifa", "home", "view:index", None, None),
                 ("Qabulxona", "desk", "view:desk", None, "desk"),
+                ("AI Analitika", "sparkles", "view:analytics", "gym.view_payment", None),
                 ("QR skaner", "scan", "view:desk_scan", None, None),
                 ("Davomat", "check", "view:desk_classes", None, None)]),
     ("Moliya", [("Kassa", "wallet", "view:cash", "gym.view_payment", None),
@@ -398,6 +399,7 @@ class GymAdminSite(admin.AdminSite):
         user = getattr(request, "user", None)
         if user is not None and user.is_authenticated and user.is_staff:
             ctx["fz_nav"] = self.build_nav(request, ctx.get("available_apps", []))
+            ctx["fz_ai"] = user.has_perm("gym.view_payment")  # the floating «AI yordamchi» button shows only to those who may see takings
         return ctx
 
     def build_nav(self, request, apps):
@@ -496,8 +498,9 @@ class GymAdminSite(admin.AdminSite):
         return super().index(request, extra)
 
     def get_urls(self):
+        from .analytics_views import analytics_urls
         from .desk import desk_urls
-        return desk_urls(self) + [path("reports/", self.gated(self.reports_view, VIEW_PERMS["reports"]), name="reports"),
+        return desk_urls(self) + analytics_urls(self) + [path("reports/", self.gated(self.reports_view, VIEW_PERMS["reports"]), name="reports"),
                 path("reports/csv/", self.gated(self.reports_csv, VIEW_PERMS["reports_csv"]), name="reports_csv"),
                 path("search/", self.gated(self.search_view, VIEW_PERMS["search"]), name="search"),
                 path("member/<int:pk>/", self.gated(self.member_view, VIEW_PERMS["member"]), name="member"),

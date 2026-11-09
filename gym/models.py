@@ -98,6 +98,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     class Meta:
         verbose_name, verbose_name_plural = "A'zo", "A'zolar"
+        indexes = [models.Index(fields=["created"], name="user_created_idx")]
 
     def save(self, *args, **kwargs):
         if not self.referral_code:
@@ -289,6 +290,8 @@ class Membership(models.Model):
     class Meta:
         ordering = ["-expires"]
         verbose_name, verbose_name_plural = "Abonement", "Abonementlar"
+        indexes = [models.Index(fields=["expires"], name="mem_expires_idx"), models.Index(fields=["user", "expires"], name="mem_user_expires_idx"),
+                   models.Index(fields=["starts"], name="mem_starts_idx")]
 
     def __str__(self):
         return f"{self.user} · {self.plan.name} · {timezone.localtime(self.expires):%d.%m.%Y}"
@@ -430,6 +433,7 @@ class Order(models.Model):
     class Meta:
         ordering = ["-created"]
         verbose_name, verbose_name_plural = "Buyurtma", "Buyurtmalar"
+        indexes = [models.Index(fields=["created"], name="order_created_idx"), models.Index(fields=["status"], name="order_status_idx")]
 
     def __str__(self):
         return f"Buyurtma #{self.pk}"
@@ -525,6 +529,7 @@ class Payment(models.Model):
     class Meta:
         ordering = ["-created"]
         verbose_name, verbose_name_plural = "To'lov", "To'lovlar"
+        indexes = [models.Index(fields=["status", "created"], name="pay_status_created_idx"), models.Index(fields=["created"], name="pay_created_idx")]  # analytics: range sums
 
     @property
     def reference(self):
@@ -541,6 +546,7 @@ class Visit(models.Model):
     class Meta:
         ordering = ["-ts"]
         verbose_name, verbose_name_plural = "Tashrif", "Tashriflar"
+        indexes = [models.Index(fields=["ts"], name="visit_ts_idx"), models.Index(fields=["user", "ts"], name="visit_user_ts_idx")]
 
 
 class Trainer(models.Model):

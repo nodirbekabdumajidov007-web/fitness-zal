@@ -5,6 +5,7 @@ import decimal
 from html import unescape
 
 from django.contrib import admin
+from django.contrib.staticfiles import finders
 from django.core.cache import cache
 from django.core.management import call_command
 from django.db import models as dj
@@ -119,6 +120,13 @@ class AdminWalk(TestCase):
         for needle in ('id="fz-side"', 'id="fz-q"', 'class="fz-user"', reverse("admin:password_change"), reverse("admin:logout"),
                        reverse("admin:cash"), reverse("admin:gym_payment_changelist"), "Moliya", "A'zolar", "Do'kon"):
             self.assertIn(needle, html, needle)
+        # «Saytga o'tish»: top-bar icon button (kept on phones, with a label for screen readers), first item of the user menu, and in the drawer
+        self.assertRegex(html, r'class="fz-site"[^>]*aria-label="Saytga o\'tish"|aria-label="Saytga o\'tish"[^>]*class="fz-site"')
+        self.assertIn('class="fz-menu-site"', html)
+        self.assertIn("fz-side-site", html)
+        self.assertLess(html.index('class="fz-menu-site"'), html.index(reverse("admin:password_change")))
+        css = open(finders.find("css/admin.css"), encoding="utf-8").read()
+        self.assertNotRegex(css, r"max-width:480px\)\{\.fz-site\{display:none")
         for emoji in ("👤", "🎫", "🛒", "💳", "✉"):
             self.assertNotIn(emoji, html, "emoji left in the admin shell")
         # the active entry is highlighted on a model page

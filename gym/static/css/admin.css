@@ -174,7 +174,7 @@ html[data-theme="dark"] .fz-top-brand .fz-logo{filter:invert(1)}
 }
 @media (max-width:1100px){.fz-site span{display:none}.fz-site{padding:0;width:38px;justify-content:center}.fz-uname{display:none}.fz-user summary{padding:0 8px 0 4px}}
 @media (max-width:820px){.fz-top>nav{display:none}.fz-search{flex:1 1 auto}.fz-tools{flex:none}}
-@media (max-width:480px){.fz-site{display:none}#header.fz-top{gap:8px}.fz-search kbd{display:none}}
+@media (max-width:480px){#header.fz-top{gap:6px}.fz-tools{gap:6px}.fz-search kbd{display:none}}
 
 /* bare pages (sign-in, errors outside the admin shell) */
 body.fz-bare #container{flex-direction:column}
@@ -733,3 +733,8 @@ html[data-theme="dark"] .mini-bars i{background:linear-gradient(180deg,#c3c9d2,#
 }
 /* dialogs and panels: never taller than the visible viewport (keyboard-safe) */
 .fz-dlg,dialog{max-height:calc(100dvh - 24px);overflow:auto}
+
+/* «Saytga o'tish» is also a menu entry: the first one in the user menu on phones (the top-bar icon can be missed) and in the drawer */
+.fz-menu-site,.fz-side-site{display:none!important}
+@media (max-width:480px){.fz-menu-site{display:flex!important}}
+@media (max-width:1023px){.fz-side-site{display:flex!important}}

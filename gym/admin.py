@@ -9,7 +9,7 @@ from django.utils.safestring import mark_safe
 
 from . import extras, services, telegram
 from .models import (Announcement, BodyLog, Booking, Category, ChatMessage, ChatReport, Exercise, GymClass, GymSettings, Membership, Order, OrderItem, Payment, PaymentCard, Plan,
-                     ClassWaitlist, EntryLog, FaqItem, GiftCertificate, GuestPass, LegalPage, MembershipFreeze, ReferralReward, TrainerReview,
+                     AdminQuery, ClassWaitlist, EntryLog, FaqItem, GiftCertificate, GuestPass, LegalPage, MembershipFreeze, ReferralReward, TrainerReview,
                      AIMessage, FoodEntry, Notification, PersonalRecord, Product, PromoCode, PTSession, Review, Trainer, User, UserFood, Visit, WorkoutPlan)
 
 
@@ -903,3 +903,18 @@ class EntryLogAdmin(admin.ModelAdmin):
     @admin.display(description="Natija", ordering="result")
     def result_pill(self, o):
         return badge(o.get_result_display(), {"ok": "#1d9a52", "repeat": "#1f5bd6"}.get(o.result, "#c0261a"))
+
+
+@admin.register(AdminQuery)
+class AdminQueryAdmin(admin.ModelAdmin):
+    """What the admins asked the AI assistant, and whether it was understood: the list to read when teaching it new phrases."""
+    list_display = ("created", "text", "intent", "matched", "user")
+    list_filter = ("matched", "intent", "created")
+    search_fields = ("text", "intent")
+    list_select_related = ("user",)
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False

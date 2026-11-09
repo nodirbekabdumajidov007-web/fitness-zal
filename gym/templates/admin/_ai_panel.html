@@ -1,0 +1,18 @@
+{% load fz_admin %}
+<button type="button" class="fz-ai-fab" id="fz-ai-fab" data-fz-ai-open aria-haspopup="dialog" aria-controls="fz-ai" title="AI yordamchi">{% aicon 'sparkles' %}<span>AI yordamchi</span></button>
+<div class="fz-ai-scrim" data-fz-ai-close hidden></div>
+<aside id="fz-ai" class="fz-ai" role="dialog" aria-label="AI yordamchi" aria-hidden="true" tabindex="-1" data-ask="{% url 'admin:analytics_ask' %}">
+  <header class="fz-ai-head">
+    <span class="fz-ai-badge">{% aicon 'sparkles' %}</span>
+    <div class="fz-ai-ttl"><b>AI yordamchi</b><small>Zal ma'lumotlaridan javob beradi</small></div>
+    <button type="button" class="fz-ai-ib" data-fz-ai-clear title="Suhbatni tozalash" aria-label="Suhbatni tozalash">{% aicon 'refresh' %}</button>
+    <button type="button" class="fz-ai-ib" data-fz-ai-close title="Yopish (Esc)" aria-label="Yopish">{% aicon 'x' %}</button>
+  </header>
+  <div class="fz-ai-log" role="log" aria-live="polite" aria-relevant="additions"></div>
+  <div class="fz-ai-chips" aria-label="Tayyor savollar"></div>
+  <form class="fz-ai-form" autocomplete="off">
+    {% csrf_token %}
+    <input type="text" name="q" maxlength="500" placeholder="Masalan: bu oy tushum qancha?" aria-label="Savolingiz" enterkeyhint="send">
+    <button type="submit" class="fz-ai-send" aria-label="Yuborish">{% aicon 'send' %}</button>
+  </form>
+</aside>

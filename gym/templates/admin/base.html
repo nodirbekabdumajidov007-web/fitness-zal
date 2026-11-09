@@ -45,6 +45,7 @@
       {% endfor %}
     </nav>
     <div class="fz-side-foot">
+      <a class="fz-nav-a fz-side-site" href="{{ site_url|default:'/' }}">{% aicon 'globe' %}<span class="fz-nav-t">Saytga o'tish</span></a>
       <button type="button" class="fz-collapse" data-fz-collapse aria-label="Yon panelni yig'ish yoki yoyish" title="Yon panelni yig'ish yoki yoyish">{% aicon 'panel' %}<span class="fz-nav-t">Yig'ish</span></button>
     </div>
   </aside>
@@ -76,12 +77,13 @@
       <div class="fz-tools">
         {% include "admin/color_theme_toggle.html" %}
         {% if has_permission %}
-        <a class="fz-site" href="{{ site_url|default:'/' }}">{% aicon 'globe' %}<span>Saytga o'tish</span></a>
+        <a class="fz-site" href="{{ site_url|default:'/' }}" title="Saytga o'tish" aria-label="Saytga o'tish">{% aicon 'globe' %}<span>Saytga o'tish</span></a>
         {% block usertools %}
         <details class="fz-user">
           <summary aria-label="Foydalanuvchi menyusi"><span class="fz-ava sm">{{ user|initials }}</span><span class="fz-uname">{% firstof user.first_name user.get_username %}</span>{% aicon 'chevron' %}</summary>
           <div class="fz-menu">
             <div class="fz-menu-head"><b>{{ user.full_name|default:user.get_username }}</b><small>{% if user.is_superuser %}Bosh admin{% else %}Xodim{% endif %}</small></div>
+            <a class="fz-menu-site" href="{{ site_url|default:'/' }}">{% aicon 'globe' %}Saytga o'tish</a>
             {% if user.has_usable_password %}<a href="{% url 'admin:password_change' %}">{% aicon 'key' %}Parolni o'zgartirish</a>{% endif %}
             <form id="logout-form" method="post" action="{% url 'admin:logout' %}">{% csrf_token %}<button type="submit" class="danger">{% aicon 'logout' %}Chiqish</button></form>
           </div>
