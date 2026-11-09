@@ -2245,3 +2245,65 @@ mark.ph{background:rgba(255,193,7,.28);color:inherit;border-radius:4px;padding:0
 .final-cta{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:28px;margin:8px 0 24px;border-radius:var(--radius,18px);border:1px solid var(--line,rgba(128,128,128,.25));background:linear-gradient(160deg,rgba(240,80,61,.14),transparent 70%),var(--surface)}
 .final-cta h2{margin:0;font-size:clamp(1.25rem,4vw,1.8rem)}
 @media (max-width:520px){.final-cta{flex-direction:column;align-items:stretch;text-align:center;padding:22px 16px}.final-cta .btn{justify-content:center}.rv-empty-lite .btn{width:100%;justify-content:center}}
+
+/* === Mobile pass 2 ===
+   Touch targets >= 44px, text >= 14px (uppercase micro-labels/badges >= 12px), safe areas, dvh dialogs.
+   Why a separate block: the "Compact sizing (global)" pass above shrank buttons/links to desktop density; on phones, tablets
+   and any coarse pointer these rules restore finger-sized targets without touching the desktop layout. */
+@media (max-width:1023.98px),(pointer:coarse){
+  /* header / chrome */
+  .navtoggle,.sb-x{width:44px;height:44px;min-width:44px}
+  header.top .logo{min-height:44px;min-width:44px}
+  .daynight,.bell,.btn,.btn.small,button,summary,[role=button],select{min-height:44px}
+  .bell{width:44px;height:44px}
+  .langpick summary,.usermenu summary{min-height:44px}
+  .lp-menu a,.um-menu a,.um-menu .um-out,.um-plan{min-height:44px;display:flex;align-items:center}
+  .sb-nav a,.sb-collapse{min-height:44px}
+  .tabbar a,.tabbar button{min-height:48px}
+  /* footer links were 22px-high text lines */
+  .ft-col>a,.ft-col p a,.ft-bottom a{display:inline-flex;align-items:center;min-height:44px}
+  .ft-social a{width:44px;height:44px}
+  .ft-top{min-height:44px}
+  .route-btn,.route-menu a{min-height:44px}
+  .totop{width:44px;height:44px}
+  .db-quick a,.chips a,.chips button,.chip,button.chip,.pf-group button,.tm-presets button,.tl-tabs button,.pf-tabs a,.acc-nav a,.acc-back{display:inline-flex;align-items:center;justify-content:center;min-height:44px}
+  .acc-nav a{display:flex;justify-content:flex-start}
+  .tl-how summary,.faq-item summary,.ci-rules summary{display:flex;align-items:center;min-height:44px}
+  .ci-rules summary{justify-content:center;min-width:44px}
+  .prod-name{display:inline-flex;align-items:center;min-height:44px}
+  .eyebrow a{display:inline-flex;align-items:center;min-height:44px}   /* breadcrumbs */
+  .legal-nav a{display:inline-flex;align-items:center;min-height:44px}
+  .card.grid>a{display:inline-flex;align-items:center;min-height:44px}
+  .btn.small,.cal-days .btn.small,.tm-presets button,.pf-group button{min-width:44px}
+  .wo-check,.pb-del,.prog-x,.vp-ib,.iconbtn{width:44px;height:44px}
+  .pw button.pw-eye{min-height:44px;min-width:44px}
+  .m-back{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px}
+  .m-send,.m-attach{width:44px;height:44px;min-width:44px;min-height:44px}
+  .m-bar textarea{min-height:44px}
+  .m-preview-x{width:44px;height:44px;top:-14px;right:-14px;background:none;font-size:0}
+  .m-preview-x::before{content:" d7";display:grid;place-items:center;width:26px;height:26px;margin:9px;border-radius:50%;background:var(--ink);color:var(--bg);font-size:1rem;line-height:1}
+  .m-lightbox button{min-width:44px;min-height:44px}
+  .dk-scan{min-width:44px;min-height:44px;display:inline-grid;place-items:center}
+  input,select,textarea{font-size:16px!important}
+  input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=range]),select,textarea{min-height:44px}
+  label:has(>input[type=checkbox]),label:has(>input[type=radio]),.chk,.pf-switch{min-height:44px;display:flex;align-items:center;gap:10px}
+  /* sticky header (+ the sticky profile tab strip) must not cover the target of an in-page link */
+  html{scroll-padding-top:84px}
+  body:has(.pf-tabs){scroll-padding-top:140px}
+}
+@media (max-width:1023.98px),(pointer:coarse){
+  /* text floor: 14px for reading text, 12px for uppercase micro-labels and badges */
+  small,label,legend,.muted,em,.field-help,.cal-how,.cal-hint,.cal-note,.crowd-txt,.rb-txt,.ft-top,.lp-code,.um-plan,.um-plan b,
+  .acc-label,.pf-label,.btn.small,.ft-bottom,.ft-bottom span,.stat small,.note,.cal-h,.m-status,.m-name,
+  .eyebrow a,.pf-group button,.chip,button.chip,.tl-how summary,.card.grid>a,.dk-kpi span,.db-quick a,.pf-chips span,.chips a,.buybox-perks li,.co-kpis span,.db-who small,.co-who span:not(.eyebrow):not(.co-ava){font-size:max(14px,.875rem)!important}
+  .eyebrow,.db-ring small,.pill:not(.btn),.stock-badge,.acc-pill,.tl-tag,.badge,.ft-eyebrow,.ft-state,.m-live,.m-ava,.um-ava,.co-ava,.co-tag,.co-slot,time.num,.co-slot .num,.m-bubble time,.m-bubble .num{font-size:max(12px,.75rem)!important}
+  .tabbar a,.tabbar button,.tabbar span{font-size:12px}
+}
+/* dialogs and tall panels: never taller than the visible (dynamic) viewport, so the on-screen keyboard cannot hide the submit button */
+.rep-dlg{max-height:calc(100dvh - 24px);overflow:auto}
+.prog-dlg{max-height:calc(100dvh - 24px)}
+@media (max-width:560px){
+  /* chat: fill the visible screen (dynamic viewport) minus the sticky header and the bottom tab bar */
+  .messenger{height:calc(100dvh - 150px - var(--tbh,0px));min-height:360px}
+}
+.m-compose{padding-bottom:max(10px,env(safe-area-inset-bottom,0px))}
