@@ -1,0 +1,35 @@
+{% extends "admin/base_site.html" %}{% load gym_tags fz_admin %}
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url 'admin:index' %}">Bosh sahifa</a> › Murojaatlar</div>{% endblock %}
+{% block content %}
+<div class="fz-wrap">
+  <section class="fz-hero fz-hero-slim">
+    <div><span class="fz-eyebrow">Mijozlar bilan aloqa</span><h2>Murojaatlar</h2>
+      <p>Saytdagi yordam oynasidan a'zolar va mehmonlar yozgan xabarlar. Javobingiz a'zoga saytdagi xabar va (yoqilgan bo'lsa) push orqali boradi.
+        {% if n_unread %}<b>{{ n_unread }} ta murojaatda o'qilmagan xabar bor.</b>{% endif %}</p>
+      <div class="fz-actions"><a href="{% url 'admin:gym_faqitem_changelist' %}">{% aicon 'help' %} Savol-javob (FAQ) va baholar</a></div></div>
+  </section>
+
+  <nav class="ig-tabs" aria-label="Filtr">
+    {% for k, name in filters %}<a href="?f={{ k }}&w={{ who }}"{% if flt == k %} class="on"{% endif %}>{{ name }} <i>{% if k == 'open' %}{{ counts.open }}{% elif k == 'pending' %}{{ counts.pending }}{% elif k == 'closed' %}{{ counts.closed }}{% else %}{{ counts.all }}{% endif %}</i></a>{% endfor %}
+    <span class="ig-tabs-sep" aria-hidden="true"></span>
+    {% for k, name in whos %}<a href="?f={{ flt }}&w={{ k }}"{% if who == k %} class="on"{% endif %}>{{ name }}</a>{% endfor %}
+    <form method="get" class="ig-find"><input type="hidden" name="f" value="{{ flt }}"><input type="hidden" name="w" value="{{ who }}"><input name="q" value="{{ q }}" placeholder="Ism yoki telefon" autocomplete="off"></form>
+  </nav>
+
+  <section class="nb ig-list">
+    {% for r in rows %}{% with t=r.t %}
+    <a class="ig-row{% if t.unread_by_staff %} unread{% endif %}" href="{% url 'admin:support_thread' t.pk %}">
+      <span class="ig-ava">{% if t.user %}{{ t.user.initials }}{% else %}{{ t.guest_name|slice:":2"|upper|default:"?" }}{% endif %}</span>
+      <span class="ig-main"><b>{{ t.display_name }}</b> <small>{% if t.user %}a'zo{% else %}mehmon{% endif %}{% if t.phone %} · {{ t.phone }}{% endif %}</small>
+        <span class="ig-prev">{% if r.last %}{% if r.last.is_staff %}Siz: {% endif %}{{ r.last.text|default:"[rasm]"|truncatechars:80 }}{% else %}—{% endif %}</span></span>
+      <span class="ig-side"><time>{{ t.last_message_at|date:"d.m H:i" }}</time>
+        <span class="ig-badges">
+          {% if t.unread_by_staff %}<span class="fz-pill green">{{ t.unread_by_staff }} yangi</span>{% endif %}
+          <span class="fz-pill{% if t.status == 'open' %} red{% elif t.status == 'pending' %} gold{% endif %}">{{ t.get_status_display }}</span>
+          {% if t.assigned_to %}<span class="fz-pill">{{ t.assigned_to.first_name|default:t.assigned_to.username }}</span>{% endif %}
+        </span></span>
+    </a>
+    {% endwith %}{% empty %}<p class="fz-empty">Murojaatlar yo'q.</p>{% endfor %}
+  </section>
+</div>
+{% endblock %}

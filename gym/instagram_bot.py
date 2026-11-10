@@ -93,7 +93,7 @@ def build_reply(text, thread):
         lines = [f"{lk['label']}: {base}{lk['url']}" for lk in (res.get("links") or [])[:2] if str(lk.get("url", "")).startswith("/")]
         if lines:
             out += "\n\n" + "\n".join(lines)
-    return out, False
+    return out, bool(res.get("approx"))  # a best-guess answer is still sent, but staff should take a look
 
 
 # ---------------------------------------------------------------- storing events

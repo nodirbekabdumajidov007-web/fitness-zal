@@ -5,6 +5,13 @@ assistant_kb_food.py (nutrition) and the newer parts: _ex (exercises), _prog (pr
 _nutr (more nutrition), _site2 (site, page by page), _misc (small talk, myths). See assistant_kb_site.py for the row format.
 """
 from .assistant_kb_ex import EX
+from .assistant_kb_ex2 import EX2
+from .assistant_kb_faq import BEGINNER, EQUIPMENT, ETIQUETTE, GLOSSARY
+from .assistant_kb_faq2 import BEGINNER2
+from .assistant_kb_site3 import SITE3, SMALL
+from .assistant_kb_food2 import FOOD2
+from .assistant_kb_myth import FAQ_LOSS, FAQ_RECOVERY, MYTHS
+from .assistant_kb_sport import REHAB, SPORT
 from .assistant_kb_food import FOOD
 from .assistant_kb_health import HEALTH
 from .assistant_kb_misc import MISC
@@ -20,7 +27,7 @@ LANGS = ("uz", "ru", "en")
 
 def _build():
     out, seen = [], set()
-    for row in SITE + TRAIN + FOOD + EX + PROG + HEALTH + NUTR + SITE2 + MISC + MORE:
+    for row in SITE + TRAIN + FOOD + EX + PROG + HEALTH + NUTR + SITE2 + MISC + MORE + EX2 + SPORT + REHAB + FOOD2 + MYTHS + FAQ_LOSS + FAQ_RECOVERY + BEGINNER + ETIQUETTE + EQUIPMENT + GLOSSARY + BEGINNER2 + SITE3 + SMALL:
         eid, topic, kw_uz, kw_ru, kw_en, a_uz, a_ru, a_en, links = row
         if eid in seen:
             raise ValueError(f"duplicate knowledge base id: {eid}")

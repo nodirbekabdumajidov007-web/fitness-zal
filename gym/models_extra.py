@@ -177,6 +177,9 @@ class FaqItem(models.Model):
     answer_uz = models.TextField("Javob (o'zbekcha)")
     answer_ru = models.TextField("Javob (ruscha)", blank=True)
     answer_en = models.TextField("Javob (inglizcha)", blank=True)
+    CATEGORIES = [("general", "Umumiy"), ("membership", "Abonement"), ("payment", "To'lov"), ("classes", "Mashg'ulotlar"), ("shop", "Do'kon"), ("account", "Akkaunt")]
+    category = models.CharField("Bo'lim", max_length=12, choices=CATEGORIES, blank=True,
+                                help_text="Bo'sh qoldirsangiz, savol matniga qarab avtomatik aniqlanadi (yordam oynasidagi bo'limlar uchun).")
     order = models.PositiveSmallIntegerField("Tartib", default=0)
     active = models.BooleanField("Ko'rinadi", default=True)
 

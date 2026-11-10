@@ -883,6 +883,7 @@ class ChatRoom(models.Model):
     user_a = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE, related_name="+")
     user_b = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE, related_name="+")
     created = models.DateTimeField(auto_now_add=True)
+    pinned_message = models.ForeignKey("ChatMessage", null=True, blank=True, on_delete=models.SET_NULL, related_name="+", verbose_name="Qadalgan xabar")
 
     class Meta:
         unique_together = [("user_a", "user_b")]
@@ -902,6 +903,8 @@ class ChatMessage(models.Model):
     image = models.FileField("Rasm", upload_to="chat/%Y/%m/", blank=True, validators=[validate_image])
     deleted = models.BooleanField("O'chirilgan", default=False)
     created = models.DateTimeField(auto_now_add=True)
+    reply_to = models.ForeignKey("self", null=True, blank=True, on_delete=models.SET_NULL, related_name="replies", verbose_name="Javob")
+    edited_at = models.DateTimeField("Tahrirlangan", null=True, blank=True)
 
     class Meta:
         ordering = ["id"]
@@ -910,6 +913,36 @@ class ChatMessage(models.Model):
 
     def __str__(self):
         return f"{self.sender}: {self.body[:40]}"
+
+
+class MessageReaction(models.Model):
+    """One emoji reaction of one member on one message (a member has at most one per message)."""
+    message = models.ForeignKey(ChatMessage, on_delete=models.CASCADE, related_name="reactions")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="+")
+    emoji = models.CharField(max_length=8)
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = [("message", "user")]
+        verbose_name, verbose_name_plural = "Xabar reaksiyasi", "Xabar reaksiyalari"
+
+
+class RoomMute(models.Model):
+    """A member switched notifications of a room/conversation off (mentions in rooms still reach them)."""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="+")
+    room = models.ForeignKey(ChatRoom, on_delete=models.CASCADE, related_name="mutes")
+
+    class Meta:
+        unique_together = [("user", "room")]
+
+
+class Mention(models.Model):
+    """@name in a room message: who was mentioned (used for the highlight and the notification)."""
+    message = models.ForeignKey(ChatMessage, on_delete=models.CASCADE, related_name="mentions")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="chat_mentions")
+
+    class Meta:
+        unique_together = [("message", "user")]
 
 
 class ChatRead(models.Model):
@@ -998,4 +1031,5 @@ class UserFood(models.Model):
 
 from .models_extra import *  # noqa: E402,F401,F403  (the newer models live in models_extra.py; importing them here registers them with Django)
 from .models_tracker import *  # noqa: E402,F401,F403  (fitness tracker: workout sessions, sets, goals)
+from .models_support import *  # noqa: E402,F401,F403  (support widget threads, messages, FAQ feedback)
 from .models_instagram import *  # noqa: E402,F401,F403  (Instagram inbox models)

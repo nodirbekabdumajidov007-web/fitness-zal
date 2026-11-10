@@ -1346,6 +1346,109 @@ ftr_no_sessions||Hali mashg'ulot yozilmagan.||Тренировок пока не
 ftr_session_saved||Mashg'ulot saqlandi||Тренировка сохранена||Workout saved
 ftr_pr_toast||Yangi rekord: {exercise} - taxminiy 1RM {value} kg!||Новый рекорд: {exercise} - расчётный 1ПМ {value} кг!||New personal record: {exercise} - estimated 1RM {value} kg!
 ftr_readonly||faqat ko'rish||только просмотр||read only
+sw_open||Yordam va xabarlar oynasini ochish||Открыть помощь и сообщения||Open help and messages
+sw_close||Yopish||Закрыть||Close
+sw_tab_home||Asosiy||Главная||Home
+sw_tab_msgs||Xabarlar||Сообщения||Messages
+sw_tab_help||Yordam||Помощь||Help
+sw_hello||Salom, {name}||Привет, {name}||Hi, {name}
+sw_guest||mehmon||гость||guest
+sw_title||Sizga qanday yordam bera olamiz?||Чем мы можем вам помочь?||How can we help?
+sw_last||Oxirgi xabar||Последнее сообщение||Latest message
+sw_send_us||Bizga xabar yuboring||Напишите нам||Send us a message
+sw_send_us_sub||Odatda bir necha soat ichida javob beramiz||Обычно отвечаем в течение нескольких часов||We usually reply within a few hours
+sw_find_help||Yordam qidirish||Поиск помощи||Search for help
+sw_search_ph||Savolingizni yozing||Введите ваш вопрос||Type your question
+sw_telegram||Telegram orqali yozish||Написать в Telegram||Message us on Telegram
+sw_just_now||hozir||только что||just now
+sw_min_ago||{n} daq. oldin||{n} мин. назад||{n} min ago
+sw_hour_ago||{n} soat oldin||{n} ч. назад||{n} h ago
+sw_day_ago||{n} kun oldin||{n} дн. назад||{n} d ago
+sw_you||Siz||Вы||You
+sw_team||Fitnes Zal jamoasi||Команда Fitnes Zal||Fitnes Zal team
+sw_photo||Rasm||Фото||Photo
+sw_msg_ph||Xabar yozing...||Напишите сообщение...||Write a message...
+sw_send||Yuborish||Отправить||Send
+sw_attach||Rasm biriktirish||Прикрепить фото||Attach a photo
+sw_remove_photo||Rasmni olib tashlash||Убрать фото||Remove photo
+sw_empty_thread||Hali xabarlar yo'q. Savolingizni yozing, jamoamiz javob beradi.||Сообщений пока нет. Напишите вопрос, и команда ответит.||No messages yet. Write your question and our team will answer.
+sw_guest_intro||Javobni sizga yetkazishimiz uchun ismingiz va telefon raqamingizni qoldiring.||Оставьте имя и телефон, чтобы мы могли вам ответить.||Leave your name and phone so we can get back to you.
+sw_name||Ismingiz||Ваше имя||Your name
+sw_phone||Telefon (90 123 45 67)||Телефон (90 123 45 67)||Phone (90 123 45 67)
+sw_email||E-mail||E-mail||E-mail
+sw_email_opt||E-mail (ixtiyoriy)||E-mail (необязательно)||E-mail (optional)
+sw_closed_note||Murojaat yopilgan. Yangi xabar yozsangiz, qayta ochiladi.||Обращение закрыто. Новое сообщение откроет его снова.||This conversation is closed. A new message reopens it.
+sw_err_net||Aloqa xatosi. Qayta urinib ko'ring.||Ошибка связи. Попробуйте ещё раз.||Connection problem. Please try again.
+sw_err_contact||Ism va to'g'ri telefon raqamini kiriting.||Укажите имя и корректный номер телефона.||Enter your name and a valid phone number.
+sw_err_email||E-mail manzili noto'g'ri.||Неверный адрес e-mail.||The e-mail address is not valid.
+sw_err_long||Xabar juda uzun (1000 belgigacha).||Сообщение слишком длинное (до 1000 символов).||The message is too long (up to 1000 characters).
+sw_err_empty||Xabar yoki rasm kiriting.||Введите сообщение или фото.||Write a message or attach a photo.
+sw_err_notfound||Topilmadi.||Не найдено.||Not found.
+sw_err_bad||Noto'g'ri so'rov.||Неверный запрос.||Invalid request.
+sw_help_hint||Savol yozing yoki bo'limni tanlang||Введите вопрос или выберите раздел||Type a question or pick a topic
+sw_results||Topilgan maqolalar||Найденные статьи||Matching articles
+sw_no_results||Hech narsa topilmadi. Xabarlar bo'limida jamoamizga yozing.||Ничего не найдено. Напишите команде в разделе «Сообщения».||Nothing found. Write to our team in Messages.
+sw_ask_assistant||Yordamchi javobi||Ответ помощника||Assistant answer
+sw_assistant_says||Avtomatik yordamchi||Автоматический помощник||Automatic assistant
+sw_categories||Bo'limlar||Разделы||Topics
+sw_back||Orqaga||Назад||Back
+sw_helpful||Foydali bo'ldimi?||Это было полезно?||Was this helpful?
+sw_yes||Ha||Да||Yes
+sw_no||Yo'q||Нет||No
+sw_thanks||Fikringiz uchun rahmat!||Спасибо за отзыв!||Thanks for your feedback!
+sw_voice||Ovozli so'rash||Спросить голосом||Ask by voice
+sw_voice_sub||Savolingizni ayting, yordamchi javob beradi||Задайте вопрос голосом, помощник ответит||Say your question and the assistant answers
+sw_new_msgs||Yangi xabarlar||Новые сообщения||New messages
+sw_sending||Yuborilmoqda...||Отправка...||Sending...
+sw_seen||O'qildi||Прочитано||Seen
+sw_status_open||Ochiq||Открыто||Open
+sw_status_pending||Javob berildi||Ответ получен||Answered
+sw_status_closed||Yopilgan||Закрыто||Closed
+sw_unread||O'qilmagan xabarlar||Непрочитанные сообщения||Unread messages
+sw_loading||Yuklanmoqda...||Загрузка...||Loading...
+sw_retry||Qayta urinish||Повторить||Retry
+sw_help_for_you||Foydali maqolalar||Полезные статьи||Helpful articles
+sw_notif_title||Fitnes Zal jamoasidan yangi javob||Новый ответ от команды Fitnes Zal||New reply from the Fitnes Zal team
+sw_notif_photo||Sizga rasm yuborildi||Вам отправили фото||You received a photo
+sw_cat_general||Umumiy||Общие||General
+sw_cat_membership||Abonement||Абонемент||Membership
+sw_cat_payment||To'lov||Оплата||Payments
+sw_cat_classes||Mashg'ulotlar||Занятия||Classes
+sw_cat_shop||Do'kon||Магазин||Shop
+sw_cat_account||Akkaunt||Аккаунт||Account
+chat_months||yanvar,fevral,mart,aprel,may,iyun,iyul,avgust,sentabr,oktyabr,noyabr,dekabr||января,февраля,марта,апреля,мая,июня,июля,августа,сентября,октября,ноября,декабря||Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec
+chat_day_fmt||{d}-{m}||{d} {m}||{m} {d}
+chat_masked||Umumiy xonada shaxsiy ma'lumot yozmang — shaxsiy chatdan foydalaning. Telefon, karta yoki email yashirildi.||Не пишите личные данные в общей комнате — используйте личный чат. Телефон, карта или email скрыты.||Don't share personal details in the public room — use a private chat. The phone, card or email was hidden.
+chat_mention_title||{name} sizni chatda eslatdi||{name} упомянул(а) вас в чате||{name} mentioned you in chat
+chat_reply_bad||Javob berilayotgan xabar topilmadi.||Сообщение, на которое вы отвечаете, не найдено.||The message you reply to was not found.
+chat_bad_reaction||Bunday reaksiya yo'q.||Такой реакции нет.||Unknown reaction.
+chat_edit_expired||Xabarni faqat 15 daqiqa ichida tahrirlash mumkin.||Сообщение можно изменить только в течение 15 минут.||A message can be edited only within 15 minutes.
+chat_reply||Javob berish||Ответить||Reply
+chat_copy||Nusxa olish||Копировать||Copy
+chat_copied||Nusxalandi||Скопировано||Copied
+chat_edit||Tahrirlash||Изменить||Edit
+chat_edited||tahrirlandi||изменено||edited
+chat_editing||Tahrirlash||Редактирование||Editing
+chat_pin||Qadash||Закрепить||Pin
+chat_unpin||Qadashni olib tashlash||Открепить||Unpin
+chat_pinned||Qadalgan xabar||Закреплённое сообщение||Pinned message
+chat_new_msgs||Yangi xabarlar||Новые сообщения||New messages
+chat_to_bottom||Oxirgi xabarga||К последнему сообщению||Jump to latest
+chat_search_ph||Xabarlardan qidirish||Поиск по сообщениям||Search messages
+chat_search_open||Qidirish||Поиск||Search
+chat_search_none||Hech narsa topilmadi||Ничего не найдено||Nothing found
+chat_jump_fail||Xabar topilmadi||Сообщение не найдено||Message not found
+chat_members_n||{n} a'zo||{n} участн.||{n} members
+chat_online_n||{n} onlayn||{n} онлайн||{n} online
+chat_mute||Bildirishnomani o'chirish||Отключить уведомления||Mute notifications
+chat_unmute||Bildirishnomani yoqish||Включить уведомления||Unmute notifications
+chat_react||Reaksiya||Реакция||React
+chat_reacted_by||Reaksiya bildirganlar||Кто отреагировал||Reactions
+chat_menu||Xabar amallari||Действия с сообщением||Message actions
+chat_replying||Javob: {name}||Ответ: {name}||Replying to {name}
+chat_close||Yopish||Закрыть||Close
+chat_more||Yana||Ещё||More
+chat_mention_ph||A'zoni tanlang||Выберите участника||Pick a member
 scan_session||Sessiya tugagan: sahifani yangilab, admin sifatida qayta kiring||Сессия истекла: обновите страницу и войдите снова как администратор||Session ended: reload the page and sign in again as admin
 """
 

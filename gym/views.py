@@ -1429,7 +1429,8 @@ def ask_payload(request, q):
     from . import assistant
     lang = request.POST.get("lang") if request.POST.get("lang") in ("uz", "ru", "en") else request.lang
     res = assistant.answer(q, lang, request.user)
-    return {"ok": True, "answer": res["answer"], "links": res["links"], "matched": res["matched"], "suggest": res["suggest"]}
+    return {"ok": True, "answer": res["answer"], "links": res["links"], "matched": res["matched"], "suggest": res["suggest"],
+            "approx": bool(res.get("approx"))}
 
 
 @require_POST

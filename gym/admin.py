@@ -886,11 +886,24 @@ class GiftCertificateAdmin(admin.ModelAdmin):
 
 @admin.register(FaqItem)
 class FaqItemAdmin(admin.ModelAdmin):
-    list_display = ("question_uz", "order", "active")
+    list_display = ("question_uz", "category", "order", "active", "votes_yes", "votes_no")
     list_editable = ("order", "active")
+    list_filter = ("category", "active")
     search_fields = ("question_uz", "question_ru", "question_en")
     fieldsets = (("O'zbekcha", {"fields": ("question_uz", "answer_uz")}), ("Ruscha", {"fields": ("question_ru", "answer_ru")}),
-                 ("Inglizcha", {"fields": ("question_en", "answer_en")}), ("Ko'rinishi", {"fields": ("order", "active")}))
+                 ("Inglizcha", {"fields": ("question_en", "answer_en")}), ("Ko'rinishi", {"fields": ("category", "order", "active")}))
+
+    def get_queryset(self, request):  # "Was this helpful?" votes from the support widget
+        return super().get_queryset(request).annotate(_yes=Count("feedback", filter=Q(feedback__helpful=True)),
+                                                      _no=Count("feedback", filter=Q(feedback__helpful=False)))
+
+    @admin.display(description="Foydali (ha)", ordering="_yes")
+    def votes_yes(self, obj):
+        return obj._yes
+
+    @admin.display(description="Foydasiz (yo'q)", ordering="_no")
+    def votes_no(self, obj):
+        return obj._no
 
     def render_change_form(self, request, context, *a, **kw):
         messages.info(request, "Javobda {hours}, {phone}, {address}, {freeze_min}, {freeze_max}, {bonus}, {cancel_hours} yozsangiz, ular sozlamalardan avtomatik to'ldiriladi.")

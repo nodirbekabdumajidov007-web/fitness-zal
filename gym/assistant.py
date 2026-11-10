@@ -14,6 +14,8 @@ How a question is handled:
 Facts that change (hours, prices, phone...) are never stored in the answers: they are {placeholders} filled from the database on every call.
 """
 import ast
+import functools
+import math
 import re
 from datetime import timedelta
 
@@ -35,7 +37,7 @@ _NONWORD = re.compile(r"[\W_]+", re.UNICODE)
 
 # (suffix, shortest root that may remain). Longest suffix first; two passes.
 _LAT = sorted([(s, 3) for s in (
-    "larning", "lardan", "larga", "larni", "lar", "ning", "dan", "ga", "ni", "da", "ka", "qa", "ini", "imiz", "ingiz", "miz", "ngiz",
+    "larning", "lardan", "larga", "larni", "lar", "ning", "dagi", "gacha", "yapti", "yapman", "yapsiz", "moqchi", "dan", "ga", "ni", "da", "ka", "qa", "ini", "imiz", "ingiz", "miz", "ngiz",
     "im", "ing", "mi", "chi", "dir", "lik", "siz", "ish", "ib", "si", "ta", "ed", "ly", "ness")] + [("s", 4), ("e", 4), ("es", 4)],
     key=lambda p: -len(p[0]))
 _RU = sorted([(s, 3) for s in (
@@ -66,10 +68,37 @@ SYN = {
     "massaa": "massa", "shtanga": "barbell", "штанга": "barbell",
     "tuxum": "tuxum", "tuhum": "tuxum", "tuxm": "tuxum",
     "oqsil": "oqsil", "ogsil": "oqsil", "oksil": "oqsil", "белок": "белок",
+    # more spelling variants (applied to questions and keywords alike, so both sides meet on one word; keys are normalised: no apostrophes, "е" for "ё")
+    "mashk": "mashq", "mashik": "mashq", "trenirovka": "mashq", "trenirofka": "mashq", "trenirovkalar": "mashq", "trening": "mashq",
+    "sportzal": "zal", "sportzali": "zal", "спортзал": "зал", "тренажерка": "зал", "качалка": "зал", "джим": "gym", "jim": "gym",
+    "whey": "protein", "geyner": "gainer", "гейнер": "gainer",
+    "ovkat": "ovqat", "ovqatt": "ovqat", "xafta": "hafta", "xamma": "hamma",
+    "kreatine": "kreatin", "vazin": "vazn", "vzn": "vazn",
+    "bicep": "biceps", "tricep": "triceps", "trisep": "triceps", "bisep": "biceps", "biseps": "biceps", "triseps": "triceps",
+    "pushups": "pushup", "pullups": "pullup",
+    "nomer": "raqam", "nomeri": "raqam", "peyme": "payme", "klik": "click", "klick": "click", "klikk": "click",
+    "insta": "instagram", "инста": "instagram", "инстаграм": "instagram", "телеграмм": "telegram", "телеграм": "telegram", "пуш": "push",
+    "halol": "halal", "xalol": "halal", "halyal": "halal", "халяль": "halal", "халал": "halal",
+    "yoqa": "yoga", "пилатес": "pilates", "pilatis": "pilates", "krossfit": "crossfit", "crosfit": "crossfit", "кроссфит": "crossfit",
+    "boks": "boxing", "boksing": "boxing", "бокс": "boxing", "kurash": "wrestling", "борьба": "wrestling", "wrestle": "wrestling",
+    "futbol": "football", "futbolchi": "football", "футбол": "football", "soccer": "football",
+    "marafon": "marathon", "марафон": "marathon", "kalistenika": "calisthenics", "калистеника": "calisthenics", "воркаут": "calisthenics",
+    "girya": "kettlebell", "гиря": "kettlebell", "гири": "kettlebell", "гирей": "kettlebell", "гирю": "kettlebell",
+    "hayz": "hayz", "xayz": "hayz", "homilador": "homiladorlik",
+    "farzand": "bola", "bolalar": "bola", "дети": "ребенок", "детей": "ребенок", "детям": "ребенок", "kids": "kid", "children": "kid", "child": "kid",
+    "dorilar": "dori", "tabletka": "dori", "tabletkalar": "dori",
 }
 
+# spelling fixes that must also work inside inflected words (applied to the whole normalised text)
+_PRE = [(re.compile(p), r) for p, r in (
+    (r"\bxaft", "haft"), (r"\bxamma", "hamma"), (r"\bovkat", "ovqat"), (r"\btrenirovk\w*", "mashq"), (r"\btrenirofk\w*", "mashq"),
+    (r"\bsportzal", "zal"), (r"\bhalol", "halal"), (r"\bxalol", "halal"),
+)]
+# a number glued to a unit ("30kg", "3kun", "500kkal") is read as two words
+_NUMUNIT = re.compile(r"(?<=\d)(?=(?:kg|gr|kkal|kcal|ккал|кг|kun|hafta|oy|yosh|marta|min|daqiqa|soat|sm|cm|см|km)(?:\b|\d))")
+
 _NUM = r"\d+(?:\.\d+)?"
-_SPECIFIC = ("ex_", "pg_", "hl_", "nu_", "st_", "mx_", "qa_")  # id prefixes of the detailed entries added after the original overview ones
+_SPECIFIC = ("ex_", "pg_", "hl_", "nu_", "st_", "mx_", "qa_", "sp_", "fd_", "fq_")  # id prefixes of the detailed entries added after the original overview ones
 
 
 def normalize(text):
@@ -94,19 +123,31 @@ def _strip(word, rules):
     return word
 
 
+_DOUBLED = ("bb", "dd", "gg", "mm", "nn", "pp", "rr", "tt")
+
+
 def stem(word):
     if word.isdigit():
         return word
-    return _strip(word, _RU if _CYR.search(word) else _LAT)
+    if _CYR.search(word):
+        return _strip(word, _RU)
+    out = _strip(word, _LAT)
+    if out != word and out[-2:] in _DOUBLED and word.endswith(("ing", "ed", "er")):  # running -> runn -> run, swimming -> swim
+        out = out[:-1]
+    return out
 
 
 def tokens(text):
-    return [stem(SYN.get(w, w)) for w in normalize(text).split()]
+    s = normalize(text)
+    for rx, rep in _PRE:
+        s = rx.sub(rep, s)
+    s = _NUMUNIT.sub(" ", s)
+    return [stem(SYN.get(w, w)) for w in s.split()]
 
 
 # ------------------------------------------------------------------ the compiled keyword index
 _INDEX = None  # list of (entry, [(stems tuple, weight, languages)])
-_VOCAB = None  # {first letter: [stems]} of every keyword stem of length >= 6, for one-typo repair
+_VOCAB = None  # {first letter: [stems]} of every keyword stem of length >= 5, for typo repair
 
 
 def _index():
@@ -128,7 +169,7 @@ def _index():
                     seen[st] = (st, w, {lang})
                     kws.append(seen[st])
                     for s in st:
-                        if len(s) >= 6 and not s.isdigit():
+                        if len(s) >= 5 and not s.isdigit():
                             vocab.setdefault(s[0], set()).add(s)
             idx.append((e, kws))
         _INDEX = idx
@@ -157,17 +198,35 @@ def _d1(a, b):
     return a[i:] == b[i + 1:]
 
 
+def _lev2(a, b):
+    """True when the Levenshtein distance of two words is at most 2 (used for long words only)."""
+    if abs(len(a) - len(b)) > 2:
+        return False
+    prev = list(range(len(b) + 1))
+    for i, ca in enumerate(a, 1):
+        cur = [i]
+        for j, cb in enumerate(b, 1):
+            cur.append(min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (ca != cb)))
+        if min(cur) > 2:
+            return False
+        prev = cur
+    return prev[-1] <= 2
+
+
 def _repair(qlist, qset):
-    """Questions often carry one typo ("protien", "kaloriyaa"): add the keyword stems that are one edit away from unknown long words."""
+    """Questions often carry typos ("protien", "kaloriyaa", "yotib surihs"): add the keyword stems that are one edit away from unknown words
+    of 5+ letters (two edits for 9+ letters)."""
     _index()
     extra = set()
     for w in qlist:
-        if len(w) < 6 or w.isdigit() or _CYR.search(w):
+        if len(w) < 5 or w.isdigit():
             continue
         cands = _VOCAB.get(w[0], ())
         if w in cands:
             continue
         found = [c for c in cands if abs(len(c) - len(w)) <= 1 and _d1(w, c)]
+        if not found and len(w) >= 9:
+            found = [c for c in cands if _lev2(w, c)]
         extra.update(found[:2])
     return qset | extra
 
@@ -187,11 +246,24 @@ def _contiguous(st, qlist):
     return any(tuple(qlist[i:i + n]) == st for i in range(len(qlist) - n + 1))
 
 
+_SITE_CTX_WORDS = ("sizda", "sizlarda", "sizning", "sizlarning", "saytda", "sayt", "saytingiz", "ilovada", "ilova", "вас", "вашем", "ваш", "ваше", "сайте", "сайт",
+                   "приложении", "приложение", "website", "site", "app")
+_SITE_CTX = None
+
+
+def _site_ctx():
+    global _SITE_CTX
+    if _SITE_CTX is None:
+        _SITE_CTX = {stem(SYN.get(w, w)) for w in _SITE_CTX_WORDS}
+    return _SITE_CTX
+
+
 def _score(qlist):
     """[(score, is_not_chat, is_specific, -order, entry, votes)] for every entry that shares a keyword with the question; votes = {lang: weight}."""
     qset = _repair(qlist, set(qlist))
     if not qset:
         return []
+    site_ctx = bool(qset & _site_ctx())  # "sizda", "у вас", "on your site": a question about this gym, so its own facts come first
     out = []
     for order, (e, kws) in enumerate(_index()):
         if e["topic"] == "chat" and len(qlist) > CHAT_MAX_WORDS:
@@ -205,6 +277,8 @@ def _score(qlist):
             ws = [h[0] for h in hits]
             sc = ws[0] + 0.25 * min(sum(ws[1:]), 4.0)
             chat = e["topic"] == "chat"
+            if site_ctx and e["topic"] in ("site", "me"):
+                sc += 0.75
             if chat:
                 sc = THRESHOLD  # small talk always clears the bar but loses every tie, so a real question wins over "salom"
             votes = {}
@@ -740,28 +814,215 @@ def suggestions(scored, lang, skip=None, n=4, entry=None):
     return [title_of(kb.BY_ID[i], lang) for i in ids[:n]]
 
 
-def _result(matched, answer_, links, suggest, eid, topic):
-    return {"matched": matched, "answer": answer_, "links": links, "suggest": suggest, "id": eid, "topic": topic}
+# ------------------------------------------------------------------ nearest answer (approximate matching), off-topic and medical guards
+APPROX_MIN_MATCH = 3.4    # idf-weighted evidence the best entry must collect before it is offered as "the closest topic"
+APPROX_MIN_COVER = 0.45   # ... and the share of the question's meaningful words that evidence must explain
+APPROX_UNKNOWN = 4.0      # a word of 5+ letters that exists nowhere in the knowledge base counts against the coverage (4 letters: half)
+OFFTOPIC_WEAK = 3.0       # an off-topic marker beats a keyword match weaker than this
+APPROX_STRONG_EV = 8.5     # ... or this much evidence with at least APPROX_STRONG_COVER of the question explained
+APPROX_STRONG_COVER = 0.33
+APPROX_ANCHOR = 2.6       # at least one keyword stem this specific (idf x certainty) must match: common words alone prove nothing
+
+_STOP_RAW = """
+qanday qanaqa nima nega nimaga qaysi necha qancha kerak bormi bor yoq mumkin mumkinmi haqida menga mening men siz sizga bu shu va yoki uchun bilan ham juda
+bir deb keyin oldin hozir ayt aytib ber bering kim qayerda qachon boladi bolsa bolmaydi boladimi yaxshi yomon qilish qilsa qilsam qilaman qilib kabi lekin ammo agar
+faqat hech nimani qiling qilaylik kerakmi
+что как какой какая какие какое сколько можно ли мне меня вы вас вам при есть нужно надо расскажи скажи подскажи почему зачем когда где кто чем про из от до за
+еще это там тут для или
+what how is are do does can my for and should where when why which about much many the tell please be have has get not this that there from will would could
+with you your me
+"""
+_STOP = None
+_AP = None
+
+
+def _stop():
+    global _STOP
+    if _STOP is None:
+        _STOP = {stem(SYN.get(w, w)) for w in _STOP_RAW.split()}
+    return _STOP
+
+
+def _useful(s):
+    return len(s) >= 3 and not s.isdigit() and s not in _stop()
+
+
+def _approx_index():
+    """(inverted index {stem: [(entry position, weight)]}, idf {stem: value}, vocab {first letter: [stems of 5+ letters]}).
+    A keyword stem weighs 1.0, a stem that only occurs in an answer 0.2; a stem found in few entries is worth more (idf)."""
+    global _AP
+    if _AP is None:
+        inv = {}
+        for i, e in enumerate(kb.ENTRIES):
+            if e["topic"] == "chat" or e["id"] in kb.PERSONAL:
+                continue
+            bag = {}
+            for lg in kb.LANGS:
+                for raw in e["kw"][lg]:
+                    for s in tokens(raw.lstrip("!")):
+                        if _useful(s):
+                            bag[s] = 1.0
+                for s in tokens(e["a"][lg]):
+                    if _useful(s):
+                        bag.setdefault(s, 0.2)
+            for s, w in bag.items():
+                inv.setdefault(s, []).append((i, w))
+        n = len(kb.ENTRIES)
+        idf = {s: min(4.5, math.log(1 + n / len(v))) for s, v in inv.items()}
+        vocab = {}
+        for s in inv:
+            if len(s) >= 5:
+                vocab.setdefault(s[0], []).append(s)
+        _AP = (inv, idf, vocab)
+    return _AP
+
+
+@functools.lru_cache(maxsize=8192)
+def _expand(w):
+    """{known stem: how sure we are it is the same word}: exact 1.0, a short ending difference 0.8, one typo 0.7, two typos in a long word 0.55."""
+    inv, _idf, vocab = _approx_index()
+    out = {}
+    if w in inv:
+        out[w] = 1.0
+    if len(w) >= 5:
+        for c in vocab.get(w[0], ()):
+            if c == w:
+                continue
+            d = abs(len(c) - len(w))
+            if d <= 2 and (c.startswith(w) or w.startswith(c)) and max(c, w, key=len)[min(len(c), len(w)):] not in ("er", "ers", "r"):
+                out[c] = 0.8
+            elif d <= 1 and _d1(w, c):
+                out[c] = 0.7
+            elif len(w) >= 9 and _lev2(w, c):
+                out[c] = 0.55
+    return out
+
+
+def _approx(qlist, partial):
+    """Entries ranked by how well they explain the question, best first: [(rank value, coverage, evidence, entry)].
+    `partial` is {entry id: keyword score} of the entries that matched a keyword but stayed under the confident threshold."""
+    inv, idf, _vocab = _approx_index()
+    stems = [s for s in dict.fromkeys(qlist) if _useful(s)]
+    total, per, anchor = 0.0, {}, {}
+    for s in stems:
+        ex = _expand(s)
+        if not ex:
+            total += APPROX_UNKNOWN if len(s) >= 5 else APPROX_UNKNOWN / 2 if len(s) == 4 else 0.0
+            continue
+        base = max(idf[c] for c in ex)
+        total += base
+        best = {}
+        for c, f in ex.items():
+            for i, w in inv[c]:
+                v = f * w * idf[c]
+                if v > best.get(i, 0.0):
+                    best[i] = v
+                if w >= 1.0 and f * idf[c] > anchor.get(i, 0.0):
+                    anchor[i] = f * idf[c]
+        for i, v in best.items():
+            per[i] = per.get(i, 0.0) + min(v, base)
+    if not per or total <= 0:
+        return []
+    out = []
+    for i, m in per.items():
+        if anchor.get(i, 0.0) < APPROX_ANCHOR:
+            continue
+        e = kb.ENTRIES[i]
+        ev = m + 1.5 * partial.get(e["id"], 0.0)
+        cover = min(1.0, m / total)
+        out.append((ev * (0.4 + cover), cover, ev, e))
+    out.sort(key=lambda t: t[0], reverse=True)
+    return out
+
+
+def _lang_votes(entry, qlist):
+    qs = set(qlist)
+    return {lg: float(len({s for raw in entry["kw"][lg] for s in tokens(raw.lstrip("!"))} & qs)) for lg in kb.LANGS}
+
+
+_OFFTOPIC = re.compile(
+    r"\b(prezident\w*|президент\w*|president|poytaxt\w*|столиц\w*|capital of|capital city|siyosat\w*|saylov\w*|политик\w*|politic\w*|tarix\w*|история|истории|"
+    r"history of|world war|tenglama\w*|уравнени\w*|equation\w*|integral\w*|интеграл\w*|derivative|hosila\w*|geometri\w*|геометри\w*|algebra|алгебр\w*|calculus|"
+    r"matematika\w*|homework|домашн\w+ задани\w*|dasturlash\w*|программирован\w*|python|javascript|write code|kino|film|фильм\w*|movie|сериал\w*|"
+    r"goroskop\w*|гороскоп\w*|horoscope|bitcoin|биткоин\w*|kripto\w*|crypto|valyuta kurs\w*|dollar kurs\w*|курс доллара|exchange rate|insho|реферат\w*|"
+    r"сочинени\w*|essay|tarjima qil\w*|переведи|translate|kim kashf\w*|кто изобр\w*|кто открыл|who invented|who discovered|qoshiq matni|текст песни|lyrics|ob havo\w*|obhavo|погод\w*|weather forecast|forecast)\b")
+_DRUG = re.compile(r"\b(ibuprofen\w*|paracetamol\w*|parasetamol\w*|aspirin\w*|antibiotic\w*|antibiotik\w*|insulin\w*|ukol\w*|укол\w*|антибиотик\w*|таблетк\w*|"
+                   r"лекарств\w*|обезболива\w*|ибупрофен\w*|парацетамол\w*|аспирин\w*|инсулин\w*|dori\w*|tabletka\w*|painkiller\w*|medicine|medication|pills?|"
+                   r"tablets?|ozempic|metformin\w*|метформин\w*)\b")
+_DOSE = re.compile(r"(\bdoz\w*|\bdose\w*|\bdosage|дозировк\w*|\bдоз[аыу]\b|\bmg\b|\bмг\b|necha (?:ta )?tabletka|сколько (?:таблеток|пить|принимать|колоть)|"
+                   r"how (?:many|much)(?: \w+)? (?:pills|tablets|to take)|qancha ich\w*|necha mg)")
+
+TXT.update({
+    "approx": {"uz": "Savolingizni to'liq tushunmadim, ehtimol bu haqida so'ragandirsiz: «{title}».",
+               "ru": "Я не до конца понял вопрос, возможно, вы спрашивали про: «{title}».",
+               "en": "I did not fully understand your question; you may be asking about: \"{title}\"."},
+    "offtopic": {"uz": "Men sport zal va fitnes bo'yicha yordamchiman: mashq, ovqatlanish, tiklanish va zal xizmatlari haqida javob bera olaman. Bu mavzuda ishonchli javob bera olmayman, o'ylab topib aytmayman. Quyidagi mavzulardan birini tanlang yoki murabbiyga Chatda yozing: {phone}.",
+                 "ru": "Я помощник по спортзалу и фитнесу: отвечаю про тренировки, питание, восстановление и услуги зала. По этой теме надёжно ответить не могу и выдумывать не буду. Выберите одну из тем ниже или напишите тренеру в Чат: {phone}.",
+                 "en": "I am the gym and fitness assistant: I can help with training, nutrition, recovery and the gym's services. I cannot answer this reliably and I will not make something up. Pick one of the topics below or message a trainer in Chat: {phone}."},
+    "medical": {"uz": "Dori va dozalar bo'yicha maslahat bera olmayman: bu shifokor yoki farmatsevt masalasi, noto'g'ri doza xavfli. Og'riq yoki kasallik bo'lsa shifokorga murojaat qiling. Mashq, ovqatlanish va tiklanish bo'yicha yordam bera olaman.",
+                "ru": "Советы по лекарствам и дозировкам я давать не могу: это вопрос к врачу или фармацевту, неверная доза опасна. При боли или болезни обратитесь к врачу. По тренировкам, питанию и восстановлению помогу.",
+                "en": "I cannot advise on medicines or doses: that is a question for a doctor or pharmacist, and a wrong dose can be dangerous. If you have pain or an illness please see a doctor. I can help with training, nutrition and recovery."},
+})
+
+
+def _result(matched, answer_, links, suggest, eid, topic, approx=False, kind=None):
+    return {"matched": matched, "answer": answer_, "links": links, "suggest": suggest, "id": eid, "topic": topic, "approx": approx,
+            "kind": kind or ("match" if matched else "unknown")}
+
+
+def _chat_links(lang):
+    try:
+        return [{"label": tx("chat_label", lang), "url": reverse("chat")}]
+    except Exception:
+        return []
+
+
+def _approx_ok(ev, cover):
+    """Enough evidence that covers enough of the question - or a lot of evidence for a long, wordy question."""
+    return (ev >= APPROX_MIN_MATCH and cover >= APPROX_MIN_COVER) or (ev >= APPROX_STRONG_EV and cover >= APPROX_STRONG_COVER)
+
+
+def _offtopic(lang, facts):
+    return _result(False, fill(tx("offtopic", lang), facts), _chat_links(lang), suggestions([], lang), None, None, kind="offtopic")
+
+
+def _fallback(text, site_lang, lang, user, rows, script, scored):
+    """No entry is sure: off-topic (say so), else the closest topic with an honest note (approx), else "I do not know" with suggestions."""
+    facts = Facts(lang, user)
+    n = normalize(text) + (" " + normalize(translit(text)) if _CYR.search(text) else "")
+    if _OFFTOPIC.search(n):
+        return _offtopic(lang, facts)
+    qlist = tokens(translit(text)) if script == "uz" else tokens(text)
+    partial = {r[4]["id"]: r[0] for r in rows if r[1] and r[0] < THRESHOLD}
+    cand = _approx(qlist, partial)
+    if cand and _approx_ok(cand[0][2], cand[0][1]):
+        best = cand[0][3]
+        lang = guess_lang(text, site_lang, script, _lang_votes(best, qlist))
+        others = [(0.0, c[3]) for c in cand[1:12] if c[3]["id"] != best["id"] and c[1] >= APPROX_MIN_COVER * 0.5]
+        body = fill(tx("approx", lang, title=title_of(best, lang)) + "\n\n" + best["a"][lang], Facts(lang, user))
+        return _result(True, body, _links(best, lang), suggestions(others, lang, skip=best["id"], n=3, entry=best), best["id"], best["topic"],
+                       approx=True, kind="approx")
+    return _result(False, fill(tx("unk", lang), facts), _chat_links(lang), suggestions(scored, lang), None, None, kind="unknown")
 
 
 def answer(text, lang="uz", user=None):
     text = str(text or "").strip()[:MAX_QUERY]
     rows, script = _rank(text)
     best_row = rows[0] if rows and rows[0][0] >= THRESHOLD else None
+    site_lang = lang
     lang = guess_lang(text, lang, script, best_row[5] if best_row else None)
     authed = user is not None and user.is_authenticated
     scored = [(r[0], r[4]) for r in rows]
     calc = calculator(text, lang) if text else None
     if calc:
-        return _result(True, calc[0], [], suggestions(scored, lang), calc[1], "calc")
+        return _result(True, calc[0], [], suggestions(scored, lang), calc[1], "calc", kind="calc")
+    low = normalize(text) + (" " + normalize(translit(text)) if _CYR.search(text) else "")
+    if _DRUG.search(low) and _DOSE.search(low):  # never a dose of a medicine, whatever the knowledge base would have matched
+        return _result(False, tx("medical", lang), _chat_links(lang), suggestions(scored, lang), None, None, kind="medical")
+    if (best_row is None or (best_row[0] < OFFTOPIC_WEAK and best_row[4]["topic"] != "chat")) and _OFFTOPIC.search(low):  # "solve the equation" must not become "squat" through a typo repair
+        return _offtopic(lang, Facts(lang, user))
     if best_row is None:
-        facts = Facts(lang, user)
-        links = []
-        try:
-            links = [{"label": tx("chat_label", lang), "url": reverse("chat")}]
-        except Exception:
-            pass
-        return _result(False, fill(tx("unk", lang), facts), links, suggestions(scored, lang), None, None)
+        return _fallback(text, site_lang, lang, user, rows, script, scored)
     best = best_row[4]
     if best["id"] in kb.PERSONAL and not authed:
         return _result(True, _t(lang, "asst_login"), [{"label": _t(lang, "login"), "url": reverse("login")}],

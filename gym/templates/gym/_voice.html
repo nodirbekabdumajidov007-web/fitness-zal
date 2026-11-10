@@ -1,6 +1,5 @@
 {% load gym_tags %}{% voice_config as vcfg %}
 {{ vcfg|json_script:"voice-i18n" }}
-<button type="button" class="vmic" id="vmic" aria-label="{% t 'vc_open' %}" title="{% t 'vc_title' %}" aria-haspopup="dialog" aria-expanded="false" aria-controls="vpanel">{% icon 'mic' %}</button>
 <section class="vpanel" id="vpanel" role="dialog" aria-labelledby="vtitle" hidden>
   {% csrf_token %}
   <header class="vp-head">

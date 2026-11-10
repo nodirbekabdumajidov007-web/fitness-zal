@@ -760,3 +760,4 @@ html[data-theme="dark"] .mini-bars i{background:linear-gradient(180deg,#c3c9d2,#
 .ig-reply{display:flex;flex-direction:column;gap:8px;margin-top:8px}.ig-reply textarea{width:100%;box-sizing:border-box;min-height:80px;font-size:16px}.ig-note{margin:0;padding:8px 10px;border-radius:8px;background:var(--st-warn-bg)}
 .ig-act{margin:6px 0}.ig-act button,.ig-reply button,.ig-link button,.ig-test button{min-height:44px;cursor:pointer}.ig-link{display:flex;gap:6px;flex-wrap:wrap}.ig-link input{flex:1;min-width:140px;min-height:44px;font-size:16px}
 .ig-side-col{display:grid;gap:12px}
+.ig-quick{display:flex;flex-wrap:wrap;gap:6px}.ig-qr{padding:6px 10px;border-radius:99px;border:1px solid var(--fz-line);background:var(--fz-soft);color:var(--fz-text);cursor:pointer;font-size:.8rem;min-height:36px}.ig-tabs-sep{width:1px;height:24px;background:var(--fz-line)}

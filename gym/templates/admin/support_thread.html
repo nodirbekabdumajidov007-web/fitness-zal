@@ -1,0 +1,64 @@
+{% extends "admin/base_site.html" %}{% load gym_tags fz_admin %}
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url 'admin:index' %}">Bosh sahifa</a> › <a href="{% url 'admin:support_inbox' %}">Murojaatlar</a> › {{ t.display_name }}</div>{% endblock %}
+{% block content %}
+<div class="fz-wrap">
+  <div class="ig-grid">
+    <section class="nb ig-chat">
+      <header class="ig-head">
+        <span class="ig-ava">{% if t.user %}{{ t.user.initials }}{% else %}{{ t.guest_name|slice:":2"|upper|default:"?" }}{% endif %}</span>
+        <div><b>{{ t.display_name }}</b> <small>{% if t.user %}a'zo{% else %}mehmon{% endif %}</small></div>
+        <span class="ig-badges">
+          <span class="fz-pill{% if t.status == 'open' %} red{% elif t.status == 'pending' %} gold{% endif %}">{{ t.get_status_display }}</span>
+          {% if t.assigned_to %}<span class="fz-pill">{{ t.assigned_to.first_name|default:t.assigned_to.username }}</span>{% endif %}
+        </span>
+      </header>
+      <div class="ig-msgs" id="ig-msgs">
+        {% for m in msgs %}
+        <div class="ig-b {% if m.is_staff %}out staff{% else %}user{% endif %}">
+          <small class="ig-who">{% if m.is_staff %}Xodim{% if m.sender_user %} · {{ m.sender_user.first_name|default:m.sender_user.username }}{% endif %}{% else %}{{ t.display_name }}{% endif %}</small>
+          {% if m.image %}<p><a href="{% url 'support_photo' m.pk %}" target="_blank" rel="noopener noreferrer"><img src="{% url 'support_photo' m.pk %}" alt="Rasm" style="max-width:100%;max-height:220px;border-radius:8px" loading="lazy"></a></p>{% endif %}
+          {% if m.text %}<p>{{ m.text }}</p>{% endif %}
+          <time>{{ m.created|date:"d.m H:i" }}{% if m.is_staff and m.read_at %} · o'qilgan{% endif %}</time>
+        </div>
+        {% empty %}<p class="fz-empty">Xabarlar yo'q.</p>{% endfor %}
+      </div>
+      <form method="post" action="{% url 'admin:support_reply' t.pk %}" class="ig-reply" enctype="multipart/form-data">{% csrf_token %}
+        {% if not t.user %}<p class="ig-note">Mehmon: javob saytda, mehmon qaytib kirganda ko'rinadi. Telefon orqali bog'lanish ham mumkin: {{ t.guest_phone }}.</p>{% endif %}
+        <div class="ig-quick" role="group" aria-label="Tayyor javoblar">{% for qr in quick %}<button type="button" class="ig-qr" data-text="{{ qr }}">{{ qr|truncatechars:42 }}</button>{% endfor %}</div>
+        <textarea name="text" id="sup-text" rows="3" maxlength="2000" placeholder="Javob yozing…"></textarea>
+        <input type="file" name="image" accept="image/jpeg,image/png,image/webp">
+        <button type="submit">Yuborish</button>
+      </form>
+    </section>
+
+    <aside class="ig-side-col">
+      <section class="nb"><header><small>Amallar</small></header>
+        {% if t.assigned_to_id != request.user.pk %}<form method="post" action="{% url 'admin:support_action' t.pk 'assign' %}" class="ig-act">{% csrf_token %}<button type="submit">Menga biriktirish</button></form>
+        {% else %}<form method="post" action="{% url 'admin:support_action' t.pk 'unassign' %}" class="ig-act">{% csrf_token %}<button type="submit">Biriktirishni olib tashlash</button></form>{% endif %}
+        {% if t.status == 'closed' %}<form method="post" action="{% url 'admin:support_action' t.pk 'reopen' %}" class="ig-act">{% csrf_token %}<button type="submit">Qayta ochish</button></form>
+        {% else %}<form method="post" action="{% url 'admin:support_action' t.pk 'close' %}" class="ig-act">{% csrf_token %}<button type="submit">Yopish (hal qilindi)</button></form>{% endif %}
+      </section>
+      <section class="nb"><header><small>{% if t.user %}A'zo{% else %}Mehmon{% endif %}</small></header>
+        {% if t.user %}
+          <p><a href="{% url 'admin:member' t.user_id %}">{{ t.user.full_name }}</a> <small>{{ t.user.member_code }}</small></p>
+          {% if t.user.phone %}<p>Telefon: <a href="tel:{{ t.user.phone }}">{{ t.user.phone }}</a></p>{% endif %}
+          {% if t.user.email %}<p>E-mail: {{ t.user.email }}</p>{% endif %}
+          <p>Abonement:
+            {% if membership %}<span class="fz-pill green">faol</span> {{ membership.plan.name }}, {{ membership.expires|date:"d.m.Y" }} gacha
+            {% elif last_membership %}<span class="fz-pill red">tugagan</span> {{ last_membership.plan.name }}, {{ last_membership.expires|date:"d.m.Y" }}
+            {% else %}<span class="fz-pill">yo'q</span>{% endif %}</p>
+        {% else %}
+          <p><b>{{ t.guest_name }}</b></p>
+          <p>Telefon: <a href="tel:{{ t.guest_phone }}">{{ t.guest_phone }}</a></p>
+          {% if t.guest_email %}<p>E-mail: {{ t.guest_email }}</p>{% endif %}
+          <small>Ro'yxatdan o'tmagan mehmon.</small>
+        {% endif %}
+      </section>
+    </aside>
+  </div>
+</div>
+<script>
+var b=document.getElementById('ig-msgs');if(b){b.scrollTop=b.scrollHeight}
+document.querySelectorAll('.ig-qr').forEach(function(x){x.addEventListener('click',function(){var t=document.getElementById('sup-text');t.value=(t.value?t.value+' ':'')+x.getAttribute('data-text');t.focus()})});
+</script>
+{% endblock %}

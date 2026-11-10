@@ -360,7 +360,8 @@ NAV = [
     ("Do'kon", [("Mahsulotlar", "package", "model:product", None, None),
                 ("Buyurtmalar", "bag", "model:order", None, "orders"),
                 ("Kategoriyalar", "folder", "model:category", None, None)]),
-    ("Mijozlar bilan aloqa", [("Instagram xabarlari", "instagram", "view:ig_inbox", None, "ig")]),
+    ("Mijozlar bilan aloqa", [("Murojaatlar", "chat", "view:support_inbox", None, "support"),
+                              ("Instagram xabarlari", "instagram", "view:ig_inbox", None, "ig")]),
     ("Kontent va huquqiy", [("Savol-javob (FAQ)", "help", "model:faqitem", None, None),
                             ("Huquqiy sahifalar", "note", "model:legalpage", None, None)]),
     ("Chat va xavfsizlik", [("Shikoyatlar", "flag", "model:chatreport", None, "reports"),
@@ -377,14 +378,15 @@ VIEW_PERMS = {"reports": "gym.view_payment", "reports_csv": "gym.view_payment", 
 def nav_badges():
     """Small counters next to the sidebar entries that wait for someone. Cached for a few seconds: this runs on every admin page."""
     from django.core.cache import cache
-    from .models import ChatReport, IgThread, Order, Payment, PTSession
+    from .models import ChatReport, IgThread, Order, Payment, PTSession, SupportThread
     got = cache.get("fz_nav_badges")
     if got is None:
         now = timezone.now()
         got = {"payments": Payment.objects.filter(status="pending").count(), "orders": Order.objects.filter(status="new").count(),
                "reports": ChatReport.objects.filter(resolved=False).count(),
                "pt": PTSession.objects.filter(status="requested", starts__gte=now).count(),
-               "ig": IgThread.objects.filter(unread__gt=0).count()}
+               "ig": IgThread.objects.filter(unread__gt=0).count(),
+               "support": SupportThread.objects.filter(unread_by_staff__gt=0).count()}
         got["desk"] = got["payments"] + got["orders"] + got["pt"]  # everything that waits for the front desk
         cache.set("fz_nav_badges", got, 20)
     return got
@@ -503,7 +505,8 @@ class GymAdminSite(admin.AdminSite):
         from .analytics_views import analytics_urls
         from .desk import desk_urls
         from .instagram_admin import ig_urls
-        return desk_urls(self) + ig_urls(self) + analytics_urls(self) + [path("reports/", self.gated(self.reports_view, VIEW_PERMS["reports"]), name="reports"),
+        from .support_admin import support_urls
+        return desk_urls(self) + ig_urls(self) + support_urls(self) + analytics_urls(self) + [path("reports/", self.gated(self.reports_view, VIEW_PERMS["reports"]), name="reports"),
                 path("reports/csv/", self.gated(self.reports_csv, VIEW_PERMS["reports_csv"]), name="reports_csv"),
                 path("search/", self.gated(self.search_view, VIEW_PERMS["search"]), name="search"),
                 path("member/<int:pk>/", self.gated(self.member_view, VIEW_PERMS["member"]), name="member"),

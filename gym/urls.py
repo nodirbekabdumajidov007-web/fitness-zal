@@ -10,7 +10,7 @@ from . import tracker_views as tk
 from . import pwa
 from . import views as v
 from . import views_extra as x
-from . import voice
+from . import support, voice
 
 urlpatterns = [
     path("", v.home, name="home"),
@@ -25,6 +25,15 @@ urlpatterns = [
     path("healthz", v.healthz),
     path("webhooks/instagram/", instagram_views.webhook, name="instagram_webhook"),
     path("voice/info/", voice.info, name="voice_info"),
+    path("support/home/", support.home, name="support_home"),
+    path("support/thread/", support.thread_view, name="support_thread"),
+    path("support/send/", support.send, name="support_send"),
+    path("support/read/", support.mark_read, name="support_read"),
+    path("support/search/", support.search, name="support_search"),
+    path("support/faq/", support.faq_list, name="support_faq"),
+    path("support/faq/<int:pk>/", support.faq_article, name="support_faq_article"),
+    path("support/faq/<int:pk>/feedback/", support.faq_feedback, name="support_faq_feedback"),
+    path("support/photo/<int:pk>/", support.photo, name="support_photo"),
     path("manifest.webmanifest", pwa.manifest, name="manifest"),
     path("sw.js", pwa.service_worker, name="sw"),
     path("offline/", pwa.offline, name="offline"),
@@ -84,7 +93,16 @@ urlpatterns = [
     path("chat/unblock/<int:uid>/", c.unblock_user, name="chat_unblock"),
     path("chat/message/<int:pk>/delete/", c.delete_message, name="chat_delete"),
     path("chat/message/<int:pk>/report/", c.report_message, name="chat_report"),
+    path("chat/message/<int:pk>/react/", c.react, name="chat_react"),
+    path("chat/message/<int:pk>/reactions/", c.reaction_users, name="chat_reaction_users"),
+    path("chat/message/<int:pk>/edit/", c.edit_message, name="chat_edit"),
     path("chat/photo/<int:pk>/", c.photo, name="chat_photo"),
+    path("chat/<int:pk>/history/", c.history, name="chat_history"),
+    path("chat/<int:pk>/search/", c.search, name="chat_search"),
+    path("chat/<int:pk>/members/", c.members, name="chat_members"),
+    path("chat/<int:pk>/typing/", c.typing, name="chat_typing"),
+    path("chat/<int:pk>/pin/", c.pin_message, name="chat_pin"),
+    path("chat/<int:pk>/mute/", c.mute_room, name="chat_mute"),
     path("chat/<int:pk>/", c.room_view, name="chat_room"),
     path("chat/<int:pk>/send/", c.send, name="chat_send"),
     path("chat/<int:pk>/poll/", c.poll, name="chat_poll"),

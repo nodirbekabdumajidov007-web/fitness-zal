@@ -59,6 +59,9 @@ class ChatConsumer(JsonWebsocketConsumer):
     def receive_json(self, content, **kwargs):
         t = content.get("t") if isinstance(content, dict) else None
         if t == "typing":
+            if self.user.chat_banned or (self.room.kind == "direct" and chat.blocked_between(self.user, self.room.other(self.user))):
+                return
+            chat.typing_mark(self.room, self.user)  # polling clients see it too
             self._send_group({"type": "chat.typing", "user": self.user.pk, "name": chat.display_name(self.user)})
         elif t == "read":
             try:
@@ -73,12 +76,25 @@ class ChatConsumer(JsonWebsocketConsumer):
 
     # ---- from the group
     def chat_new(self, event):
-        msg = ChatMessage.objects.select_related("sender").filter(pk=event["id"], room=self.room).first()
+        msg = chat.with_related(ChatMessage.objects).filter(pk=event["id"], room=self.room).first()
         if msg:
             self.send_json({"t": "msg", "m": chat.serialize(msg, self.user, chat.read_upto(self.room, self.user))})
 
     def chat_deleted(self, event):
         self.send_json({"t": "deleted", "id": event["id"]})
+
+    def chat_reaction(self, event):
+        """Counts are the same for everyone, but "mine" is per reader, so each socket builds its own list."""
+        self.send_json({"t": "reaction", "id": event["id"], "reactions": chat.reactions_map([event["id"]], self.user).get(event["id"], [])})
+
+    def chat_edit(self, event):
+        msg = chat.with_related(ChatMessage.objects.filter(pk=event["id"], room=self.room)).first()
+        if msg:
+            self.send_json({"t": "edit", "m": chat.serialize(msg, self.user, chat.read_upto(self.room, self.user))})
+
+    def chat_pin(self, event):
+        room = ChatRoom.objects.select_related("pinned_message__sender").get(pk=self.room.pk)
+        self.send_json({"t": "pin", "pin": chat.pin_payload(room)})
 
     def chat_read(self, event):
         if event["user"] != self.user.pk:  # the other person read up to here: my ticks turn blue

@@ -207,6 +207,13 @@ def voice_config(context):
     return voice.config(context["request"])
 
 
+@register.simple_tag(takes_context=True)
+def support_config(context):
+    """Strings, URLs and the unread count for the support widget (rendered with |json_script)."""
+    from .. import support
+    return support.config(context["request"])
+
+
 @register.filter
 def legal_text(text):
     """Plain legal text -> HTML: "# " heading, "- " list item, blank line = new paragraph. Escaped first; [PLACEHOLDERS] are highlighted."""
