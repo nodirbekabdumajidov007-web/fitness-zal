@@ -55,6 +55,23 @@ def _context(request, user, readonly=False, data_url="", compare_url=""):
     }
 
 
+def _reached_goals(user):
+    """Keys of the goals that are already reached right now; a failure here must never break saving a measurement."""
+    try:
+        return {(g["kind"], g["metric"]) for g in tracker.goals_overview(user) if g["state"] == "reached"}
+    except Exception:
+        return None
+
+
+def _flash_goal_reached(request, user, before):
+    """A celebration (confetti) when a measurement has just carried a goal over the line - and only then."""
+    if before is None:
+        return
+    now = _reached_goals(user)
+    if now and now - before:
+        flash(request, messages.SUCCESS, "ftr_goal_reached", celebrate=True)
+
+
 # ---------------------------------------------------------------- /progress/
 @login_required
 def progress_view(request):
@@ -64,11 +81,13 @@ def progress_view(request):
         edit = BodyLog.objects.filter(pk=int(request.GET["edit"]), user=u).first()
     if request.method == "POST":
         pk = request.POST.get("pk", "")
+        before = _reached_goals(u)
         log, err = tracker.save_body_entry(u, request.POST, int(pk) if pk.isdigit() else None)
         if err:
             flash(request, messages.ERROR, err)
             return redirect(request.path + (f"?edit={pk}" if pk.isdigit() else ""))
-        flash(request, messages.SUCCESS, "saved")
+        flash(request, messages.SUCCESS, "body_saved")
+        _flash_goal_reached(request, u, before)
         return redirect("progress")
     ctx = _context(request, u, data_url=reverse("progress_data"))
     last_h = tracker.latest_height(u)
@@ -105,13 +124,15 @@ def progress_weight(request):
         flash(request, messages.ERROR, "ftr_err_range")
     else:
         today = timezone.localdate()
+        before = _reached_goals(u)
         row = u.bodylogs.filter(date=today).order_by("-id").first()
         if row:
             row.weight = w
             row.save(update_fields=["weight"])
         else:
             BodyLog.objects.create(user=u, date=today, weight=w, height_cm=tracker.latest_height(u))
-        flash(request, messages.SUCCESS, "saved")
+        flash(request, messages.SUCCESS, "weight_saved")
+        _flash_goal_reached(request, u, before)
     return redirect(safe_next(request, "dashboard"))
 
 
@@ -147,7 +168,7 @@ def progress_export(request):
 @login_required
 def goal_save(request):
     g, err = tracker.save_goal(request.user, request.POST)
-    flash(request, messages.ERROR if err else messages.SUCCESS, err or "saved")
+    flash(request, messages.ERROR if err else messages.SUCCESS, err or "goal_saved")
     return redirect("progress")
 
 
@@ -166,7 +187,7 @@ def goal_delete(request, pk):
 def _report_records(request, records):
     if records:
         r = max(records, key=lambda x: x["one_rm"])
-        flash(request, messages.SUCCESS, "ftr_pr_toast", exercise=r["exercise"], value=r["one_rm"])
+        flash(request, messages.SUCCESS, "ftr_pr_toast", celebrate=True, exercise=r["exercise"], value=r["one_rm"])
 
 
 @login_required

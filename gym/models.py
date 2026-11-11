@@ -397,6 +397,20 @@ class Product(models.Model):
         return f"img/products/{self.kind}.svg"
 
     @property
+    def stock_photo(self):
+        """A free-licence stock photo (static/img/products/photos, see CREDITS.md) shown until the gym uploads its own picture."""
+        n = self.name.lower()
+        for keys, pic in ((("shaker", "kokteyl"), "shaker-shake"), (("izotonik", "isotonic"), "can-isotonic"),
+                          (("energetik", "energy"), "can-energy"), (("batonchik", "bar"), "bar-protein"),
+                          (("kreatin", "creatine"), "tub-creatine"), (("whey", "protein", "bcaa", "gainer"), "tub-whey")):
+            if any(k in n for k in keys):
+                return f"img/products/photos/{pic}.jpg"
+        if "suv" in n or "water" in n:
+            big = re.search(r"(\d+(?:[.,]\d+)?)\s*(l|litr)\b", n)
+            return "img/products/photos/bottle-large.jpg" if big and float(big.group(1).replace(",", ".")) >= 1 else "img/products/photos/bottle-small.jpg"
+        return ""
+
+    @property
     def tone(self):
         """Tint of the placeholder tile: drinks blue, protein red-orange, snacks amber, accessories grey."""
         return {"bottle": "drink", "can": "drink", "tub": "protein", "bar": "snack"}.get(self.kind, "gear")

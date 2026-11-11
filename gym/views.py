@@ -42,8 +42,10 @@ BACKEND = "django.contrib.auth.backends.ModelBackend"
 DEMO_METHODS = ["Payme", "Click", "Uzum"]
 
 
-def flash(request, level, key, **kw):
-    messages.add_message(request, level, translate(request.lang, key, **kw))
+def flash(request, level, key, celebrate=False, **kw):
+    """Queue a toast. `celebrate=True` (extra tag "celebrate") is the only thing that fires the confetti: use it for genuine wins only
+    (new record, goal reached, membership bought/renewed, workout completed), never for an ordinary "saved"."""
+    messages.add_message(request, level, translate(request.lang, key, **kw), extra_tags="celebrate" if celebrate else "")
 
 
 def allowed_methods(gs):
@@ -560,7 +562,7 @@ def pt_cancel(request, pk):
     s = get_object_or_404(PTSession, pk=pk, user=request.user)
     s.status = PTSession.Status.CANCELLED
     s.save(update_fields=["status"])
-    flash(request, messages.SUCCESS, "cancel_ok")
+    flash(request, messages.SUCCESS, "pt_cancel_ok")  # a personal-training request, not a class booking ("cancel_ok")
     return redirect("trainers")
 
 
@@ -734,7 +736,7 @@ def workout_toggle(request, pk):
         todays = set(ex.plan.exercises.filter(weekday=today.weekday()).values_list("id", flat=True))
         done = set(ExerciseLog.objects.filter(user=request.user, date=today, exercise_id__in=todays).values_list("exercise_id", flat=True))
         if todays and todays == done:
-            flash(request, messages.SUCCESS, "workout_all_done")  # the confetti moment
+            flash(request, messages.SUCCESS, "workout_all_done", celebrate=True)  # the confetti moment
     return redirect("workouts")
 
 
@@ -822,7 +824,8 @@ def records_view(request):
             return redirect("records")
         prev = max((r.one_rm for r in PersonalRecord.objects.filter(user=request.user, lift=lift)), default=0)
         rec = PersonalRecord.objects.create(user=request.user, lift=lift, weight=round(weight, 1), reps=reps)
-        flash(request, messages.SUCCESS if rec.one_rm > prev else messages.INFO, "record_new" if rec.one_rm > prev else "record_saved")
+        flash(request, messages.SUCCESS if rec.one_rm > prev else messages.INFO, "record_new" if rec.one_rm > prev else "record_saved",
+              celebrate=rec.one_rm > prev)
         return redirect("records")
     recs = list(PersonalRecord.objects.filter(user=request.user))
     lifts = []
@@ -897,7 +900,8 @@ def buy_plan(request, code):
         return redirect("pay", pk=pay.pk)
     if pay.status == Payment.Status.PENDING:
         telegram.alert_admin(f"Yangi to'lov (tasdiq kutadi): {request.user.full_name} · {plan.name} · {pay.amount} so'm")
-    flash(request, messages.SUCCESS, "bought_pending" if pay.status == Payment.Status.PENDING else "bought_paid")
+    flash(request, messages.SUCCESS, "bought_pending" if pay.status == Payment.Status.PENDING else "bought_paid",
+          celebrate=pay.status != Payment.Status.PENDING)  # confetti only when the membership is really active
     return redirect("dashboard")
 
 
@@ -1263,7 +1267,7 @@ def profile_view(request):
                 u.show_in_leaderboard = bool(request.POST.get("show_in_leaderboard"))
                 u.chat_visible = bool(request.POST.get("chat_visible"))
                 u.save()
-                flash(request, messages.SUCCESS, "saved")
+                flash(request, messages.SUCCESS, "profile_saved")
                 return redirect("profile")
         elif kind == "avatar":
             u = request.user
@@ -1325,7 +1329,7 @@ def profile_view(request):
                     u.set_password(wform.cleaned_data["new"])
                     u.save(update_fields=["password"])
                     update_session_auth_hash(request, u)
-                    flash(request, messages.SUCCESS, "saved")
+                    flash(request, messages.SUCCESS, "pw_changed")
                     return redirect("profile")
     u = request.user
     last = u.bodylogs.order_by("-date", "-id").first()

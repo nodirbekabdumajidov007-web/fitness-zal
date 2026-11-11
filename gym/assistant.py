@@ -18,11 +18,13 @@ import functools
 import math
 import re
 from datetime import timedelta
+from zoneinfo import ZoneInfo
 
 from django.urls import reverse
 from django.utils import timezone
 
 from . import assistant_kb as kb
+from . import assistant_live as live
 from .i18n import T
 
 MAX_QUERY = 300
@@ -357,9 +359,12 @@ _MONTH = {"uz": ("yanvar", "fevral", "mart", "aprel", "may", "iyun", "iyul", "av
           "ru": ("января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"),
           "en": ("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")}
 _TIME_RE = re.compile(r"\b(soat nechi|soat nechchi|soat necha boldi|hozir soat|xozir soat|который час|сколько времени|сколько сейчас времени|"
-                      r"what time is it|what is the time|whats the time|current time|time now|time is it now)\b")
-_DATE_RE = re.compile(r"(bugun qaysi kun|bugun nechanchi|bugungi sana|bugun sana|bugun qanaqa kun|какое сегодня число|какое число|какой сегодня день|"
-                      r"какая сегодня дата|сегодняшняя дата|what day is it|what is the date|whats the date|todays date|current date|what is today)")
+                      r"what time is it|what is the time|whats the time|current time|time now|time is it now|"
+                      r"vaqt nechi|hozir vaqt nechi|hozirgi vaqt|который сейчас час|сколько сейчас времени|скажи время|what time now|tell me the time)\b")
+_DATE_RE = re.compile(r"(bugun qaysi kun|bugun nechanchi|bugun nechinchi|bugungi sana|bugun sana|bugun qanaqa kun|bugun qaysi sana|nechanchi sana|sana nechi|"
+                      r"bugun haftaning qaysi kuni|какое сегодня число|какое число|какой сегодня день|"
+                      r"какая сегодня дата|сегодняшняя дата|дата сегодня|какое число сегодня|what day is it|what is the date|whats the date|todays date|"
+                      r"current date|what is today|what date is it|date today|what day is today|whats today|what is the date today|what is todays date)")
 _REPS_WORD = r"(?:marta|mart|ta|раз|раза|reps?|rep|takror\w*|повтор\w*|times|rep\.)"
 _RM_A = re.compile(r"(" + _NUM + r")\s*(?:kg|кг|kilo|lbs?)?\s*[x×*х]\s*(\d{1,2})\b")
 _RM_B = re.compile(r"(" + _NUM + r")\s*(kg|кг|kilo|lbs?)?\s*(?:ga|da|bilan|на|по|for|ni|ta|dan|@)?\s*(\d{1,2})\s*" + _REPS_WORD + r"\b")
@@ -379,10 +384,12 @@ def _num(s):
 
 def _calc_time(raw, lang):
     n = normalize(raw)
-    now = timezone.localtime()
+    if _CYR.search(str(raw)):  # Uzbek written in Cyrillic ("бугун сана нечи") is read through its Latin form as well
+        n += " " + normalize(translit(raw))
+    now = timezone.localtime(timezone.now(), ZoneInfo("Asia/Tashkent"))
     if _TIME_RE.search(n):
-        return {"uz": f"Hozir soat {now:%H:%M} (server vaqti).", "ru": f"Сейчас {now:%H:%M} (время сервера).",
-                "en": f"It is {now:%H:%M} now (server time)."}[lang], "calc_time"
+        return {"uz": f"Hozir soat {now:%H:%M} (Toshkent vaqti).", "ru": f"Сейчас {now:%H:%M} (время Ташкента).",
+                "en": f"It is {now:%H:%M} now (Tashkent time)."}[lang], "calc_time"
     if _DATE_RE.search(n):
         wd, mo = _WEEKDAY[lang][now.weekday()], _MONTH[lang][now.month - 1]
         return {"uz": f"Bugun {now.day}-{mo} {now.year}, {wd}.", "ru": f"Сегодня {now.day} {mo} {now.year}, {wd}.",
@@ -734,6 +741,18 @@ class Facts:
             s += tx("prof_target", lang, t=u.target_weight)
         return s + "." + ("" if u.goal else tx("prof_nogoal", lang))
 
+    # ---- live answers (gym/assistant_live.py)
+    def f_weather(self):
+        return live.weather_answer(self.lang, self.gs)
+
+    def f_admin_help(self):
+        return live.admin_answer(self.lang, self.user)
+
+    def f_hours_per_day(self):
+        u = self.user
+        goal = u.goal if (u is not None and u.goal) else None
+        return live.hours_answer(self.lang, goal, self._goal_name(u) if goal else "")
+
     def f_goal_tip(self):
         u, lang = self.user, self.lang
         if not u or not u.goal:
@@ -945,7 +964,7 @@ _OFFTOPIC = re.compile(
     r"history of|world war|tenglama\w*|уравнени\w*|equation\w*|integral\w*|интеграл\w*|derivative|hosila\w*|geometri\w*|геометри\w*|algebra|алгебр\w*|calculus|"
     r"matematika\w*|homework|домашн\w+ задани\w*|dasturlash\w*|программирован\w*|python|javascript|write code|kino|film|фильм\w*|movie|сериал\w*|"
     r"goroskop\w*|гороскоп\w*|horoscope|bitcoin|биткоин\w*|kripto\w*|crypto|valyuta kurs\w*|dollar kurs\w*|курс доллара|exchange rate|insho|реферат\w*|"
-    r"сочинени\w*|essay|tarjima qil\w*|переведи|translate|kim kashf\w*|кто изобр\w*|кто открыл|who invented|who discovered|qoshiq matni|текст песни|lyrics|ob havo\w*|obhavo|погод\w*|weather forecast|forecast)\b")
+    r"сочинени\w*|essay|tarjima qil\w*|переведи|translate|kim kashf\w*|кто изобр\w*|кто открыл|who invented|who discovered|qoshiq matni|текст песни|lyrics)\b")
 _DRUG = re.compile(r"\b(ibuprofen\w*|paracetamol\w*|parasetamol\w*|aspirin\w*|antibiotic\w*|antibiotik\w*|insulin\w*|ukol\w*|укол\w*|антибиотик\w*|таблетк\w*|"
                    r"лекарств\w*|обезболива\w*|ибупрофен\w*|парацетамол\w*|аспирин\w*|инсулин\w*|dori\w*|tabletka\w*|painkiller\w*|medicine|medication|pills?|"
                    r"tablets?|ozempic|metformin\w*|метформин\w*)\b")
@@ -1028,5 +1047,8 @@ def answer(text, lang="uz", user=None):
         return _result(True, _t(lang, "asst_login"), [{"label": _t(lang, "login"), "url": reverse("login")}],
                        suggestions(scored, lang, skip=best["id"], entry=best), best["id"], best["topic"])
     facts = Facts(lang, user)
-    return _result(True, fill(best["a"][lang], facts), _links(best, lang), suggestions(scored, lang, skip=best["id"], entry=best),
+    links = _links(best, lang)
+    if best["id"] == "mx_admin_panel" and authed and user.is_staff:  # staff get the real link; everybody else only Dashboard / Account
+        links = [{"label": _t(lang, "nav_admin"), "url": "/django-admin/"}] + links
+    return _result(True, fill(best["a"][lang], facts), links, suggestions(scored, lang, skip=best["id"], entry=best),
                    best["id"], best["topic"])

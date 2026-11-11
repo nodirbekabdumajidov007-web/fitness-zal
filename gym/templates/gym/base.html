@@ -197,7 +197,7 @@
   </div></div>
 </footer>
 
-{% if messages %}<div class="msgs" role="status">{% for m in messages %}<div class="msg {{ m.level_tag }}">{{ m }}</div>{% endfor %}</div>{% endif %}
+{% if messages %}<div class="msgs" role="status">{% for m in messages %}<div class="msg {{ m.level_tag }}{% if "celebrate" in m.extra_tags %} celebrate{% endif %}">{{ m }}</div>{% endfor %}</div>{% endif %}
 <button type="button" class="totop" id="totop" aria-label="{% t 'back_top' %}" title="{% t 'back_top' %}" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 {% include "gym/_voice.html" %}
 {% include "gym/_support.html" %}

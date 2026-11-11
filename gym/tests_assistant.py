@@ -2,6 +2,7 @@
 the /assistant/ask/ endpoint (CSRF, rate limit) and the rule-based workout plan."""
 import json
 from datetime import timedelta
+from unittest import mock
 
 from django.core.cache import cache
 from django.test import Client, TestCase
@@ -975,3 +976,186 @@ class FallbackTests(TestCase):
         self.assertGreaterEqual(sum(1 for e in assistant_kb.ENTRIES if e["id"].startswith("mx_m_")), 50)  # myths and weight FAQs
         self.assertGreaterEqual(by["sp"], 30)
         self.assertGreaterEqual(by["fd"], 50)
+
+
+# ---------------------------------------------------------------- live answers: admin panel, date/time, weather, training hours, capabilities
+LIVE_QUESTIONS = [
+    # admin panel
+    ("admin panelga kir", "mx_admin_panel"), ("admin panel qayerda", "mx_admin_panel"), ("admin panelga qanday kiraman", "mx_admin_panel"),
+    ("админ панелга кириш", "mx_admin_panel"), ("админ панел қаерда", "mx_admin_panel"),
+    ("как зайти в админку", "mx_admin_panel"), ("где админ панель", "mx_admin_panel"), ("how to open admin", "mx_admin_panel"),
+    ("where is the admin panel", "mx_admin_panel"),
+    # date and time (Asia/Tashkent)
+    ("bugun sana nechi", "calc_date"), ("bugun nechanchi", "calc_date"), ("bugun nechanchi sana", "calc_date"), ("какое сегодня число", "calc_date"),
+    ("какая сегодня дата", "calc_date"), ("what's the date", "calc_date"), ("what is the date today", "calc_date"), ("бугун сана нечи", "calc_date"),
+    ("бугун нечанчи сана", "calc_date"),
+    ("soat nechi", "calc_time"), ("hozir vaqt nechi", "calc_time"), ("сколько сейчас времени", "calc_time"), ("what time is it", "calc_time"),
+    # weather
+    ("ob-havo qanday", "mx_weather"), ("bugun ob havo qanday", "mx_weather"), ("havo harorati", "mx_weather"), ("обҳаво қандай", "mx_weather"),
+    ("погода", "mx_weather"), ("какая сегодня погода", "mx_weather"), ("сколько градусов на улице", "mx_weather"), ("weather", "mx_weather"),
+    ("what is the weather", "mx_weather"), ("will it rain", "mx_weather"), ("how hot is it", "mx_weather"),
+    # how long to train
+    ("kuniga necha soat mashq qilishim kerak", "mx_train_hours"),
+    ("кунига неча соат машқ қилишим керак", "mx_train_hours"), ("сколько часов в день тренироваться", "mx_train_hours"),
+    ("how many hours a day should i train", "mx_train_hours"), ("how long should a workout be", "mx_train_hours"),
+    ("mashq qancha davom etishi kerak", "mx_train_hours"),
+    # capabilities
+    ("sen nimani tushunasan", "mx_capabilities"), ("nima qila olasan", "mx_capabilities"), ("сен нимани тушунасан", "mx_capabilities"),
+    ("что ты умеешь", "mx_capabilities"), ("что ты понимаешь", "mx_capabilities"), ("what can you do", "mx_capabilities"),
+    ("what do you understand", "mx_capabilities"),
+]
+
+_FAKE = {"current": {"temperature_2m": 31.2, "apparent_temperature": 36.0, "precipitation": 0.0, "weather_code": 1, "wind_speed_10m": 9.0},
+         "daily": {"temperature_2m_max": [34.0], "temperature_2m_min": [21.5]}}
+
+
+def _fake(cur=None):
+    d = json.loads(json.dumps(_FAKE))
+    d["current"].update(cur or {})
+    return d
+
+
+class LiveAnswerTests(TestCase):
+    def setUp(self):
+        cache.clear()
+        GymSettings.load()
+        GymSettings.objects.get(pk=1).save()
+
+    def _ask(self, q, lang="uz", user=None, weather=None):
+        with mock.patch("gym.assistant_live._http_json", return_value=weather or _fake()):
+            return assistant.answer(q, lang, user)
+
+    def test_at_least_forty_questions(self):
+        self.assertGreaterEqual(len(LIVE_QUESTIONS), 40)
+
+    def test_every_question_lands_on_its_answer(self):
+        wrong = []
+        for q, want in LIVE_QUESTIONS:
+            got = self._ask(q)["id"]
+            if got != want:
+                wrong.append((q, want, got))
+        self.assertEqual(wrong, [])
+
+    def test_old_weather_refusal_is_gone(self):
+        self.assertNotIn("bilmayman", self._ask("ob-havo qanday")["answer"])
+        self.assertNotIn("weather forecast", assistant._OFFTOPIC.pattern)
+
+    def test_admin_panel_depends_on_who_asks(self):
+        guest = self._ask("admin panelga kir")
+        self.assertNotIn("/django-admin/", guest["answer"])
+        self.assertNotIn(".admin", guest["answer"])  # the sign-in trick is never revealed to non-staff
+        self.assertNotIn("/django-admin/", json.dumps(guest["links"]))
+        self.assertTrue(guest["links"])
+        member = User.objects.create_user(username="mem", email="m@x.uz", password="pw12345678")
+        res = self._ask("how to open admin", "en", member)
+        self.assertIn("staff only", res["answer"])
+        self.assertNotIn(".admin", res["answer"])
+        self.assertNotIn("/django-admin/", json.dumps(res["links"]))
+        staff = User.objects.create_user(username="stf", email="s@x.uz", password="pw12345678", is_staff=True)
+        for q, lang in (("admin panelga kir", "uz"), ("как зайти в админку", "ru"), ("how to open admin", "en")):
+            res = self._ask(q, lang, staff)
+            self.assertIn("/django-admin/", res["answer"])
+            self.assertEqual(res["links"][0]["url"], "/django-admin/")
+            self.assertNotIn(".admin", res["answer"])
+
+    def test_date_and_time_are_tashkent_and_localized(self):
+        from zoneinfo import ZoneInfo
+        now = timezone.localtime(timezone.now(), ZoneInfo("Asia/Tashkent"))
+        uz = assistant.answer("bugun sana nechi", "uz")["answer"]
+        self.assertIn(assistant._MONTH["uz"][now.month - 1], uz)
+        self.assertIn(assistant._WEEKDAY["uz"][now.weekday()], uz)
+        self.assertIn(str(now.year), uz)
+        ru = assistant.answer("какое сегодня число", "ru")["answer"]
+        self.assertIn(assistant._MONTH["ru"][now.month - 1], ru)
+        en = assistant.answer("what is the date today", "en")["answer"]
+        self.assertIn(assistant._WEEKDAY["en"][now.weekday()], en)
+        self.assertIn(f"{now:%H:%M}", assistant.answer("soat nechi", "uz")["answer"])
+        self.assertEqual(assistant.answer("soat nechada ochiladi", "uz")["id"], "hours")
+
+    def test_weather_answer_has_everything(self):
+        a = self._ask("ob-havo qanday")["answer"]
+        self.assertIn("31°C", a)
+        self.assertIn("36°C", a)  # feels like
+        self.assertIn("asosan ochiq", a)  # WMO code 1
+        self.assertIn("22…34°C", a)  # today's min..max
+        self.assertIn("Mashq maslahati", a)
+        self.assertIn("suv", a)  # hot -> hydrate
+        self.assertNotIn("{", a)
+        self.assertIn("mostly clear", self._ask("weather", "en")["answer"])
+        self.assertIn("преимущественно ясно", self._ask("погода", "ru")["answer"])
+
+    def test_weather_uses_gym_coordinates_and_tashkent_fallback(self):
+        urls = []
+
+        def grab(url):
+            urls.append(url)
+            return _fake()
+        with mock.patch("gym.assistant_live._http_json", side_effect=grab):
+            assistant.answer("ob-havo qanday", "uz")
+            self.assertIn("latitude=41.3111", urls[-1])
+            self.assertIn("longitude=69.2797", urls[-1])
+            self.assertIn("api.open-meteo.com/v1/forecast", urls[-1])
+            self.assertIn("timezone=Asia%2FTashkent", urls[-1])
+            self.assertIn("weather_code", urls[-1])
+            gs = GymSettings.load()
+            gs.map_lat, gs.map_lng = "39.654200", "66.975800"
+            gs.save()
+            cache.clear()
+            assistant.answer("ob-havo qanday", "uz")
+            self.assertIn("latitude=39.6542", urls[-1])
+            self.assertIn("longitude=66.9758", urls[-1])
+
+    def test_weather_is_cached_for_half_an_hour(self):
+        with mock.patch("gym.assistant_live._http_json", return_value=_fake()) as m:
+            assistant.answer("ob-havo qanday", "uz")
+            assistant.answer("погода", "ru")
+            assistant.answer("weather", "en")
+            self.assertEqual(m.call_count, 1)
+
+    def test_weather_failure_is_graceful(self):
+        with mock.patch("gym.assistant_live._http_json", side_effect=OSError("down")):
+            res = assistant.answer("ob-havo qanday", "uz")
+        self.assertTrue(res["matched"])
+        self.assertIn("ob-havo ma'lumotini hozir olib bo'lmadi", res["answer"])
+        cache.clear()
+        with mock.patch("gym.assistant_live._http_json", return_value={"oops": 1}):
+            self.assertIn("olib bo'lmadi", assistant.answer("ob-havo qanday", "uz")["answer"])
+
+    def test_weather_never_touches_the_network_in_tests(self):
+        from . import assistant_live
+        with self.assertRaises(OSError):
+            assistant_live._http_json("https://api.open-meteo.com/v1/forecast")
+        self.assertIn("olib bo'lmadi", assistant.answer("ob-havo qanday", "uz")["answer"])
+
+    def test_weather_codes_and_tips(self):
+        from . import assistant_live as lv
+        cases = [(61, 12, 12, 3, "wet"), (95, 20, 20, 3, "storm"), (0, 38, 40, 3, "heat"), (0, -10, -14, 3, "freeze"), (3, 3, 0, 3, "cold"),
+                 (0, 20, 20, 40, "wind"), (45, 10, 10, 3, "fog"), (0, 25, 29, 3, "warm"), (0, 22, 22, 3, "good"), (73, -1, -4, 3, "wet")]
+        for code, t, f, w, tip in cases:
+            self.assertEqual(lv.tip_for({"code": code, "t": t, "f": f, "w": w}), tip, (code, t, f, w))
+        for code, (kind, uz, ru, en) in lv._WMO.items():
+            self.assertTrue(uz and ru and en, code)
+        rain = self._ask("ob-havo qanday", "uz", weather=_fake({"weather_code": 63, "precipitation": 1.2, "apparent_temperature": 12, "temperature_2m": 13}))["answer"]
+        self.assertIn("yomg'ir", rain)
+        self.assertIn("1.2 mm", rain)
+        self.assertIn("zalda", rain)
+
+    def test_hours_answer_is_evidence_based(self):
+        a = self._ask("kuniga necha soat mashq qilishim kerak")["answer"]
+        for part in ("150-300", "75-150", "45-75", "dam"):
+            self.assertIn(part, a)
+        self.assertNotIn("{", a)
+        self.assertNotIn("Maqsadingiz", a)  # no goal known, no personal paragraph
+        self.assertIn("150-300", self._ask("how many hours a day should i train", "en")["answer"])
+        u = User.objects.create_user(username="goaler", email="g@x.uz", password="pw12345678", goal="lose")
+        res = self._ask("kuniga necha soat mashq qilishim kerak", "uz", u)["answer"]
+        self.assertIn("ozish", res.lower())
+        self.assertNotIn("{", res)
+
+    def test_capabilities_answer_lists_topics_and_limits(self):
+        uz = self._ask("sen nimani tushunasan")["answer"]
+        for part in ("Hisoblagichlar", "ob-havo", "sana", "Chegaralarim", "dori"):
+            self.assertIn(part, uz)
+        en = self._ask("what can you do", "en")["answer"]
+        self.assertIn("My limits", en)
+        self.assertIn("weather", en)

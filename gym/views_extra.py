@@ -216,7 +216,7 @@ def gift_redeem(request):
     else:
         with transaction.atomic():
             m, err = extras.redeem_gift_plan(request.user, g)
-        flash(request, messages.ERROR if err else messages.SUCCESS, err or "gift_redeemed")
+        flash(request, messages.ERROR if err else messages.SUCCESS, err or "gift_redeemed", celebrate=not err)
     return redirect("gift")
 
 

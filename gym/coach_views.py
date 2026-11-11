@@ -107,7 +107,7 @@ def pt_action(request, pk, action):
         s.status = PTSession.Status.CANCELLED
         telegram.notify_user(s.user, "tg_pt_cancelled", trainer=request.trainer.name)
     s.save(update_fields=["status"])
-    flash(request, messages.SUCCESS, "done_ok")
+    flash(request, messages.SUCCESS, "pt_confirmed_ok" if action == "confirm" else "pt_declined_ok")
     return redirect("coach")
 
 

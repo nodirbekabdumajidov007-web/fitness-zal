@@ -296,7 +296,7 @@ pay_cancel||To'lovni bekor qilish||Отменить платёж||Cancel payment
 pay_cancelled||To'lov bekor qilindi.||Платёж отменён.||Payment cancelled.
 pay_now||To'lash||Оплатить||Pay now
 no_card_note||Hozir karta ulanmagan. Zalda naqd to'lang yoki administrator bilan bog'laning.||Карта сейчас не подключена. Оплатите наличными в зале или свяжитесь с администратором.||No card is connected right now. Pay cash at the gym or contact the admin.
-report_sent||Xabaringiz yuborildi. To'lov tasdiqlangach abonement/buyurtma faollashadi.||Сообщение отправлено. После подтверждения платежа абонемент/заказ активируется.||Notice sent. Your membership/order activates once the payment is confirmed.
+report_sent||To'lov haqida xabaringiz yuborildi. To'lov tasdiqlangach abonement/buyurtma faollashadi.||Сообщение об оплате отправлено. После подтверждения платежа абонемент/заказ активируется.||Payment notice sent. Your membership/order activates once the payment is confirmed.
 err_last4||Kartaning oxirgi 4 raqamini yozing||Введите последние 4 цифры карты||Enter the last 4 digits of the card
 proof_yes||To'ladim degan||Сообщил(а) об оплате||Says paid
 proof_no||Hali xabar yo'q||Пока без сообщения||Not reported yet
@@ -361,7 +361,7 @@ chat_privacy_note||Sizni faqat ism va familiya bosh harfi bilan ko'rishadi, tele
 chat_you||Siz||Вы||You
 chat_delete||O'chirish||Удалить||Delete
 chat_report||Shikoyat||Пожаловаться||Report
-chat_report_sent||Shikoyat yuborildi. Rahmat.||Жалоба отправлена. Спасибо.||Report sent. Thank you.
+chat_report_sent||Shikoyat administratorga yuborildi. Rahmat.||Жалоба отправлена администратору. Спасибо.||Your report was sent to the admin. Thank you.
 chat_empty_room||Hali xabar yo'q. Birinchi bo'lib yozing!||Сообщений пока нет. Напишите первым!||No messages yet. Be the first!
 chat_blocked_notice||Bu suhbatda yozib bo'lmaydi (blok).||В этой переписке писать нельзя (блокировка).||You can't write in this conversation (blocked).
 chat_type||Xabar yozing...||Напишите сообщение...||Write a message...
@@ -869,7 +869,7 @@ cal_today||Bugun||Сегодня||Today
 cal_empty||Bu kunga hali hech narsa yozilmagan. Birinchi ovqatni qo'shing.||За этот день пока ничего нет. Добавьте первую еду.||Nothing logged for this day yet. Add your first meal.
 cal_bad_grams||Gramm 1 dan 5000 gacha bo'lishi kerak||Граммы должны быть от 1 до 5000||Grams must be between 1 and 5000
 cal_bad_food||Nomi va to'g'ri raqamlarni kiriting||Укажите название и корректные числа||Enter a name and valid numbers
-cal_added||Qo'shildi||Добавлено||Added
+cal_added||Ovqat qo'shildi||Еда добавлена||Food added
 cal_remove||O'chirish||Убрать||Remove
 cal_note||Qiymatlar taxminiy. Kasallik yoki maxsus parhez bo'lsa, shifokor bilan maslahatlashing.||Значения примерные. При болезнях и особой диете проконсультируйтесь с врачом.||Values are approximate. For medical conditions or special diets, ask a doctor.
 ann_more||batafsil||подробнее||read more
@@ -1449,6 +1449,15 @@ chat_replying||Javob: {name}||Ответ: {name}||Replying to {name}
 chat_close||Yopish||Закрыть||Close
 chat_more||Yana||Ещё||More
 chat_mention_ph||A'zoni tanlang||Выберите участника||Pick a member
+profile_saved||Profil ma'lumotlari saqlandi||Данные профиля сохранены||Profile details saved
+pw_changed||Parol o'zgartirildi||Пароль изменён||Password changed
+pt_cancel_ok||Shaxsiy mashg'ulot so'rovi bekor qilindi||Запрос на персональную тренировку отменён||Personal training request cancelled
+pt_confirmed_ok||Shaxsiy mashg'ulot so'rovi tasdiqlandi||Запрос на персональную тренировку подтверждён||Personal training request confirmed
+pt_declined_ok||Shaxsiy mashg'ulot so'rovi rad etildi||Запрос на персональную тренировку отклонён||Personal training request declined
+body_saved||O'lchov saqlandi||Замер сохранён||Measurement saved
+weight_saved||Bugungi vazn yangilandi||Вес на сегодня обновлён||Today's weight updated
+goal_saved||Maqsad saqlandi||Цель сохранена||Goal saved
+ftr_goal_reached||🎯 Maqsadga erishdingiz! Tabriklaymiz!||🎯 Цель достигнута! Поздравляем!||🎯 Goal reached! Congratulations!
 scan_session||Sessiya tugagan: sahifani yangilab, admin sifatida qayta kiring||Сессия истекла: обновите страницу и войдите снова как администратор||Session ended: reload the page and sign in again as admin
 """
 

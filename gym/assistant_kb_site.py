@@ -7,6 +7,8 @@ Row format: (id, topic, keywords uz, keywords ru, keywords en, answer uz, answer
  - links: ((i18n label key, url name), ...).
 """
 
+from .assistant_kb_live import CAP_EN, CAP_RU, CAP_UZ
+
 SITE = [
     # ------------------------------------------------------------ gym facts (dynamic)
     ("hours", "site",
@@ -441,9 +443,7 @@ SITE = [
      "nimalar qila olasan|nima qila olasiz|yordam ber|yordam kerak|nima haqida so'rasam bo'ladi|qanday yordam bera olasiz",
      "что ты умеешь|что вы умеете|помоги|нужна помощь|о чём можно спросить|чем можешь помочь",
      "what can you do|help me|i need help|what can i ask|how can you help|help",
-     "Zal haqida (ish vaqti, narxlar, to'lov, manzil), mashq texnikasi va rejalari, ovqatlanish va kaloriya haqida javob beraman. Kirgan bo'lsangiz abonementingiz va bugungi kaloriyangizni ham ayta olaman. Masalan: \"squat qanday qilinadi?\" yoki \"osh necha kaloriya?\".",
-     "Я отвечаю о зале (часы, цены, оплата, адрес), технике и планах тренировок, питании и калориях. Если вы вошли, могу назвать срок абонемента и сегодняшние калории. Например: «как делать присед?» или «сколько калорий в плове?».",
-     "I answer about the gym (hours, prices, payment, address), exercise technique and programs, nutrition and calories. If you are signed in I can tell your membership expiry and today's calories. For example: \"how do I squat?\" or \"how many calories in plov?\".", ()),
+     CAP_UZ, CAP_RU, CAP_EN, ()),
     ("ok_chat", "chat",
      "tushunarli|mayli|ajoyib|durust",
      "понятно|хорошо|отлично|ладно|ясно",

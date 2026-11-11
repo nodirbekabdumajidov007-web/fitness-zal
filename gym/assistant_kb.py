@@ -14,6 +14,7 @@ from .assistant_kb_myth import FAQ_LOSS, FAQ_RECOVERY, MYTHS
 from .assistant_kb_sport import REHAB, SPORT
 from .assistant_kb_food import FOOD
 from .assistant_kb_health import HEALTH
+from .assistant_kb_live import LIVE
 from .assistant_kb_misc import MISC
 from .assistant_kb_more import MORE
 from .assistant_kb_nutr import NUTR
@@ -27,7 +28,7 @@ LANGS = ("uz", "ru", "en")
 
 def _build():
     out, seen = [], set()
-    for row in SITE + TRAIN + FOOD + EX + PROG + HEALTH + NUTR + SITE2 + MISC + MORE + EX2 + SPORT + REHAB + FOOD2 + MYTHS + FAQ_LOSS + FAQ_RECOVERY + BEGINNER + ETIQUETTE + EQUIPMENT + GLOSSARY + BEGINNER2 + SITE3 + SMALL:
+    for row in SITE + TRAIN + FOOD + EX + PROG + HEALTH + NUTR + SITE2 + MISC + MORE + EX2 + SPORT + REHAB + FOOD2 + MYTHS + FAQ_LOSS + FAQ_RECOVERY + BEGINNER + ETIQUETTE + EQUIPMENT + GLOSSARY + BEGINNER2 + SITE3 + SMALL + LIVE:
         eid, topic, kw_uz, kw_ru, kw_en, a_uz, a_ru, a_en, links = row
         if eid in seen:
             raise ValueError(f"duplicate knowledge base id: {eid}")

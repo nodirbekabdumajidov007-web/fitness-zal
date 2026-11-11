@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // the service worker is registered by pwa.js (install prompt, update toast, offline banner, push)
 
-  // a little celebration after anything that went well (order placed, payment reported, class booked, welcome...)
+  // confetti only for a genuine win: the server marks such a flash message with the "celebrate" tag (new record, goal reached, membership bought, workout done)
   function confetti() {
     var c = document.createElement('canvas'), x = c.getContext('2d'), W = c.width = innerWidth, H = c.height = innerHeight;
     c.className = 'confetti'; c.setAttribute('aria-hidden', 'true'); document.body.appendChild(c);
@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', function () {
     })(t0);
   }
   window.fzConfetti = confetti;
-  if (document.querySelector('.msg.success') && !matchMedia('(prefers-reduced-motion: reduce)').matches) setTimeout(confetti, 250);
+  if (document.querySelector('.msg.success.celebrate') && !matchMedia('(prefers-reduced-motion: reduce)').matches) setTimeout(confetti, 250);
 
   // flash messages fade out
   document.querySelectorAll('.msg').forEach(function (m) { setTimeout(function () { m.classList.add('gone'); }, 6000); });
