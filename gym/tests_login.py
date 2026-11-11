@@ -45,7 +45,7 @@ class Base(TestCase):
 
     def google(self, c, email="ali@gmail.com"):
         info = {"aud": CID, "email": email, "email_verified": "true", "given_name": "Ali", "family_name": "Valiyev"}
-        with mock.patch("gym.views.urllib.request.urlopen", return_value=io.BytesIO(json.dumps(info).encode())):
+        with mock.patch("gym.views.google_auth.verify", return_value=info):  # signature check is covered in tests_email_login
             return c.post("/auth/google/", json.dumps({"credential": "x.y.z"}), content_type="application/json")
 
 

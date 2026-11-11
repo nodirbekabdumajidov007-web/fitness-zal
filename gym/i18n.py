@@ -1356,7 +1356,6 @@ sw_guest||mehmon||гость||guest
 sw_title||Sizga qanday yordam bera olamiz?||Чем мы можем вам помочь?||How can we help?
 sw_last||Oxirgi xabar||Последнее сообщение||Latest message
 sw_send_us||Bizga xabar yuboring||Напишите нам||Send us a message
-sw_send_us_sub||Odatda bir necha soat ichida javob beramiz||Обычно отвечаем в течение нескольких часов||We usually reply within a few hours
 sw_find_help||Yordam qidirish||Поиск помощи||Search for help
 sw_search_ph||Savolingizni yozing||Введите ваш вопрос||Type your question
 sw_telegram||Telegram orqali yozish||Написать в Telegram||Message us on Telegram
@@ -1458,6 +1457,59 @@ body_saved||O'lchov saqlandi||Замер сохранён||Measurement saved
 weight_saved||Bugungi vazn yangilandi||Вес на сегодня обновлён||Today's weight updated
 goal_saved||Maqsad saqlandi||Цель сохранена||Goal saved
 ftr_goal_reached||🎯 Maqsadga erishdingiz! Tabriklaymiz!||🎯 Цель достигнута! Поздравляем!||🎯 Goal reached! Congratulations!
+sw_st_open||Hozir ochiq · javob beramiz||Сейчас открыто · отвечаем||Open now · we reply
+sw_st_closed||Yopiq · {time} dan javob beramiz||Закрыто · ответим с {time}||Closed · we reply from {time}
+sw_hours_ans||Zal har kuni {hours} ishlaydi.||Зал работает ежедневно {hours}.||The gym is open every day {hours}.
+sw_qa_label||Tezkor amallar||Быстрые действия||Quick actions
+sw_qa_prices||Narxlar||Цены||Prices
+sw_qa_hours||Ish vaqti||Часы работы||Opening hours
+sw_qa_member||Abonementim||Мой абонемент||My membership
+sw_qa_coach||Murabbiy yordamchi||Помощник-тренер||Coach assistant
+sw_call||Qo'ng'iroq qilish||Позвонить||Call us
+sw_ask_title||Yordamchidan so'rash||Спросить помощника||Ask the assistant
+sw_ask_ph||Masalan: abonementni qanday muzlataman?||Например: как заморозить абонемент?||e.g. how do I freeze my membership?
+sw_ask_go||So'rash||Спросить||Ask
+sw_continue||Yordam bo'limida davom ettirish||Продолжить в разделе «Помощь»||Continue in Help
+sw_ms_left||Abonement: {n} kun qoldi||Абонемент: осталось {n} дн.||Membership: {n} days left
+sw_ms_today||Abonement bugun tugaydi||Абонемент заканчивается сегодня||Membership ends today
+sw_ms_none||Faol abonement yo'q||Нет активного абонемента||No active membership
+sw_ms_extend||Uzaytirish||Продлить||Extend
+sw_ms_buy||Tanlash||Выбрать||Choose
+sw_online||Jamoa onlayn||Команда онлайн||Team is online
+sw_pg_title||Yordam markazi||Центр помощи||Help center
+sw_pg_sub||Savolingizni yozing, jamoamiz javob beradi.||Напишите вопрос, и команда ответит.||Write your question and our team will reply.
+sw_pg_chat||Jamoa bilan suhbat||Чат с командой||Chat with the team
+sw_pg_faq||Ko'p so'raladigan savollar||Частые вопросы||Top questions
+sw_pg_all||Barcha savollar||Все вопросы||All questions
+sw_pg_search||Savollardan qidirish||Поиск по вопросам||Search the questions
+sw_pg_widget_note||Bu suhbat sayt burchagidagi yordam oynasi bilan bir xil.||Этот чат совпадает с окном помощи в углу сайта.||This is the same conversation as the help window in the corner.
+promo_eyebrow||Zal bilan tanishing||Знакомство с залом||Meet the gym
+promo_title||Zalimiz ichida nima bor?||Что внутри нашего зала?||What is inside our gym?
+promo_play||Videoni ijro etish||Воспроизвести видео||Play the video
+theme_to_dark||Tungi mavzuni yoqish||Включить тёмную тему||Switch to dark theme
+theme_to_light||Kunduzgi mavzuni yoqish||Включить светлую тему||Switch to light theme
+ec_tab||Kod bilan kirish (e-mail)||Вход по коду (e-mail)||Sign in with an e-mail code
+ec_title||E-mail orqali kod bilan kirish||Вход по коду из e-mail||Sign in with an e-mailed code
+ec_help||E-mail manzilingizni (yoki loginingizni) yozing — akkauntingizga ulangan pochtaga 6 xonali kod yuboramiz. Parol kerak emas.||Введите e-mail (или логин) — отправим 6-значный код на почту аккаунта. Пароль не нужен.||Enter your e-mail (or username) and we will send a 6-digit code to the account's inbox. No password needed.
+ec_login_label||E-mail yoki login||E-mail или логин||E-mail or username
+ec_send||Kod yuborish||Отправить код||Send the code
+ec_code_title||E-mailga kelgan kod||Код из письма||The code from your e-mail
+ec_code_help||Agar bunday akkaunt mavjud bo'lsa, pochtaga kod yuborildi (10 daqiqa amal qiladi). «Spam» papkasini ham tekshiring.||Если такой аккаунт есть, на почту отправлен код (действует 10 минут). Проверьте и папку «Спам».||If such an account exists, a code was sent to its inbox (valid 10 minutes). Check the spam folder too.
+ec_code_help_to||Tasdiqlash kodi yuborildi:||Код подтверждения отправлен на:||A verification code was sent to:
+ec_code_label||6 xonali kod||6-значный код||6-digit code
+ec_bad||Kod noto'g'ri yoki muddati o'tgan.||Код неверный или просрочен.||The code is wrong or has expired.
+ec_locked||Urinishlar tugadi. Qaytadan kod so'rang.||Попытки закончились. Запросите код заново.||Too many attempts. Request a new code.
+ec_wait||Qayta yuborishdan oldin biroz kuting (60 soniya).||Подождите немного перед повторной отправкой (60 секунд).||Please wait a little before resending (60 seconds).
+ec_resent||Kod qayta yuborildi (agar akkaunt mavjud bo'lsa).||Код отправлен повторно (если аккаунт существует).||The code was sent again (if the account exists).
+ec_subject||Fitnes Zal: kirish kodi {code}||Fitnes Zal: код для входа {code}||Fitnes Zal: your sign-in code {code}
+ec_mail_title||Kirish kodi||Код для входа||Sign-in code
+ec_mail_intro||{gym} akkauntiga kirish uchun quyidagi koddan foydalaning:||Используйте этот код для входа в аккаунт {gym}:||Use this code to sign in to your {gym} account:
+ec_mail_valid||Kod {minutes} daqiqa amal qiladi va faqat bir marta ishlatiladi.||Код действует {minutes} минут и используется только один раз.||The code is valid for {minutes} minutes and works only once.
+ec_mail_secret||Kodni hech kimga aytmang.||Никому не сообщайте код.||Never share this code with anyone.
+ec_mail_ignore||Agar siz so'ramagan bo'lsangiz, bu xatga e'tibor bermang: akkauntingizga hech kim kira olmaydi.||Если вы не запрашивали код, просто проигнорируйте это письмо: в аккаунт никто не войдёт.||If you did not request this, just ignore this e-mail: nobody can get into your account.
+ec_2fa_label||Kirishda e-mailga tasdiqlash kodi||Код подтверждения на e-mail при входе||E-mail verification code at sign-in
+ec_2fa_help||Yoqilsa, parol (yoki Google) to'g'ri bo'lsa ham, e-mailingizga kelgan 6 xonali kod kerak bo'ladi.||Если включить, то даже после верного пароля (или Google) потребуется 6-значный код из e-mail.||When on, even after a correct password (or Google) a 6-digit code from your e-mail is required.
+ec_2fa_staff||Xodimlar uchun tavsiya etiladi: admin akkaunti himoyasini kuchaytiradi.||Рекомендуем для сотрудников: усиливает защиту админ-аккаунта.||Recommended for staff: it strengthens the protection of an admin account.
 scan_session||Sessiya tugagan: sahifani yangilab, admin sifatida qayta kiring||Сессия истекла: обновите страницу и войдите снова как администратор||Session ended: reload the page and sign in again as admin
 """
 

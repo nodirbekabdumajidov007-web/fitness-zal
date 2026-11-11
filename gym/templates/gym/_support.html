@@ -16,7 +16,6 @@
           <span class="sw-logo"><img src="{% vstatic 'img/logo.png' %}" alt="Fitnes Zal" width="30" height="44"></span>
           <span class="sw-faces" id="sw-faces" aria-hidden="true"></span>
         </div>
-        
         <p class="sw-hello">{% t 'sw_hello' name=scfg.name %}
           <svg class="sw-wave" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 11.5V6a1.5 1.5 0 0 1 3 0v4m0-1V4.5a1.5 1.5 0 0 1 3 0V10m0-4.5a1.5 1.5 0 0 1 3 0V12m0-3.5a1.5 1.5 0 0 1 3 0V15a7 7 0 0 1-7 7h-.5a6.5 6.5 0 0 1-5.4-2.9L3.700 14.800a1.500 1.500 0 0 1 2.400-1.800L7 14.200"/></svg></p>
         <h2 class="sw-h2">{% t 'sw_title' %}</h2>
@@ -27,21 +26,36 @@
           <span class="sw-last-body"></span>
         </button>
         <button type="button" class="sw-card sw-new" id="sw-new">
-          <span><b>{% t 'sw_send_us' %}</b><small>{% t 'sw_send_us_sub' %}</small></span>
+          <span><b>{% t 'sw_send_us' %}</b><small class="sw-st{% if scfg.status.open %} on{% endif %}" id="sw-st"><i class="sw-sdot" aria-hidden="true"></i><span id="sw-st-text">{{ scfg.status.text }}</span></small></span>
           <span class="sw-chev"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></span>
         </button>
+        <div class="sw-chips" role="group" aria-label="{% t 'sw_qa_label' %}">
+          <a class="sw-qc" href="{% url 'plans' %}">{% t 'sw_qa_prices' %}</a>
+          <button type="button" class="sw-qc" id="sw-qa-hours" aria-expanded="false">{% t 'sw_qa_hours' %}</button>
+          {% if user.is_authenticated %}<a class="sw-qc" href="{% url 'membership' %}">{% t 'sw_qa_member' %}</a>{% endif %}
+          <a class="sw-qc" href="{% url 'ai' %}">{% t 'sw_qa_coach' %}</a>
+        </div>
+        <section class="sw-card sw-find">
+          <b>{% t 'sw_ask_title' %}</b>
+          <form id="sw-hsearch" class="sw-search" role="search" autocomplete="off">
+            <input type="search" id="sw-hq" maxlength="200" placeholder="{% t 'sw_ask_ph' %}" aria-label="{% t 'sw_ask_title' %}" enterkeyhint="search">
+            <button type="submit" aria-label="{% t 'sw_ask_go' %}">{% icon 'search' %}</button>
+          </form>
+          <div class="sw-inline" id="sw-inline" aria-live="polite" hidden></div>
+          <div class="sw-rows" id="sw-top"></div>
+        </section>
+        {% if user.is_authenticated %}<div class="sw-card sw-mem" id="sw-mem" hidden>
+          <span><b id="sw-mem-text"></b></span>
+          <a class="sw-btn" id="sw-mem-link" href="{% url 'plans' %}"></a>
+        </div>{% endif %}
+        {% if scfg.phone %}<a class="sw-card sw-new sw-tg" id="sw-call" href="{{ scfg.phone.href }}">
+          <span><b>{% t 'sw_call' %}</b><small>{{ scfg.phone.label }}</small></span>
+          <span class="sw-chev">{% icon 'phone' %}</span>
+        </a>{% endif %}
         {% if gs.telegram %}<a class="sw-card sw-new sw-tg" href="{{ gs.telegram }}" target="_blank" rel="noopener">
           <span><b>{% t 'sw_telegram' %}</b></span>
           <span class="sw-chev"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 4 3 11l6 2 2 6 3-4 5 4z"/><path d="m9 13 8-6"/></svg></span>
         </a>{% endif %}
-        <section class="sw-card sw-find">
-          <b>{% t 'sw_find_help' %}</b>
-          <form id="sw-hsearch" class="sw-search" role="search" autocomplete="off">
-            <input type="search" id="sw-hq" maxlength="200" placeholder="{% t 'sw_search_ph' %}" aria-label="{% t 'sw_find_help' %}" enterkeyhint="search">
-            <button type="submit" aria-label="{% t 'sw_find_help' %}">{% icon 'search' %}</button>
-          </form>
-          <div class="sw-rows" id="sw-top"></div>
-        </section>
       </div>
     </div>
 

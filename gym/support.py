@@ -5,6 +5,7 @@ touches the conversation that belongs to the caller: the signed-in member's own 
 `fz_support` cookie. Thread ids are never accepted from the browser, so another person's conversation cannot be asked for."""
 import json
 import re
+from datetime import timedelta
 
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
@@ -12,6 +13,7 @@ from django.core.validators import validate_email
 from django.db import transaction
 from django.db.models import F
 from django.http import FileResponse, Http404, JsonResponse
+from django.shortcuts import render
 from django.utils import timezone
 from django.views.decorators.http import require_GET, require_POST
 
@@ -70,15 +72,67 @@ def staff_name(u):
     return (u.first_name or "").strip() or "Fitnes Zal"
 
 
+ONLINE_MINUTES = 10  # a staff member who did something in the last 10 minutes shows a green dot
+
+
 def staff_people():
-    """Up to three staff faces for the widget header (people with a photo first). Cached: it runs for visitors, not for staff only."""
+    """Up to three staff faces for the widget header (people with a photo first). The list is cached for a minute; the green "online"
+    dot is worked out from the stored last-activity time on every call, so it is never older than the clock says."""
     got = cache.get("sw:staff")
     if got is None:
         users = list(User.objects.filter(is_staff=True, is_active=True).order_by("-pk")[:12])
         users.sort(key=lambda u: (not u.avatar, -u.pk))
-        got = [{"name": staff_name(u), "initials": u.initials, "src": u.avatar_src} for u in users[:3]]
-        cache.set("sw:staff", got, 300)
+        got = [{"name": staff_name(u), "initials": u.initials, "src": u.avatar_src, "seen": u.last_seen.timestamp() if u.last_seen else 0} for u in users[:3]]
+        cache.set("sw:staff", got, 60)
+    limit = (timezone.now() - timedelta(minutes=ONLINE_MINUTES)).timestamp()
+    return [{**p, "online": p["seen"] >= limit} for p in got]
+
+
+def staff_online():
+    """True when any staff account was active in the last ONLINE_MINUTES (chat / support inbox presence)."""
+    got = cache.get("sw:online")
+    if got is None:
+        got = User.objects.filter(is_staff=True, is_active=True, last_seen__gte=timezone.now() - timedelta(minutes=ONLINE_MINUTES)).exists()
+        cache.set("sw:online", got, 30)
     return got
+
+
+def gym_is_open(gs):
+    now = timezone.localtime().time()
+    o, c = gs.open_time, gs.close_time
+    return (o <= now < c) if o <= c else (now >= o or now < c)
+
+
+def status(lang, gs=None):
+    """The real opening status for the widget: open now, or closed until the opening time. No made-up reply-time promises."""
+    gs = gs or GymSettings.load()
+    opened = gym_is_open(gs)
+    text = translate(lang, "sw_st_open") if opened else translate(lang, "sw_st_closed").replace("{time}", f"{gs.open_time:%H:%M}")
+    hours = f"{gs.open_time:%H:%M}–{gs.close_time:%H:%M}"
+    return {"open": opened, "text": text, "hours": hours, "online": staff_online(),
+            "hours_answer": translate(lang, "sw_hours_ans").replace("{hours}", hours) + " " + text}
+
+
+def phone_info(gs):
+    """{"label", "href"} for the "Call us" row, or None when no phone is set."""
+    digits = re.sub(r"\D", "", gs.phone or "")
+    if digits.startswith("998"):
+        digits = digits[3:]
+    if len(digits) < 7:
+        return None
+    return {"label": f"+998 {gs.phone.strip()}" if not (gs.phone or "").strip().startswith("+") else gs.phone.strip(), "href": f"tel:+998{digits}"}
+
+
+def membership_card(user, lang):
+    """Small "N days left" card data for a signed-in member (None for guests)."""
+    if not user.is_authenticated:
+        return None
+    m = services.active_membership(user)
+    if not m:
+        return {"active": False, "text": translate(lang, "sw_ms_none"), "days": 0}
+    days = (timezone.localtime(m.expires).date() - timezone.localdate()).days
+    text = translate(lang, "sw_ms_today") if days <= 0 else translate(lang, "sw_ms_left").replace("{n}", str(days))
+    return {"active": True, "text": text, "days": max(days, 0)}
 
 
 def image_url(msg):
@@ -250,7 +304,8 @@ def home(request):
     rows = faq_rows(request.lang)
     gs = GymSettings.load()
     return JsonResponse({"ok": True, "staff": staff_people(), "last": summary(t), "unread": t.unread_by_user if t else 0, "thread": thread_info(t),
-                         "top": [brief(r) for r in rows[:4]], "telegram": gs.telegram if gs.telegram.startswith("https://") else ""})
+                         "top": [brief(r) for r in rows[:4]], "telegram": gs.telegram if gs.telegram.startswith("https://") else "",
+                         "status": status(request.lang, gs), "member": membership_card(request.user, request.lang)})
 
 
 # ------------------------------------------------------------------ the conversation
@@ -269,8 +324,9 @@ def thread_view(request):
         msgs = list(qs.filter(pk__gt=after).order_by("pk")[:POLL_LIMIT])
     else:
         msgs = list(qs.order_by("-pk")[:POLL_LIMIT])[::-1]
+    seen = qs.filter(is_staff=False, read_at__isnull=False).order_by("-pk").values_list("pk", flat=True).first() or 0  # "seen" ticks on my own bubbles
     return JsonResponse({"ok": True, "thread": thread_info(t), "messages": [serialize(m) for m in msgs], "unread": t.unread_by_user,
-                         "last_id": msgs[-1].pk if msgs else after})
+                         "last_id": msgs[-1].pk if msgs else after, "read_upto": seen})
 
 
 @require_POST
@@ -424,12 +480,14 @@ def mark_seen_by_staff(thread):
 
 # ------------------------------------------------------------------ page config for the widget
 UI_KEYS = [
-    "sw_open", "sw_close", "sw_tab_home", "sw_tab_msgs", "sw_tab_help", "sw_hello", "sw_guest", "sw_title", "sw_last", "sw_send_us", "sw_send_us_sub",
+    "sw_open", "sw_close", "sw_tab_home", "sw_tab_msgs", "sw_tab_help", "sw_hello", "sw_guest", "sw_title", "sw_last", "sw_send_us",
     "sw_find_help", "sw_search_ph", "sw_telegram", "sw_just_now", "sw_min_ago", "sw_hour_ago", "sw_day_ago", "sw_you", "sw_team", "sw_photo",
     "sw_msg_ph", "sw_send", "sw_attach", "sw_remove_photo", "sw_empty_thread", "sw_guest_intro", "sw_name", "sw_phone", "sw_email", "sw_email_opt",
     "sw_closed_note", "sw_err_net", "sw_err_contact", "sw_err_long", "sw_err_empty", "sw_help_hint", "sw_results", "sw_no_results", "sw_ask_assistant",
     "sw_assistant_says", "sw_categories", "sw_back", "sw_helpful", "sw_yes", "sw_no", "sw_thanks", "sw_voice", "sw_voice_sub", "sw_new_msgs", "sw_sending",
     "sw_seen", "sw_status_open", "sw_status_pending", "sw_status_closed", "sw_unread", "sw_loading", "sw_retry", "sw_help_for_you",
+    "sw_qa_label", "sw_qa_prices", "sw_qa_hours", "sw_qa_member", "sw_qa_coach", "sw_call", "sw_ask_title", "sw_ask_ph", "sw_ask_go", "sw_continue",
+    "sw_ms_extend", "sw_ms_buy", "sw_online", "sw_pg_title", "sw_pg_sub", "sw_pg_chat", "sw_pg_faq", "sw_pg_all", "sw_pg_search", "sw_pg_widget_note",
 ]
 LANG_SPEECH = {"uz": "uz-UZ", "ru": "ru-RU", "en": "en-US"}
 
@@ -439,7 +497,20 @@ def config(request):
     from django.urls import reverse
     name = (request.user.first_name or "").strip() if request.user.is_authenticated else ""
     return {"lang": lang, "auth": bool(request.user.is_authenticated), "unread": unread_for(request), "max": MAX_TEXT,
-            "name": name or translate(lang, "sw_guest"),
+            "name": name or translate(lang, "sw_guest"), "status": status(lang), "phone": phone_info(GymSettings.load()),
             "t": {k.replace("_", "-"): translate(lang, k) for k in UI_KEYS},  # hyphens: the page audit treats "a_b" words as leaked keys
             "urls": {"home": reverse("support_home"), "thread": reverse("support_thread"), "send": reverse("support_send"), "read": reverse("support_read"),
-                     "search": reverse("support_search"), "faq": reverse("support_faq"), "faqBase": "/support/faq/", "login": reverse("login")}}
+                     "search": reverse("support_search"), "faq": reverse("support_faq"), "faqBase": "/support/faq/", "login": reverse("login"),
+                     "plans": reverse("plans"), "membership": reverse("membership"), "ai": reverse("ai"), "page": reverse("support_center")}}
+
+
+# ------------------------------------------------------------------ the full-page support center (/yordam/)
+@require_GET
+def center(request):
+    """Same conversation as the widget (same thread, same endpoints, guests by the same token cookie) on a roomy page, with the status,
+    a call button, Telegram and the top questions in the aside. The floating widget is not drawn here: the page replaces it."""
+    gs = GymSettings.load()
+    rows = faq_rows(request.lang)
+    tg = gs.telegram if (gs.telegram or "").startswith("https://") else ""
+    return render(request, "gym/support_center.html", {"no_widget": True, "st": status(request.lang, gs), "call": phone_info(gs), "tg": tg,
+                                                       "top_faq": rows[:6], "member_card": membership_card(request.user, request.lang)})

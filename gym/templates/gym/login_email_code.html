@@ -1,0 +1,23 @@
+{% extends "gym/base.html" %}{% load gym_tags %}
+{% block title %}{% t 'ec_code_title' %}{% endblock %}
+{% block bodyclass %}auth-page{% endblock %}
+{% block outer %}
+{% include "gym/_auth_scene.html" %}
+<main class="wrap auth2"><div class="tilt" data-tilt>
+<div class="card grid glass otp-card">
+  <i class="glare" aria-hidden="true"></i>
+  <div class="otp-icon" aria-hidden="true">{% icon 'mail' %}</div>
+  <h2>{% t 'ec_code_title' %}</h2>
+  <p class="muted" style="margin:0">{% if hint %}{% t 'ec_code_help_to' %} <b class="num" style="white-space:nowrap">{{ hint }}</b>{% else %}{% t 'ec_code_help' %}{% endif %}</p>
+  <form class="grid" method="post" novalidate data-warp>
+    {% csrf_token %}
+    <label for="ec_code">{% t 'ec_code_label' %}<input id="ec_code" class="otp-input num" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]*" maxlength="6" autofocus required></label>
+    {% if error %}<span class="field-err" role="alert">{% t error %}</span>{% endif %}
+    <button class="btn primary portal" type="submit"><span>{% t 'confirm' %}</span></button>
+  </form>
+  <form method="post">{% csrf_token %}<input type="hidden" name="action" value="resend"><button class="btn" type="submit"{% if left %} disabled data-wait="{{ left }}"{% endif %}>{% t 'resend_code' %}{% if left %} <span class="num" data-count>({{ left }})</span>{% endif %}</button></form>
+  <a class="muted" href="{% url 'login' %}">← {% t 'login' %}</a>
+</div>
+</div></main>
+{% endblock %}
+{% block scripts %}<script src="{% vstatic 'js/scene.js' %}"></script><script src="{% vstatic 'js/emailcode.js' %}"></script>{% endblock %}

@@ -17,7 +17,7 @@ PHONE_VALIDATOR = RegexValidator(r"^\+998\d{9}$", "+998 bilan boshlanib, 9 ta ra
 def image_url(kind, obj):
     """URL of an uploaded picture, with a version so browsers refetch it after a change."""
     import zlib
-    f = {"product": "image", "trainer": "photo", "avatar": "avatar"}[kind]
+    f = {"product": "image", "trainer": "photo", "avatar": "avatar", "promo": "promo_video_poster"}[kind]
     f = getattr(obj, f)
     return f"/img/{kind}/{obj.pk}/?v={zlib.crc32(f.name.encode())}" if f else ""
 
@@ -82,6 +82,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     consent_at = models.DateTimeField("Oferta va maxfiylik siyosatiga rozilik vaqti", null=True, blank=True, editable=False)
     deleted_at = models.DateTimeField("Akkaunt o'chirilgan vaqt", null=True, blank=True, editable=False)
     calendar_token = models.CharField(max_length=40, blank=True, editable=False, db_index=True)
+    email_2fa = models.BooleanField("Kirishda e-mailga tasdiqlash kodi", default=False,
+                                    help_text="Yoqilsa, parol (yoki Google) to'g'ri bo'lsa ham, e-mailga kelgan 6 xonali kodsiz kirib bo'lmaydi.")
     chat_visible = models.BooleanField("Chatda qidiruvda ko'rinsin", default=True)
     chat_banned = models.BooleanField("Chatda yozishdan chetlatilgan", default=False)
     last_seen = models.DateTimeField("Oxirgi faollik (chat)", null=True, blank=True, editable=False)
@@ -177,6 +179,11 @@ class GymSettings(models.Model):
     yandex_map_url = models.URLField("Yandex xaritadagi zal havolasi", max_length=300, blank=True,
                                      validators=[RegexValidator(r"^https://yandex\.(uz|ru|com)/maps/", "Yandex Maps havolasi (https://yandex.uz/maps/...)")],
                                      help_text="Yandex xaritada zalingizni oching va manzil satridagi havolani shu yerga qo'ying: saytda xarita chiqadi.")
+    promo_video_url = models.URLField("Bosh sahifa: tanishuv videosi havolasi", max_length=300, blank=True, validators=[validate_video_url],
+                                      help_text="YouTube (watch, shorts yoki youtu.be), Instagram reel/post yoki to'g'ridan-to'g'ri .mp4 havolasi. Bo'sh bo'lsa, bo'lim ko'rinmaydi. "
+                                                "Video faqat bosilgandan keyin yuklanadi (sayt tez ishlaydi, uchinchi tomonga oldindan ma'lumot ketmaydi).")
+    promo_video_poster = models.FileField("Tanishuv videosi muqovasi (rasm)", upload_to="promo/", blank=True, validators=[validate_image],
+                                          help_text="Ixtiyoriy. Bo'sh bo'lsa, YouTube uchun uning muqovasi, boshqalar uchun oddiy fon ko'rsatiladi. 16:9 (reel uchun 9:16) rasm yaxshi.")
     low_stock_threshold = models.PositiveSmallIntegerField("Omborda shundan kam qolsa ogohlantirish", default=5)
     alert_phone = models.CharField("Ogohlantirish SMS keladigan telefon (9 raqam)", max_length=20, blank=True,
                                    help_text="Bo'sh bo'lsa, zal telefoniga yuboriladi.")

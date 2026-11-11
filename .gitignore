@@ -9,3 +9,5 @@ backups/
 logs/
 media/
 .env
+
+docs/video/*.mp4

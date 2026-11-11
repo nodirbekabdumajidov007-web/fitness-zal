@@ -8,7 +8,7 @@ from django.template.response import TemplateResponse
 from django.urls import path
 from django.utils import timezone
 
-from . import services, support
+from . import chat, services, support
 from .media import validate_image
 from .models import SupportThread
 
@@ -30,6 +30,7 @@ def _row(t):
 
 
 def inbox(request):
+    chat.touch(request.user)
     flt = request.GET.get("f", "open")
     who = request.GET.get("w", "all")
     qs = SupportThread.objects.select_related("user", "assigned_to")
@@ -57,6 +58,7 @@ def inbox(request):
 
 def thread_page(request, pk):
     t = get_object_or_404(SupportThread.objects.select_related("user", "assigned_to"), pk=pk)
+    chat.touch(request.user)  # staff presence: the widget's green "online" dot
     support.mark_seen_by_staff(t)
     msgs = list(t.messages.select_related("sender_user").order_by("-created", "-id")[:200])[::-1]
     membership = services.active_membership(t.user) if t.user_id else None

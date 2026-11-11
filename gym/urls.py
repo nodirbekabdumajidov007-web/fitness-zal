@@ -10,6 +10,7 @@ from . import tracker_views as tk
 from . import pwa
 from . import views as v
 from . import views_extra as x
+from . import views_emailcode as ve
 from . import support, voice
 
 urlpatterns = [
@@ -25,6 +26,7 @@ urlpatterns = [
     path("healthz", v.healthz),
     path("webhooks/instagram/", instagram_views.webhook, name="instagram_webhook"),
     path("voice/info/", voice.info, name="voice_info"),
+    path("yordam/", support.center, name="support_center"),
     path("support/home/", support.home, name="support_home"),
     path("support/thread/", support.thread_view, name="support_thread"),
     path("support/send/", support.send, name="support_send"),
@@ -45,6 +47,8 @@ urlpatterns = [
     path("register/", v.register_view, name="register"),
     path("login/", v.login_view, name="login"),
     path("login/code/", v.login_code, name="login_code"),
+    path("login/email/", ve.email_login_view, name="login_email"),
+    path("login/email/code/", ve.email_code_view, name="login_email_code"),
     path("login/phone/", v.login_phone, name="login_phone"),
     path("logout/", v.logout_view, name="logout"),
     path("forgot/", v.forgot_view, name="forgot"),

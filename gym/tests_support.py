@@ -380,3 +380,212 @@ class WidgetMarkupTests(Base):
         for needle in ("fz_sw_tab", "Escape", "prefers-reduced-motion", "visibilitychange", "d.messages", "C.urls.send"):
             self.assertIn(needle, js)
         self.assertNotIn("innerHTML = m", js)
+
+
+# ---------------------------------------------------------------- widget v2: real status, quick actions, call row, membership card, /yordam/, toggle
+class StatusAndHomeTests(Base):
+    def test_status_text_open_and_closed(self):
+        with mock.patch("gym.support.gym_is_open", return_value=True):
+            html = self.client.get("/").content.decode()
+            self.assertIn("Hozir ochiq · javob beramiz", html)
+            self.assertEqual(self.client.get("/support/home/").json()["status"]["open"], True)
+        with mock.patch("gym.support.gym_is_open", return_value=False):
+            html = self.client.get("/").content.decode()
+            self.assertIn("Yopiq · 06:00 dan javob beramiz", html)
+            st = self.client.get("/support/home/").json()["status"]
+            self.assertFalse(st["open"])
+            self.assertIn("06:00", st["hours_answer"])
+        self.assertNotIn("Odatda bir necha soat", self.client.get("/").content.decode())  # the vague promise is gone
+
+    def test_status_translated(self):
+        self.client.cookies["fz_lang"] = "en"
+        with mock.patch("gym.support.gym_is_open", return_value=False):
+            self.assertIn("Closed · we reply from 06:00", self.client.get("/").content.decode())
+
+    def test_quick_actions_render(self):
+        html = self.client.get("/").content.decode()
+        home = html.split('id="sw-v-home"')[1].split('id="sw-v-msgs"')[0]
+        for needle in ('href="/plans/"', 'id="sw-qa-hours"', 'href="/ai/"', 'id="sw-hsearch"', "Narxlar", "Ish vaqti", "Murabbiy yordamchi"):
+            self.assertIn(needle, home)
+        self.assertNotIn('href="/membership/"', home)  # "My membership" is for signed-in members only
+        self.assertNotIn('id="sw-mem"', home)
+        mhome = self.mc.get("/").content.decode().split('id="sw-v-home"')[1].split('id="sw-v-msgs"')[0]
+        self.assertIn('href="/membership/"', mhome)
+        self.assertIn("Abonementim", mhome)
+        self.assertIn('id="sw-mem"', mhome)
+
+    def test_call_row_only_with_phone(self):
+        def home():
+            return self.client.get("/").content.decode().split('id="sw-v-home"')[1].split('id="sw-v-msgs"')[0]
+        self.assertIn('id="sw-call"', home())
+        self.assertIn('href="tel:+998908775505"', home())
+        from .models import GymSettings
+        GymSettings.objects.filter(pk=1).update(phone="")
+        self.assertNotIn('id="sw-call"', home())
+        self.assertNotIn("Qo'ng'iroq qilish", home())
+
+    def test_membership_card_for_members_only(self):
+        from datetime import timedelta
+        from django.utils import timezone
+        from .models import Membership, Plan
+        self.assertIsNone(self.client.get("/support/home/").json()["member"])
+        m = self.mc.get("/support/home/").json()["member"]
+        self.assertEqual((m["active"], m["text"]), (False, "Faol abonement yo'q"))
+        plan = Plan.objects.first() or Plan.objects.create(code="t1", name="Test", months=1, price=1000)
+        Membership.objects.create(user=self.member, plan=plan, starts=timezone.now() - timedelta(days=1), expires=timezone.now() + timedelta(days=12, hours=6))
+        m = self.mc.get("/support/home/").json()["member"]
+        self.assertTrue(m["active"])
+        self.assertEqual(m["days"], 12)
+        self.assertEqual(m["text"], "Abonement: 12 kun qoldi")
+
+    def test_staff_online_dot_from_recent_activity(self):
+        from datetime import timedelta
+        from django.utils import timezone
+        cache.clear()
+        User.objects.filter(pk=self.admin.pk).update(last_seen=timezone.now() - timedelta(minutes=30))
+        d = self.client.get("/support/home/").json()
+        self.assertFalse(d["status"]["online"])
+        self.assertFalse(any(p["online"] for p in d["staff"]))
+        cache.clear()
+        User.objects.filter(pk=self.admin.pk).update(last_seen=timezone.now() - timedelta(minutes=3))
+        d = self.client.get("/support/home/").json()
+        self.assertTrue(d["status"]["online"])
+        self.assertTrue(any(p["online"] for p in d["staff"]))
+
+    def test_asking_the_assistant_inline_uses_search_endpoint(self):
+        r = self.client.get("/support/search/?q=abonement+muzlatish", **FETCH).json()
+        self.assertTrue(r["ok"])
+        self.assertIn("faq", r)
+        js = open("gym/static/js/support.js", encoding="utf-8").read()
+        for needle in ("askHome", "sw-inline", "sw_continue", "paintStatus", "paintMember", "markSeen", "sw-qa-hours"):
+            self.assertIn(needle, js)
+
+    def test_close_button_and_title_css(self):
+        css = open("gym/static/css/app.css", encoding="utf-8").read()
+        self.assertIn(".sw-x{position:absolute;top:12px;right:12px;z-index:3;width:44px;height:44px", css)
+        self.assertIn("scrollbar-width:none", css)
+        self.assertIn("text-transform:none", css.split(".sw-h2{")[1].split("}")[0])
+
+    def test_read_upto_marks_my_seen_messages(self):
+        first = self.send(self.mc, "Salom").json()["message"]["id"]
+        self.assertEqual(self.mc.get("/support/thread/").json()["read_upto"], 0)
+        t = SupportThread.objects.get(user=self.member)
+        with mock.patch("gym.services.notify"):
+            support.staff_reply(t, self.admin, "Javob")  # staff_reply marks the member's messages as read
+        self.assertEqual(self.mc.get("/support/thread/").json()["read_upto"], first)
+        self.assertEqual(self.mc.get(f"/support/thread/?after={first}").json()["read_upto"], first)
+
+
+class SupportCenterTests(Base):
+    def test_page_for_guest_and_member(self):
+        for c in (self.client, self.mc):
+            r = c.get("/yordam/")
+            self.assertEqual(r.status_code, 200)
+            html = r.content.decode()
+            for needle in ('id="hc"', 'id="sw-list"', 'id="sw-form"', 'id="sw-file"', "js/support_center.js", 'id="hc-search"', 'href="/faq/"', "t.me/", 'id="hc-call"'):
+                self.assertIn(needle, html)
+            self.assertNotIn('id="sw-fab"', html)  # the page replaces the floating widget
+            self.assertNotIn("js/support.js", html)
+        self.assertIn('id="sw-contact">', self.client.get("/yordam/").content.decode())
+        self.assertIn('id="sw-contact" hidden', self.mc.get("/yordam/").content.decode())
+
+    def test_page_status_and_top_faq(self):
+        FaqItem.objects.create(question_uz="Soat nechada ochiladi?", answer_uz="Ertalab 6 da.", active=True)
+        with mock.patch("gym.support.gym_is_open", return_value=False):
+            html = self.client.get("/yordam/").content.decode()
+        self.assertIn("Yopiq · 06:00 dan javob beramiz", html)
+        self.assertIn("Soat nechada ochiladi?", html)
+        self.assertIn("Ertalab 6 da.", html)
+
+    def test_page_without_phone_has_no_call_button(self):
+        from .models import GymSettings
+        GymSettings.objects.filter(pk=1).update(phone="")
+        self.assertNotIn('id="hc-call"', self.client.get("/yordam/").content.decode())
+
+    def test_member_thread_is_shared_between_widget_and_page(self):
+        self.send(self.mc, "Widgetdan yozdim")  # the widget and the page use the same endpoints
+        d = self.mc.get("/support/thread/", **FETCH).json()
+        self.assertEqual([m["text"] for m in d["messages"]], ["Widgetdan yozdim"])
+        self.send(self.mc, "Sahifadan yozdim")
+        self.assertEqual(SupportThread.objects.filter(user=self.member).count(), 1)
+        self.assertEqual(SupportThread.objects.get(user=self.member).messages.count(), 2)
+
+    def test_guest_token_cookie_shares_the_thread(self):
+        c = Client()
+        self.guest_send(c, "Mehmon xabari")
+        self.assertIn("fz_support", c.cookies)
+        d = c.get("/support/thread/", **FETCH).json()
+        self.assertEqual([m["text"] for m in d["messages"]], ["Mehmon xabari"])
+        self.assertEqual(c.get("/yordam/").status_code, 200)
+        self.assertEqual(SupportThread.objects.count(), 1)
+        # somebody else with no cookie sees nothing
+        self.assertEqual(Client().get("/support/thread/", **FETCH).json()["messages"], [])
+
+    def test_nav_item_and_unread_badge(self):
+        html = self.client.get("/").content.decode()
+        self.assertIn('class="nav-help" href="/yordam/"', html)
+        self.assertNotIn("data-support-badge", html)
+        self.send(self.mc, "Salom")
+        t = SupportThread.objects.get(user=self.member)
+        with mock.patch("gym.services.notify"):
+            support.staff_reply(t, self.admin, "Javob 1")
+            support.staff_reply(t, self.admin, "Javob 2")
+        self.assertIn("data-support-badge>2</span>", self.mc.get("/plans/").content.decode())
+        self.mc.post("/support/read/", **FETCH)
+        self.assertNotIn("data-support-badge", self.mc.get("/plans/").content.decode())
+
+    def test_guest_badge_with_token(self):
+        c = Client()
+        self.guest_send(c, "Salom")
+        t = SupportThread.objects.get()
+        with mock.patch("gym.services.notify"):
+            support.staff_reply(t, self.admin, "Javob")
+        self.assertIn("data-support-badge>1</span>", c.get("/plans/").content.decode())
+
+    def test_new_keys_exist_in_all_languages(self):
+        for lang in ("uz", "ru", "en"):
+            for k in ("sw_st_open", "sw_st_closed", "sw_qa_prices", "sw_qa_hours", "sw_qa_member", "sw_qa_coach", "sw_call", "sw_ask_title", "sw_continue",
+                      "sw_ms_left", "sw_ms_extend", "sw_pg_title", "sw_pg_faq", "promo_title", "promo_play", "theme_to_dark", "theme_to_light"):
+                self.assertIn(k, T[lang], (lang, k))
+        self.client.cookies["fz_lang"] = "ru"
+        self.assertIn("Центр помощи", self.client.get("/yordam/").content.decode())
+
+    def test_page_has_no_raw_keys_in_any_language(self):
+        import re
+        for lang in ("uz", "ru", "en"):
+            self.client.cookies["fz_lang"] = lang
+            html = self.client.get("/yordam/").content.decode()
+            self.assertIsNone(re.search(r">\s*(sw|promo|theme)_[a-z_]+\s*<", html), lang)
+
+
+class ThemeToggleTests(Base):
+    def test_switch_markup_and_aria(self):
+        html = self.client.get("/").content.decode()
+        tag = html.split('<button class="daynight"')[1].split(">")[0]
+        btn = html.split('<button class="daynight"')[1].split("</button>")[0]
+        self.assertIn('role="switch"', tag)
+        self.assertIn('aria-checked="false"', tag)
+        self.assertIn('data-label-dark="Tungi mavzuni yoqish"', tag)
+        self.assertIn('data-label-light="Kunduzgi mavzuni yoqish"', tag)
+        self.assertIn('aria-label="Tungi mavzuni yoqish"', tag)
+        for cls in ("dn-track", "dn-knob", "dn-ksun", "dn-kmoon", "dn-ghost-sun", "dn-ghost-moon"):
+            self.assertIn(cls, btn)
+
+    def test_no_weight_plate_knob_left(self):
+        css = open("gym/static/css/app.css", encoding="utf-8").read()
+        self.assertNotIn("--knurl", css)
+        self.assertNotIn("--hub:", css)
+        self.assertNotIn(".dn-knob::before", css)
+        self.assertIn("prefers-reduced-motion:reduce){.daynight", css)
+        self.assertIn("width:52px;height:28px", css)
+
+    def test_labels_translated(self):
+        self.client.cookies["fz_lang"] = "en"
+        self.assertIn('data-label-dark="Switch to dark theme"', self.client.get("/").content.decode())
+        self.client.cookies["fz_lang"] = "ru"
+        self.assertIn("Включить светлую тему", self.client.get("/").content.decode())
+
+    def test_js_updates_label_and_aria(self):
+        js = open("gym/static/js/app.js", encoding="utf-8").read()
+        for needle in ("data-label-light", "data-label-dark", "aria-checked", "fz-theme"):
+            self.assertIn(needle, js)

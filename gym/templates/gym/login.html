@@ -33,6 +33,7 @@
       <a href="{% url 'forgot' %}">{% t 'forgot' %}</a>
     </div>
     <button class="btn primary portal" type="submit"><span>{% t 'login' %}</span></button>
+    {% if email_code_on %}<a class="btn pill ec-link" href="{% url 'login_email' %}{% if next %}?next={{ next|urlencode }}{% endif %}">{% icon 'mail' %} {% t 'ec_tab' %}</a>{% endif %}
     {% if google_only %}</div></details>{% else %}
     {% if sms_on %}<span class="muted">{% icon 'smartphone' %} {% t 'sms_login_note' %}</span>{% endif %}
     <div class="sep">{% t 'or_continue' %}</div>

@@ -1,0 +1,67 @@
+{% extends "gym/base.html" %}{% load gym_tags %}
+{% block title %}{% t 'sw_pg_title' %}{% endblock %}
+{% block bodyclass %}hc-page{% endblock %}
+{% block content %}
+{% support_config as scfg %}
+{{ scfg|json_script:"sw-config" }}
+<div class="hc" id="hc">
+  <header class="hc-head">
+    <h2>{% t 'sw_pg_title' %}</h2>
+    <p class="muted">{% t 'sw_pg_sub' %}</p>
+  </header>
+  <div class="hc-grid">
+    <section class="card hc-chat" aria-labelledby="hc-chat-h">
+      {% csrf_token %}
+      <div class="hc-chat-top">
+        <h3 id="hc-chat-h">{% t 'sw_pg_chat' %}</h3>
+        <span class="sw-status" id="sw-status" hidden></span>
+      </div>
+      <div class="hc-list" id="sw-list" aria-live="polite" aria-relevant="additions" tabindex="0"></div>
+      <p class="sw-note" id="sw-closed" hidden>{% t 'sw_closed_note' %}</p>
+      <form class="hc-form" id="sw-form" autocomplete="off" novalidate>
+        <div class="sw-contact" id="sw-contact"{% if user.is_authenticated %} hidden{% endif %}>
+          <input id="sw-name" maxlength="80" placeholder="{% t 'sw_name' %}" aria-label="{% t 'sw_name' %}" autocomplete="name">
+          <input id="sw-phone" type="tel" maxlength="20" placeholder="{% t 'sw_phone' %}" aria-label="{% t 'sw_phone' %}" autocomplete="tel" inputmode="tel">
+          <input id="sw-email" type="email" maxlength="120" placeholder="{% t 'sw_email_opt' %}" aria-label="{% t 'sw_email' %}" autocomplete="email">
+        </div>
+        <input type="text" id="sw-hp" class="sw-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <p class="sw-err" id="sw-err" role="alert" hidden></p>
+        <div class="sw-chip" id="sw-chip" hidden></div>
+        <div class="sw-compose">
+          <input type="file" id="sw-file" accept="image/jpeg,image/png,image/webp" hidden>
+          <button type="button" class="sw-ib" id="sw-attach" aria-label="{% t 'sw_attach' %}" title="{% t 'sw_attach' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21.4 11.1-8.5 8.5a5.5 5.5 0 0 1-7.8-7.8l8.5-8.5a3.7 3.7 0 0 1 5.2 5.2l-8.5 8.5a1.8 1.8 0 0 1-2.6-2.6l7.8-7.8"/></svg></button>
+          <textarea id="sw-text" rows="1" maxlength="1000" placeholder="{% t 'sw_msg_ph' %}" aria-label="{% t 'sw_msg_ph' %}"></textarea>
+          <button type="submit" class="sw-ib sw-send" id="sw-send" aria-label="{% t 'sw_send' %}" title="{% t 'sw_send' %}">{% icon 'send' %}</button>
+        </div>
+      </form>
+      <p class="hc-sync muted">{% t 'sw_pg_widget_note' %}</p>
+    </section>
+
+    <aside class="hc-side" aria-label="{% t 'sw_tab_help' %}">
+      <div class="card hc-st">
+        <div class="sw-st{% if st.open %} on{% endif %}"><i class="sw-sdot" aria-hidden="true"></i><b>{{ st.text }}</b></div>
+        <p class="muted">{% t 'sw_qa_hours' %}: <b class="num">{{ st.hours }}</b>{% if st.online %} · <span class="hc-online"><i aria-hidden="true"></i>{% t 'sw_online' %}</span>{% endif %}</p>
+        {% if member_card %}<p class="hc-mem{% if not member_card.active or member_card.days <= 3 %} warn{% endif %}"><span>{{ member_card.text }}</span> <a href="{% url 'plans' %}">{% if member_card.active %}{% t 'sw_ms_extend' %}{% else %}{% t 'sw_ms_buy' %}{% endif %} →</a></p>{% endif %}
+        <div class="hc-actions">
+          {% if call %}<a class="btn primary" id="hc-call" href="{{ call.href }}">{% icon 'phone' %}{% t 'sw_call' %} · {{ call.label }}</a>{% endif %}
+          {% if tg %}<a class="btn" href="{{ tg }}" target="_blank" rel="noopener">{% t 'sw_telegram' %}</a>{% endif %}
+        </div>
+      </div>
+
+      <div class="card hc-faq">
+        <h3>{% t 'sw_pg_faq' %}</h3>
+        <form id="hc-search" class="sw-search" role="search" autocomplete="off">
+          <input type="search" id="hc-q" maxlength="200" placeholder="{% t 'sw_pg_search' %}" aria-label="{% t 'sw_pg_search' %}" enterkeyhint="search">
+          <button type="submit" aria-label="{% t 'sw_ask_go' %}">{% icon 'search' %}</button>
+        </form>
+        <div class="hc-res" id="hc-res" aria-live="polite" hidden></div>
+        <div class="hc-top" id="hc-top">
+          {% for r in top_faq %}<details class="hc-q"><summary>{{ r.q }}</summary><p>{{ r.a|linebreaksbr }}</p></details>{% endfor %}
+        </div>
+        <a class="hc-all" href="{% url 'faq' %}">{% t 'sw_pg_all' %} →</a>
+      </div>
+    </aside>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{% vstatic 'js/support_center.js' %}" defer></script>{% endblock %}

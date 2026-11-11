@@ -56,6 +56,11 @@
       {% for e in pw_errors %}<span class="field-err acc-wide">{% t e %}</span>{% endfor %}
       <small class="muted acc-wide">{% t 'acc_pw_help' %}</small>
 
+      {% if mail_ready and user.email %}<div class="acc-wide acc-2fa">
+        <label class="acc-clear"><input type="checkbox" name="email_2fa" value="1"{% if user.email_2fa %} checked{% endif %}> <b>{% t 'ec_2fa_label' %}</b></label>
+        <small class="muted">{% t 'ec_2fa_help' %}</small>
+        {% if user.is_staff and not user.email_2fa %}<div class="note info" role="note">{% icon 'shield' %} {% t 'ec_2fa_staff' %}</div>{% endif %}
+      </div>{% endif %}
       <div class="acc-wide acc-actions"><button class="btn primary pill" type="submit">{% icon 'save' %} {% t 'save' %}</button></div>
     </form>
   </section>

@@ -45,6 +45,17 @@
     {% if classes_count %}<div><b class="num" data-count="{{ classes_count }}">{{ classes_count }}</b><span>{% t 'stat_classes' %}</span></div>{% endif %}
   </section>
 
+  {% if promo %}
+  <section class="promo reveal" aria-labelledby="promo-h">
+    <div class="sec-head"><span class="eyebrow">{% t 'promo_eyebrow' %}</span><h2 id="promo-h">{% t 'promo_title' %}</h2></div>
+    <div class="promo-box{% if promo.vertical %} tall{% endif %}" data-promo data-kind="{{ promo.kind }}" data-src="{{ promo.src }}" data-label="{% t 'promo_play' %}">
+      {% if promo.poster %}<img class="promo-poster" src="{{ promo.poster }}" alt="" loading="lazy" decoding="async">{% endif %}
+      <button type="button" class="promo-play" aria-label="{% t 'promo_play' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l11-6.5a1 1 0 0 0 0-1.72l-11-6.5A1 1 0 0 0 8 5.5z"/></svg></button>
+    </div>
+    <noscript><p class="muted"><a href="{{ gs.promo_video_url }}" target="_blank" rel="noopener noreferrer">{% t 'promo_play' %}</a></p></noscript>
+  </section>
+  {% endif %}
+
   <section class="feat-grid">
     <a class="feat reveal" href="{% url 'ai' %}"><i>✦</i><b>{% t 'ai_coach' %}</b><span>{% t 'ai_coach_sub' %}</span></a>
     <a class="feat reveal" href="{% url 'classes' %}"><i>◷</i><b>{% t 'nav_classes' %}</b><span>{% t 'feat_classes_sub' %}</span></a>
@@ -110,4 +121,4 @@
   {% endif %}{% endwith %}
 </main>
 {% endblock %}
-{% block scripts %}<script src="{% vstatic 'js/home.js' %}"></script>{% endblock %}
+{% block scripts %}<script src="{% vstatic 'js/home.js' %}"></script>{% if promo %}<script src="{% vstatic 'js/promo.js' %}" defer></script>{% endif %}{% endblock %}

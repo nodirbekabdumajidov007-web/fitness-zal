@@ -94,6 +94,40 @@ Sinov (Payme/Click/Uzum "to'landi") tugmalari faqat `DJANGO_DEBUG=1` bo'lganda v
 | Zaxira | Baza nusxasi | `python manage.py backup_db` (oxirgi 14 tasi saqlanadi). PostgreSQL uchun `pg_dump` kerak |
 | Loglar | Xatolarni kuzatish | `FZ_LOG_DIR=logs` fayl yozadi. Telegram sozlangan bo'lsa server xatolari admin chatga ketadi |
 
+## E-mail orqali kod bilan kirish, 2 bosqichli tasdiq va Google bilan kirish
+
+Sayt e-mailga 6 xonali kod yuboradi (10 daqiqa amal qiladi, bir marta ishlaydi, 5 ta noto'g'ri urinishdan keyin yonib ketadi, qayta yuborish 60 soniyadan keyin). Uch imkoniyat bor:
+
+1. **Kod bilan kirish** (`/login/email/`): parolsiz, e-mail yoki login yoziladi, kod pochtaga keladi. Xodim/egasi bu yo'l bilan faqat oddiy rejimda kiradi; admin panel uchun baribir parol + `.admin` kerak.
+2. **Kirishda e-mailga tasdiqlash kodi**: Akkaunt sahifasida (`/account/`) yoqiladi (standart: o'chiq). Yoqilsa, parol yoki Google to'g'ri bo'lsa ham kod so'raladi. Xodimlar uchun yoqish tavsiya etiladi.
+3. **Google bilan kirish**: ID token serverda Google'ning ochiq kalitlari (JWKS) bilan imzo, `iss`, `aud`, muddat va `email_verified` bo'yicha tekshiriladi (`gym/google_auth.py`; qo'shimcha kutubxona kerak emas). E-mail bo'yicha akkaunt topiladi yoki yaratiladi.
+
+E-mail sozlanmagan bo'lsa (SMTP yo'q, `DJANGO_DEBUG=0`) bu imkoniyatlar yashirin: foydalanuvchi kod ololmay qolib ketmasligi uchun.
+
+### Gmail SMTP ni Render'da sozlash
+
+1. Gmail akkauntida **2-bosqichli tasdiq**ni yoqing (Google akkaunt -> Xavfsizlik -> 2-Step Verification).
+2. Google akkaunt -> Xavfsizlik -> **App passwords** (Ilova parollari) -> yangi parol yarating. 16 belgili parol chiqadi. Oddiy Gmail parolingiz ishlamaydi.
+3. Render -> Service -> Environment ga qo'shing:
+
+| O'zgaruvchi | Qiymat |
+|---|---|
+| `EMAIL_HOST` | `smtp.gmail.com` |
+| `EMAIL_PORT` | `587` |
+| `EMAIL_USE_TLS` | `1` |
+| `EMAIL_HOST_USER` | Gmail manzilingiz (masalan `zalingiz@gmail.com`) |
+| `EMAIL_HOST_PASSWORD` | 16 belgili App Password (bo'shliqsiz) |
+| `DEFAULT_FROM_EMAIL` | `Fitnes Zal <zalingiz@gmail.com>` |
+
+Parolni kodga yoki gitga yozmang: faqat Render Environment'ida turadi. Gmail kuniga ~500 ta xat yuborishga ruxsat beradi.
+
+### Google bilan kirishni sozlash
+
+1. [Google Cloud Console](https://console.cloud.google.com/) -> APIs & Services -> Credentials -> **Create credentials -> OAuth client ID** -> Application type: **Web application**.
+2. **Authorized JavaScript origins**: `https://fitness-zal-ji76.onrender.com` (lokal sinov uchun `http://localhost:8000` ham). Redirect URI shart emas.
+3. Chiqqan **Client ID** (`...apps.googleusercontent.com`) ni Render'da `GOOGLE_CLIENT_ID` ga yozing (yoki admin paneldagi "Zal sozlamalari"ga). `GOOGLE_CLIENT_ID` bo'sh bo'lsa, Google tugmasi umuman ko'rinmaydi.
+4. Eslatma: Content Security Policy `accounts.google.com` ga allaqachon ruxsat beradi, qo'shimcha o'zgarish kerak emas.
+
 Ilova (PWA) va push: `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` (`python manage.py generate_vapid` yangi juftlik chiqaradi; faqat serverning environment'iga qo'ying, gitga yozmang), `VAPID_SUBJECT` (ixtiyoriy). Google Play: `ANDROID_PACKAGE_NAME`, `ANDROID_SHA256_FINGERPRINTS`: `docs/ANDROID.md` ga qarang. Kalitlar bo'lmasa push tugmasi ko'rinmaydi, sayt odatdagidek ishlaydi.
 
 Boshqa o'zgaruvchilar: `DJANGO_DEBUG` (internetda `0`), `DJANGO_SECRET_KEY`, `DJANGO_ALLOWED_HOSTS`, `DATABASE_URL`, `FZ_ADMIN_PASSWORD`, `FZ_SECURE_COOKIE`.

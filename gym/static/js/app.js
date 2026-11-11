@@ -23,16 +23,26 @@ document.addEventListener('DOMContentLoaded', function () {
   function isDark() {
     return root.getAttribute('data-theme') === 'dark' || (!root.getAttribute('data-theme') && matchMedia('(prefers-color-scheme:dark)').matches);
   }
+  function paintSwitch(dark) {  // aria-checked = dark mode is on; the label always names what a press will do
+    tb.setAttribute('aria-checked', dark ? 'true' : 'false');
+    var label = tb.getAttribute(dark ? 'data-label-light' : 'data-label-dark');
+    if (label) { tb.setAttribute('aria-label', label); tb.setAttribute('title', label); }
+  }
   if (tb) {
-    tb.setAttribute('aria-checked', isDark() ? 'true' : 'false');
+    paintSwitch(isDark());
     tb.addEventListener('click', function () {
       var next = isDark() ? 'light' : 'dark';
       root.classList.add('theme-anim');  // colours glide instead of snapping, only during the switch
       root.setAttribute('data-theme', next);
-      tb.setAttribute('aria-checked', next === 'dark' ? 'true' : 'false');
+      paintSwitch(next === 'dark');
       setTimeout(function () { root.classList.remove('theme-anim'); }, 600);
       try { localStorage.setItem('fz-theme', next); } catch (e) {}
     });
+    if (window.matchMedia) {  // while the visitor has not picked a theme, follow the OS if it changes
+      var mq = matchMedia('(prefers-color-scheme:dark)');
+      var follow = function () { if (!root.getAttribute('data-theme')) paintSwitch(isDark()); };
+      if (mq.addEventListener) mq.addEventListener('change', follow);
+    }
   }
 
   // phone mask: keep only 9 digits, shown as 90 877 55 05

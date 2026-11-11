@@ -1,0 +1,12 @@
+{{ gym }}
+
+{{ t.ec_mail_intro }}
+
+    {{ code }}
+
+{{ t.ec_mail_valid }}
+{{ t.ec_mail_secret }}
+
+{{ t.ec_mail_ignore }}
+
+— {{ gym }}

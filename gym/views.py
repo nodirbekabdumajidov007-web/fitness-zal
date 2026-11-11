@@ -28,7 +28,7 @@ from django.utils.safestring import mark_safe
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
-from . import click, extras, services, sms, telegram
+from . import click, emailcode, extras, google_auth, services, sms, telegram
 from .media import ranged_file_response, video_embed
 from .forms import AccountForm, BodyLogForm, LoginForm, PasswordForm, PhoneField, ProfileForm, RegisterForm, ReviewForm, find_user, normalize_phone
 from .i18n import LANGS
@@ -135,7 +135,14 @@ def home(request):
     reviews = Review.objects.filter(approved=True).select_related("user")
     now = timezone.now()
     plans = Plan.objects.filter(active=True)
+    from .models import image_url as models_image_url
+    from .promo_video import parse_promo
+    gs = GymSettings.load()
+    promo = parse_promo(gs.promo_video_url)
+    if promo:
+        promo["poster"] = models_image_url("promo", gs) or promo["thumb"]
     return render(request, "gym/home.html", {
+        "promo": promo,
         "crowd": crowd_level(), "next_class": home_next_class(), "cheapest_plan": plans.order_by("price").first(),
         "plans": plans, "trainers": Trainer.objects.filter(active=True)[:3],
         "announcements": Announcement.objects.filter(active=True)[:3],
@@ -198,8 +205,14 @@ def send_login_code(request, user):
         flash(request, messages.INFO, "otp_sent_to", phone=mask_phone(user.phone))
 
 
-def second_step(request, user, admin_mode=False, nxt="", remember=True):
-    """After the password or Google check: either log in now, or ask for the SMS code (or the phone number first)."""
+def second_step(request, user, admin_mode=False, nxt="", remember=True, skip_email=False):
+    """After the password or Google check: the e-mailed code when the account switched it on, then either log in now or ask for the SMS code
+    (or the phone number first). `skip_email` is set once the e-mail code was already entered (or was the first factor itself)."""
+    if not skip_email and user.email_2fa and user.email and emailcode.mail_ready():
+        sent, _ = emailcode.issue(user, "login", request.lang)
+        request.session["pending_email"] = {"uid": user.pk, "mode": "2fa", "admin": bool(admin_mode), "ts": int(time.time()), "sent": time.time(),
+                                            "next": nxt, "remember": remember, "tries": 0}
+        return redirect("login_email_code")
     if not sms_login_on():
         do_login(request, user, admin_mode, remember)
         return redirect("/django-admin/" if admin_mode else (nxt or "dashboard"))
@@ -334,7 +347,8 @@ def login_view(request):
     return render(request, "gym/login.html", {"form": form, "error": error, "next": request.GET.get("next", ""),
                                               "remember": request.method != "POST" or bool(request.POST.get("remember")),
                                               "role": "trainer" if request.POST.get("role") == "trainer" or request.GET.get("as") == "trainer" else "member",
-                                              "google_only": google_required(), "sms_on": sms_login_on()})
+                                              "google_only": google_required(), "sms_on": sms_login_on(),
+                                              "email_code_on": emailcode.mail_ready() and not google_required()})
 
 
 @require_POST
@@ -353,14 +367,13 @@ def google_login(request):
     try:
         cred = json.loads(request.body).get("credential", "")
         assert isinstance(cred, str) and len(cred) < 4096
-        with urllib.request.urlopen("https://oauth2.googleapis.com/tokeninfo?id_token=" + urllib.parse.quote(cred), timeout=6) as r:
-            info = json.load(r)
     except Exception:
         return fail("err_google", 401)
-    if info.get("aud") != client_id or info.get("email_verified") not in ("true", True) or not info.get("email"):
+    info = google_auth.verify(cred, client_id)  # signature (Google's JWKS), issuer, audience, expiry and verified e-mail
+    if not info:
         return fail("err_google", 401)
     email = info["email"].lower()
-    user = User.objects.filter(email=email).first()
+    user = User.objects.filter(email__iexact=email).first()
     if not user:
         user = User.objects.create_user(email=email, first_name=(info.get("given_name") or email.split("@")[0])[:40],
                                         last_name=(info.get("family_name") or "-")[:40], lang=request.lang)
@@ -503,7 +516,8 @@ def trainer_detail(request, pk):
 def image_view(request, kind, pk):
     """Serves an uploaded product/trainer picture. The type is read from the file's bytes, and the response can never run as a page."""
     from .media import image_type
-    model, field = {"product": (Product, "image"), "trainer": (Trainer, "photo"), "avatar": (User, "avatar")}.get(kind, (None, None))
+    model, field = {"product": (Product, "image"), "trainer": (Trainer, "photo"), "avatar": (User, "avatar"),
+                          "promo": (GymSettings, "promo_video_poster")}.get(kind, (None, None))
     if not model:
         raise Http404()
     obj = get_object_or_404(model, pk=pk)
@@ -1535,6 +1549,7 @@ def account_view(request):
                 user.avatar = None
             if new:
                 user.set_password(new)
+            user.email_2fa = bool(request.POST.get("email_2fa")) and bool(user.email) and emailcode.mail_ready()
             user.save()
             if old_photo and old_photo != (user.avatar.name if user.avatar else ""):
                 try:
@@ -1546,7 +1561,8 @@ def account_view(request):
             flash(request, messages.SUCCESS, "account_saved")
             return redirect("account")
     role = "admin" if u.is_superuser else "trainer" if Trainer.objects.filter(user=u, active=True).exists() else "member"
-    return render(request, "gym/account.html", {"form": form, "pw_errors": pw_errors, "photo_error": photo_error, "role": role})
+    return render(request, "gym/account.html", {"form": form, "pw_errors": pw_errors, "photo_error": photo_error, "role": role,
+                                                "mail_ready": emailcode.mail_ready()})
 
 
 def default_storage_for(user):

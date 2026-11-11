@@ -1,0 +1,23 @@
+{% extends "gym/base.html" %}{% load gym_tags %}
+{% block title %}{% t 'ec_title' %}{% endblock %}
+{% block bodyclass %}auth-page{% endblock %}
+{% block outer %}
+{% include "gym/_auth_scene.html" %}
+<main class="wrap auth2"><div class="tilt" data-tilt>
+<div class="card grid glass otp-card">
+  <i class="glare" aria-hidden="true"></i>
+  <div class="otp-icon" aria-hidden="true">{% icon 'mail' %}</div>
+  <h2>{% t 'ec_title' %}</h2>
+  <p class="muted" style="margin:0">{% t 'ec_help' %}</p>
+  <form class="grid" method="post" novalidate data-warp>
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
+    <label for="ec_login">{% t 'ec_login_label' %}<input id="ec_login" name="login" autocomplete="email" autocapitalize="none" spellcheck="false" maxlength="254" placeholder="name@gmail.com" value="{{ login_text }}" autofocus required></label>
+    {% if error %}<span class="field-err" role="alert">{% t error %}</span>{% endif %}
+    <button class="btn primary portal" type="submit"><span>{% t 'ec_send' %}</span></button>
+  </form>
+  <a class="muted" href="{% url 'login' %}">← {% t 'login' %}</a>
+</div>
+</div></main>
+{% endblock %}
+{% block scripts %}<script src="{% vstatic 'js/scene.js' %}"></script>{% endblock %}

@@ -437,6 +437,9 @@ class GymSettingsAdmin(admin.ModelAdmin):
     fieldsets = (
         ("Zal", {"fields": (("open_time", "close_time"), "phone", "address", "instagram", "telegram", "telegram_bot")}),
         ("Bosh sahifa ko'rinishi", {"fields": ("hero_video",)}),
+        ("Bosh sahifa: tanishuv videosi", {"fields": ("promo_video_url", "promo_video_poster"),
+                                          "description": "Zal haqida qisqa video. Havolani qo'ying: YouTube (youtube.com/watch?v=..., /shorts/... yoki youtu.be/...), "
+                                                         "Instagram (instagram.com/reel/... yoki /p/...) yoki to'g'ridan-to'g'ri .mp4 fayl havolasi. Havola bo'sh bo'lsa, bo'lim chiqmaydi."}),
         ("Kirish xavfsizligi", {"fields": ("google_client_id", "apple_client_id", "require_google", "login_sms_code", "require_phone_verify"), "description": GOOGLE_HELP}),
         ("Abonement va bonuslar", {"fields": (("freeze_min_days", "freeze_max_days"), "class_cancel_hours", "reminder_email", "referral_bonus_days", "referral_newcomer_percent", "revenue_goal", "gym_capacity"),
                                   "description": "Muzlatish: eng ko'p kun 0 bo'lsa, a'zolar muzlata olmaydi. Eslatmalar 7, 3 va 1 kun oldin avtomatik ketadi."}),

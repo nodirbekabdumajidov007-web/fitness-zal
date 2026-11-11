@@ -15,7 +15,7 @@
 
   var views = { home: $('sw-v-home'), msgs: $('sw-v-msgs'), help: $('sw-v-help') };
   var tabs = panel.querySelectorAll('[data-sw-tab]');
-  var state = { tab: 'home', open: false, unread: C.unread || 0, lastId: 0, thread: null, known: !!C.auth || (C.unread || 0) > 0, loadedMsgs: false,
+  var state = { hoursText: (C.status && C.status.hours_answer) || '', readUpto: 0, tab: 'home', open: false, unread: C.unread || 0, lastId: 0, thread: null, known: !!C.auth || (C.unread || 0) > 0, loadedMsgs: false,
                 loadedHome: false, loadedFaq: false, sending: false, photo: null, helpBack: null, pollTimer: null, polling: false };
 
   // ---------------------------------------------------------------- helpers
@@ -134,7 +134,28 @@
   function staffFaces(list) {
     var box = $('sw-faces');
     clear(box);
-    (list || []).slice(0, 3).forEach(function (p) { box.appendChild(avatar(p.src, p.initials, 'sw-face')); });
+    (list || []).slice(0, 3).forEach(function (p) {
+      var a = avatar(p.src, p.initials, 'sw-face' + (p.online ? ' online' : ''));
+      if (p.online) a.title = T('sw_online');
+      box.appendChild(a);
+    });
+  }
+  function paintStatus(st) {  // real opening hours: open now, or closed until the opening time
+    if (!st) return;
+    var box = $('sw-st'), tx = $('sw-st-text');
+    if (tx) tx.textContent = st.text;
+    if (box) box.classList.toggle('on', !!st.open);
+    state.hoursText = st.hours_answer || '';
+  }
+  function paintMember(m) {
+    var box = $('sw-mem');
+    if (!box) return;
+    if (!m) { box.hidden = true; return; }
+    box.hidden = false;
+    $('sw-mem-text').textContent = m.text;
+    var a = $('sw-mem-link');
+    a.textContent = T(m.active ? 'sw_ms_extend' : 'sw_ms_buy');
+    box.classList.toggle('warn', !m.active || m.days <= 3);
   }
   function faqRow(item, onPick) {
     var b = el('button', 'sw-row');
@@ -176,6 +197,8 @@
       if (!d.ok) return;
       state.loadedHome = true;
       staffFaces(d.staff);
+      paintStatus(d.status);
+      paintMember(d.member);
       renderLast(d.last);
       renderTop(d.top);
       if (d.thread) state.known = true;
@@ -185,11 +208,59 @@
   }
   $('sw-last').addEventListener('click', function () { showTab('msgs', true); });
   $('sw-new').addEventListener('click', function () { showTab('msgs', true); });
+  // "Ask the assistant" on the home tab: the answer appears right here; a link continues in the Help tab
+  var inline = $('sw-inline'), askSeq = 0;
+  function inlineCard(extra) {  // fills the inline box: a card with the text, optional links, and the "continue in Help" button
+    clear(inline);
+    inline.hidden = false;
+    return extra;
+  }
+  function askHome(term) {
+    var mine = ++askSeq;
+    inlineCard();
+    inline.appendChild(el('p', 'sw-muted', T('sw_loading')));
+    api(C.urls.search + '?q=' + encodeURIComponent(term)).then(function (d) {
+      if (mine !== askSeq) return;
+      clear(inline);
+      if (!d.ok) { inline.appendChild(el('p', 'sw-err-t', d.error)); return; }
+      if (d.assistant) {
+        var card = el('div', 'sw-ans');
+        card.appendChild(el('small', null, T('sw_assistant_says')));
+        card.appendChild(el('p', null, d.assistant.answer));
+        (d.assistant.links || []).forEach(function (l) {
+          if (String(l.url).charAt(0) !== '/') return;
+          var a = el('a', 'sw-link', l.label); a.href = l.url; card.appendChild(a);
+        });
+        inline.appendChild(card);
+      }
+      (d.faq || []).slice(0, 3).forEach(function (it) { inline.appendChild(faqRow(it, function (x) { showTab('help'); openArticle(x.id, 'main'); })); });
+      if (!d.assistant && !(d.faq || []).length) inline.appendChild(el('p', 'sw-muted', T('sw_no_results')));
+      var more = el('button', 'sw-pill sw-more', T('sw_continue')); more.type = 'button';
+      more.addEventListener('click', function () { showTab('help', true); $('sw-q').value = term; runSearch(term); });
+      inline.appendChild(more);
+      if (!d.assistant && !(d.faq || []).length) {
+        var go = el('button', 'sw-btn', T('sw_send_us')); go.type = 'button';
+        go.addEventListener('click', function () { showTab('msgs', true); });
+        inline.appendChild(go);
+      }
+    });
+  }
   $('sw-hsearch').addEventListener('submit', function (e) {
     e.preventDefault();
-    var q = $('sw-hq').value.trim();
-    showTab('help', true);
-    if (q) { $('sw-q').value = q; runSearch(q); }
+    var qv = $('sw-hq').value.trim();
+    if (!qv) { inline.hidden = true; return; }
+    askHome(qv);
+  });
+  var hoursBtn = $('sw-qa-hours');
+  if (hoursBtn) hoursBtn.addEventListener('click', function () {  // opening hours answered on the spot from the settings
+    ++askSeq;
+    inlineCard();
+    var card = el('div', 'sw-ans');
+    card.appendChild(el('small', null, T('sw_qa_hours')));
+    card.appendChild(el('p', null, state.hoursText));
+    inline.appendChild(card);
+    hoursBtn.setAttribute('aria-expanded', 'true');
+    inline.scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
   });
 
   // ---------------------------------------------------------------- messages tab
@@ -225,6 +296,15 @@
     });
     if (state.stick) toBottom();
   }
+  function markSeen(upto) {  // "Seen" on my own bubbles that staff have read (the poll only brings new messages, so older bubbles are updated here)
+    state.readUpto = Math.max(state.readUpto, upto);
+    list.querySelectorAll('.sw-b.mine:not(.seen)').forEach(function (row) {
+      if (parseInt(row.getAttribute('data-id'), 10) > state.readUpto) return;
+      row.classList.add('seen');
+      var tm = row.querySelector('.sw-b-time');
+      if (tm && tm.textContent.indexOf(T('sw_seen')) === -1) tm.textContent += ' · ' + T('sw_seen');
+    });
+  }
   function paintThread(t) {
     state.thread = t;
     contact.hidden = !!(C.auth || t);
@@ -245,6 +325,7 @@
       state.stick = true;
       appendMessages(d.messages);
       toBottom();
+      if (d.read_upto) markSeen(d.read_upto);
       if (d.unread) markRead();
     });
   }
@@ -261,6 +342,7 @@
       state.polling = false;
       if (!d.ok) return;
       if (d.thread) paintThread(d.thread);
+      if (d.read_upto) markSeen(d.read_upto);
       var viewing = state.open && state.tab === 'msgs';
       if (d.messages && d.messages.length && state.loadedMsgs) appendMessages(d.messages);
       if (viewing) { if (d.unread) markRead(); }
