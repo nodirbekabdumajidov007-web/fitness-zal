@@ -513,4 +513,12 @@ def center(request):
     rows = faq_rows(request.lang)
     tg = gs.telegram if (gs.telegram or "").startswith("https://") else ""
     return render(request, "gym/support_center.html", {"no_widget": True, "st": status(request.lang, gs), "call": phone_info(gs), "tg": tg,
-                                                       "top_faq": rows[:6], "member_card": membership_card(request.user, request.lang)})
+                                                       "faq_groups": faq_groups(rows), "member_card": membership_card(request.user, request.lang)})
+
+
+def faq_groups(rows):
+    """Every FAQ item, grouped by section in CATEGORY_KEYS order: [(label key, [rows])]. The help center lists them all (it replaced the separate menu item)."""
+    by = {}
+    for r in rows:
+        by.setdefault(r["cat"] if r["cat"] in CATEGORY_KEYS else "general", []).append(r)
+    return [(CATEGORY_KEYS[c], by[c]) for c in CATEGORY_KEYS if c in by]

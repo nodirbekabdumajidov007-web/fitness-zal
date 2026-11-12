@@ -122,8 +122,7 @@
       <div class="sb-items" id="sbg-comm">
       {% if user.is_authenticated %}<a href="{% url 'chat' %}"{% if '/chat' in p %} aria-current="page"{% endif %}>{% icon 'message' %}<span class="sb-lbl">{% t 'chat' %}</span>{% if chat_unread %}<span class="badge">{{ chat_unread }}</span>{% endif %}</a>{% endif %}
       <a href="{% url 'reviews' %}"{% if '/reviews' in p %} aria-current="page"{% endif %}>{% icon 'star' %}<span class="sb-lbl">{% t 'nav_reviews' %}</span></a>
-      <a class="nav-help" href="{% url 'support_center' %}"{% if '/yordam' in p %} aria-current="page"{% endif %}>{% icon 'help' %}<span class="sb-lbl">{% t 'sw_tab_help' %}</span>{% if support_unread %}<span class="badge" data-support-badge>{{ support_unread }}</span>{% endif %}</a>
-      <a href="{% url 'faq' %}"{% if '/faq' in p %} aria-current="page"{% endif %}>{% icon 'message' %}<span class="sb-lbl">{% t 'faq_title' %}</span></a>
+      <a class="nav-help" href="{% url 'support_center' %}"{% if '/yordam' in p or '/faq' in p %} aria-current="page"{% endif %}>{% icon 'help' %}<span class="sb-lbl">{% t 'sw_tab_help' %}</span>{% if support_unread %}<span class="badge" data-support-badge>{{ support_unread }}</span>{% endif %}</a>
       </div>
     </div>
     {% if is_trainer or admin_mode %}<div class="sb-grp fold" data-g="staff">

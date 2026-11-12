@@ -56,7 +56,10 @@
         </form>
         <div class="hc-res" id="hc-res" aria-live="polite" hidden></div>
         <div class="hc-top" id="hc-top">
-          {% for r in top_faq %}<details class="hc-q"><summary>{{ r.q }}</summary><p>{{ r.a|linebreaksbr }}</p></details>{% endfor %}
+          {% for key, items in faq_groups %}<section class="hc-sec" id="faq-{{ forloop.counter }}">
+            <h3 class="hc-sec-h">{% t key %} <small class="muted num">{{ items|length }}</small></h3>
+            {% for r in items %}<details class="hc-q"><summary>{{ r.q }}</summary><p>{{ r.a|linebreaksbr }}</p></details>{% endfor %}
+          </section>{% endfor %}
         </div>
         <a class="hc-all" href="{% url 'faq' %}">{% t 'sw_pg_all' %} →</a>
       </div>

@@ -2945,3 +2945,15 @@ label.db-ava.busy{opacity:.6}
 .card-dlg-x{position:absolute;top:10px;right:10px;width:36px;height:36px;border-radius:50%;border:0;background:#f1f1f1;color:#111;display:grid;place-items:center;cursor:pointer}
 .card-dlg-x:hover{background:#e3e3e3}
 .card-dlg-x .ico{width:18px;height:18px}
+
+/* Help center: every FAQ question, grouped by section (the separate "Savol-javob" menu item was folded in here) */
+.hc-sec{display:grid;gap:0;margin-top:14px}
+.hc-sec:first-child{margin-top:0}
+.hc-sec-h{margin:0 0 4px;display:flex;align-items:baseline;gap:8px;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.hc-sec-h small{font-size:.75rem;letter-spacing:0}
+
+/* Dashboard quick links on phones: wrap onto rows instead of a sideways strip, so every link (card, membership, records...) is in sight */
+@media (max-width:640px){
+  .db-quick{flex-wrap:wrap;overflow:visible;gap:6px}
+  .db-quick a{flex:1 1 auto;justify-content:center;padding:6px 10px;min-height:40px;font-size:.82rem!important}
+}
