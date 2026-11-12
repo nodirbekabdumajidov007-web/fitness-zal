@@ -1385,7 +1385,7 @@ def export_my_data(request):
                    "target_weight": float(u.target_weight) if u.target_weight else None},
         "memberships": [{"plan": m.plan.name, "starts": m.starts.isoformat(), "expires": m.expires.isoformat()} for m in u.memberships.select_related("plan")],
         "payments": [{"id": p.pk, "amount": p.amount, "method": p.method, "status": p.status, "date": p.created.isoformat()} for p in u.payments.all()],
-        "orders": [{"id": o.pk, "total": o.total, "status": o.status, "items": [[i.name, i.qty, i.price] for i in o.items.all()]} for o in u.orders.all()],
+        "orders": [{"id": o.pk, "total": o.total, "status": o.status, "items": [[i.name, i.qty, i.price] for i in o.items.all()]} for o in u.orders.prefetch_related("items")],
         "visits": [timezone.localtime(v.ts).isoformat() for v in u.visits.all()[:1000]],
         "body": [{"date": b.date.isoformat(), "weight": float(b.weight), "height_cm": b.height_cm,
                   **{k: float(getattr(b, k)) for k in BodyLog.CIRCUMFERENCES + ["body_fat"] if getattr(b, k) is not None}, "resting_hr": b.resting_hr} for b in u.bodylogs.all()],

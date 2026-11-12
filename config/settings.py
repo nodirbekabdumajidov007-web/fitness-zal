@@ -40,7 +40,8 @@ def _secret_key():
 
 
 SECRET_KEY = _secret_key()
-DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
+# Default: on for local runs/tests, off on Render (it sets RENDER=true) so a missing DJANGO_DEBUG never exposes debug pages.
+DEBUG = os.environ.get("DJANGO_DEBUG", "0" if os.environ.get("RENDER") else "1") == "1"
 ALLOWED_HOSTS = [h.strip() for h in os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,testserver").split(",") if h.strip()]
 if os.environ.get("RENDER_EXTERNAL_HOSTNAME"):  # Render.com sets this automatically
     ALLOWED_HOSTS.append(os.environ["RENDER_EXTERNAL_HOSTNAME"])
