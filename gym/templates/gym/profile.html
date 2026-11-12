@@ -99,9 +99,8 @@
     <div class="pf-row"><span><b>{% icon 'send' %} Telegram</b><small class="muted">{% if tg_linked %}{% t 'tg_connected' %}{% else %}{% t 'tg_help_profile' %}{% endif %}</small></span>
       {% if tg_linked %}<form method="post">{% csrf_token %}<input type="hidden" name="form" value="telegram_unlink"><button class="btn small danger" type="submit">{% t 'tg_disconnect' %}</button></form>
       {% elif tg_url %}<a class="btn small primary" href="{{ tg_url }}" target="_blank" rel="noopener">{% t 'tg_connect' %}</a>{% else %}<span class="pill mute">{% t 'soon' %}</span>{% endif %}</div>
-    <div class="pf-row"><span><b>{% icon 'gift' %} {% t 'invite' %}</b><small class="muted">{% t 'invite_short' %}</small></span>
-      <button class="btn small" type="button" data-copy="pf-ref" data-done="{% t 'copied' %}">{% t 'copy' %}</button></div>
-    <input id="pf-ref" value="{{ referral_url }}" readonly aria-label="{% t 'invite' %}">
+    <div class="pf-row"><span><b>{% icon 'gift' %} {% t 'invite' %}</b><small class="muted">{% t 'invite_short' %}</small></span></div>
+    <div class="pf-ref"><input id="pf-ref" value="{{ referral_url }}" readonly aria-label="{% t 'invite' %}"><button class="btn small" type="button" data-copy="pf-ref" data-done="{% t 'copied' %}">{% icon 'clipboard' %} {% t 'copy' %}</button></div>
     <div class="pf-links">
       <a href="{% url 'payments' %}">{% icon 'credit-card' %} {% t 'payments' %}</a><a href="{% url 'orders' %}">{% icon 'cart' %} {% t 'orders' %}</a>
       <a href="{% url 'records' %}">{% icon 'trophy' %} {% t 'records' %}</a><a href="{% url 'card' %}">▣ {% t 'member_card' %}</a><a href="{% url 'inbox' %}">{% icon 'bell' %} {% t 'inbox' %}</a>

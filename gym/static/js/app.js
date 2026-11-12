@@ -66,6 +66,7 @@ document.addEventListener('DOMContentLoaded', function () {
       var v = pw.value, s = 0;
       if (v.length >= 6) s++; if (v.length >= 10) s++; if (/[A-Z]/.test(v) && /[a-z]/.test(v)) s++; if (/\d/.test(v)) s++; if (/[^A-Za-z0-9]/.test(v)) s++;
       bar.style.width = (s / 5 * 100) + '%';
+      bar.parentNode.classList.toggle('on', v.length > 0);  // the empty track stays hidden until typing starts
       bar.className = s <= 1 ? 'weak' : s <= 3 ? 'ok' : 'strong';
     });
   });

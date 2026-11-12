@@ -2957,3 +2957,22 @@ label.db-ava.busy{opacity:.6}
   .db-quick{flex-wrap:wrap;overflow:visible;gap:6px}
   .db-quick a{flex:1 1 auto;justify-content:center;padding:6px 10px;min-height:40px;font-size:.82rem!important}
 }
+
+/* Profile page fixes: even goal tiles, a compact "soon" pill, link + copy on one row, tidy shortcut tiles, meter only while typing */
+.pf-goalpick{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
+.pf-goalpick label{display:grid}
+.pf-goalpick span{display:flex;align-items:center;justify-content:center;gap:6px;min-height:48px;line-height:1.2}
+.pf-goalpick span .ico{flex:none}
+.pf-row>.pill,.pf-row>form,.pf-row>.btn{flex:none}
+.pf-row>.pill{display:inline-flex;align-items:center;white-space:nowrap}
+.pf-ref{display:flex;gap:8px;align-items:stretch}
+.pf-ref input,#pf-ref{flex:1;min-width:0;font-family:inherit;font-size:.88rem;text-overflow:ellipsis;background:var(--bg)}
+.pf-ref .btn{flex:none;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.pf-links{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.pf-links a{display:flex;align-items:center;gap:8px;min-height:46px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pf-links a .ico{flex:none;color:var(--accent)}
+.pw-meter{opacity:0;height:0;transition:opacity .2s}
+.pw-meter.on{opacity:1;height:6px}
+.pf-goalpick{grid-auto-rows:1fr}
+/* profile tabs on phones: drop the icons so all four labels fit in full */
+@media (max-width:480px){.pf-tabs{gap:2px;padding:4px}.pf-tabs a{padding:8px 6px;font-size:.84rem;overflow:visible;text-overflow:clip}.pf-tabs a .ico{display:none}}

@@ -23,16 +23,6 @@ A'zo: ro'yxatdan o'tish, abonement (promokod, muzlatish), "Zalga kirdim", do'kon
 **mashq rejasi** (murabbiy admin paneldan yozadi, a'zo kunma-kun belgilaydi), tana o'lchami va BMI grafigi, **yutuqlar, ball va oylik reyting**,
 **QR a'zo kartasi**, **do'stni taklif qilish** (ikkalasiga bonus kunlar), fikr qoldirish, kvitansiya, **parolni SMS bilan tiklash**, **telefonni tasdiqlash**, **Telegram eslatmalari**.
 
-## Mashq darslari (`/training/`)
-
-Har kun uchun mashg'ulotlar: hafta kunini tanlaysiz, tur (kuch, kardio, yoga...) va daraja bo'yicha filtrlaysiz. Har darsda video, "qanday bajariladi" qadamlari, ishlaydigan mushaklar, jihoz va xatolar/maslahatlar bor. Hafta kuni bo'sh qoldirilgan dars **har kuni** ko'rinadi (masalan qizdirish).
-
-Admin panel → **Mashg'ulot turlari** va **Darslar**. Video qo'shishning ikki yo'li:
-1. **Faylni yuklash** (`.mp4` yoki `.webm`, standart chegara 500 MB, `FZ_MAX_VIDEO_MB`): "Video fayl" maydoni. Fayl `media/` papkasiga tushadi va faqat dastur orqali beriladi (to'g'ridan-to'g'ri havolasi yo'q). **VIP darsning videosini faqat VIP a'zolar ko'ra oladi**, videoni o'tkazib ko'rish (seek) ham ishlaydi.
-2. **Havola:** YouTube, Vimeo yoki `.mp4` havolasi (faqat `https://`). YouTube/Vimeo sahifa ichida ko'rinadi.
-Yuklangan fayl havoladan ustun turadi. **Internetga chiqarganda:** bepul hostingning diski vaqtincha, yuklangan videolar yo'qolib qoladi. Doimiy disk yoki YouTube (Unlisted) ishlating. Katta videolar uchun YouTube qulayroq. YouTube havolasi VIP bo'lsa ham, havola biladigan odam uni ochishi mumkin, shuning uchun to'liq yopiq VIP video kerak bo'lsa faylni yuklang.
-`setup_gym --demo` 16 ta **namuna** dars qo'shadi (umumiy tavsiyalar, video yo'q): ularni o'z murabbiylaringiz darslari bilan almashtiring.
-
 ## Chat (`/chat/`)
 
 - **Shaxsiy yozishmalar:** a'zoni ism yoki a'zo raqami (FZ-0012) bilan topasiz va yozasiz. Telefon raqam bilan **qidirib bo'lmaydi** va hech kimga ko'rinmaydi. Boshqalar sizni "Aziz K." ko'rinishida ko'radi.
