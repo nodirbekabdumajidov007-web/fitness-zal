@@ -72,8 +72,21 @@ def title_text(entry, lang):
     return entry["kw"]["uz"][0]
 
 
+def _merge_alias(entries):
+    """Everyday phrasings (assistant_kb_alias.py) are added to the entries' own keywords; an unknown id is a mistake, not a silent no-op."""
+    from .assistant_kb_alias import ALIAS
+    by_id = {e["id"]: e for e in entries}
+    for eid, row in ALIAS.items():
+        e = by_id.get(eid)
+        if e is None:
+            raise ValueError(f"assistant_kb_alias: unknown entry id {eid}")
+        for lg, kw in zip(("uz", "ru", "en"), row):
+            e["kw"][lg] += [k for k in kw.split("|") if k and k not in e["kw"][lg]]
+
+
 ENTRIES = _build()
 _merge_extra(ENTRIES)
+_merge_alias(ENTRIES)
 BY_ID = {e["id"]: e for e in ENTRIES}
 
 # entries that need a signed-in member (their answers are built from the member's own data)

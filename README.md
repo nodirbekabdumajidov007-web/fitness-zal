@@ -7,7 +7,7 @@ Django 5.2: server shablonlari, formalar, Django admin (dashboard va hisobotlar 
 `start.bat` ni ikki marta bosing: `.venv` yaratadi, Django va segno'ni o'rnatadi, bazani tayyorlaydi, namuna ma'lumot qo'shadi va serverni ochadi.
 Sayt: http://127.0.0.1:8000. Admin paroli terminalda **bir marta** chiqadi. Oynani yopsangiz sayt to'xtaydi.
 
-Testlar (42 ta): `.venv\Scripts\python manage.py test gym`
+Testlar (900+): `.venv\Scripts\python manage.py test gym`
 
 ## Admin kirishi
 
@@ -134,7 +134,7 @@ Boshqa o'zgaruvchilar: `DJANGO_DEBUG` (internetda `0`), `DJANGO_SECRET_KEY`, `DJ
 
 ## Nima sinalgan va nima sinalmagan
 
-Testlar (42 ta) Click imzosini (soxta kalit bilan), Telegram mantiqini (soxta transport bilan), SMS kodlarini, QR imzosini, referal, yutuqlar, PT, zaxira va admin sahifalarini qamraydi.
+Testlar Click imzosini (soxta kalit bilan), Telegram mantiqini (soxta transport bilan), SMS kodlarini, QR imzosini, referal, yutuqlar, PT, zaxira va admin sahifalarini qamraydi.
 **Haqiqiy tashqi xizmatlarga ulanib sinalmagan:** Eskiz (SMS), Telegram API, Click serverlari, Google. Ularni ishlatishdan oldin o'z akkauntingiz bilan sinang. Click uchun avval ularning sandbox muhitida.
 Kamera orqali QR o'qish faqat Chrome/Edge'da ishlaydi (boshqa brauzerda qo'lda kiritish yoki USB skaner).
 

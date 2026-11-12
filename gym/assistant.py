@@ -226,20 +226,63 @@ def _lev2(a, b):
     return prev[-1] <= 2
 
 
-def _repair(qlist, qset):
-    """Questions often carry typos ("protien", "kaloriyaa", "yotib surihs"): add the keyword stems that are one edit away from unknown words
-    of 5+ letters (two edits for 9+ letters)."""
+_SKEL_MAP = str.maketrans({"x": "h", "q": "k", "w": "v", "e": "a", "i": "a", "o": "a", "u": "a",
+                           "о": "а", "е": "а", "и": "а", "э": "а", "ы": "а", "я": "а", "ю": "а", "у": "а", "ё": "а"})
+_RUNS = re.compile(r"(.)\1+")
+
+
+@functools.lru_cache(maxsize=16384)
+def skel(word):
+    """How a word sounds, roughly: vowels are one letter, x = h, q = k, doubled letters count once. People mix exactly these up when they type
+    Uzbek in a hurry ("kolariya" ~ "kaloriya", "xisoblash" ~ "hisoblash", "abanimen" ~ "abonement", "murabiy" ~ "murabbiy", "скока" ~ ...)."""
+    return _RUNS.sub(r"\1", word.translate(_SKEL_MAP))
+
+
+def _skel_index(stems):
+    """{skeleton: [stems]} and {skeleton length: [skeletons]} for the stems of 4+ letters."""
+    by, by_len = {}, {}
+    for s in stems:
+        if len(s) >= 4 and not s.isdigit():
+            by.setdefault(skel(s), []).append(s)
+    for k in by:
+        by_len.setdefault(len(k), []).append(k)
+    return by, by_len
+
+
+def _sound_alike(w, by, by_len):
+    """[(stem, certainty)] for a word not found as typed: the same skeleton (0.65), or - for 5+ letters - a skeleton one edit away (0.5)."""
+    if len(w) < 4 or w.isdigit() or _CYR.search(w):  # Latin only: the Uzbek habits it models (x/h, q/k, o/a) are not Russian ones
+        return []
+    k = skel(w)
+    out = [(s, 0.65) for s in by.get(k, ()) if s != w]
+    if not out and len(w) >= 5 and len(k) >= 4:
+        for n in (len(k) - 1, len(k), len(k) + 1):
+            out += [(s, 0.5) for c in by_len.get(n, ()) if _d1(k, c) for s in by[c]]
+    return out[:3]
+
+
+_KW_SKEL = None
+
+
+def _repair(qlist, qset, loose=True):
+    """Questions often carry typos ("protien", "kaloriyaa", "yotib surihs", "kolariya xisoblash"): add the keyword stems that are one edit away from
+    unknown words of 5+ letters (two edits for 9+ letters), else the ones that sound the same (see skel)."""
+    global _KW_SKEL
     _index()
+    if _KW_SKEL is None:
+        stems = {s for e, kws in _INDEX for st, _w, _l in kws for s in st}
+        _KW_SKEL = (stems,) + _skel_index(stems)
+    stems, by, by_len = _KW_SKEL
     extra = set()
     for w in qlist:
-        if len(w) < 5 or w.isdigit():
+        if len(w) < 4 or w.isdigit() or w in stems:
             continue
         cands = _VOCAB.get(w[0], ())
-        if w in cands:
-            continue
-        found = [c for c in cands if abs(len(c) - len(w)) <= 1 and _d1(w, c)]
+        found = [c for c in cands if abs(len(c) - len(w)) <= 1 and _d1(w, c)] if len(w) >= 5 else []
         if not found and len(w) >= 9:
             found = [c for c in cands if _lev2(w, c)]
+        if not found and loose:
+            found = [s for s, _c in _sound_alike(w, by, by_len)]
         extra.update(found[:2])
     return qset | extra
 
@@ -271,9 +314,9 @@ def _site_ctx():
     return _SITE_CTX
 
 
-def _score(qlist):
+def _score(qlist, loose=True):
     """[(score, is_not_chat, is_specific, -order, entry, votes)] for every entry that shares a keyword with the question; votes = {lang: weight}."""
-    qset = _repair(qlist, set(qlist))
+    qset = _repair(qlist, set(qlist), loose)
     if not qset:
         return []
     site_ctx = bool(qset & _site_ctx())  # "sizda", "у вас", "on your site": a question about this gym, so its own facts come first
@@ -311,7 +354,7 @@ def _rank(text):
         return rows, None
     if _TG_LETTERS.search(text) or _KY_LETTERS.search(text):  # Tajik / Kyrgyz Cyrillic: never read as Uzbek
         return rows, None
-    alt = _score(tokens(translit(text)))
+    alt = _score(tokens(translit(text)), loose=False)  # a transliterated reading must win on real words, not on guesses
     top = lambda r: r[0][0] if r else 0.0
     if _UZ_LETTERS.search(text) or top(alt) > top(rows):
         return alt, "uz"
@@ -962,7 +1005,15 @@ def _expand(w):
                 out[c] = 0.7
             elif len(w) >= 9 and _lev2(w, c):
                 out[c] = 0.55
+    if not out:  # nothing close as typed: try how it sounds ("kolariya", "xisoblash", "abanimen")
+        global _AP_SKEL
+        if _AP_SKEL is None:
+            _AP_SKEL = _skel_index(inv)
+        out.update(_sound_alike(w, *_AP_SKEL))
     return out
+
+
+_AP_SKEL = None
 
 
 def _approx(qlist, partial):
