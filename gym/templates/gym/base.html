@@ -100,8 +100,9 @@
       <a href="{% url 'card' %}"{% if '/card' in p %} aria-current="page"{% endif %}>{% icon 'credit-card' %}<span class="sb-lbl">{% t 'member_card' %}</span></a>{% endif %}
       <a href="{% url 'ai' %}"{% if '/ai/' in p %} aria-current="page"{% endif %}>{% icon 'sparkles' %}<span class="sb-lbl">{% t 'ai_coach' %}</span></a>
     </div>
-    <div class="sb-grp">
-      <h2 class="sb-cap">{% t 'nav_g_train' %}</h2>
+    <div class="sb-grp fold" data-g="train">
+      <h2 class="sb-cap"><button type="button" class="sb-fold" aria-expanded="false" aria-controls="sbg-train">{% t 'nav_g_train' %}</button></h2>
+      <div class="sb-items" id="sbg-train">
       <a href="{% url 'plans' %}"{% if '/plans' in p %} aria-current="page"{% endif %}>{% icon 'ticket' %}<span class="sb-lbl">{% t 'nav_plans' %}</span></a>
       <a href="{% url 'classes' %}"{% if '/classes' in p %} aria-current="page"{% endif %}>{% icon 'calendar' %}<span class="sb-lbl">{% t 'nav_classes' %}</span></a>
       {% if has_trainers %}<a href="{% url 'trainers' %}"{% if '/trainers' in p %} aria-current="page"{% endif %}>{% icon 'users' %}<span class="sb-lbl">{% t 'nav_trainers' %}</span></a>{% endif %}
@@ -111,23 +112,30 @@
       <a href="{% url 'achievements' %}"{% if '/achievements' in p %} aria-current="page"{% endif %}>{% icon 'award' %}<span class="sb-lbl">{% t 'achievements' %}</span></a>
       <a href="{% url 'calories' %}"{% if '/calories' in p %} aria-current="page"{% endif %}>{% icon 'flame' %}<span class="sb-lbl">{% t 'nav_calories' %}</span></a>{% endif %}
       <a href="{% url 'tools' %}"{% if '/tools' in p %} aria-current="page"{% endif %}>{% icon 'calculator' %}<span class="sb-lbl">{% t 'tools' %}</span></a>
+      </div>
     </div>
-    <div class="sb-grp">
-      <h2 class="sb-cap">{% t 'nav_g_shop' %}</h2>
+    <div class="sb-grp fold" data-g="shop">
+      <h2 class="sb-cap"><button type="button" class="sb-fold" aria-expanded="false" aria-controls="sbg-shop">{% t 'nav_g_shop' %}</button></h2>
+      <div class="sb-items" id="sbg-shop">
       <a href="{% url 'shop' %}"{% if '/shop' in p or '/cart' in p %} aria-current="page"{% endif %}>{% icon 'bag' %}<span class="sb-lbl">{% t 'nav_shop' %}</span><span class="badge" id="cart-badge"{% if not cart_count %} hidden{% endif %}>{{ cart_count }}</span></a>
       {% if user.is_authenticated %}<a href="{% url 'orders' %}"{% if '/orders' in p %} aria-current="page"{% endif %}>{% icon 'package' %}<span class="sb-lbl">{% t 'orders' %}</span></a>{% endif %}
+      </div>
     </div>
-    <div class="sb-grp">
-      <h2 class="sb-cap">{% t 'nav_g_comm' %}</h2>
+    <div class="sb-grp fold" data-g="comm">
+      <h2 class="sb-cap"><button type="button" class="sb-fold" aria-expanded="false" aria-controls="sbg-comm">{% t 'nav_g_comm' %}</button></h2>
+      <div class="sb-items" id="sbg-comm">
       {% if user.is_authenticated %}<a href="{% url 'chat' %}"{% if '/chat' in p %} aria-current="page"{% endif %}>{% icon 'message' %}<span class="sb-lbl">{% t 'chat' %}</span>{% if chat_unread %}<span class="badge">{{ chat_unread }}</span>{% endif %}</a>{% endif %}
       <a href="{% url 'reviews' %}"{% if '/reviews' in p %} aria-current="page"{% endif %}>{% icon 'star' %}<span class="sb-lbl">{% t 'nav_reviews' %}</span></a>
       <a class="nav-help" href="{% url 'support_center' %}"{% if '/yordam' in p %} aria-current="page"{% endif %}>{% icon 'help' %}<span class="sb-lbl">{% t 'sw_tab_help' %}</span>{% if support_unread %}<span class="badge" data-support-badge>{{ support_unread }}</span>{% endif %}</a>
       <a href="{% url 'faq' %}"{% if '/faq' in p %} aria-current="page"{% endif %}>{% icon 'message' %}<span class="sb-lbl">{% t 'faq_title' %}</span></a>
+      </div>
     </div>
-    {% if is_trainer or admin_mode %}<div class="sb-grp">
-      <h2 class="sb-cap">{% t 'nav_g_staff' %}</h2>
+    {% if is_trainer or admin_mode %}<div class="sb-grp fold" data-g="staff">
+      <h2 class="sb-cap"><button type="button" class="sb-fold" aria-expanded="false" aria-controls="sbg-staff">{% t 'nav_g_staff' %}</button></h2>
+      <div class="sb-items" id="sbg-staff">
       {% if is_trainer %}<a class="nav-coach" href="{% url 'coach' %}"{% if '/coach' in p %} aria-current="page"{% endif %}>{% icon 'clipboard' %}<span class="sb-lbl">{% t 'coach_panel' %}</span></a>{% endif %}
       {% if admin_mode %}<a href="/django-admin/">{% icon 'shield' %}<span class="sb-lbl">{% t 'nav_admin' %}</span></a>{% endif %}
+      </div>
     </div>{% endif %}
     <div class="sb-grp" data-pwa-install hidden>
       <a href="#" data-pwa-install-btn>{% icon 'download' %}<span class="sb-lbl">{% t 'pwa_install' %}</span></a>

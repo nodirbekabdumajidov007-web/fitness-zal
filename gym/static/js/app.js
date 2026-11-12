@@ -337,3 +337,25 @@ document.addEventListener('DOMContentLoaded', function () {
   var onMq = function () { if (!mq.matches) closeDrawer(false); };
   if (mq.addEventListener) mq.addEventListener('change', onMq); else if (mq.addListener) mq.addListener(onMq);
 })();
+
+/* Sidebar sections fold open/closed on their heading; the choice is remembered per section. */
+(function () {
+  var KEY = 'fz-sbg', saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) {}
+  document.querySelectorAll('.sb-grp.fold').forEach(function (g) {
+    var btn = g.querySelector('.sb-fold'), items = g.querySelector('.sb-items'), id = g.getAttribute('data-g');
+    if (!btn || !items) return;
+    if (saved[id] === 1) g.classList.add('open');
+    else if (saved[id] === 0 && !g.querySelector('[aria-current]')) g.classList.add('shut');  // never hide the page you are on
+    function sync() { btn.setAttribute('aria-expanded', getComputedStyle(items).display !== 'none' ? 'true' : 'false'); }
+    sync();
+    btn.addEventListener('click', function () {
+      var show = btn.getAttribute('aria-expanded') !== 'true';
+      g.classList.toggle('open', show);
+      g.classList.toggle('shut', !show);
+      saved[id] = show ? 1 : 0;
+      try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {}
+      sync();
+    });
+  });
+})();
