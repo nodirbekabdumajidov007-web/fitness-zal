@@ -2901,3 +2901,20 @@ a.db-kpi{transition:transform .2s,border-color .2s}a.db-kpi:hover{transform:tran
 .fold.shut .sb-items{display:none}
 .fold.open .sb-fold::after,.fold:not(.shut):has([aria-current]) .sb-fold::after{transform:rotate(45deg)}
 html.sb-rail .fold .sb-items{display:grid}  /* icon rail: no headings, so always show every icon */
+
+/* Support widget: one contact card (write / call / Telegram side by side) and a shorter hero, so the useful parts fit without scrolling */
+.sw-hero{padding:14px 18px 46px}
+.sw-hello{margin:12px 0 2px;font-size:1rem}
+.sw-h2{font-size:20px}
+.sw-body{margin-top:-30px}
+.sw-contact-card{display:grid;gap:10px;padding:12px}
+.sw-acts{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:8px}
+.sw-act{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:68px;padding:10px 6px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:600 .8rem/1.2 var(--body);text-align:center;text-decoration:none;cursor:pointer;transition:background .15s,border-color .15s,transform .1s}
+.sw-act svg,.sw-act .ico{width:22px;height:22px;flex:none;color:var(--accent);fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sw-act:hover{border-color:color-mix(in srgb,var(--accent) 45%,var(--line));background:color-mix(in srgb,var(--accent) 7%,var(--bg))}
+.sw-act:active{transform:scale(.97)}
+.sw-act:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#sw-new.sw-act{background:var(--accent);border-color:var(--accent);color:#fff}
+#sw-new.sw-act svg{color:#fff}
+#sw-new.sw-act:hover{background:color-mix(in srgb,var(--accent) 88%,#000)}
+.sw-contact-card small.sw-st{justify-content:center;margin:0}

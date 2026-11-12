@@ -185,6 +185,7 @@ sw_qa_hours||Çalışma saatleri||Иш убактысы||Соатҳои корӣ
 sw_qa_member||Üyeliğim||Менин абонементим||Абонементи ман
 sw_qa_coach||Antrenör asistanı||Машыктыруучу жардамчысы||Ёвари мураббӣ
 sw_call||Bizi arayın||Бизге чалыңыз||Ба мо занг занед
+sw_write||Yaz||Жазуу||Навиштан
 sw_ask_title||Asistana sorun||Жардамчыдан сураңыз||Аз ёвар пурсед
 sw_ask_ph||örn. üyeliğimi nasıl dondururum?||мис. абонементимди кантип тоңдурам?||масалан, абонементамро чӣ тавр яхбандӣ мекунам?
 sw_ask_go||Sor||Суроо||Пурсидан

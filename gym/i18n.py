@@ -1517,6 +1517,7 @@ reset_mail_asked||Fitnes Zal saytida parolni tiklash so'raldi (login: {login}).|
 reset_mail_open||Yangi parol o'rnatish uchun quyidagi havolani oching (3 soat amal qiladi):||Чтобы задать новый пароль, откройте ссылку ниже (действует 3 часа):||To set a new password, open the link below (valid for 3 hours):
 reset_mail_ignore||Agar buni siz so'ramagan bo'lsangiz, bu xatga e'tibor bermang: parolingiz o'zgarmaydi.||Если вы этого не запрашивали, просто проигнорируйте письмо: пароль не изменится.||If you did not ask for this, ignore this e-mail: your password will not change.
 reset_subject||Fitnes Zal: parolni tiklash||Fitnes Zal: восстановление пароля||Fitnes Zal: password reset
+sw_write||Yozish||Написать||Message
 scan_session||Sessiya tugagan: sahifani yangilab, admin sifatida qayta kiring||Сессия истекла: обновите страницу и войдите снова как администратор||Session ended: reload the page and sign in again as admin
 """
 

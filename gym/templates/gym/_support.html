@@ -25,10 +25,14 @@
           <small>{% t 'sw_last' %}</small>
           <span class="sw-last-body"></span>
         </button>
-        <button type="button" class="sw-card sw-new" id="sw-new">
-          <span><b>{% t 'sw_send_us' %}</b><small class="sw-st{% if scfg.status.open %} on{% endif %}" id="sw-st"><i class="sw-sdot" aria-hidden="true"></i><span id="sw-st-text">{{ scfg.status.text }}</span></small></span>
-          <span class="sw-chev"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></span>
-        </button>
+        <div class="sw-card sw-contact-card">
+          <div class="sw-acts">
+            <button type="button" class="sw-act" id="sw-new"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15a2 2 0 0 1-2 2H8l-4 4V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z"/></svg><span>{% t 'sw_write' %}</span></button>
+            {% if scfg.phone %}<a class="sw-act" id="sw-call" href="{{ scfg.phone.href }}" title="{{ scfg.phone.label }}">{% icon 'phone' %}<span>{% t 'sw_call' %}</span></a>{% endif %}
+            {% if gs.telegram %}<a class="sw-act" href="{{ gs.telegram }}" target="_blank" rel="noopener" title="{% t 'sw_telegram' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 4 3 11l6 2 2 6 3-4 5 4z"/><path d="m9 13 8-6"/></svg><span>Telegram</span></a>{% endif %}
+          </div>
+          <small class="sw-st{% if scfg.status.open %} on{% endif %}" id="sw-st"><i class="sw-sdot" aria-hidden="true"></i><span id="sw-st-text">{{ scfg.status.text }}</span></small>
+        </div>
         <div class="sw-chips" role="group" aria-label="{% t 'sw_qa_label' %}">
           <a class="sw-qc" href="{% url 'plans' %}">{% t 'sw_qa_prices' %}</a>
           <button type="button" class="sw-qc" id="sw-qa-hours" aria-expanded="false">{% t 'sw_qa_hours' %}</button>
@@ -48,14 +52,6 @@
           <span><b id="sw-mem-text"></b></span>
           <a class="sw-btn" id="sw-mem-link" href="{% url 'plans' %}"></a>
         </div>{% endif %}
-        {% if scfg.phone %}<a class="sw-card sw-new sw-tg" id="sw-call" href="{{ scfg.phone.href }}">
-          <span><b>{% t 'sw_call' %}</b><small>{{ scfg.phone.label }}</small></span>
-          <span class="sw-chev">{% icon 'phone' %}</span>
-        </a>{% endif %}
-        {% if gs.telegram %}<a class="sw-card sw-new sw-tg" href="{{ gs.telegram }}" target="_blank" rel="noopener">
-          <span><b>{% t 'sw_telegram' %}</b></span>
-          <span class="sw-chev"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 4 3 11l6 2 2 6 3-4 5 4z"/><path d="m9 13 8-6"/></svg></span>
-        </a>{% endif %}
       </div>
     </div>
 
