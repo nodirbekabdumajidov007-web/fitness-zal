@@ -34,8 +34,8 @@
     </div>
     <nav class="fz-nav" aria-label="Bo'limlar">
       {% for g in fz_nav %}
-      <section class="fz-grp">
-        <h2>{{ g.title }}</h2>
+      <section class="fz-grp{% if not forloop.first %} fz-fold{% endif %}" data-g="{{ g.title|slugify }}">
+        {% if forloop.first %}<h2>{{ g.title }}</h2>{% else %}<h2><button type="button" class="fz-fold-b" aria-expanded="false">{{ g.title }}<b class="fz-badge fz-grp-badge" hidden></b></button></h2>{% endif %}
         <ul>
           {% for i in g.items %}
           <li><a class="fz-nav-a{% if i.on %} on{% endif %}" href="{{ i.url }}"{% if i.on %} aria-current="page"{% endif %} title="{{ i.label }}">{% if i.model %}{% model_icon i.model %}{% else %}{% aicon i.icon %}{% endif %}<span class="fz-nav-t">{{ i.label }}</span>{% if i.badge %}<b class="fz-badge" title="Kutilmoqda: {{ i.badge }}">{{ i.badge }}</b>{% endif %}</a></li>

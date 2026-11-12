@@ -110,3 +110,29 @@ document.addEventListener('DOMContentLoaded', function () {
   setInterval(poll, 20000);
   document.addEventListener('visibilitychange', function () { if (!document.hidden) poll(); });
 });
+
+/* Sidebar groups fold open/closed on their heading; the choice is remembered per group. */
+(function () {
+  var KEY = 'fz-adm-grp', saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) {}
+  document.querySelectorAll('.fz-grp.fz-fold').forEach(function (g) {
+    var btn = g.querySelector('.fz-fold-b'), list = g.querySelector('ul'), id = g.getAttribute('data-g');
+    if (!btn || !list) return;
+    var sum = 0;
+    g.querySelectorAll('ul .fz-badge').forEach(function (b) { sum += parseInt(b.textContent, 10) || 0; });
+    var gb = btn.querySelector('.fz-grp-badge');
+    if (gb && sum) { gb.textContent = sum; gb.hidden = false; }
+    if (saved[id] === 1) g.classList.add('open');
+    else if (saved[id] === 0 && !g.querySelector('.on')) g.classList.add('shut');
+    function sync() { btn.setAttribute('aria-expanded', getComputedStyle(list).display !== 'none' ? 'true' : 'false'); }
+    sync();
+    btn.addEventListener('click', function () {
+      var show = btn.getAttribute('aria-expanded') !== 'true';
+      g.classList.toggle('open', show);
+      g.classList.toggle('shut', !show);
+      saved[id] = show ? 1 : 0;
+      try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {}
+      sync();
+    });
+  });
+})();

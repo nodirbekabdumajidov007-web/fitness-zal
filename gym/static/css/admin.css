@@ -761,3 +761,17 @@ html[data-theme="dark"] .mini-bars i{background:linear-gradient(180deg,#c3c9d2,#
 .ig-act{margin:6px 0}.ig-act button,.ig-reply button,.ig-link button,.ig-test button{min-height:44px;cursor:pointer}.ig-link{display:flex;gap:6px;flex-wrap:wrap}.ig-link input{flex:1;min-width:140px;min-height:44px;font-size:16px}
 .ig-side-col{display:grid;gap:12px}
 .ig-quick{display:flex;flex-wrap:wrap;gap:6px}.ig-qr{padding:6px 10px;border-radius:99px;border:1px solid var(--fz-line);background:var(--fz-soft);color:var(--fz-text);cursor:pointer;font-size:.8rem;min-height:36px}.ig-tabs-sep{width:1px;height:24px;background:var(--fz-line)}
+
+/* Sidebar groups fold on their heading (the first group always stays open). The group holding the current page opens by itself;
+   a closed group shows the sum of its pending badges on the heading so nothing waiting is hidden. */
+.fz-fold-b{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:8px;width:100%;cursor:pointer;border-radius:6px}
+.fz-fold-b:hover{color:#c9d1db}
+.fz-fold-b:focus-visible{outline:2px solid var(--fz-accent,#e5432d);outline-offset:2px}
+.fz-fold-b::after{content:"";flex:none;margin-left:auto;width:6px;height:6px;margin-right:4px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(-45deg);transition:transform .15s}
+.fz-fold-b .fz-grp-badge{font-size:.62rem;letter-spacing:0}
+.fz-fold ul{display:none}
+.fz-fold:has(.on) ul,.fz-fold.open ul{display:block}
+.fz-fold.shut ul{display:none}
+.fz-fold.open .fz-fold-b::after,.fz-fold:not(.shut):has(.on) .fz-fold-b::after{transform:rotate(45deg)}
+.fz-fold.open .fz-grp-badge,.fz-fold:not(.shut):has(.on) .fz-grp-badge{display:none}
+@media (min-width:1024px){html.fz-collapsed .fz-fold ul{display:block}}  /* icon rail: no headings, so every icon stays visible */
