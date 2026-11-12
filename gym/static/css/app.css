@@ -2918,3 +2918,8 @@ html.sb-rail .fold .sb-items{display:grid}  /* icon rail: no headings, so always
 #sw-new.sw-act svg{color:#fff}
 #sw-new.sw-act:hover{background:color-mix(in srgb,var(--accent) 88%,#000)}
 .sw-contact-card small.sw-st{justify-content:center;margin:0}
+
+/* Freeze form: the button sits on the inputs' baseline at its natural size instead of stretching to the whole grid cell */
+.freeze-form{align-items:end}
+.freeze-form .btn{align-self:end;justify-self:start;width:auto;min-width:140px;height:auto;min-height:44px;padding:10px 22px}
+@media (max-width:640px){.freeze-form .btn{justify-self:stretch;width:100%}}

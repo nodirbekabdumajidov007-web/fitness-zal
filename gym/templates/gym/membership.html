@@ -26,7 +26,7 @@
     <div class="note info">{% t 'freeze_scheduled' start=fz.scheduled.start_date|dmy until=fz.scheduled.end_date|dmy %}</div>
     <form method="post" action="{% url 'unfreeze' %}">{% csrf_token %}<button class="btn" type="submit" data-confirm="{% t 'sure' %}">{% t 'freeze_cancel_btn' %}</button></form>
   {% elif fz.can %}
-    <form method="post" action="{% url 'freeze' %}" class="grid g3">{% csrf_token %}
+    <form method="post" action="{% url 'freeze' %}" class="grid g3 freeze-form">{% csrf_token %}
       <label for="fz-days">{% t 'freeze_days' %}<input id="fz-days" name="days" type="number" min="{{ fz.min }}" max="{{ fz.left }}" value="{{ fz.min }}" required></label>
       <label for="fz-start">{% t 'freeze_start' %}<input id="fz-start" name="start" type="date" min="{{ today|date:'Y-m-d' }}" max="{{ last_day|date:'Y-m-d' }}" value="{{ today|date:'Y-m-d' }}"></label>
       <button class="btn primary" type="submit" data-confirm="{% t 'confirm' %}">{% t 'freeze_do' %}</button>
