@@ -27,3 +27,12 @@
     })();
   }
 })();
+
+/* Member card: opens in a dialog on the dashboard instead of leaving the page (the link still works without JS, and /card/ stays for offline use). */
+(function () {
+  var dlg = document.getElementById('card-dlg'), open = document.querySelector('[data-card-open]');
+  if (!dlg || !open || typeof dlg.showModal !== 'function') return;
+  open.addEventListener('click', function (e) { e.preventDefault(); dlg.showModal(); });
+  dlg.querySelector('[data-card-close]').addEventListener('click', function () { dlg.close(); });
+  dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });  // a tap on the backdrop closes it
+})();

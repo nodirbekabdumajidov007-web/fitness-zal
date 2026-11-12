@@ -17,7 +17,7 @@
     var inp = af.querySelector('input[type=file]');
     inp.addEventListener('change', function () {
       if (!inp.files.length) return;
-      var lab = af.querySelector('.pf-ava'), img = lab.querySelector('img') || document.createElement('img');
+      var lab = af.querySelector('.pf-ava, .db-ava'), img = lab.querySelector('img') || document.createElement('img');
       img.src = URL.createObjectURL(inp.files[0]); lab.classList.add('has-img', 'busy');
       var s = lab.querySelector('span'); if (s) s.remove();
       if (!img.parentNode) lab.prepend(img);

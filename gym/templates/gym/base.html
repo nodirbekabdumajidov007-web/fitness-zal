@@ -95,9 +95,7 @@
     <div class="sb-grp">
       <h2 class="sb-cap">{% t 'nav_g_main' %}</h2>
       <a href="{% url 'home' %}"{% if p == '/' %} aria-current="page"{% endif %}>{% icon 'home' %}<span class="sb-lbl">{% t 'nav_home' %}</span></a>
-      {% if user.is_authenticated %}<a href="{% url 'membership' %}"{% if '/membership' in p %} aria-current="page"{% endif %}>{% icon 'ticket' %}<span class="sb-lbl">{% t 'ms_title' %}</span></a>
-      <a href="{% url 'dashboard' %}"{% if '/dashboard' in p %} aria-current="page"{% endif %}>{% icon 'activity' %}<span class="sb-lbl">{% t 'nav_dash' %}</span></a>
-      <a href="{% url 'card' %}"{% if '/card' in p %} aria-current="page"{% endif %}>{% icon 'credit-card' %}<span class="sb-lbl">{% t 'member_card' %}</span></a>{% endif %}
+      {% if user.is_authenticated %}<a href="{% url 'dashboard' %}"{% if '/dashboard' in p %} aria-current="page"{% endif %}>{% icon 'activity' %}<span class="sb-lbl">{% t 'nav_dash' %}</span></a>{% endif %}
       <a href="{% url 'ai' %}"{% if '/ai/' in p %} aria-current="page"{% endif %}>{% icon 'sparkles' %}<span class="sb-lbl">{% t 'ai_coach' %}</span></a>
     </div>
     <div class="sb-grp fold" data-g="train">
@@ -108,8 +106,6 @@
       {% if has_trainers %}<a href="{% url 'trainers' %}"{% if '/trainers' in p %} aria-current="page"{% endif %}>{% icon 'users' %}<span class="sb-lbl">{% t 'nav_trainers' %}</span></a>{% endif %}
       {% if user.is_authenticated %}<a href="{% url 'workouts' %}"{% if '/workouts' in p %} aria-current="page"{% endif %}>{% icon 'dumbbell' %}<span class="sb-lbl">{% t 'workouts' %}</span></a>
       <a href="{% url 'progress' %}"{% if '/progress' in p %} aria-current="page"{% endif %}>{% icon 'trending-up' %}<span class="sb-lbl">{% t 'nav_progress' %}</span></a>
-      <a href="{% url 'records' %}"{% if '/records' in p %} aria-current="page"{% endif %}>{% icon 'trophy' %}<span class="sb-lbl">{% t 'records' %}</span></a>
-      <a href="{% url 'achievements' %}"{% if '/achievements' in p %} aria-current="page"{% endif %}>{% icon 'award' %}<span class="sb-lbl">{% t 'achievements' %}</span></a>
       <a href="{% url 'calories' %}"{% if '/calories' in p %} aria-current="page"{% endif %}>{% icon 'flame' %}<span class="sb-lbl">{% t 'nav_calories' %}</span></a>{% endif %}
       <a href="{% url 'tools' %}"{% if '/tools' in p %} aria-current="page"{% endif %}>{% icon 'calculator' %}<span class="sb-lbl">{% t 'tools' %}</span></a>
       </div>

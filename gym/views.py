@@ -639,7 +639,9 @@ def dashboard(request):
         next_at = timezone.make_aware(datetime.combine(nxt.date, nxt.gym_class.start_time))
         if next_at < now:
             next_at = None
-    return render(request, "gym/dashboard.html", {
+    q = segno.make(services.card_token(request.user), error="m")  # the member card opens in a dialog right here (/card/ stays for offline use)
+    card_qr = mark_safe(q.svg_inline(scale=6, border=2, dark="#111111", light="#ffffff"))
+    return render(request, "gym/dashboard.html", {"card_qr": card_qr,
         "tk": tk_sum, "heat": heat, "spark": spark, "w_change": w_change, "w_last": logs[-1].weight if logs else None,
         "next_booking": nxt if next_at else None,
         "next_at": next_at.isoformat() if next_at else "", "crowd": crowd_level(), "stats_total": stats["total"],
@@ -1309,7 +1311,7 @@ def profile_view(request):
                 u.avatar = None
                 u.save(update_fields=["avatar"])
                 flash(request, messages.SUCCESS, "avatar_removed")
-                return redirect("profile")
+                return redirect(safe_next(request, "profile"))
             f = request.FILES.get("avatar")
             from .media import validate_image
             try:
@@ -1318,7 +1320,7 @@ def profile_view(request):
                 validate_image(f)
             except ValidationError:
                 flash(request, messages.ERROR, "err_avatar")
-                return redirect("profile")
+                return redirect(safe_next(request, "profile"))
             old = u.avatar.name if u.avatar else ""
             u.avatar = f
             u.save(update_fields=["avatar"])
@@ -1328,7 +1330,7 @@ def profile_view(request):
                 except OSError:
                     pass
             flash(request, messages.SUCCESS, "avatar_saved")
-            return redirect("profile")
+            return redirect(safe_next(request, "profile"))
         elif kind == "telegram_unlink":
             User.objects.filter(pk=request.user.pk).update(telegram_chat_id=None)
             return redirect("profile")

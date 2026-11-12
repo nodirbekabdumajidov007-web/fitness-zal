@@ -8,18 +8,24 @@
   <button type="button" class="pwa-x" data-pwa-dismiss aria-label="{% t 'pwa_later' %}">{% icon 'x' %}</button>
 </div>
 <section class="db-hero">
-  <span class="db-ava" aria-hidden="true">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
+  <form class="db-ava-form" method="post" action="{% url 'profile' %}" enctype="multipart/form-data" data-avatar-form>{% csrf_token %}
+    <input type="hidden" name="form" value="avatar"><input type="hidden" name="next" value="{% url 'dashboard' %}">
+    <label class="db-ava{% if user.avatar %} has-img{% endif %}" title="{% t 'avatar_change' %}">
+      {% if user.avatar %}<img src="{{ user.avatar_src }}" alt="{{ user.full_name }}">{% else %}<span>{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>{% endif %}
+      <i class="db-ava-cam" aria-hidden="true">{% icon 'camera' %}</i>
+      <input type="file" name="avatar" accept="image/jpeg,image/png,image/webp" class="sr-only" aria-label="{% t 'avatar_change' %}">
+    </label>
+  </form>
   <div class="db-who">
     <span class="eyebrow">{% t 'hello' %} · {% now "d.m.Y" %}</span>
     <h1>{{ user.first_name }} {{ user.last_name }}</h1>
   </div>
   <div class="db-quick">
-    <a href="{% url 'card' %}"><i>▣</i>{% t 'member_card' %}</a>
+    <a href="{% url 'card' %}" data-card-open aria-haspopup="dialog"><i>▣</i>{% t 'member_card' %}</a>
+    <a href="{% url 'membership' %}"><i>{% icon 'ticket' %}</i>{% t 'ms_title' %}</a>
     <a href="{% url 'entry_history' %}"><i>{% icon 'clock' %}</i>{% t 'entry_title' %}</a>
-    <a href="{% url 'classes' %}"><i>{% icon 'calendar' %}</i>{% t 'nav_classes' %}</a>
-    <a href="{% url 'workouts' %}"><i>{% icon 'trending-up' %}</i>{% t 'workouts' %}</a>
-    <a href="{% url 'shop' %}"><i>{% icon 'cart' %}</i>{% t 'nav_shop' %}</a>
-    <a href="{% url 'chat' %}"><i>{% icon 'message' %}</i>{% t 'chat' %}</a>
+    <a href="{% url 'records' %}"><i>{% icon 'trophy' %}</i>{% t 'records' %}</a>
+    <a href="{% url 'achievements' %}"><i>{% icon 'award' %}</i>{% t 'achievements' %}</a>
   </div>
 </section>
 
@@ -137,5 +143,18 @@
     <a class="card lift" href="{% url 'payments' %}"><i>{% icon 'credit-card' %}</i><b>{% t 'payments' %}</b><span class="muted">{% t 'receipt' %}</span></a>
   </nav>
 </div>
+
+<dialog class="card-dlg" id="card-dlg" aria-label="{% t 'member_card' %}">
+  <button type="button" class="card-dlg-x" data-card-close aria-label="{% t 'nav_close' %}">{% icon 'x' %}</button>
+  <div class="card-dlg-body">
+    <h3 class="card-brand"><img src="{% vstatic 'img/logo.png' %}" alt="" width="219" height="320">FITNES.ZAL</h3>
+    <div class="qr">{{ card_qr }}</div>
+    <b class="num card-dlg-code">{{ user.member_code }}</b>
+    <span>{{ user.full_name }}</span>
+    {% if m %}<span class="pill good">{% plan_name m.plan %} · {% t 'until' %} {{ m.expires|dmy }}</span>{% else %}<span class="pill bad">{% t 'no_membership' %}</span>{% endif %}
+    <small class="muted">{% t 'card_help' %}</small>
+    <a class="btn small" href="{% url 'card' %}">{% t 'qr_3d' %} →</a>
+  </div>
+</dialog>
 {% endblock %}
-{% block scripts %}<script src="{% vstatic 'js/dashboard.js' %}"></script>{% endblock %}
+{% block scripts %}<script src="{% vstatic 'js/dashboard.js' %}"></script><script src="{% vstatic 'js/profile.js' %}"></script>{% endblock %}
