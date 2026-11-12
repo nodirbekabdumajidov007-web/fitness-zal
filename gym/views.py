@@ -10,6 +10,7 @@ import segno
 from django import forms
 from django.conf import settings as dj
 from django.contrib import messages
+from django.contrib.auth import views as auth_views
 from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
@@ -151,6 +152,13 @@ def home(request):
         "members_count": Membership.objects.filter(starts__lte=now, expires__gt=now).values("user").distinct().count(),
         "trainers_count": Trainer.objects.filter(active=True).count(),
     })
+
+
+class LangPasswordResetView(auth_views.PasswordResetView):
+    """Django's reset view, but the e-mail is written in the language the visitor uses on the site."""
+    def form_valid(self, form):
+        self.extra_email_context = {"lang": getattr(self.request, "lang", "uz")}
+        return super().form_valid(form)
 
 
 def set_lang(request, code):
@@ -596,8 +604,9 @@ def dashboard(request):
     if m and days_left <= 5 and not upcoming:
         notes.append(("warn", translate(request.lang, "expiring", days=days_left)))
     pending = u.payments.filter(status=Payment.Status.PENDING)
+    pending_msg = ""  # shown as a status line inside the membership card (not a separate full-width bar)
     if pending.exists():
-        notes.append(("info", translate(request.lang, "pending_card_note" if pending.filter(method="card").exists() else "pending_note")))
+        pending_msg = translate(request.lang, "pending_card_note" if pending.filter(method="card").exists() else "pending_note")
     if GymSettings.load().require_phone_verify and not u.phone_verified:
         notes.append(("warn", translate(request.lang, "verify_needed")))
     stats = services.visit_stats(u)
@@ -634,7 +643,7 @@ def dashboard(request):
         "tk": tk_sum, "heat": heat, "spark": spark, "w_change": w_change, "w_last": logs[-1].weight if logs else None,
         "next_booking": nxt if next_at else None,
         "next_at": next_at.isoformat() if next_at else "", "crowd": crowd_level(), "stats_total": stats["total"],
-        "m": m, "last": last, "upcoming": upcoming, "days_left": days_left, "pct": pct, "stats": stats, "notes": notes,
+        "m": m, "last": last, "upcoming": upcoming, "days_left": days_left, "pct": pct, "stats": stats, "notes": notes, "pending_msg": pending_msg,
         "announcements": Announcement.objects.filter(active=True)[:3],
         "bookings": u.bookings.filter(date__gte=timezone.localdate()).select_related("gym_class", "gym_class__trainer")[:5],
         "can_enter": services.can_enter(u), "points": services.points(u),
@@ -841,20 +850,26 @@ def records_view(request):
         flash(request, messages.SUCCESS if rec.one_rm > prev else messages.INFO, "record_new" if rec.one_rm > prev else "record_saved",
               celebrate=rec.one_rm > prev)
         return redirect("records")
+    from .tracker_text import lift_name, tx_for
     recs = list(PersonalRecord.objects.filter(user=request.user))
     lifts = []
     for key, label in PersonalRecord.LIFTS:
+        short, sub = lift_name(key, request.lang)
         mine = sorted((r for r in recs if r.lift == key), key=lambda r: (r.date, r.id))
         if not mine:
-            lifts.append({"key": key, "label": label, "best": None})
+            lifts.append({"key": key, "label": label, "short": short, "sub": sub, "best": None})
             continue
         best = max(mine, key=lambda r: r.one_rm)
-        lo, hi = min(r.one_rm for r in mine), max(r.one_rm for r in mine)
+        last10 = mine[-10:]
+        lo, hi = min(r.one_rm for r in last10), max(r.one_rm for r in last10)
         span = (hi - lo) or 1
-        pts = " ".join(f"{round(i / max(1, len(mine) - 1) * 100, 1)},{round(90 - (r.one_rm - lo) / span * 80, 1)}" for i, r in enumerate(mine[-10:]))
-        lifts.append({"key": key, "label": label, "best": best, "n": len(mine), "spark": pts if len(mine) > 1 else "",
-                      "gain": round(mine[-1].one_rm - mine[0].one_rm, 1) if len(mine) > 1 else 0})
-    return render(request, "gym/records.html", {"lifts": lifts, "recent": recs[:12], "choices": PersonalRecord.LIFTS})
+        pts = " ".join(f"{round(i / max(1, len(last10) - 1) * 100, 1)},{round(90 - (r.one_rm - lo) / span * 80, 1)}" for i, r in enumerate(last10))
+        others = [r.one_rm for r in mine if r is not best]
+        vs_prev = round(best.one_rm - max(others), 1) if others and best.one_rm > max(others) else 0
+        lifts.append({"key": key, "label": label, "short": short, "sub": sub, "best": best, "n": len(mine), "spark": pts if len(last10) > 1 else "", "vs_prev": vs_prev})
+    preselect = request.GET.get("lift", "")
+    preselect = preselect if preselect in dict(PersonalRecord.LIFTS) else ""
+    return render(request, "gym/records.html", {"lifts": lifts, "recent": recs[:12], "choices": PersonalRecord.LIFTS, "tx": tx_for(request.lang), "preselect": preselect})
 
 
 @require_POST
@@ -1445,7 +1460,7 @@ def ask_text(request):
 
 def ask_payload(request, q):
     from . import assistant
-    lang = request.POST.get("lang") if request.POST.get("lang") in ("uz", "ru", "en") else request.lang
+    lang = request.POST.get("lang") if request.POST.get("lang") in LANGS else request.lang
     res = assistant.answer(q, lang, request.user)
     return {"ok": True, "answer": res["answer"], "links": res["links"], "matched": res["matched"], "suggest": res["suggest"],
             "approx": bool(res.get("approx"))}

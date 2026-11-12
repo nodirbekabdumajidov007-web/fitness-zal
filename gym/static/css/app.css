@@ -2683,6 +2683,212 @@ a.sw-btn{display:inline-flex;align-items:center;text-decoration:none;white-space
 
 /* theme switch tap area: 44px tall on phones, the visible track stays 52x28 */
 @media (max-width:767px),(pointer:coarse){.daynight{min-height:44px;min-width:56px;width:56px}}
+.legal-note{margin:.5rem 0 1rem;padding:.6rem .8rem;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-size:.92rem;line-height:1.5}
+
+/* === Home hero in the light theme === */
+/* The hero used to stay dark in both themes. In the light theme the photo now sits under a light veil (strongest behind the text on the left)
+   and the copy turns dark, so the top of the page follows the theme like everything below it. */
+@media (prefers-color-scheme:light){
+  :root:not([data-theme="dark"]) .cine-shade{background:linear-gradient(90deg,rgba(247,248,250,.95) 0%,rgba(247,248,250,.82) 45%,rgba(247,248,250,.35) 100%),linear-gradient(0deg,#f4f5f7 0%,rgba(244,245,247,0) 30%)}
+  :root:not([data-theme="dark"]) .cine-inner{color:#14171c}
+  :root:not([data-theme="dark"]) .cine-title{text-shadow:none}
+  :root:not([data-theme="dark"]) .cine-title .w:last-of-type>span{color:#c8321f}
+  :root:not([data-theme="dark"]) .cine-sub{color:#3a404a;text-shadow:none}
+  :root:not([data-theme="dark"]) .cine-eyebrow{color:#bd2a19;border-color:rgba(189,42,25,.45);background:rgba(255,255,255,.7)}
+  :root:not([data-theme="dark"]) .cine .btn.frost{color:#14171c;border-color:rgba(20,23,28,.35);background:rgba(255,255,255,.6)}
+  :root:not([data-theme="dark"]) .cine-down{border-color:rgba(20,23,28,.4)}
+  :root:not([data-theme="dark"]) .cine-down span{background:#14171c}
+}
+:root[data-theme="light"] .cine-shade{background:linear-gradient(90deg,rgba(247,248,250,.95) 0%,rgba(247,248,250,.82) 45%,rgba(247,248,250,.35) 100%),linear-gradient(0deg,#f4f5f7 0%,rgba(244,245,247,0) 30%)}
+:root[data-theme="light"] .cine-inner{color:#14171c}
+:root[data-theme="light"] .cine-title{text-shadow:none}
+:root[data-theme="light"] .cine-title .w:last-of-type>span{color:#c8321f}
+:root[data-theme="light"] .cine-sub{color:#3a404a;text-shadow:none}
+:root[data-theme="light"] .cine-eyebrow{color:#bd2a19;border-color:rgba(189,42,25,.45);background:rgba(255,255,255,.7)}
+:root[data-theme="light"] .cine .btn.frost{color:#14171c;border-color:rgba(20,23,28,.35);background:rgba(255,255,255,.6)}
+:root[data-theme="light"] .cine-down{border-color:rgba(20,23,28,.4)}
+:root[data-theme="light"] .cine-down span{background:#14171c}
+@media (max-width:860px){
+  :root[data-theme="light"] .cine-shade{background:linear-gradient(180deg,rgba(247,248,250,.88) 0%,rgba(247,248,250,.9) 55%,#f4f5f7 100%)}
+}
+@media (max-width:860px) and (prefers-color-scheme:light){
+  :root:not([data-theme="dark"]) .cine-shade{background:linear-gradient(180deg,rgba(247,248,250,.88) 0%,rgba(247,248,250,.9) 55%,#f4f5f7 100%)}
+}
+/* .cine pins the dark design tokens; in the light theme it takes the light ones back */
+:root[data-theme="light"] .cine{--bg:#f4f5f7;--surface:#ffffff;--ink:#14171c;--muted:#4a515c;--line:#dde1e7;color:#14171c;color-scheme:light}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .cine{--bg:#f4f5f7;--surface:#ffffff;--ink:#14171c;--muted:#4a515c;--line:#dde1e7;color:#14171c;color-scheme:light}}
+
+/* === Compact header controls (language picker + inbox bell) === */
+.tools .langpick summary{gap:6px;padding:3px 8px 3px 6px;min-height:32px;font-size:.8rem}
+.tools .langpick .flag{width:20px;height:auto}
+.tools .bell{width:32px;height:32px;min-height:32px;border-radius:10px}
+.tools .bell svg{width:16px;height:16px}
+.tools .bell b{top:-5px;right:-5px;min-width:16px;height:16px;line-height:16px;font-size:.62rem}
+@media (max-width:1023.98px),(pointer:coarse){
+  /* a little roomier for fingers, but no longer the chunky 44px squares */
+  .tools .langpick summary{min-height:36px;padding:4px 9px 4px 7px}
+  .tools .bell{width:36px;height:36px;min-height:36px}
+}
+
+/* === Compact dashboard === */
+.db-hero{display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding:12px 16px;border-radius:16px;margin-bottom:12px}
+.db-hero::after{width:120px;height:120px;right:-20px;bottom:-30px}
+.db-ava{width:48px;height:48px;border-radius:14px;font-size:1.2rem;box-shadow:0 6px 16px rgba(240,80,61,.35)}
+.db-who{flex:1 1 200px;min-width:0;gap:0}
+.db-who .eyebrow{font-size:.72rem}
+.db-who h1{font-size:clamp(1.25rem,2.2vw,1.75rem);line-height:1.15;margin:0;overflow-wrap:anywhere}
+.db-quick{flex:0 1 auto;max-width:100%;justify-content:flex-start;gap:6px;margin:0}
+.db-quick a{padding:6px 11px;gap:6px;font-size:.8rem;white-space:nowrap}
+.db-quick .ico{width:1em;height:1em}
+.note{margin:0 0 12px}
+.db-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:12px}
+.db-kpi{display:flex;flex-direction:column;justify-content:center;gap:2px;padding:12px 14px;border-radius:14px;min-width:0;text-decoration:none;color:inherit}
+a.db-kpi{transition:transform .2s,border-color .2s}a.db-kpi:hover{transform:translateY(-2px);border-color:var(--accent)}
+.db-kpi .muted{font-size:.78rem;line-height:1.25}
+.db-kpi .db-num{font-size:1.7rem;display:flex;align-items:center;gap:6px}
+.db-kpi .db-flame{font-size:1.3rem;display:inline-flex}.db-kpi .db-flame .ico{width:1.3rem;height:1.3rem}
+.db-kpi-days{flex-direction:row;align-items:center;gap:10px}
+.db-kpi-days .db-ring{width:48px;height:48px}
+.db-kpi-days .db-ring span{width:38px;height:38px}
+.db-kpi-days .db-ring b{font-size:1.05rem}
+.db-grid{grid-template-columns:repeat(12,minmax(0,1fr));grid-auto-flow:row dense;gap:12px;align-items:stretch}
+.db-tile{gap:6px;padding:14px 16px;border-radius:14px}
+.db-head h3{font-size:1rem}
+.db-mem{grid-column:span 8;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px}
+.db-mem-body{flex:1 1 240px;gap:2px;min-width:0}
+.db-mem .big{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:1.25rem}
+.db-mem-acts{margin:0;gap:8px}
+.db-mem-acts form{margin:0}
+.db-pending{font-size:.8rem;color:var(--accent);font-weight:600}
+.db-weight{grid-column:span 4}
+.db-weight .spark{height:34px}
+.db-heat{grid-column:span 4}
+.heat{display:flex;gap:3px;justify-content:flex-start}
+.heat-col{display:grid;grid-template-rows:repeat(7,14px);grid-template-columns:14px;gap:3px;flex:none}
+.heat i{aspect-ratio:auto;width:14px;height:14px;border-radius:3px;box-shadow:none}
+.heat i.on{box-shadow:none}
+.heat-legend{justify-content:flex-start}
+.db-next{grid-column:span 4}
+.db-wo{grid-column:span 4}
+.db-book,.db-news,.db-invite{grid-column:span 4}
+.db-line{font-size:.9rem}
+.db-next,.db-wo,.db-book,.db-news{align-self:start}
+.db-links{grid-column:1/-1;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.db-links a{padding:12px 14px;border-radius:14px}
+.db-links .muted{font-size:.78rem}
+.db-tile .countdown{margin-top:0}
+@media (max-width:1100px){
+  .db-kpis{grid-template-columns:repeat(6,minmax(0,1fr))}
+  .db-kpis>*{grid-column:span 2}.db-kpis>:nth-child(n+4){grid-column:span 3}
+  .db-mem{grid-column:span 12}.db-weight{grid-column:span 12}
+  .db-heat,.db-next,.db-wo,.db-book,.db-news,.db-invite{grid-column:span 6}
+  .db-links{grid-template-columns:repeat(6,minmax(0,1fr))}
+  .db-links>*{grid-column:span 2}.db-links>:nth-child(n+4){grid-column:span 3}
+}
+@media (max-width:640px){
+  .db-hero{padding:10px 12px}
+  .db-quick{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin:0 -2px;padding:2px}
+  .db-quick::-webkit-scrollbar{display:none}
+  .db-quick a{flex:none}
+  .db-kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .db-kpis>*,.db-kpis>:nth-child(n+4){grid-column:auto}
+  .db-kpi-days{flex-direction:row}
+  .db-kpi.db-kw{grid-column:1/-1}
+  .db-grid{grid-template-columns:1fr;gap:10px}
+  .db-mem,.db-weight,.db-heat,.db-next,.db-wo,.db-book,.db-news,.db-invite,.db-links{grid-column:auto}
+  .db-mem{flex-direction:column;align-items:stretch}
+  .db-mem-body{flex:none}
+  .db-links{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .db-links>*,.db-links>:nth-child(n+4){grid-column:auto}.db-links>:last-child{grid-column:1/-1}
+  .heat{overflow-x:auto}
+}
+
+/* === Tracker polish === */
+.tk-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px 20px}
+.tk-titlebox{display:grid;gap:4px;min-width:0}.tk-titlebox p{margin:0}
+.tk-top .tk-links{margin:0;align-items:center;gap:8px}
+.tk-menu{position:relative}
+.tk-menu summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;user-select:none}
+.tk-menu summary::-webkit-details-marker{display:none}
+.tk-menu-list{position:absolute;right:0;top:calc(100% + 6px);z-index:30;display:grid;min-width:210px;padding:6px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.18)}
+.tk-menu-list a{padding:10px 12px;border-radius:8px;color:var(--ink);text-decoration:none;white-space:nowrap}
+.tk-menu-list a:hover,.tk-menu-list a:focus-visible{background:var(--line)}
+.tk-kpis{gap:10px}
+.tk-kpi{gap:2px!important;padding:12px 14px!important;align-content:start}
+.tk-kpi>small{font-size:.78rem}
+.tk-kpi b{font-size:1.4rem;line-height:1.2}.tk-kpi b small{font-size:.8rem;font-weight:500;color:var(--muted)}
+.tk-sub{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;font-size:.76rem;color:var(--muted);min-height:1.3em}
+.tk-sub .pill{font-size:.72rem;padding:0 8px}
+.tk-delta{white-space:nowrap}
+.tk-need{color:#bd2a19;font-weight:600;text-decoration:underline;text-underline-offset:2px}
+:root[data-theme="dark"] .tk-need{color:var(--accent)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tk-need{color:var(--accent)}}
+.tk-entry{gap:8px!important;padding:14px 16px!important}
+.tk-entry .db-head h3{font-size:1rem}
+.tk-row1{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr auto;gap:10px;align-items:start}
+.tk-row1 label{display:grid;gap:4px;font-size:.84rem;min-width:0;align-content:start}
+.tk-row1 input,.tk-row1 select{min-height:44px;width:100%;box-sizing:border-box}
+.tk-row1 .tk-save{align-self:start;margin-top:calc(.84rem * 1.4 + 4px);min-height:44px;padding-inline:24px}
+.tk-entry [aria-invalid=true]{border-color:var(--bad)!important;outline-color:var(--bad)}
+.tk-entry .field-err{font-size:.78rem;line-height:1.25}
+.tk-more{margin-top:0}.tk-more summary{padding:2px 0;font-size:.9rem}.tk-more .tk-grid{margin-top:8px}
+.tk-goals{gap:4px!important;padding:14px 16px!important}.tk-goals .db-head h3{font-size:1rem}
+.tk-goal{gap:6px!important;padding:8px 0!important}
+.tk-goal-act{display:inline-flex;align-items:center;gap:8px}.tk-goal-act form{margin:0}
+.tk-goalbar{height:8px!important}
+.tk-goal-facts{font-size:.82rem!important}
+.tk-goalform summary{font-size:.9rem}
+.tk-goalform .tk-goalfields,.tk-goalprompt .tk-goalfields{margin-top:8px}
+.tk-goalprompt{border:1px dashed var(--line);border-radius:var(--r);background:var(--surface);padding:6px 10px}
+.tk-goalprompt>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:40px;font-size:.92rem}
+.tk-goalprompt>summary::-webkit-details-marker{display:none}
+.tk-goalprompt>summary>span:first-child{display:inline-flex;align-items:center;gap:8px;min-width:0}
+.tk-charts{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px!important}
+.tk-charts>.tk-bar,.tk-charts>[data-chart=weight],.tk-charts>.tk-compare{grid-column:1/-1}
+.tk-bar{align-items:center;gap:6px 12px!important}
+.tk-periods button{min-height:36px!important;padding:0 14px!important;font-size:.88rem}
+.tk-streak{font-size:.85rem}
+.tk-chart{padding:14px 16px!important;align-content:start}
+.tk-chart .db-head h3{font-size:1rem}
+.tk-plot{min-height:200px;display:grid;align-content:center;min-width:0}
+.tk-plot.is-empty{place-items:center;border:1px dashed var(--line);border-radius:12px;min-height:200px}
+.tk-empty{margin:0!important;padding:12px 18px;max-width:38ch;text-align:center;font-size:.9rem}
+@media (max-width:900px){.tk-charts{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:700px){
+  .tk-row1{grid-template-columns:1fr 1fr}
+  .tk-row1 .tk-save{grid-column:1/-1;margin-top:0;width:100%}
+}
+@media (max-width:520px){
+  .tk-top{align-items:stretch}.tk-top .tk-links{width:100%}
+  .tk-top .tk-links .btn.primary{flex:1 1 100%;justify-content:center;text-align:center}
+  .tk-menu-list{left:0;right:auto}
+  .tk-streak{flex-basis:100%}
+  .tk-goalprompt>summary{flex-wrap:wrap}
+}
+/* records */
+.rc-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:12px!important}
+.rc-card{padding:16px!important;gap:8px!important;opacity:1!important;border-radius:16px}
+.rc-card::after{content:none!important}
+.rc-card.empty{border-style:dashed;gap:6px!important;padding:12px 16px!important}
+.rc-head{display:flex;align-items:center;gap:10px;min-width:0}
+.rc-head h3{margin:0;font:inherit;font-size:1rem;font-weight:700;line-height:1.25;letter-spacing:0;text-transform:none;min-width:0;overflow-wrap:anywhere}
+.rc-head h3 small{display:block;font-size:.76rem;font-weight:500}
+.rc-ico{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent)}
+.rc-ico svg{width:18px;height:18px}
+.rc-card .rc-big{font-size:2.1rem}
+.rc-est{font-size:.88rem}.rc-est b{font-weight:700}
+.rc-foot{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;font-size:.8rem}
+.rc-card .spark{height:36px}
+.rc-first{display:inline-flex;align-items:center;min-height:40px;color:#bd2a19;font-weight:600;text-decoration:none}
+.rc-first:hover{text-decoration:underline}
+:root[data-theme="dark"] .rc-first{color:var(--accent)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .rc-first{color:var(--accent)}}
+.rc-form{gap:8px 10px!important}
+@media (max-width:900px){.rc-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media (max-width:479px){.rc-grid{grid-template-columns:minmax(0,1fr)!important}}
+
+/* longer Turkish / Kyrgyz / Tajik labels: the header buttons shrink instead of leaving the screen on phones */
+@media (max-width:480px){header.top .tools{gap:4px}header.top .tools .btn{padding-inline:8px;font-size:.8rem;max-width:36vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pf-tabs a{overflow:hidden;text-overflow:ellipsis}}
 
 /* Sidebar: foldable sections (Mashg'ulot, Do'kon, ...). Heading is a button; the section with the current page starts open. */
 .sb-cap .sb-fold{all:unset;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;cursor:pointer;border-radius:6px}

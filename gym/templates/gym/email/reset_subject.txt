@@ -1,1 +1,1 @@
-Fitnes Zal: parolni tiklash
+{% load gym_tags %}{% t 'reset_subject' %}

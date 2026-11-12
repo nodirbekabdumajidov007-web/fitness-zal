@@ -9,7 +9,7 @@ from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from . import assistant, assistant_kb, assistant_plan, calories
+from . import assistant, assistant_kb, assistant_kb_x, assistant_plan, calories
 from .models import BodyLog, FoodEntry, GymSettings, Membership, Plan, User, WorkoutPlan
 
 # (question, expected entry id) in Uzbek, Russian and English: site, training, nutrition
@@ -564,8 +564,11 @@ class MatchingTests(TestCase):
     def test_kb_size_and_shape(self):
         self.assertGreaterEqual(len(assistant_kb.ENTRIES), 900)
         for e in assistant_kb.ENTRIES:
-            for lang in assistant_kb.LANGS:
+            for lang in ("uz", "ru", "en"):  # tr / ky / tg texts exist for the main entries only (assistant_kb_x*.py); the rest falls back
                 self.assertTrue(e["kw"][lang] and e["a"][lang].strip(), (e["id"], lang))
+            for lang in ("tr", "ky", "tg"):
+                self.assertEqual(bool(e["kw"][lang]), e["id"] in assistant_kb_x.XT, (e["id"], lang))
+                self.assertTrue(assistant_kb.answer_text(e, lang).strip(), (e["id"], lang))
 
     def test_representative_questions(self):
         for q, lang, want in CASES:
@@ -638,7 +641,7 @@ class MatchingTests(TestCase):
             for lang in assistant_kb.LANGS:
                 if e["id"] in assistant_kb.PERSONAL:
                     continue
-                text = assistant.fill(e["a"][lang], assistant.Facts(lang))
+                text = assistant.fill(assistant_kb.answer_text(e, lang), assistant.Facts(lang))
                 self.assertNotRegex(text, r"\{\w+\}", (e["id"], lang))
 
     def test_unknown_gives_suggestions(self):

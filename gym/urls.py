@@ -54,7 +54,7 @@ urlpatterns = [
     path("forgot/", v.forgot_view, name="forgot"),
     path("reset/", v.reset_view, name="reset"),
     # password reset by e-mail: Django's built-in views with the site's own page
-    path("password/email/", auth_views.PasswordResetView.as_view(
+    path("password/email/", v.LangPasswordResetView.as_view(
         template_name="gym/pw_email.html", extra_context={"step": "ask"}, email_template_name="gym/email/reset.txt",
         subject_template_name="gym/email/reset_subject.txt", success_url="/password/email/sent/"), name="pw_email"),
     path("password/email/sent/", auth_views.PasswordResetDoneView.as_view(

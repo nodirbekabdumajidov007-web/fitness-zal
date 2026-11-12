@@ -12,53 +12,75 @@
   <div class="db-who">
     <span class="eyebrow">{% t 'hello' %} · {% now "d.m.Y" %}</span>
     <h1>{{ user.first_name }} {{ user.last_name }}</h1>
-    <div class="db-quick">
-      <a href="{% url 'card' %}"><i>▣</i>{% t 'member_card' %}</a>
-      <a href="{% url 'entry_history' %}"><i>{% icon 'clock' %}</i>{% t 'entry_title' %}</a>
-      <a href="{% url 'classes' %}"><i>{% icon 'calendar' %}</i>{% t 'nav_classes' %}</a>
-      <a href="{% url 'workouts' %}"><i>{% icon 'trending-up' %}</i>{% t 'workouts' %}</a>
-      <a href="{% url 'shop' %}"><i>{% icon 'cart' %}</i>{% t 'nav_shop' %}</a>
-      <a href="{% url 'chat' %}"><i>{% icon 'message' %}</i>{% t 'chat' %}</a>
-    </div>
   </div>
-  {% if is_open %}<span class="crowd db-crowd {{ crowd.level }}" title="{% t 'crowd_help' %}"><span class="crowd-txt">{% t 'crowd_now' %}: <b>{% t 'crowd_'|add:crowd.level %}</b></span><span class="crowd-bar"><i style="width:{{ crowd.pct }}%"></i></span></span>{% endif %}
+  <div class="db-quick">
+    <a href="{% url 'card' %}"><i>▣</i>{% t 'member_card' %}</a>
+    <a href="{% url 'entry_history' %}"><i>{% icon 'clock' %}</i>{% t 'entry_title' %}</a>
+    <a href="{% url 'classes' %}"><i>{% icon 'calendar' %}</i>{% t 'nav_classes' %}</a>
+    <a href="{% url 'workouts' %}"><i>{% icon 'trending-up' %}</i>{% t 'workouts' %}</a>
+    <a href="{% url 'shop' %}"><i>{% icon 'cart' %}</i>{% t 'nav_shop' %}</a>
+    <a href="{% url 'chat' %}"><i>{% icon 'message' %}</i>{% t 'chat' %}</a>
+  </div>
 </section>
 
 {% for kind, text in notes %}<div class="note {{ kind }}">{{ text }}</div>{% endfor %}
 
+<!-- KPI strip -->
+<div class="db-kpis">
+  <div class="card db-kpi db-kpi-days">
+    <div class="db-ring" style="--p:{{ pct|default:0 }}"><span><b class="num">{% if m %}{{ days_left }}{% else %}0{% endif %}</b></span></div>
+    <span class="muted">{% t 'days_left' %}</span>
+  </div>
+  <div class="card db-kpi db-stat">
+    <span class="muted">{% t 'visits_month' %}</span><b class="db-num num" data-count="{{ stats.month }}">{{ stats.month }}</b>
+  </div>
+  <div class="card db-kpi db-wstreak" title="{% t 'streak' %}: {{ stats.streak }}">
+    <span class="muted">{% t 'wk_streak' %}</span>
+    <b class="db-num num"><span class="db-flame{% if stats.streak or wk.weeks %} lit{% endif %}" aria-hidden="true">{% icon 'flame' %}</span>{{ wk.weeks }}</b>
+    <span class="muted num">{% t 'wk_this' done=wk.this_week need=wk.need %}</span>
+  </div>
+  <a class="card db-kpi db-pts" href="{% url 'achievements' %}">
+    <span class="muted">{% t 'points' %}</span><b class="db-num num">{{ points }}</b>
+    <span class="muted">{% t 'achievements' %} →</span>
+  </a>
+  <a class="card db-kpi db-kw" href="{% url 'progress' %}">
+    <span class="muted">{% t 'weight' %}</span><b class="db-num num">{% if w_last %}{{ w_last }}<small>kg</small>{% else %}—{% endif %}</b>
+    {% if w_change is not None %}<span class="muted num">{% if w_change > 0 %}+{% endif %}{{ w_change }} kg</span>{% endif %}
+  </a>
+</div>
+
 <div class="db-grid">
-  <!-- membership: ring of days left + check-in -->
+  <!-- membership: compact horizontal -->
   <section class="card db-tile db-mem">
-    <div class="db-ring" style="--p:{{ pct|default:0 }}"><span><b class="num">{% if m %}{{ days_left }}{% else %}0{% endif %}</b><small>{% t 'days_left' %}</small></span></div>
     <div class="db-mem-body">
       <span class="eyebrow">{% t 'membership' %}</span>
-      <div class="big">{% if m %}{% plan_name m.plan %}{% else %}{% t 'no_membership' %}{% endif %}</div>
-      {% if m %}<span class="muted num">{% t 'until' %} {{ m.expires|dmy }}</span>{% if m.is_frozen %}<span class="muted"> · {% t 'frozen_until' %} {{ m.frozen_until|dmy }}</span>{% endif %}
+      <div class="big">{% if m %}{% plan_name m.plan %}{% else %}{% t 'no_membership' %}{% endif %}
+        {% if m %}<span class="pill {% if m.is_frozen %}warn{% else %}good{% endif %}">{% if m.is_frozen %}{% t 'frozen' %}{% else %}{% t 'active' %}{% endif %}</span>{% elif last %}<span class="pill bad">{% t 'expired' %}</span>{% endif %}</div>
+      {% if m %}<span class="muted num">{% t 'until' %} {{ m.expires|dmy }}{% if m.is_frozen %} · {% t 'frozen_until' %} {{ m.frozen_until|dmy }}{% endif %}</span>
       {% elif last %}<span class="muted num">{% t 'expired' %}: {{ last.expires|dmy }}</span>{% endif %}
       {% if upcoming %}<span class="muted">{% t 'upcoming' %}: {% plan_name upcoming.plan %} · {{ upcoming.starts|dmy }}</span>{% endif %}
-      <div class="db-mem-acts">
-        {% if m %}<span class="pill {% if m.is_frozen %}warn{% else %}good{% endif %}">{% if m.is_frozen %}{% t 'frozen' %}{% else %}{% t 'active' %}{% endif %}</span>{% elif last %}<span class="pill bad">{% t 'expired' %}</span>{% endif %}
-        <form method="post" action="{% url 'checkin' %}">{% csrf_token %}<button class="btn primary pulse pill" type="submit" {% if stats.today or not can_enter %}disabled{% endif %}>{% if stats.today %}✓ {% t 'checked_in' %}{% else %}{% t 'checkin' %}{% endif %}</button></form>
-        {% if show_renew and renew_plan %}<a class="btn pill primary" href="{% url 'renew' %}">{% t 'renew_btn' %}</a>{% elif not m %}<a class="btn pill" href="{% url 'plans' %}">{% t 'buy' %}</a>{% endif %}
-        <a class="btn pill" href="{% url 'membership' %}">{% t 'ms_title' %}</a>
-      </div>
+      {% if pending_msg %}<span class="db-pending">{{ pending_msg }}</span>{% endif %}
+    </div>
+    <div class="db-mem-acts">
+      {% if stats.today %}<span class="pill good">✓ {% t 'checked_in' %}</span>
+      {% elif m and can_enter %}<form method="post" action="{% url 'checkin' %}">{% csrf_token %}<button class="btn primary pulse pill" type="submit">{% t 'checkin' %}</button></form>{% endif %}
+      {% if show_renew and renew_plan %}<a class="btn pill primary" href="{% url 'renew' %}">{% t 'renew_btn' %}</a>{% elif not m %}<a class="btn pill primary" href="{% url 'plans' %}">{% t 'buy' %}</a>{% endif %}
+      <a class="btn pill" href="{% url 'membership' %}">{% t 'ms_title' %}</a>
     </div>
   </section>
 
-  <section class="card db-tile db-streak">
-    <span class="db-flame{% if stats.streak %} lit{% endif %}" aria-hidden="true">{% icon 'flame' %}</span>
-    <b class="db-num num" data-count="{{ stats.streak }}">{{ stats.streak }}</b>
-    <span class="muted">{% t 'streak' %}</span>
-  </section>
-
-  <section class="card db-tile db-wstreak">
-    <span class="muted">{% t 'wk_streak' %}</span><b class="db-num num">{{ wk.weeks }}</b>
-    <span class="muted num">{% t 'wk_this' done=wk.this_week need=wk.need %}</span>
-  </section>
-
-  <section class="card db-tile db-stat">
-    <span class="muted">{% t 'visits_month' %}</span><b class="db-num num" data-count="{{ stats.month }}">{{ stats.month }}</b>
-    <span class="muted">{% t 'points' %}: <b class="num">{{ points }}</b> · <a href="{% url 'achievements' %}">{% t 'achievements' %} →</a></span>
+  <!-- weight trend + tracker widget -->
+  <section class="card db-tile db-weight">
+    <div class="db-head"><h3><a href="{% url 'progress' %}">{% icon 'scale' %} {% t 'weight' %}</a></h3>{% if w_change is not None %}<span class="pill {% if w_change < 0 %}good{% elif w_change > 0 %}warn{% endif %} num">{% if w_change > 0 %}+{% endif %}{{ w_change }} kg</span>{% endif %}</div>
+    {% if spark %}<svg class="spark" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="{{ spark }}" pathLength="100" vector-effect="non-scaling-stroke"/></svg>
+    {% elif not w_last %}<span class="muted">{% t 'weight_empty' %}</span>{% endif %}
+    {% with g=tk.goal %}{% if g and g.current is not None %}
+      <div class="tk-goalbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ g.pct }}" aria-label="{% t 'ftr_goal' %}"><i style="width:{{ g.pct }}%"></i></div>
+      <small class="muted num">{% t 'ftr_goal' %}: {{ g.target|floatformat:"-1" }} kg · {% t 'ftr_remaining' %} {{ g.remaining|floatformat:"-1" }} kg</small>
+    {% endif %}{% endwith %}
+    <small class="muted num">{% icon 'dumbbell' %} {% t 'ftr_this_week' %}: <b>{{ tk.week_workouts }}</b> {% t 'ftr_workouts_n' %}</small>
+    <form class="tk-quick" method="post" action="{% url 'progress_weight' %}">{% csrf_token %}<input type="hidden" name="next" value="{% url 'dashboard' %}">
+      <input name="weight" inputmode="decimal" placeholder="kg" aria-label="{% t 'weight' %}" required><button class="btn small primary" type="submit">{% t 'ftr_enter_weight' %}</button></form>
   </section>
 
   <!-- 12-week activity map -->
@@ -78,22 +100,7 @@
       <b>{{ next_booking.gym_class.name }}</b>
       <span class="muted num">{{ next_booking.date|dmy }} · {{ next_booking.gym_class.start_time|hm }}{% if next_booking.gym_class.trainer %} · {{ next_booking.gym_class.trainer.name }}{% endif %}</span>
       <div class="countdown num" data-countdown="{{ next_at }}" data-now="{% t 'starts_now' %}" data-labels="{% t 'cd_labels' %}"></div>
-    {% else %}<span class="muted">{% t 'none_yet' %}</span><a class="btn small" href="{% url 'classes' %}">{% t 'nav_classes' %} →</a>{% endif %}
-  </section>
-
-  <!-- weight trend -->
-  <section class="card db-tile db-weight">
-    <div class="db-head"><h3><a href="{% url 'progress' %}">{% icon 'scale' %} {% t 'weight' %}</a></h3>{% if w_change is not None %}<span class="pill {% if w_change < 0 %}good{% elif w_change > 0 %}warn{% endif %} num">{% if w_change > 0 %}+{% endif %}{{ w_change }} kg</span>{% endif %}</div>
-    {% if spark %}<b class="db-num num">{{ w_last }} <small>kg</small></b>
-      <svg class="spark" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="{{ spark }}" pathLength="100" vector-effect="non-scaling-stroke"/></svg>
-    {% else %}<span class="muted">{% t 'weight_empty' %}</span>{% endif %}
-    {% with g=tk.goal %}{% if g and g.current is not None %}
-      <div class="tk-goalbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ g.pct }}" aria-label="{% t 'ftr_goal' %}"><i style="width:{{ g.pct }}%"></i></div>
-      <small class="muted num">{% t 'ftr_goal' %}: {{ g.target|floatformat:"-1" }} kg · {% t 'ftr_remaining' %} {{ g.remaining|floatformat:"-1" }} kg</small>
-    {% endif %}{% endwith %}
-    <small class="muted num">{% icon 'dumbbell' %} {% t 'ftr_this_week' %}: <b>{{ tk.week_workouts }}</b> {% t 'ftr_workouts_n' %}</small>
-    <form class="tk-quick" method="post" action="{% url 'progress_weight' %}">{% csrf_token %}<input type="hidden" name="next" value="{% url 'dashboard' %}">
-      <input name="weight" inputmode="decimal" placeholder="kg" aria-label="{% t 'weight' %}" required><button class="btn small primary" type="submit">{% t 'ftr_enter_weight' %}</button></form>
+    {% else %}<span class="muted db-line">{% t 'none_yet' %} · <a href="{% url 'classes' %}">{% t 'nav_classes' %} →</a></span>{% endif %}
   </section>
 
   <!-- today's workout -->
@@ -101,11 +108,6 @@
     <div class="db-head"><h3>{% icon 'trending-up' %} {% t 'workouts' %}</h3></div>
     {% if todays %}<div class="wo-bar"><i style="width:{% widthratio done_today todays 100 %}%"></i></div><span class="muted">{% t 'today_ex' done=done_today total=todays %}</span>
     {% else %}<span class="muted">{% t 'rest_day' %}</span>{% endif %}
-  </a>
-
-  <a class="card db-tile db-cal" href="{% url 'calories' %}">
-    <div class="db-head"><h3>{% icon 'flame' %} {% t 'nav_calories' %}</h3></div>
-    <span class="muted">{% t 'cal_sub' %}</span>
   </a>
 
   <section class="card db-tile db-book">
@@ -118,7 +120,7 @@
 
   <section class="card db-tile db-news">
     <div class="db-head"><h3>{% icon 'megaphone' %} {% t 'announcements' %}</h3></div>
-    {% for a in announcements %}<div><b>{{ a.title }}</b><div class="muted">{{ a.body|truncatechars:140 }}</div></div>{% empty %}<span class="muted">{% t 'none_yet' %}</span>{% endfor %}
+    {% for a in announcements %}<div><b>{{ a.title }}</b><div class="muted">{{ a.body|truncatechars:140 }}</div></div>{% empty %}<span class="muted db-line">{% t 'none_yet' %}</span>{% endfor %}
   </section>
 
   <section class="card db-tile db-invite">
@@ -128,6 +130,7 @@
   </section>
 
   <nav class="db-links">
+    <a class="card lift db-cal" href="{% url 'calories' %}"><i>{% icon 'flame' %}</i><b>{% t 'nav_calories' %}</b><span class="muted">{% t 'cal_sub' %}</span></a>
     <a class="card lift" href="{% url 'ai' %}"><i>✦</i><b>{% t 'ai_coach' %}</b><span class="muted">{% t 'ai_coach_sub' %}</span></a>
     <a class="card lift" href="{% url 'orders' %}"><i>{% icon 'cart' %}</i><b>{% t 'orders' %}</b><span class="muted">{% t 'nav_shop' %}</span></a>
     <a class="card lift" href="{% url 'gift' %}"><i>{% icon 'gift' %}</i><b>{% t 'gift_title' %}</b><span class="muted">{% t 'gift_sub' %}</span></a>

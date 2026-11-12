@@ -16,6 +16,7 @@ from .coach_views import client_or_404, trainer_required
 from .models import BodyLog
 from .models_tracker import TrackerGoal, WorkoutSession
 from .templatetags.gym_tags import translate
+from .tracker_text import tx_for
 from .views import bmi_label, flash, safe_next
 
 JS_KEYS = ["ftr_weight", "ftr_ma7", "ftr_goal", "ftr_projection", "ftr_measures", "ftr_body_fat", "ftr_resting_hr", "ftr_strength", "ftr_volume", "ftr_workouts",
@@ -23,8 +24,22 @@ JS_KEYS = ["ftr_weight", "ftr_ma7", "ftr_goal", "ftr_projection", "ftr_measures"
            "ftr_m_waist", "ftr_m_chest", "ftr_m_hips", "ftr_m_neck", "ftr_m_arm", "ftr_m_thigh", "ftr_m_calf", "bmi", "weight", "ftr_est1rm", "ftr_streak", "ftr_adherence"]
 
 
+TX_JS = ["empty_weight", "empty_measures", "empty_fat", "empty_strength", "empty_volume", "empty_activity", "empty_calories", "v_weight", "v_height", "v_date"]
+
+
 def _labels(lang):
-    return {k.replace("_", ""): translate(lang, k) for k in JS_KEYS}  # no underscores: the page audit treats "ftr_x" words as leaked keys
+    labels = {k.replace("_", ""): translate(lang, k) for k in JS_KEYS}  # no underscores: the page audit treats "ftr_x" words as leaked keys
+    text = tx_for(lang)
+    labels.update({k.replace("_", ""): text[k] for k in TX_JS})
+    return labels
+
+
+def _fmt(v, lang, signed=False):
+    """1.2 -> '1,2' (Uzbek / Russian decimal comma); signed adds the arrow: down, up or flat."""
+    if v is None:
+        return ""
+    s = f"{abs(v):.1f}".replace(".", ",") if lang != "en" else f"{abs(v):.1f}"
+    return (("↓" if v < 0 else "↑" if v > 0 else "→") + s) if signed else s
 
 
 def _date_arg(raw, default=None):
@@ -36,7 +51,12 @@ def _date_arg(raw, default=None):
 
 def _body_rows(user, limit=30):
     logs = list(user.bodylogs.order_by("-date", "-id")[:limit])
-    return [{"l": l, "bmi": l.bmi, "label": bmi_label(l.bmi)} for l in logs]
+    height = tracker.latest_height(user)  # an entry without its own height still gets a BMI from the newest known one
+    out = []
+    for l in logs:
+        bmi = l.bmi or tracker.bmi_value(l.weight, tracker.latest_height(user, l.date) or height)
+        out.append({"l": l, "bmi": bmi, "label": bmi_label(bmi)})
+    return out
 
 
 def _context(request, user, readonly=False, data_url="", compare_url=""):
@@ -44,13 +64,13 @@ def _context(request, user, readonly=False, data_url="", compare_url=""):
     period = period if period in tracker.PERIODS else tracker.DEFAULT_PERIOD
     goals = tracker.goals_overview(user)
     last = user.bodylogs.order_by("-date", "-id").first()
+    summary = tracker.progress_summary(user)
+    summary["d7_txt"], summary["d30_txt"] = _fmt(summary["d7"], request.lang, True), _fmt(summary["d30"], request.lang, True)
     return {
         "readonly": readonly, "member": user, "compare_url": compare_url or reverse("progress_compare"), "period": period, "periods": list(tracker.PERIODS), "data_url": data_url, "goals": goals,
-        "labels": _labels(request.lang), "measures": tracker.MEASURES, "rows": _body_rows(user), "last": last,
+        "labels": _labels(request.lang), "measures": tracker.MEASURES, "rows": _body_rows(user), "last": last, "tx": tx_for(request.lang),
         "recent_sessions": list(user.workout_sessions.prefetch_related("sets")[:3]),
-        "summary": {"weight": last.weight if last else None, "bmi": last.bmi if last else None,
-                    "body_fat": next((l.body_fat for l in user.bodylogs.order_by("-date", "-id")[:30] if l.body_fat is not None), None),
-                    "week_workouts": user.workout_sessions.filter(date__gte=timezone.localdate() - timedelta(days=timezone.localdate().weekday())).count()},
+        "summary": summary,
         "today": timezone.localdate().isoformat(),
     }
 
@@ -99,7 +119,7 @@ def progress_view(request):
             v = getattr(src, k, None)
             vals[k] = "" if v is None else v
     vals["weight"] = vals["weight"] if edit or not src else src.weight  # a new entry starts from the last weight
-    ctx.update({"edit": edit, "vals": vals, "form_height": (edit.height_cm if edit else last_h), "form_date": edit.date.isoformat() if edit else ctx["today"],
+    ctx.update({"edit": edit, "vals": vals, "form_height": ((edit.height_cm or last_h) if edit else last_h), "form_date": edit.date.isoformat() if edit else ctx["today"],
                 "form_sex": u.sex})
     return render(request, "gym/tracker/progress.html", ctx)
 

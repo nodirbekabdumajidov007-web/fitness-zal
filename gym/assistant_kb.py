@@ -23,7 +23,7 @@ from .assistant_kb_site import SITE
 from .assistant_kb_site2 import SITE2
 from .assistant_kb_train import TRAIN
 
-LANGS = ("uz", "ru", "en")
+from .i18n import CHAIN, LANGS  # noqa: E402,F401  (uz, ru, en, tr, ky, tg)
 
 
 def _build():
@@ -35,14 +35,45 @@ def _build():
         seen.add(eid)
         out.append({
             "id": eid, "topic": topic,
-            "kw": {"uz": kw_uz.split("|"), "ru": kw_ru.split("|"), "en": kw_en.split("|")},
-            "a": {"uz": a_uz, "ru": a_ru, "en": a_en},
+            "kw": {"uz": kw_uz.split("|"), "ru": kw_ru.split("|"), "en": kw_en.split("|"), "tr": [], "ky": [], "tg": []},
+            "a": {"uz": a_uz, "ru": a_ru, "en": a_en, "tr": "", "ky": "", "tg": ""},
             "links": tuple(links),
         })
     return out
 
 
+def _merge_extra(entries):
+    """Turkish / Kyrgyz / Tajik keywords and answers (assistant_kb_x*.py): {id: (kw_tr, kw_ky, kw_tg, a_tr, a_ky, a_tg)}. An entry without them is
+    still found by its uz / ru / en keywords, and is answered in the fallback language (tr -> en, ky / tg -> ru); keywords can exist without an answer."""
+    from .assistant_kb_x import XT
+    by_id = {e["id"]: e for e in entries}
+    for eid, row in XT.items():
+        e = by_id.get(eid)
+        if e is None:
+            raise ValueError(f"assistant_kb_x: unknown entry id {eid}")
+        for lg, kw, ans in zip(("tr", "ky", "tg"), row[:3], row[3:]):
+            e["kw"][lg] = [k for k in kw.split("|") if k]
+            e["a"][lg] = ans
+
+
+def answer_text(entry, lang):
+    """The answer in `lang`; an entry with no text of its own in that language is answered along the fallback chain (tr -> en, ky / tg -> ru -> uz)."""
+    for lg in CHAIN.get(lang, ("uz",)):
+        if entry["a"].get(lg):
+            return entry["a"][lg]
+    return entry["a"]["uz"]
+
+
+def title_text(entry, lang):
+    """The first keyword in `lang` (the entry's title in "did you mean" chips), or in the fallback language when there is none."""
+    for lg in CHAIN.get(lang, ("uz",)):
+        if entry["kw"].get(lg):
+            return entry["kw"][lg][0]
+    return entry["kw"]["uz"][0]
+
+
 ENTRIES = _build()
+_merge_extra(ENTRIES)
 BY_ID = {e["id"]: e for e in ENTRIES}
 
 # entries that need a signed-in member (their answers are built from the member's own data)

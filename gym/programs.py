@@ -8,6 +8,8 @@ repetition is in TR (keyed by the Uzbek text), and `tr()`, `rows()`, `schedule()
 """
 import re
 
+from .programs_x import RAW as _RAWX
+
 GOALS = ("lose", "mass", "strength", "tone", "endurance")
 LEVELS = ("beginner", "intermediate", "advanced")
 PLACES = ("gym", "home")
@@ -115,16 +117,28 @@ PROGRAMS = {
 }
 
 
-LANGS = ("uz", "ru", "en")
-REST_LABEL = {"uz": "Dam", "ru": "Отдых", "en": "Rest"}  # the start of the "Dam: 60 s" note on an exercise
-_UNITS = {"uz": ("s", "daq"), "ru": ("с", "мин"), "en": ("s", "min")}  # seconds, minutes
+LANGS = ("uz", "ru", "en", "tr", "ky", "tg")
+REST_LABEL = {"uz": "Dam", "ru": "Отдых", "en": "Rest", "tr": "Dinlenme", "ky": "Эс алуу", "tg": "Истироҳат"}  # the start of the "Dam: 60 s" note on an exercise
+_UNITS = {"uz": ("s", "daq"), "ru": ("с", "мин"), "en": ("s", "min"), "tr": ("sn", "dk"), "ky": ("сек", "мүн"), "tg": ("сон", "дақ")}  # seconds, minutes
 _TIMED = re.compile(r"(\d+) (s|daq)")  # a repetition value such as "30 s" or "20 daq"
+
+
+TRX = {}  # English text -> (Turkish, Kyrgyz, Tajik)
+for _line in _RAWX.strip().splitlines():
+    _en, *_cells = _line.split("||")
+    TRX[_en] = tuple(_cells)
 
 
 def tr(text, lang="uz"):
     """`text` (written in Uzbek, as in PROGRAMS) in `lang`; the Uzbek text itself for uz, an unknown language or an unknown text."""
-    pair = TR.get(text) if lang in ("ru", "en") else None
-    return (pair[0] if lang == "ru" else pair[1]) if pair else text
+    pair = TR.get(text) if lang in ("ru", "en", "tr", "ky", "tg") else None
+    if not pair:
+        return text
+    if lang in ("ru", "en"):
+        return pair[0] if lang == "ru" else pair[1]
+    own = TRX.get(pair[1])  # Turkish / Kyrgyz / Tajik: keyed by the English text; a missing one falls back (tr -> en, ky/tg -> ru)
+    got = own[("tr", "ky", "tg").index(lang)] if own else ""
+    return got or (pair[1] if lang == "tr" else pair[0])
 
 
 def rest_label(lang="uz"):
@@ -154,7 +168,7 @@ def fmt_rest(sec, lang="uz"):
 
 def fmt_reps(reps, lang="uz"):
     m = _TIMED.fullmatch(reps)
-    if m and lang in ("ru", "en"):
+    if m and lang in ("ru", "en", "tr", "ky", "tg"):
         return f"{m.group(1)} {_UNITS[lang][0 if m.group(2) == 's' else 1]}"
     return tr(reps, lang)
 

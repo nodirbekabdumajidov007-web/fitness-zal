@@ -4,6 +4,7 @@
 <article class="card legal">
   <h1>{{ title }}</h1>
   <p class="muted">{% t 'legal_updated' %}: <span class="num">{{ page.updated|dmy }}</span></p>
+  {% if legal_notice %}<p class="legal-note" role="note">{% t legal_notice %}</p>{% endif %}
   <nav class="legal-nav">
     <a href="{% url 'oferta' %}"{% if slug == 'oferta' %} aria-current="page"{% endif %}>{% t 'ft_oferta' %}</a>
     <a href="{% url 'privacy' %}"{% if slug == 'privacy' %} aria-current="page"{% endif %}>{% t 'ft_privacy' %}</a>

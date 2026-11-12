@@ -9,6 +9,7 @@ import re
 from .food_data1 import RAW as _RAW1
 from .food_data2 import RAW as _RAW2
 from .food_names import NAMES as _NAMES
+from .food_names import NAMES_X as _NAMES_X
 
 _APOS = "ʻʼ’‘`´'"
 _NOT_WORD = re.compile(r"[^\w%]+", re.UNICODE)
@@ -41,8 +42,14 @@ class Food:
     def label(self, lang="uz"):
         """The name to show in `lang` (uz / ru / en): the explicit Russian / English name of a built-in food, else the Uzbek one.
         A member's own food always keeps the name the member typed."""
-        tr = None if self.mine or lang not in ("ru", "en") else _NAMES.get(self.name)
-        return (tr[0] if lang == "ru" else tr[1]) if tr else self.name
+        tr = None if self.mine or lang not in ("ru", "en", "tr", "ky", "tg") else _NAMES.get(self.name)
+        if not tr:
+            return self.name
+        if lang in ("ru", "en"):
+            return tr[0] if lang == "ru" else tr[1]
+        own = _NAMES_X.get(self.name)
+        got = own[("tr", "ky", "tg").index(lang)] if own else ""
+        return got or (tr[1] if lang == "tr" else tr[0])  # Turkish falls back to English, Kyrgyz / Tajik to Russian
 
     def as_dict(self, lang="uz"):
         return {"id": ("u%d" % self.id) if self.mine else str(self.id), "name": self.label(lang), "kcal": _n(self.kcal), "p": _n(self.p), "f": _n(self.f), "c": _n(self.c),
@@ -86,7 +93,7 @@ def _load():
     foods = []
     for name, k, p, f, c, piece, portion, base, inner, listed, only_listed in rows:
         auto = [x for x in [base] + inner if x]
-        shown = [plain(x) for x in _NAMES.get(name, ()) if plain(x)]  # the displayed ru / en names must find their own food too
+        shown = [plain(x) for x in _NAMES.get(name, ()) + _NAMES_X.get(name, ()) if plain(x)]  # the displayed ru / en names must find their own food too
         search = list(dict.fromkeys([plain(name)] + auto + listed + shown))
         if only_listed:
             # the whole name ("Shirchoy (sho'rva)" -> "shirchoy shorva") also counts: being the longest phrase it takes both words, so the

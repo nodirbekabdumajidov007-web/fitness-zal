@@ -3,7 +3,7 @@ import re
 
 from django.test import Client
 
-from .i18n import T
+from .i18n import LANGS, T
 from .models import Trainer, User
 from .tests_smoke import INVALID, SmokeTests
 
@@ -50,7 +50,7 @@ class FullSmokeTests(SmokeTests):
             url = reverse(p.name, kwargs=self.args_for(p.name, p.pattern.converters) or None) if p.name else "/" + str(p.pattern)
             for who, client in clients.items():
                 self.check(client, url, who)
-        for lang in ("uz", "ru", "en"):
+        for lang in LANGS:
             for client in clients.values():
                 client.get(f"/lang/{lang}/")
                 for url in ("/", "/plans/", "/shop/", "/classes/", "/trainers/", "/tools/", "/ai/", "/reviews/", "/login/", "/register/",

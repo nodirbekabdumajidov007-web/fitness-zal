@@ -657,3 +657,90 @@ class MiscTests(TrackerBase):
         self.assertEqual(d["body"][0]["waist"], 80.0)
         self.assertEqual(d["workouts"][0]["sets"][0]["exercise"], "Bench press")
         self.assertEqual(d["goals"][0]["target"], 65.0)
+
+
+class ProgressPolishTests(TrackerBase):
+    def test_bmi_uses_height_from_an_earlier_entry(self):
+        BodyLog.objects.create(user=self.u, date=self.today - timedelta(days=10), weight=Decimal("85"), height_cm=180)
+        BodyLog.objects.create(user=self.u, date=self.today, weight=Decimal("78"))  # no height of its own
+        s = self.client.get(reverse("progress")).context["summary"]
+        self.assertEqual(s["bmi"], round(78 / 1.8 ** 2, 1))
+        self.assertEqual(s["bmi_label"], "bmi_ok")
+        self.assertEqual(s["d7"], -7.0)
+        self.assertIsNone(s["d30"])
+
+    def test_height_and_sex_are_prefilled(self):
+        self.u.sex = "f"
+        self.u.save(update_fields=["sex"])
+        BodyLog.objects.create(user=self.u, date=self.today - timedelta(days=3), weight=Decimal("60"), height_cm=168)
+        r = self.client.get(reverse("progress"))
+        self.assertContains(r, 'name="height_cm" inputmode="numeric" placeholder="175" value="168"')
+        self.assertContains(r, '<option value="f" selected>')
+        self.assertNotContains(r, "data-focus=\"id_height_cm\"")
+
+    def test_unknown_height_and_body_fat_hints(self):
+        BodyLog.objects.create(user=self.u, date=self.today, weight=Decimal("50"))
+        r = self.client.get(reverse("progress"))
+        self.assertIsNone(r.context["summary"]["bmi"])
+        self.assertContains(r, 'data-focus="id_height_cm"')
+        self.assertContains(r, "data-open-more")
+        self.assertContains(r, 'id="tk-more"')
+
+    def test_header_has_one_primary_button_and_export_menu(self):
+        r = self.client.get(reverse("progress"))
+        self.assertContains(r, "data-menu")
+        self.assertContains(r, reverse("progress_export") + "?kind=workouts")
+        self.assertContains(r, reverse("workouts_log"))
+        self.assertContains(r, reverse("records"))
+        self.assertContains(r, 'class="btn primary" href="' + reverse("workout_add"))
+
+    def test_week_tile_and_goal_prompt_and_chart_empty_labels(self):
+        r = self.client.get(reverse("progress"))
+        s = r.context["summary"]
+        self.assertEqual((s["week_workouts"], s["week_target"], s["week_visits"]), (0, 3, 0))
+        self.assertContains(r, "tk-goalprompt")
+        self.assertNotContains(r, "tk-goal-top")
+        for k in ("emptyweight", "emptymeasures", "emptyfat", "emptystrength", "emptyvolume", "emptyactivity", "emptycalories", "vweight", "vheight", "vdate"):
+            self.assertIn(k, r.context["labels"])
+            self.assertTrue(r.context["labels"][k])
+
+    def test_goal_row_replaces_prompt(self):
+        BodyLog.objects.create(user=self.u, date=self.today, weight=Decimal("80"))
+        TrackerGoal.objects.create(user=self.u, kind="weight", metric="weight", target=Decimal("75"))
+        r = self.client.get(reverse("progress"))
+        self.assertContains(r, "tk-goal-top")
+        self.assertNotContains(r, "tk-goalprompt")
+
+    def test_body_fat_label(self):
+        self.assertEqual(tracker.body_fat_label("m", 8), "bf_lean")
+        self.assertEqual(tracker.body_fat_label("f", 25), "bf_ok")
+        self.assertEqual(tracker.body_fat_label("m", 30), "bf_high")
+        self.assertIsNone(tracker.body_fat_label("", 20))
+
+
+class RecordsPageTests(TrackerBase):
+    def test_empty_state_has_cards_and_first_result_links(self):
+        r = self.client.get(reverse("records"))
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.content.decode().count('class="card rc-card empty"'), 6)
+        for k in ("bench", "squat", "deadlift", "ohp", "pullup", "row"):
+            self.assertContains(r, f'data-lift="{k}"')
+            self.assertContains(r, f"?lift={k}#rc-form")
+        self.assertNotContains(r, "🏆")
+
+    def test_preselect_lift(self):
+        self.assertContains(self.client.get(reverse("records"), {"lift": "squat"}), '<option value="squat" selected>')
+        self.assertNotContains(self.client.get(reverse("records"), {"lift": "bogus"}), " selected>")
+
+    def test_card_with_records(self):
+        from .models import PersonalRecord
+        PersonalRecord.objects.create(user=self.u, lift="bench", weight=Decimal("80"), reps=5, date=self.today - timedelta(days=9))
+        PersonalRecord.objects.create(user=self.u, lift="bench", weight=Decimal("90"), reps=3, date=self.today)
+        r = self.client.get(reverse("records"))
+        bench = next(l for l in r.context["lifts"] if l["key"] == "bench")
+        self.assertEqual(bench["best"].weight, Decimal("90.0"))
+        self.assertEqual(bench["vs_prev"], round(99.0 - 93.3, 1))
+        self.assertEqual(bench["n"], 2)
+        self.assertContains(r, "<svg class=\"spark\"")
+        self.assertEqual(r.content.decode().count('class="card rc-card empty"'), 5)
+        self.assertNotContains(r, "🏆")

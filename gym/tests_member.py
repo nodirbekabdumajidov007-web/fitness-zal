@@ -46,6 +46,21 @@ class DashboardTests(Base):
             self.assertContains(r, part)
 
 
+    def test_compact_layout_without_membership(self):
+        """No membership: a Buy CTA, no disabled check-in button, no 'crowd' pill, one KPI strip (the weekly streak is merged), pending notice inside the card."""
+        Payment.objects.create(user=self.m, amount=100000, method="cash", status=Payment.Status.PENDING)
+        r = self.c.get("/dashboard/")
+        self.assertContains(r, "db-kpis")
+        self.assertEqual(r.content.decode().count("db-wstreak"), 1)
+        self.assertNotContains(r, "db-streak")
+        self.assertNotContains(r, "disabled")
+        self.assertNotContains(r, "db-crowd")
+        self.assertContains(r, "/plans/")
+        self.assertContains(r, "db-pending")
+        self.assertEqual(r.context["notes"], [])
+        self.assertTrue(r.context["pending_msg"])
+
+
 class ProgramTests(Base):
     def test_start_and_stop_program(self):
         self.assertContains(self.c.get("/workouts/"), "wo-empty")

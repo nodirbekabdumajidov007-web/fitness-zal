@@ -182,6 +182,7 @@ def tip_for(d):
 
 
 def weather_answer(lang, gs):
+    lang = lang if lang in ("uz", "ru", "en") else "en"
     lat, lng = coords(gs)
     d = get_weather(lat, lng)
     if not d:
@@ -194,11 +195,13 @@ def weather_answer(lang, gs):
 
 
 def admin_answer(lang, user):
+    lang = lang if lang in ("uz", "ru", "en") else "en"
     staff = bool(user is not None and getattr(user, "is_authenticated", False) and getattr(user, "is_staff", False))
     return L["admin_staff" if staff else "admin_other"][lang]
 
 
 def hours_answer(lang, goal=None, goal_name=""):
+    lang = lang if lang in ("uz", "ru", "en") else "en"
     """The evidence-based "how long should I train" answer, with a goal-specific paragraph when the member's goal is known."""
     extra = ""
     if goal:

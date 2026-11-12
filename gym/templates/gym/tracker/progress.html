@@ -1,39 +1,56 @@
 {% extends "gym/base.html" %}{% load gym_tags %}
 {% block title %}{% t 'progress' %}{% endblock %}
 {% block content %}
-<section class="tl-hero">
-  <span class="eyebrow">{% t 'ftr_title' %}</span>
-  <h1>{% icon 'trending-up' %} {% t 'progress' %}</h1>
-  <p class="muted">{% t 'ftr_sub' %}</p>
+<section class="tl-hero tk-top">
+  <div class="tk-titlebox">
+    <span class="eyebrow">{% t 'ftr_title' %}</span>
+    <h1>{% icon 'trending-up' %} {% t 'progress' %}</h1>
+    <p class="muted">{% t 'ftr_sub' %}</p>
+  </div>
   <div class="tk-links">
-    <a class="btn small pill" href="{% url 'workout_add' %}">＋ {% t 'ftr_add_workout' %}</a>
-    <a class="btn small pill" href="{% url 'workouts_log' %}">{% t 'ftr_history' %}</a>
+    <a class="btn primary" href="{% url 'workout_add' %}">＋ {% t 'ftr_add_workout' %}</a>
+    <a class="btn small pill" href="{% url 'workouts_log' %}">{{ tx.history }}</a>
     <a class="btn small pill" href="{% url 'records' %}">{% icon 'trophy' %} {% t 'records' %}</a>
-    <a class="btn small pill" href="{% url 'progress_export' %}">{% icon 'download' %} CSV {% t 'ftr_csv_body' %}</a>
-    <a class="btn small pill" href="{% url 'progress_export' %}?kind=workouts">{% icon 'download' %} CSV {% t 'ftr_csv_workouts' %}</a>
+    <details class="tk-menu" data-menu>
+      <summary class="btn small pill">{% icon 'download' %} {{ tx.export }} <span aria-hidden="true">▾</span></summary>
+      <div class="tk-menu-list" role="menu">
+        <a role="menuitem" href="{% url 'progress_export' %}">CSV · {% t 'ftr_csv_body' %}</a>
+        <a role="menuitem" href="{% url 'progress_export' %}?kind=workouts">CSV · {% t 'ftr_csv_workouts' %}</a>
+      </div>
+    </details>
   </div>
 </section>
 
 <div class="tk-kpis">
-  <div class="card"><small class="muted">{% t 'ftr_weight' %}</small><b class="num">{% if summary.weight %}{{ summary.weight }} kg{% else %}—{% endif %}</b></div>
-  <div class="card"><small class="muted">{% t 'bmi' %}</small><b class="num">{{ summary.bmi|default:"—" }}</b></div>
-  <div class="card"><small class="muted">{% t 'ftr_body_fat' %}</small><b class="num">{% if summary.body_fat %}{{ summary.body_fat }} %{% else %}—{% endif %}</b></div>
-  <div class="card"><small class="muted">{% t 'ftr_this_week' %}</small><b class="num">{{ summary.week_workouts }} <small>{% t 'ftr_workouts_n' %}</small></b></div>
+  <div class="card tk-kpi"><small class="muted">{% t 'ftr_weight' %}</small>
+    <b class="num">{% if summary.weight %}{{ summary.weight }} <small>kg</small>{% else %}—{% endif %}</b>
+    <span class="tk-sub">{% if summary.d7 is not None %}<span class="tk-delta num" title="{{ tx.d7 }}">{{ summary.d7_txt }} kg · {{ tx.d7 }}</span>{% endif %}{% if summary.d30 is not None %}<span class="tk-delta num" title="{{ tx.d30 }}">{{ summary.d30_txt }} kg · {{ tx.d30 }}</span>{% endif %}</span></div>
+  <div class="card tk-kpi"><small class="muted">{% t 'bmi' %}</small>
+    {% if summary.bmi %}<b class="num">{{ summary.bmi }}</b><span class="tk-sub"><span class="pill {% if summary.bmi_label == 'bmi_ok' %}good{% elif summary.bmi_label == 'bmi_obese' %}bad{% else %}warn{% endif %}">{% t summary.bmi_label %}</span></span>
+    {% elif summary.weight %}<b class="num muted">—</b><span class="tk-sub"><a class="tk-need" href="#id_height_cm" data-focus="id_height_cm">{{ tx.bmi_need_height }}</a></span>
+    {% else %}<b class="num">—</b>{% endif %}</div>
+  <div class="card tk-kpi"><small class="muted">{% t 'ftr_body_fat' %}</small>
+    {% if summary.body_fat %}<b class="num">{{ summary.body_fat }} <small>%</small></b>{% if summary.bf_label %}<span class="tk-sub"><span class="pill {% if summary.bf_label == 'bf_high' %}warn{% else %}good{% endif %}">{% if summary.bf_label == 'bf_lean' %}{{ tx.bf_lean }}{% elif summary.bf_label == 'bf_ok' %}{{ tx.bf_ok }}{% else %}{{ tx.bf_high }}{% endif %}</span></span>{% endif %}
+    {% else %}<b class="num muted">—</b><span class="tk-sub"><a class="tk-need" href="#tk-more" data-open-more>{{ tx.bf_need }}</a></span>{% endif %}</div>
+  <div class="card tk-kpi"><small class="muted">{% t 'ftr_this_week' %}</small>
+    <b class="num">{{ summary.week_workouts }}<small>/{{ summary.week_target }}</small> <small>{% t 'ftr_workouts_n' %}</small></b>
+    <span class="tk-sub"><span class="tk-delta num">{{ summary.week_visits }} {{ tx.visits_n }}</span></span></div>
 </div>
 
 {% include "gym/tracker/_goals.html" %}
 
-<form class="card tk-entry" method="post" id="tk-entry">
+<form class="card tk-entry" method="post" id="tk-entry" novalidate data-entry>
   {% csrf_token %}
   <div class="db-head"><h3>{% icon 'ruler' %} {% if edit %}{% t 'ftr_edit_entry' %}{% else %}{% t 'ftr_quick_entry' %}{% endif %}</h3>{% if edit %}<a class="btn small" href="{% url 'progress' %}">{% t 'cancel' %}</a>{% endif %}</div>
   {% if edit %}<input type="hidden" name="pk" value="{{ edit.pk }}">{% endif %}
-  <div class="tk-grid">
-    <label for="id_date">{% t 'date' %}<input id="id_date" name="date" type="date" max="{{ today }}" value="{{ form_date }}"></label>
-    <label for="id_weight">{% t 'weight' %}<input id="id_weight" name="weight" inputmode="decimal" required placeholder="72.5" value="{{ vals.weight }}"></label>
-    <label for="id_height_cm">{% t 'height' %}<input id="id_height_cm" name="height_cm" inputmode="numeric" placeholder="175" value="{{ form_height|default:'' }}"></label>
+  <div class="tk-row1">
+    <label for="id_date">{% t 'date' %}<input id="id_date" name="date" type="date" min="2000-01-01" max="{{ today }}" value="{{ form_date }}" data-check="date"></label>
+    <label for="id_weight">{% t 'weight' %} (kg)<input id="id_weight" name="weight" inputmode="decimal" required placeholder="72.5" value="{{ vals.weight }}" data-check="weight"></label>
+    <label for="id_height_cm">{% t 'height' %}<input id="id_height_cm" name="height_cm" inputmode="numeric" placeholder="175" value="{{ form_height|default:'' }}" data-check="height"></label>
     <label for="id_sex">{% t 'ftr_sex' %}<select id="id_sex" name="sex"><option value="">—</option><option value="m"{% if form_sex == 'm' %} selected{% endif %}>{% t 'ftr_sex_m' %}</option><option value="f"{% if form_sex == 'f' %} selected{% endif %}>{% t 'ftr_sex_f' %}</option></select></label>
+    <button class="btn primary tk-save" type="submit">{% t 'save' %}</button>
   </div>
-  <details class="tk-more"{% if edit %} open{% endif %}><summary>{% t 'ftr_more' %}</summary>
+  <details class="tk-more" id="tk-more" data-more{% if edit %} open data-force{% endif %}><summary>{% t 'ftr_more' %}</summary>
     <div class="tk-grid">
       <label>{% t 'ftr_m_waist' %}<input name="waist" inputmode="decimal" placeholder="cm" value="{{ vals.waist }}"></label>
       <label>{% t 'ftr_m_chest' %}<input name="chest" inputmode="decimal" placeholder="cm" value="{{ vals.chest }}"></label>
@@ -48,7 +65,6 @@
     </div>
     <p class="muted tk-hint">{% t 'ftr_bf_hint' %}</p>
   </details>
-  <div><button class="btn primary" type="submit">{% t 'save' %}</button></div>
 </form>
 
 {% include "gym/tracker/_charts.html" %}

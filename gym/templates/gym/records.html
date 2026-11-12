@@ -8,25 +8,35 @@
   <div class="tk-links"><a class="btn small pill" href="{% url 'workout_add' %}">＋ {% t 'ftr_add_workout' %}</a> <a class="btn small pill" href="{% url 'progress' %}">{% icon 'trending-up' %} {% t 'progress' %}</a></div>
 </section>
 
-<form class="card rc-form" method="post">
+<form class="card rc-form" method="post" id="rc-form">
   {% csrf_token %}
-  <label>{% t 'exercise' %}<select name="lift">{% for k, label in choices %}<option value="{{ k }}">{{ label }}</option>{% endfor %}</select></label>
+  <label>{% t 'exercise' %}<select name="lift">{% for k, label in choices %}<option value="{{ k }}"{% if k == preselect %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
   <label>{% t 'tools_lifted' %} (kg)<input name="weight" type="number" min="0" max="500" step="0.5" required placeholder="80"></label>
   <label>{% t 'reps' %}<input name="reps" type="number" min="1" max="30" value="1" required></label>
-  <button class="btn primary pill" type="submit">＋ {% t 'record_add' %}</button>
+  <button class="btn primary" type="submit">＋ {% t 'record_add' %}</button>
 </form>
 
 <div class="rc-grid">
   {% for l in lifts %}
-  <article class="card rc-card{% if not l.best %} empty{% endif %}">
-    <span class="eyebrow">{{ l.label }}</span>
-    {% if l.best %}
-      <b class="rc-big num">{{ l.best.one_rm }} <small>kg</small></b>
-      <span class="muted num">1RM · {{ l.best.weight }} kg × {{ l.best.reps }} · {{ l.best.date|dmy }}</span>
-      {% if l.spark %}<svg class="spark" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="{{ l.spark }}" pathLength="100" vector-effect="non-scaling-stroke"/></svg>{% endif %}
-      {% if l.gain %}<span class="pill {% if l.gain > 0 %}good{% else %}warn{% endif %} num">{% if l.gain > 0 %}+{% endif %}{{ l.gain }} kg · {{ l.n }} {% t 'records_entries' %}</span>{% endif %}
-    {% else %}<span class="rc-big muted">—</span><span class="muted">{% t 'records_none' %}</span>{% endif %}
+  {% if l.best %}
+  <article class="card rc-card" data-lift="{{ l.key }}">
+    <header class="rc-head"><span class="rc-ico" aria-hidden="true">{% icon 'trophy' %}</span>
+      <h3>{{ l.short }}{% if l.sub %} <small class="muted">{{ l.sub }}</small>{% endif %}</h3></header>
+    <b class="rc-big num">{{ l.best.weight|floatformat:"-1" }} <small>kg × {{ l.best.reps }}</small></b>
+    <span class="rc-est num">{{ tx.rc_est }} <b>{{ l.best.one_rm }} kg</b></span>
+    <div class="rc-foot">
+      <span class="muted num">{{ l.best.date|dmy }} · {{ l.n }} {% t 'records_entries' %}</span>
+      {% if l.vs_prev %}<span class="pill good num">+{{ l.vs_prev }} kg · {{ tx.rc_vs_prev }}</span>{% endif %}
+    </div>
+    {% if l.spark %}<svg class="spark" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="{{ l.spark }}" pathLength="100" vector-effect="non-scaling-stroke"/></svg>{% endif %}
   </article>
+  {% else %}
+  <article class="card rc-card empty" data-lift="{{ l.key }}">
+    <header class="rc-head"><span class="rc-ico" aria-hidden="true">{% icon 'trophy' %}</span>
+      <h3>{{ l.short }}{% if l.sub %} <small class="muted">{{ l.sub }}</small>{% endif %}</h3></header>
+    <a class="rc-first" href="{% url 'records' %}?lift={{ l.key }}#rc-form">＋ {{ tx.rc_first }}</a>
+  </article>
+  {% endif %}
   {% endfor %}
 </div>
 

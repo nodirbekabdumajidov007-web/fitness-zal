@@ -1,10 +1,10 @@
-Assalomu alaykum, {{ user.full_name }}!
+{% load gym_tags %}{% t 'reset_mail_hello' name=user.full_name %}
 
-Fitnes Zal saytida parolni tiklash so'raldi (login: {{ user.username }}).
-Yangi parol o'rnatish uchun quyidagi havolani oching (3 soat amal qiladi):
+{% t 'reset_mail_asked' login=user.username %}
+{% t 'reset_mail_open' %}
 
 {{ protocol }}://{{ domain }}{% url 'pw_confirm' uidb64=uid token=token %}
 
-Agar buni siz so'ramagan bo'lsangiz, bu xatga e'tibor bermang: parolingiz o'zgarmaydi.
+{% t 'reset_mail_ignore' %}
 
 — Fitnes Zal

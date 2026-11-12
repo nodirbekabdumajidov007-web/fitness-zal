@@ -1,10 +1,12 @@
 {% load gym_tags %}
+{% if goals or readonly %}
 <section class="card tk-goals">
   <div class="db-head"><h3>{% icon 'target' %} {% t 'ftr_goals' %}</h3></div>
   {% for g in goals %}
   <div class="tk-goal">
     <div class="tk-goal-top"><b>{% if g.kind == 'weight' %}{% t 'ftr_weight' %}{% elif g.kind == 'measure' %}{% if g.metric == 'body_fat' %}{% t 'ftr_body_fat' %}{% else %}{% t 'ftr_m_'|add:g.metric %}{% endif %}{% else %}{{ g.metric }}{% endif %}</b>
-      <span class="pill {% if g.state == 'reached' or g.state == 'on_track' %}good{% elif g.state == 'off_track' %}bad{% else %}mute{% endif %}">{% t 'ftr_state_'|add:g.state %}</span></div>
+      <span class="tk-goal-act"><span class="pill {% if g.state == 'reached' or g.state == 'on_track' %}good{% elif g.state == 'off_track' %}bad{% else %}mute{% endif %}">{% t 'ftr_state_'|add:g.state %}</span>
+      {% if not readonly and g.saved %}<form method="post" action="{% url 'goal_delete' g.pk %}">{% csrf_token %}<button class="btn small danger" type="submit" data-bin data-confirm="{% t 'sure' %}" aria-label="{% t 'delete' %}">{% t 'delete' %}</button></form>{% endif %}</span></div>
     {% if g.current is not None %}
     <div class="tk-goalbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ g.pct }}"><i style="width:{{ g.pct }}%"></i></div>
     <div class="tk-goal-facts num">
@@ -15,21 +17,13 @@
       {% if g.target_date %}<span>{% t 'ftr_deadline' %}: {{ g.target_date|dmy }}</span>{% endif %}
     </div>
     {% else %}<p class="muted">{% t 'ftr_goal_nodata' %}</p>{% endif %}
-    {% if not readonly and g.saved %}<form method="post" action="{% url 'goal_delete' g.pk %}">{% csrf_token %}<button class="btn small danger" type="submit" data-bin data-confirm="{% t 'sure' %}">{% t 'delete' %}</button></form>{% endif %}
   </div>
   {% empty %}<p class="muted">{% t 'ftr_no_goals' %}</p>{% endfor %}
-
-  {% if not readonly %}
-  <details class="tk-goalform"><summary>＋ {% t 'ftr_set_goal' %}</summary>
-    <form method="post" action="{% url 'goal_save' %}" class="tk-grid" data-goalform>{% csrf_token %}
-      <label>{% t 'ftr_goal_type' %}<select name="kind" data-goal-kind>
-        <option value="weight">{% t 'ftr_weight' %}</option><option value="measure">{% t 'ftr_measures' %}</option><option value="strength">{% t 'ftr_strength' %}</option></select></label>
-      <label data-for="measure" hidden>{% t 'ftr_goal_metric' %}<select name="metric" disabled>{% for m in measures %}<option value="{{ m }}">{% t 'ftr_m_'|add:m %}</option>{% endfor %}<option value="body_fat">{% t 'ftr_body_fat' %}</option></select></label>
-      <label data-for="strength" hidden>{% t 'exercise' %}<input name="metric" list="tkExercises" maxlength="80" disabled></label>
-      <label>{% t 'ftr_target' %}<input name="target" inputmode="decimal" required></label>
-      <label>{% t 'ftr_deadline' %}<input name="target_date" type="date" min="{{ today }}"></label>
-      <div><button class="btn primary" type="submit">{% t 'save' %}</button></div>
-    </form>
-  </details>
-  {% endif %}
+  {% if not readonly %}<details class="tk-goalform"><summary>＋ {% t 'ftr_set_goal' %}</summary>{% include "gym/tracker/_goalform.html" %}</details>{% endif %}
 </section>
+{% else %}
+<details class="tk-goalprompt">
+  <summary><span>{% icon 'target' %} {{ tx.goal_prompt }}</span><span class="btn small pill">＋ {% t 'ftr_set_goal' %}</span></summary>
+  {% include "gym/tracker/_goalform.html" %}
+</details>
+{% endif %}

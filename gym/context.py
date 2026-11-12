@@ -2,6 +2,7 @@ from django.conf import settings as dj
 from django.utils import timezone
 
 from . import pwa
+from .i18n import NAMES
 from .models import GymSettings
 
 
@@ -53,4 +54,4 @@ def gym(request):
             "demo_on": bool(s.demo_payments and dj.ALLOW_DEMO_PAYMENTS),
             "admin_mode": bool(request.user.is_authenticated and request.user.is_staff and request.session.get("admin_mode")),
             "push_vapid": (dj.VAPID_PUBLIC_KEY if pwa.push_enabled() else ""), "google_client_id": s.google_id(), "apple_client_id": s.apple_id(),
-            "langs": (("uz", "O'zbekcha"), ("ru", "Русский"), ("en", "English"))}
+            "langs": tuple((c, n) for c, n, _f in NAMES)}

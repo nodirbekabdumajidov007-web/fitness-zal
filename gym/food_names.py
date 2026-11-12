@@ -628,3 +628,12 @@ for _line in RAW.strip().splitlines():
     if _uz in NAMES:
         raise ValueError(f"duplicate food name: {_uz}")
     NAMES[_uz] = (_ru, _en)
+
+# {Uzbek name: (Turkish, Kyrgyz, Tajik)}: food_names_x.py is keyed by the English name; a missing / empty cell falls back (tr -> en, ky / tg -> ru)
+from .food_names_x import RAW as _RAWX  # noqa: E402
+
+_BY_EN = {}
+for _line in _RAWX.strip().splitlines():
+    _en, *_cells = (x.strip() for x in _line.split(" | "))
+    _BY_EN[_en] = tuple(_cells)
+NAMES_X = {_uz: _BY_EN[_en] for _uz, (_ru, _en) in NAMES.items() if _en in _BY_EN}

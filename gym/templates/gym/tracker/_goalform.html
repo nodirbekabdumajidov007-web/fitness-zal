@@ -1,0 +1,9 @@
+{% load gym_tags %}<form method="post" action="{% url 'goal_save' %}" class="tk-grid tk-goalfields" data-goalform>{% csrf_token %}
+  <label>{% t 'ftr_goal_type' %}<select name="kind" data-goal-kind>
+    <option value="weight">{% t 'ftr_weight' %}</option><option value="measure">{% t 'ftr_measures' %}</option><option value="strength">{% t 'ftr_strength' %}</option></select></label>
+  <label data-for="measure" hidden>{% t 'ftr_goal_metric' %}<select name="metric" disabled>{% for m in measures %}<option value="{{ m }}">{% t 'ftr_m_'|add:m %}</option>{% endfor %}<option value="body_fat">{% t 'ftr_body_fat' %}</option></select></label>
+  <label data-for="strength" hidden>{% t 'exercise' %}<input name="metric" list="tkExercises" maxlength="80" disabled></label>
+  <label>{% t 'ftr_target' %}<input name="target" inputmode="decimal" required></label>
+  <label>{% t 'ftr_deadline' %}<input name="target_date" type="date" min="{{ today }}"></label>
+  <div><button class="btn primary" type="submit">{% t 'save' %}</button></div>
+</form>

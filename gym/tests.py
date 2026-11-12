@@ -8,7 +8,7 @@ from django.test import Client, TestCase, override_settings
 from django.utils import timezone
 
 from . import services
-from .i18n import T
+from .i18n import LANGS, T
 from .models import Booking, GymClass, GymSettings, Membership, Order, Payment, Plan, Product, PromoCode, Review, User
 
 PW = "secret12"
@@ -53,7 +53,7 @@ class AuthTests(Base):
 
     def test_pages_render_in_all_languages(self):
         c, _ = self.member()
-        for lang in ("uz", "ru", "en"):
+        for lang in LANGS:
             c.cookies["fz_lang"] = lang
             for url in ("/", "/dashboard/", "/plans/", "/shop/", "/cart/", "/classes/", "/trainers/", "/progress/", "/reviews/", "/profile/", "/orders/", "/payments/"):
                 r = c.get(url)

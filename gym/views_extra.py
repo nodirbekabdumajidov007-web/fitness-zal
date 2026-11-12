@@ -260,7 +260,12 @@ def legal_view(request, slug):
     page = extras.get_legal(slug)
     if not page:
         raise Http404()
-    return render(request, "gym/legal.html", {"page": page, "title": page.title(request.lang), "body": page.body(request.lang), "slug": slug})
+    lang, notice = request.lang, ""
+    if lang in ("tr", "ky", "tg"):  # legal texts are not translated: the official Uzbek text (Russian for ky / tg when it exists) with a notice
+        shown = "ru" if lang != "tr" and page.body_ru.strip() else "uz"
+        notice = "legal_notice_ru" if shown == "ru" else "legal_notice"
+        lang = shown
+    return render(request, "gym/legal.html", {"page": page, "title": page.title(lang), "body": page.body(lang), "slug": slug, "legal_notice": notice})
 
 
 @require_POST

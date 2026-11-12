@@ -30,7 +30,8 @@
   function num(v) { return Math.round(v * 10) / 10; }
   function section(name) { return root.querySelector('[data-chart="' + name + '"]'); }
   function clear(n) { while (n.firstChild) n.removeChild(n.firstChild); }
-  function empty(plot) { clear(plot); html('p', 'muted tk-empty', plot, t('ftr_no_data')); }
+  function empty(plot, key) { clear(plot); var p = html('p', 'muted tk-empty', plot, key ? t('empty_' + key) : t('ftr_no_data')); p.setAttribute('role', 'status'); plot.classList.add('is-empty'); }
+  function filled(plot) { plot.classList.remove('is-empty'); }
 
   /* ---- generic line chart: series = [{name, color, pts:[[x, y]], dash, dots, width}], hlines = [{y, color, label}] */
   function line(plot, series, o) {
@@ -40,7 +41,8 @@
     series.forEach(function (s) { all = all.concat(s.pts); });
     (o.hlines || []).forEach(function (h) { all.push([null, h.y]); });
     var xs = all.filter(function (p) { return p[0] != null; }).map(function (p) { return p[0]; });
-    if (!xs.length) { empty(plot); return; }
+    if (!xs.length) { empty(plot, o.key); return; }
+    filled(plot);
     var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs);
     if (x1 === x0) { x0 -= 1; x1 += 1; }
     var ys = all.map(function (p) { return p[1]; });
@@ -81,7 +83,8 @@
   function bars(plot, items, colors, o) {
     o = o || {};
     clear(plot);
-    if (!items.length) { empty(plot); return; }
+    if (!items.length || !items.some(function (i) { return i.vals.some(function (v) { return v > 0; }); })) { empty(plot, o.key); return; }
+    filled(plot);
     var max = Math.max.apply(null, items.map(function (i) { return Math.max.apply(null, i.vals); }).concat([o.line || 0, 1]));
     var W = 640, H = 220, ML = 44, MR = 12, MT = 12, MB = 26, n = items.length, k = colors.length;
     var svg = el('svg', { viewBox: '0 0 ' + W + ' ' + H, 'class': 'chart tk-svg', role: 'img', 'aria-label': o.label || '' }, plot);
@@ -133,7 +136,7 @@
     if (w.goal) { hl.push({ y: w.goal.target, color: 'var(--good)', label: t('ftr_goal') + ' ' + w.goal.target }); ent.push({ name: t('ftr_goal'), color: 'var(--good)' }); }
     if (w.projection) { series.push({ name: t('ftr_projection'), color: 'var(--focus)', dash: '6 5', dots: false, pts: [[day(w.projection.d0), w.projection.v0], [day(w.projection.d1), w.projection.v1]] }); ent.push({ name: t('ftr_projection'), color: 'var(--focus)' }); }
     legend(s.querySelector('[data-legend]'), ent);
-    if (!w.points.length) empty(plot); else line(plot, series, { hlines: hl, label: t('ftr_weight') });
+    if (w.points.length < 2) { empty(plot, 'weight'); s.querySelector('[data-legend]').hidden = true; } else { s.querySelector('[data-legend]').hidden = false; line(plot, series, { hlines: hl, label: t('ftr_weight') }); }
     var ma = {};
     w.ma.forEach(function (p) { ma[p.d] = p.v; });
     table(s.querySelector('[data-table]'), [t('ftr_date'), t('ftr_weight'), t('ftr_ma7')], w.points.map(function (p) { return [fmtIso(p.d), p.v, ma[p.d]]; }));
@@ -150,7 +153,7 @@
       lab.appendChild(document.createTextNode(t('ftr_m_' + k)));
     });
     var series = keys.filter(function (k) { return !hidden[k]; }).map(function (k) { return { name: t('ftr_m_' + k), color: COLORS[keys.indexOf(k) % COLORS.length], pts: xy(ser[k]) }; });
-    if (!keys.length || !series.length) empty(plot); else line(plot, series, { label: t('ftr_measures') });
+    if (!keys.length) { empty(plot, 'measures'); lg.hidden = true; } else { lg.hidden = false; if (!series.length || !series.some(function (x) { return x.pts.length > 1; })) empty(plot, 'measures'); else line(plot, series, { label: t('ftr_measures') }); }
     var dates = {};
     keys.forEach(function (k) { ser[k].forEach(function (p) { (dates[p.d] = dates[p.d] || {})[k] = p.v; }); });
     table(s.querySelector('[data-table]'), [t('ftr_date')].concat(keys.map(function (k) { return t('ftr_m_' + k); })),
@@ -161,9 +164,10 @@
     var s = section('body_fat'), plot = s.querySelector('[data-plot]'), f = d.body_fat.points, h = d.resting_hr.points;
     clear(plot);
     legend(s.querySelector('[data-legend]'), [{ name: t('ftr_body_fat') + ' (%)', color: 'var(--accent)' }, { name: t('ftr_resting_hr') + ' (bpm)', color: 'var(--focus)' }]);
-    if (!f.length && !h.length) { empty(plot); } else {
-      if (f.length) line(html('div', '', plot), [{ name: t('ftr_body_fat'), color: 'var(--accent)', pts: xy(f) }], { h: 180, label: t('ftr_body_fat') });
-      if (h.length) line(html('div', '', plot), [{ name: t('ftr_resting_hr'), color: 'var(--focus)', pts: xy(h) }], { h: 180, label: t('ftr_resting_hr') });
+    if (f.length < 2 && h.length < 2) { empty(plot, 'fat'); s.querySelector('[data-legend]').hidden = true; } else {
+      filled(plot); s.querySelector('[data-legend]').hidden = false;
+      if (f.length > 1) line(html('div', '', plot), [{ name: t('ftr_body_fat'), color: 'var(--accent)', pts: xy(f) }], { h: 180, label: t('ftr_body_fat') });
+      if (h.length > 1) line(html('div', '', plot), [{ name: t('ftr_resting_hr'), color: 'var(--focus)', pts: xy(h) }], { h: 180, label: t('ftr_resting_hr') });
     }
     var m = {};
     f.forEach(function (p) { (m[p.d] = m[p.d] || {}).f = p.v; });
@@ -173,26 +177,27 @@
 
   function drawStrength(d) {
     var s = section('strength'), sel = s.querySelector('[data-picker]'), plot = s.querySelector('[data-plot]'), names = d.strength.exercises;
-    if (!names.length) { sel.hidden = true; empty(plot); table(s.querySelector('[data-table]'), [], []); return; }
+    if (!names.length) { sel.hidden = true; empty(plot, 'strength'); table(s.querySelector('[data-table]'), [], []); return; }
     sel.hidden = false;
     if (names.indexOf(strengthPick) < 0) strengthPick = names[0];
     clear(sel);
     names.forEach(function (n) { var o = html('option', '', sel, n); o.value = n; o.selected = n === strengthPick; });
     var pts = d.strength.series[strengthPick] || [];
-    line(plot, [{ name: strengthPick, color: 'var(--accent)', pts: xy(pts) }], { label: t('ftr_strength') + ': ' + strengthPick });
+    if (pts.length < 2) empty(plot, 'strength'); else line(plot, [{ name: strengthPick, color: 'var(--accent)', pts: xy(pts) }], { label: t('ftr_strength') + ': ' + strengthPick });
     table(s.querySelector('[data-table]'), [t('ftr_date'), t('ftr_est1rm') + ' (kg)'], pts.map(function (p) { return [fmtIso(p.d), p.v]; }));
   }
 
   function drawVolume(d) {
     var s = section('volume');
-    bars(s.querySelector('[data-plot]'), d.volume.map(function (w) { return { label: fmtDay(day(w.w)), vals: [w.v] }; }), ['var(--accent)'], { label: t('ftr_volume') });
+    bars(s.querySelector('[data-plot]'), d.volume.map(function (w) { return { label: fmtDay(day(w.w)), vals: [w.v] }; }), ['var(--accent)'], { label: t('ftr_volume'), key: 'volume' });
     table(s.querySelector('[data-table]'), [t('ftr_week'), t('ftr_volume') + ' (kg)'], d.volume.map(function (w) { return [fmtIso(w.w), w.v]; }));
   }
 
   function drawActivity(d) {
     var s = section('activity');
     legend(s.querySelector('[data-legend]'), [{ name: t('ftr_workouts'), color: 'var(--accent)' }, { name: t('ftr_visits'), color: 'var(--focus)' }]);
-    bars(s.querySelector('[data-plot]'), d.activity.map(function (w) { return { label: fmtDay(day(w.w)), vals: [w.workouts, w.visits] }; }), ['var(--accent)', 'var(--focus)'], { label: t('ftr_activity') });
+    s.querySelector('[data-legend]').hidden = !d.activity.some(function (w) { return w.workouts || w.visits; });
+    bars(s.querySelector('[data-plot]'), d.activity.map(function (w) { return { label: fmtDay(day(w.w)), vals: [w.workouts, w.visits] }; }), ['var(--accent)', 'var(--focus)'], { label: t('ftr_activity'), key: 'activity' });
     table(s.querySelector('[data-table]'), [t('ftr_week'), t('ftr_workouts'), t('ftr_visits')], d.activity.map(function (w) { return [fmtIso(w.w), w.workouts, w.visits]; }));
   }
 
@@ -201,11 +206,12 @@
     badge.textContent = c.adherence == null ? '' : t('ftr_adherence').replace('{pct}', c.adherence).replace('{n}', c.within_days).replace('{total}', c.logged_days);
     badge.hidden = c.adherence == null;
     legend(s.querySelector('[data-legend]'), [{ name: t('ftr_calories') + ' (±10%)', color: 'var(--good)' }, { name: t('ftr_calories'), color: 'var(--warn)' }]);
+    s.querySelector('[data-legend]').hidden = !c.days.length;
     var items = c.days.map(function (x) {
       var ok = Math.abs(x.kcal - x.target) <= x.target * .1;
       return { label: fmtDay(day(x.d)), vals: [x.kcal], colors: [ok ? 'var(--good)' : 'var(--warn)'] };
     });
-    bars(s.querySelector('[data-plot]'), items, ['var(--warn)'], { line: c.target, label: t('ftr_calories') });
+    bars(s.querySelector('[data-plot]'), items, ['var(--warn)'], { line: c.days.length ? c.target : 0, label: t('ftr_calories'), key: 'calories' });
     table(s.querySelector('[data-table]'), [t('ftr_date'), 'kcal', t('ftr_target')], c.days.map(function (x) { return [fmtIso(x.d), x.kcal, x.target]; }));
   }
 
@@ -267,4 +273,57 @@
 
   var firstActive = root.querySelector('[data-period][aria-pressed="true"]');
   load(firstActive ? firstActive.dataset.period : '3m');
+})();
+
+/* /progress/ quick entry: inline validation, the remembered "more measurements" state, focus links and the export menu. */
+(function () {
+  var form = document.querySelector('[data-entry]');
+  var L = {};
+  try { L = JSON.parse(document.getElementById('tkLabels').textContent); } catch (e) {}
+  function msg(k) { return L[k] || ''; }
+  var more = document.querySelector('[data-more]');
+  var KEY = 'tkMoreOpen';
+  if (more) {
+    var want = false;
+    try { want = localStorage.getItem(KEY) === '1'; } catch (e) {}
+    if (want || more.hasAttribute('data-force') || location.hash === '#tk-more') more.open = true;
+    more.addEventListener('toggle', function () { try { localStorage.setItem(KEY, more.open ? '1' : '0'); } catch (e) {} });
+  }
+  document.querySelectorAll('[data-open-more]').forEach(function (a) {
+    a.addEventListener('click', function () { if (more) { more.open = true; var f = more.querySelector('input'); if (f) setTimeout(function () { f.focus(); }, 0); } });
+  });
+  document.querySelectorAll('[data-focus]').forEach(function (a) {
+    a.addEventListener('click', function (e) { var f = document.getElementById(a.dataset.focus); if (f) { e.preventDefault(); f.scrollIntoView({ block: 'center' }); f.focus(); } });
+  });
+  var menu = document.querySelector('[data-menu]');
+  if (menu) {
+    document.addEventListener('click', function (e) { if (!menu.contains(e.target)) menu.open = false; });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && menu.open) { menu.open = false; menu.querySelector('summary').focus(); } });
+  }
+  if (!form) return;
+  var checks = {
+    weight: function (v) { v = v.replace(',', '.').trim(); if (!v) return 'vweight'; var n = Number(v); return (isNaN(n) || n < 20 || n > 400) ? 'vweight' : ''; },
+    height: function (v) { v = v.trim(); if (!v) return ''; var n = Number(v); return (isNaN(n) || n < 100 || n > 250 || Math.floor(n) !== n) ? 'vheight' : ''; },
+    date: function (v, el) { return v && el.max && v > el.max ? 'vdate' : ''; }
+  };
+  function run(el) {
+    var key = checks[el.dataset.check] ? el.dataset.check : null;
+    if (!key) return true;
+    var bad = checks[key](el.value, el), box = el.parentNode.querySelector('.field-err');
+    if (!bad) { el.removeAttribute('aria-invalid'); if (box) box.remove(); return true; }
+    el.setAttribute('aria-invalid', 'true');
+    if (!box) { box = document.createElement('small'); box.className = 'field-err'; box.setAttribute('role', 'alert'); el.parentNode.appendChild(box); }
+    box.textContent = msg(bad);
+    return false;
+  }
+  var fields = form.querySelectorAll('[data-check]');
+  fields.forEach(function (el) {
+    el.addEventListener('blur', function () { run(el); });
+    el.addEventListener('input', function () { if (el.getAttribute('aria-invalid')) run(el); });
+  });
+  form.addEventListener('submit', function (e) {
+    var first = null;
+    fields.forEach(function (el) { if (!run(el) && !first) first = el; });
+    if (first) { e.preventDefault(); first.focus(); }
+  });
 })();

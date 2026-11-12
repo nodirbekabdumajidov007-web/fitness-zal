@@ -1,4 +1,4 @@
-"""UI strings in three languages. One line per key: key||Uzbek||Russian||English"""
+"""UI strings in six languages. One line per key: key||Uzbek||Russian||English; Turkish, Kyrgyz and Tajik are in i18n_x*.py (key||tr||ky||tg)."""
 
 RAW = """
 brand||Fitnes Zal||Fitnes Zal||Fitnes Zal
@@ -569,7 +569,7 @@ zone_5||5 · Maksimum||5 · Максимум||5 · Maximum
 records||Rekordlarim||Мои рекорды||My records
 records_sub||Har bir ko'tarishni yozing: eng yaxshi natija va 1RM avtomatik hisoblanadi, yangi rekordda konfetti!||Записывайте подходы: лучший результат и 1ПМ считаются сами, новый рекорд — конфетти!||Log your lifts: best result and 1RM are worked out, and a new record gets confetti!
 record_add||Qo'shish||Добавить||Add
-record_new||🏆 Yangi rekord! Tabriklaymiz!||🏆 Новый рекорд! Поздравляем!||🏆 New personal record! Congratulations!
+record_new||Yangi rekord! Tabriklaymiz!||Новый рекорд! Поздравляем!||New personal record! Congratulations!
 record_saved||Natija saqlandi||Результат сохранён||Result saved
 record_bad||Mashq, og'irlik (0–500 kg) va takror (1–30) to'g'ri bo'lsin||Проверьте упражнение, вес (0–500) и повторы (1–30)||Check the lift, weight (0–500 kg) and reps (1–30)
 records_entries||ta yozuv||записей||entries
@@ -1510,11 +1510,57 @@ ec_mail_ignore||Agar siz so'ramagan bo'lsangiz, bu xatga e'tibor bermang: akkaun
 ec_2fa_label||Kirishda e-mailga tasdiqlash kodi||Код подтверждения на e-mail при входе||E-mail verification code at sign-in
 ec_2fa_help||Yoqilsa, parol (yoki Google) to'g'ri bo'lsa ham, e-mailingizga kelgan 6 xonali kod kerak bo'ladi.||Если включить, то даже после верного пароля (или Google) потребуется 6-значный код из e-mail.||When on, even after a correct password (or Google) a 6-digit code from your e-mail is required.
 ec_2fa_staff||Xodimlar uchun tavsiya etiladi: admin akkaunti himoyasini kuchaytiradi.||Рекомендуем для сотрудников: усиливает защиту админ-аккаунта.||Recommended for staff: it strengthens the protection of an admin account.
+legal_notice||Rasmiy matn o'zbek tilida; qulaylik uchun shu tilda ko'rsatilmoqda.||Официальный текст на узбекском языке; он показан на узбекском для удобства.||The official text is in Uzbek; it is shown in Uzbek for convenience.
+legal_notice_ru||Rasmiy matn o'zbek tilida; qulaylik uchun rus tilidagi nusxa ko'rsatilmoqda.||Официальный текст на узбекском языке; для удобства показана версия на русском.||The official text is in Uzbek; the Russian version is shown for convenience.
+reset_mail_hello||Assalomu alaykum, {name}!||Здравствуйте, {name}!||Hello, {name}!
+reset_mail_asked||Fitnes Zal saytida parolni tiklash so'raldi (login: {login}).||На сайте Fitnes Zal запросили восстановление пароля (логин: {login}).||A password reset was requested on the Fitnes Zal site (login: {login}).
+reset_mail_open||Yangi parol o'rnatish uchun quyidagi havolani oching (3 soat amal qiladi):||Чтобы задать новый пароль, откройте ссылку ниже (действует 3 часа):||To set a new password, open the link below (valid for 3 hours):
+reset_mail_ignore||Agar buni siz so'ramagan bo'lsangiz, bu xatga e'tibor bermang: parolingiz o'zgarmaydi.||Если вы этого не запрашивали, просто проигнорируйте письмо: пароль не изменится.||If you did not ask for this, ignore this e-mail: your password will not change.
+reset_subject||Fitnes Zal: parolni tiklash||Fitnes Zal: восстановление пароля||Fitnes Zal: password reset
 scan_session||Sessiya tugagan: sahifani yangilab, admin sifatida qayta kiring||Сессия истекла: обновите страницу и войдите снова как администратор||Session ended: reload the page and sign in again as admin
 """
 
-T = {"uz": {}, "ru": {}, "en": {}}
-for line in RAW.strip().splitlines():
-    key, uz, ru, en = line.split("||")
-    T["uz"][key], T["ru"][key], T["en"][key] = uz, ru, en
-LANGS = ("uz", "ru", "en")
+LANGS = ("uz", "ru", "en", "tr", "ky", "tg")
+# When a language has no text of its own (an empty cell), the next language in its chain is used: Turkish -> English -> Uzbek,
+# Kyrgyz and Tajik -> Russian -> Uzbek (most of their readers know Russian; Turkish readers usually know English).
+CHAIN = {"uz": ("uz",), "ru": ("ru", "uz"), "en": ("en", "uz"), "tr": ("tr", "en", "uz"), "ky": ("ky", "ru", "uz"), "tg": ("tg", "ru", "uz")}
+FALLBACK = {"uz": "uz", "ru": "ru", "en": "en", "tr": "en", "ky": "ru", "tg": "ru"}  # the language used when a whole feature has no own text
+NAMES = (("uz", "O'zbekcha", "🇺🇿"), ("ru", "Русский", "🇷🇺"), ("en", "English", "🇬🇧"),
+         ("tr", "Türkçe", "🇹🇷"), ("ky", "Кыргызча", "🇰🇬"), ("tg", "Тоҷикӣ", "🇹🇯"))
+EXTRA_LANGS = ("tr", "ky", "tg")
+
+
+def pick(values, lang, default=""):
+    """values: {lang: text}. The text in `lang`, or the first non-empty one along the language's fallback chain."""
+    for lg in CHAIN.get(lang, CHAIN["uz"]):
+        if values.get(lg):
+            return values[lg]
+    return default
+
+
+T = {lg: {} for lg in LANGS}
+OWN = {lg: set() for lg in EXTRA_LANGS}  # keys that have their own (not fallback) text in tr / ky / tg
+for _line in RAW.strip().splitlines():
+    _key, _uz, _ru, _en = _line.split("||")
+    T["uz"][_key], T["ru"][_key], T["en"][_key] = _uz, _ru, _en
+
+# tr / ky / tg texts live in gym/i18n_x*.py: one line per key, key||Turkish||Kyrgyz||Tajik (an empty cell falls back along CHAIN)
+from importlib import import_module  # noqa: E402
+
+for _mod in ("i18n_x1", "i18n_x2", "i18n_x3", "i18n_x4", "i18n_x5", "i18n_x6"):
+    try:
+        _raw = import_module("." + _mod, __package__).RAW
+    except ModuleNotFoundError:
+        continue
+    for _line in _raw.strip().splitlines():
+        _key, *_cells = _line.split("||")
+        if _key not in T["uz"]:
+            raise ValueError(f"i18n: unknown key {_key!r} in {_mod}")
+        for _lg, _cell in zip(EXTRA_LANGS, _cells):
+            if _cell.strip():
+                T[_lg][_key] = _cell.strip()
+                OWN[_lg].add(_key)
+for _lg in EXTRA_LANGS:
+    for _key in T["uz"]:
+        if _key not in T[_lg]:
+            T[_lg][_key] = next(T[x][_key] for x in CHAIN[_lg][1:])

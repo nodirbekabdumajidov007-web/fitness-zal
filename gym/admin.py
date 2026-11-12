@@ -892,9 +892,11 @@ class FaqItemAdmin(admin.ModelAdmin):
     list_display = ("question_uz", "category", "order", "active", "votes_yes", "votes_no")
     list_editable = ("order", "active")
     list_filter = ("category", "active")
-    search_fields = ("question_uz", "question_ru", "question_en")
+    search_fields = ("question_uz", "question_ru", "question_en", "question_tr", "question_ky", "question_tg")
     fieldsets = (("O'zbekcha", {"fields": ("question_uz", "answer_uz")}), ("Ruscha", {"fields": ("question_ru", "answer_ru")}),
-                 ("Inglizcha", {"fields": ("question_en", "answer_en")}), ("Ko'rinishi", {"fields": ("category", "order", "active")}))
+                 ("Inglizcha", {"fields": ("question_en", "answer_en")}),
+                 ("Turkcha", {"fields": ("question_tr", "answer_tr")}), ("Qirg'izcha", {"fields": ("question_ky", "answer_ky")}),
+                 ("Tojikcha", {"fields": ("question_tg", "answer_tg")}), ("Ko'rinishi", {"fields": ("category", "order", "active")}))
 
     def get_queryset(self, request):  # "Was this helpful?" votes from the support widget
         return super().get_queryset(request).annotate(_yes=Count("feedback", filter=Q(feedback__helpful=True)),

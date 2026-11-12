@@ -179,6 +179,8 @@ def build_plan(goal="general", level="beginner", days=3, equipment="gym", lang="
     """The structured plan: {"title", "notes", "goal", "level", "days_per_week", "equipment", "days": [7 x {weekday, rest, label, exercises}]}.
     Each exercise is {key, name, sets, reps, rest, note}; rest days have an empty list."""
     goal, level, days, equipment = clean(goal, level, days, equipment)
+    from .i18n import FALLBACK
+    lang = FALLBACK.get(lang, lang)  # plan texts exist in uz / ru / en: Turkish gets English, Kyrgyz and Tajik get Russian
     lang = lang if lang in LANGS else "uz"
     i = _li(lang)
     schedule, split = SCHEDULE[days], SPLITS[days]

@@ -489,7 +489,7 @@ UI_KEYS = [
     "sw_qa_label", "sw_qa_prices", "sw_qa_hours", "sw_qa_member", "sw_qa_coach", "sw_call", "sw_ask_title", "sw_ask_ph", "sw_ask_go", "sw_continue",
     "sw_ms_extend", "sw_ms_buy", "sw_online", "sw_pg_title", "sw_pg_sub", "sw_pg_chat", "sw_pg_faq", "sw_pg_all", "sw_pg_search", "sw_pg_widget_note",
 ]
-LANG_SPEECH = {"uz": "uz-UZ", "ru": "ru-RU", "en": "en-US"}
+LANG_SPEECH = {"uz": "uz-UZ", "ru": "ru-RU", "en": "en-US", "tr": "tr-TR", "ky": "ky-KG", "tg": "tg-TJ"}
 
 
 def config(request):

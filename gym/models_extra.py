@@ -177,6 +177,12 @@ class FaqItem(models.Model):
     answer_uz = models.TextField("Javob (o'zbekcha)")
     answer_ru = models.TextField("Javob (ruscha)", blank=True)
     answer_en = models.TextField("Javob (inglizcha)", blank=True)
+    question_tr = models.CharField("Savol (turkcha)", max_length=200, blank=True)
+    question_ky = models.CharField("Savol (qirg'izcha)", max_length=200, blank=True)
+    question_tg = models.CharField("Savol (tojikcha)", max_length=200, blank=True)
+    answer_tr = models.TextField("Javob (turkcha)", blank=True)
+    answer_ky = models.TextField("Javob (qirg'izcha)", blank=True)
+    answer_tg = models.TextField("Javob (tojikcha)", blank=True)
     CATEGORIES = [("general", "Umumiy"), ("membership", "Abonement"), ("payment", "To'lov"), ("classes", "Mashg'ulotlar"), ("shop", "Do'kon"), ("account", "Akkaunt")]
     category = models.CharField("Bo'lim", max_length=12, choices=CATEGORIES, blank=True,
                                 help_text="Bo'sh qoldirsangiz, savol matniga qarab avtomatik aniqlanadi (yordam oynasidagi bo'limlar uchun).")
@@ -191,10 +197,19 @@ class FaqItem(models.Model):
         return self.question_uz
 
     def q(self, lang):
-        return getattr(self, f"question_{lang}", "") or self.question_uz
+        """The question in `lang`; an empty one falls back along the language chain (tr -> en, ky / tg -> ru, then Uzbek)."""
+        return self._chain("question", lang)
 
     def a(self, lang):
-        return getattr(self, f"answer_{lang}", "") or self.answer_uz
+        return self._chain("answer", lang)
+
+    def _chain(self, field, lang):
+        from .i18n import CHAIN
+        for lg in CHAIN.get(lang, ("uz",)):
+            got = getattr(self, f"{field}_{lg}", "")
+            if got:
+                return got
+        return getattr(self, f"{field}_uz")
 
 
 class LegalPage(models.Model):

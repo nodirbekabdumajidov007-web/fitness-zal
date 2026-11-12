@@ -16,6 +16,7 @@ from django.utils import timezone
 from . import assistant, assistant_kb as kb
 from . import instagram_api as ig
 from .extras import site_url
+from .i18n import pick
 from .models import GymSettings, IgMessage, IgThread
 
 log = logging.getLogger("gym.instagram")
@@ -84,10 +85,10 @@ def build_reply(text, thread):
     res = assistant.answer(text, lang, user=thread.member)
     t = TXT
     if not res["matched"] or (res["id"] in kb.PERSONAL and thread.member is None):
-        return t["fallback"][lang], True
+        return pick(t["fallback"], lang), True
     base = site_url()
     if res["id"] == "hello":
-        return t["welcome"][lang] + (f"\n{base}" if base else ""), False
+        return pick(t["welcome"], lang) + (f"\n{base}" if base else ""), False
     out = format_dm(res["answer"])
     if base:
         lines = [f"{lk['label']}: {base}{lk['url']}" for lk in (res.get("links") or [])[:2] if str(lk.get("url", "")).startswith("/")]

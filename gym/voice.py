@@ -32,7 +32,7 @@ PAGE_LABEL = {  # id -> i18n key of the page name read out ("opening: Shop")
     "calories": "nav_calories", "dashboard": "nav_dash", "chat": "chat", "cart": "cart", "ai": "ai_coach", "tools": "tools",
     "reviews": "nav_reviews", "profile": "nav_profile", "account": "acc_title",
 }
-SPEECH_LANG = {"uz": "uz-UZ", "ru": "ru-RU", "en": "en-US"}
+SPEECH_LANG = {"uz": "uz-UZ", "ru": "ru-RU", "en": "en-US", "tr": "tr-TR", "ky": "ky-KG", "tg": "tg-TJ"}
 
 
 def _t(lang, key):

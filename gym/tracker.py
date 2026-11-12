@@ -579,6 +579,48 @@ def workout_csv_rows(user):
     return rows
 
 
+# ---------------------------------------------------------------- /progress/ tiles
+WEEK_TARGET = 3  # workouts a week that count as "on plan"
+
+
+def bmi_value(weight, height):
+    return round(float(weight) / ((height / 100) ** 2), 1) if weight and height else None
+
+
+def body_fat_label(sex, bf):
+    """'bf_lean' / 'bf_ok' / 'bf_high' (None when the sex or the value is unknown)."""
+    if bf is None or sex not in ("m", "f"):
+        return None
+    lo, hi = (10, 22) if sex == "m" else (18, 30)
+    bf = float(bf)
+    return "bf_lean" if bf < lo else "bf_ok" if bf <= hi else "bf_high"
+
+
+def _delta(user, last, days):
+    old = user.bodylogs.filter(date__lte=last.date - timedelta(days=days)).order_by("-date", "-id").first()
+    return round(float(last.weight) - float(old.weight), 1) if old else None
+
+
+def progress_summary(user, today=None):
+    """Numbers of the /progress/ tiles. The BMI uses the newest known height (the latest entry may have none); body fat is the newest value of
+    the last 30 entries; weight trends compare with the entry at least 7 / 30 days older."""
+    today = today or timezone.localdate()
+    logs = list(user.bodylogs.order_by("-date", "-id")[:30])
+    last = logs[0] if logs else None
+    height = (last.height_cm if last else None) or latest_height(user)
+    bmi = bmi_value(last.weight, height) if last else None
+    bf = next((l.body_fat for l in logs if l.body_fat is not None), None)
+    monday = today - timedelta(days=today.weekday())
+    from . import services
+    visits = sum(1 for d in services.visit_days(user) if monday <= d <= today)
+    return {
+        "weight": last.weight if last else None, "height": height, "bmi": bmi, "bmi_label": None if bmi is None else ("bmi_low" if bmi < 18.5 else "bmi_ok" if bmi < 25 else "bmi_high" if bmi < 30 else "bmi_obese"),
+        "body_fat": bf, "bf_label": body_fat_label(user.sex, bf),
+        "d7": _delta(user, last, 7) if last else None, "d30": _delta(user, last, 30) if last else None,
+        "week_workouts": user.workout_sessions.filter(date__gte=monday, date__lte=today).count(), "week_target": WEEK_TARGET, "week_visits": visits,
+    }
+
+
 # ---------------------------------------------------------------- dashboard
 def dashboard_summary(user, today=None):
     """Goal progress of the weight goal and this week's logged workouts for the dashboard tile."""

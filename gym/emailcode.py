@@ -15,6 +15,7 @@ from django.core.cache import cache
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 
+from .i18n import LANGS
 from .templatetags.gym_tags import translate
 
 TTL = 600          # a code lives 10 minutes
@@ -83,7 +84,7 @@ def _miss(key, rec):
 
 
 def send_code_mail(user, code, purpose, lang, minutes):
-    lang = lang if lang in ("uz", "ru", "en") else "uz"
+    lang = lang if lang in LANGS else "uz"
     ctx = {"code": code, "gym": "Fitnes Zal", "user": user, "lang": lang,
            "t": {k: translate(lang, k, minutes=minutes, gym="Fitnes Zal") for k in ("ec_mail_title", "ec_mail_intro", "ec_mail_valid", "ec_mail_ignore", "ec_mail_secret")}}
     subject = translate(lang, "ec_subject").format(code=code)

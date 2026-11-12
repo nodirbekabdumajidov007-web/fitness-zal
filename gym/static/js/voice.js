@@ -53,7 +53,7 @@
     if (!ttsOn || !window.speechSynthesis || !window.SpeechSynthesisUtterance || !s) return;
     try {
       var v = pickVoice();
-      if (!v && C.lang === 'uz') return;  // Uzbek voices are rare: the text answer is enough, a Russian voice would mispronounce it
+      if (!v && C.lang !== 'ru' && C.lang !== 'en') return;  // Uzbek, Turkish, Kyrgyz and Tajik voices are rare: without a matching voice the text answer is enough (another language's voice would mispronounce it)
       stopSpeak();
       var u = new SpeechSynthesisUtterance(s);
       u.lang = v ? v.lang : C.speechLang;

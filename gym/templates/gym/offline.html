@@ -32,13 +32,16 @@
 <body>
 <main>
   <img src="{% static 'img/icon-192.png' %}" alt="" width="72" height="72">
-  <h1 data-l="uz">Internet yo'q</h1><h1 data-l="ru">Нет интернета</h1><h1 data-l="en">You're offline</h1>
+  <h1 data-l="uz">Internet yo'q</h1><h1 data-l="ru">Нет интернета</h1><h1 data-l="en">You're offline</h1><h1 data-l="tr">İnternet yok</h1><h1 data-l="ky">Интернет жок</h1><h1 data-l="tg">Интернет нест</h1>
   <p data-l="uz">Aloqa tiklangach sahifa o'zi ochiladi. A'zo kartangiz (QR) avval ochilgan bo'lsa, internetsiz ham ko'rinadi.</p>
   <p data-l="ru">Страница откроется, когда появится связь. Карта участника (QR), если вы открывали её раньше, доступна и без интернета.</p>
   <p data-l="en">The page will work again once you're back online. Your member card (QR) is available offline if you opened it before.</p>
+  <p data-l="tr">Bağlantı geri geldiğinde sayfa kendiliğinden açılır. Üye kartınız (QR) daha önce açtıysanız internetsiz de görünür.</p>
+  <p data-l="ky">Байланыш кайра жаралганда барак өзү ачылат. Мүчө картаңыз (QR) мурда ачылган болсо, интернетсиз да көрүнөт.</p>
+  <p data-l="tg">Пас аз барқарор шудани алоқа саҳифа худ кушода мешавад. Корти аъзогии шумо (QR), агар пештар кушода бошед, бе интернет ҳам дастрас аст.</p>
   <div class="row">
-    <button class="btn primary" type="button" id="retry"><span data-l="uz">Qayta urinish</span><span data-l="ru">Повторить</span><span data-l="en">Try again</span></button>
-    <a class="btn" id="card" href="/card/" hidden><span data-l="uz">A'zo kartam (QR)</span><span data-l="ru">Моя карта (QR)</span><span data-l="en">My member card (QR)</span></a>
+    <button class="btn primary" type="button" id="retry"><span data-l="uz">Qayta urinish</span><span data-l="ru">Повторить</span><span data-l="en">Try again</span><span data-l="tr">Tekrar dene</span><span data-l="ky">Кайра аракет кылуу</span><span data-l="tg">Дубора кӯшиш кунед</span></button>
+    <a class="btn" id="card" href="/card/" hidden><span data-l="uz">A'zo kartam (QR)</span><span data-l="ru">Моя карта (QR)</span><span data-l="en">My member card (QR)</span><span data-l="tr">Üye kartım (QR)</span><span data-l="ky">Мүчө картам (QR)</span><span data-l="tg">Корти аъзогии ман (QR)</span></a>
   </div>
 </main>
 </body>

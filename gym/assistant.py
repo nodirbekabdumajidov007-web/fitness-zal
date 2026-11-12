@@ -25,7 +25,7 @@ from django.utils import timezone
 
 from . import assistant_kb as kb
 from . import assistant_live as live
-from .i18n import T
+from .i18n import CHAIN, FALLBACK, T, pick
 
 MAX_QUERY = 300
 THRESHOLD = 2.0
@@ -35,6 +35,13 @@ CHAT_MAX_WORDS = 4  # small talk only answers short messages, so "yaxshi" inside
 _APOS = re.compile("[ʻʼ’‘`´ʹ′']")
 _CYR = re.compile("[Ѐ-ӿ]")
 _UZ_LETTERS = re.compile("[ЎўҚқҒғҲҳ]")
+_TG_LETTERS = re.compile("[ӢӣӮӯҶҷ]")  # letters only Tajik has (Uzbek Cyrillic shares қ ғ ҳ with it)
+_KY_LETTERS = re.compile("[ҢңӨөҮү]")  # letters only Kyrgyz has
+_TR_LETTERS = re.compile("[ğışİĞŞ]")  # Turkish letters (ö ü ç are weaker evidence: other languages use them too)
+# Turkish, Kyrgyz and Tajik letters are folded to their nearest Russian / Latin letter before matching (keywords go through the same fold),
+# so "nasıl" ~ "nasil", "кандай" ~ "кандай", "үчүн" ~ "учун", "чӣ" ~ "чи"
+_FOLD = str.maketrans({"ı": "i", "ğ": "g", "ş": "s", "ç": "c", "ö": "o", "ü": "u", "â": "a", "î": "i", "û": "u",
+                       "ң": "н", "ө": "о", "ү": "у", "ӣ": "и", "ӯ": "у", "ҳ": "х", "қ": "к", "ғ": "г", "ҷ": "ч"})
 _NONWORD = re.compile(r"[\W_]+", re.UNICODE)
 
 # (suffix, shortest root that may remain). Longest suffix first; two passes.
@@ -42,6 +49,10 @@ _LAT = sorted([(s, 3) for s in (
     "larning", "lardan", "larga", "larni", "lar", "ning", "dagi", "gacha", "yapti", "yapman", "yapsiz", "moqchi", "dan", "ga", "ni", "da", "ka", "qa", "ini", "imiz", "ingiz", "miz", "ngiz",
     "im", "ing", "mi", "chi", "dir", "lik", "siz", "ish", "ib", "si", "ta", "ed", "ly", "ness")] + [("s", 4), ("e", 4), ("es", 4)],
     key=lambda p: -len(p[0]))
+_TRK = sorted([(s, 3) for s in ("lerinden", "larindan", "lerin", "larin", "leri", "lari", "lere", "lara", "lerde", "larda", "ler", "iyor", "uyor", "miyor", "mek", "mak",
+                                 "leriniz", "lariniz", "lerimiz", "larimiz", "uyorum", "iyorum", "yorum")]
+              + [(s, 4) for s in ("den", "ten", "tan", "yor", "nin", "nun", "yle", "yla", "yi", "yu", "imi", "umu", "iniz", "urum", "irim", "erim", "arim")]
+              + [("i", 5)], key=lambda p: -len(p[0]))  # Turkish endings (folded letters)
 _RU = sorted([(s, 3) for s in (
     "ами", "ями", "ого", "его", "ому", "ему", "ыми", "ими", "ать", "ять", "ить", "еть", "ует", "ают", "яют", "ешь", "ишь", "ете", "ите",
     "ется", "ится", "ает", "яет", "ая", "яя", "ое", "ее", "ие", "ые", "ий", "ый", "ой", "ей", "ом", "ем", "ам", "ям", "ах", "ях", "ов", "ев", "ою",
@@ -104,7 +115,7 @@ _SPECIFIC = ("ex_", "pg_", "hl_", "nu_", "st_", "mx_", "qa_", "sp_", "fd_", "fq_
 
 
 def normalize(text):
-    s = _APOS.sub("", str(text or "").lower()).replace("ё", "е")
+    s = _APOS.sub("", str(text or "").lower()).replace("i̇", "i").translate(_FOLD).replace("ё", "е")
     return _NONWORD.sub(" ", s).strip()
 
 
@@ -133,7 +144,7 @@ def stem(word):
         return word
     if _CYR.search(word):
         return _strip(word, _RU)
-    out = _strip(word, _LAT)
+    out = _strip(_strip(word, _LAT), _TRK)
     if out != word and out[-2:] in _DOUBLED and word.endswith(("ing", "ed", "er")):  # running -> runn -> run, swimming -> swim
         out = out[:-1]
     return out
@@ -298,6 +309,8 @@ def _rank(text):
     rows = _score(tokens(text))
     if not _CYR.search(str(text or "")):
         return rows, None
+    if _TG_LETTERS.search(text) or _KY_LETTERS.search(text):  # Tajik / Kyrgyz Cyrillic: never read as Uzbek
+        return rows, None
     alt = _score(tokens(translit(text)))
     top = lambda r: r[0][0] if r else 0.0
     if _UZ_LETTERS.search(text) or top(alt) > top(rows):
@@ -316,26 +329,60 @@ _FUNC = {
            "yoki", "mumkinmi", "bolad", "boladimi", "bolsa", "ham", "emas", "yoq", "bor", "keyin", "oldin", "kuniga", "haftasiga", "yaxshi", "qilish"},
     "en": {"the", "how", "what", "is", "are", "do", "does", "can", "i", "my", "to", "for", "of", "and", "should", "where", "when", "why", "which",
            "a", "an", "in", "on", "with", "it", "you", "your", "me", "about", "much", "many"},
+    "tr": {"nasil", "nedir", "kac", "icin", "hangi", "nerede", "nerde", "ne zaman", "zaman", "olur", "gerekir", "benim", "bana", "musun", "misin", "veya",
+           "ile", "var", "yok", "kadar", "sonra", "once", "haftada", "gunde", "yapmali", "yapilir", "nelerdir", "midir", "mudur", "ederim", "yapabilirim"},
+}
+_FUNC_CYR = {  # normalised (folded) words that tell Kyrgyz / Tajik / Russian apart in Cyrillic
+    "ky": {"кандай", "эмне", "канча", "качан", "кантип", "болот", "керек", "жок", "бар", "менин", "учун", "менен", "же", "кайда", "кайсы", "болобу",
+           "керекпи", "жана", "бул", "ушул", "мага", "сиз", "эмес", "барбы", "кайсыл", "алам", "жасайм", "кылам", "болбойт", "канткен"},
+    "tg": {"чи", "чанд", "кай", "кучо", "аст", "нест", "мумкин", "барои", "дар", "ман", "ба", "бо", "аз", "ки", "ва", "ё", "ои", "лозим", "мешавад",
+           "чаро", "кадом", "бояд", "тавр", "чунин", "оё", "кунам", "мекунам", "метавонам", "ҳаст", "хаст", "чист", "куча"},
+    "ru": {"как", "что", "какой", "какая", "какие", "сколько", "когда", "где", "почему", "можно", "нужно", "для", "это", "мне", "мой", "моя", "есть",
+           "или", "и", "в", "на", "с", "по", "от", "ли", "если", "надо", "ли", "сколько"},
 }
 
 
 def guess_lang(text, site_lang, script=None, votes=None):
-    """The language to answer in: the one the question is written in (Cyrillic -> Russian unless Uzbek, Latin -> Uzbek or English by its
-    function words and by which language's keywords matched), otherwise the site language."""
+    """The language to answer in: the one the question is written in. Cyrillic -> Uzbek (its letters ў қ ғ ҳ), Tajik (ӣ ӯ ҷ), Kyrgyz (ң ө ү) or, without
+    such letters, Russian / Kyrgyz / Tajik by function words and by which language's keywords matched; Latin -> Uzbek, English or Turkish the same way.
+    Otherwise the site language."""
     site_lang = site_lang if site_lang in kb.LANGS else "uz"
+    votes = votes or {}
     letters = [c for c in str(text or "") if c.isalpha()]
     if script == "uz":
         return "uz"
-    if letters and sum(1 for c in letters if _CYR.match(c)) * 2 > len(letters):
-        return "uz" if _UZ_LETTERS.search(text) else "ru"
     words = set(normalize(text).split())
+    if letters and sum(1 for c in letters if _CYR.match(c)) * 2 > len(letters):
+        if _TG_LETTERS.search(text):
+            return "tg"
+        if _KY_LETTERS.search(text):
+            return "ky"
+        sc = {lg: len(words & fw) for lg, fw in _FUNC_CYR.items()}
+        if _UZ_LETTERS.search(text):
+            return "tg" if (site_lang == "tg" and sc["tg"] > 0 and sc["tg"] >= sc["ky"]) else "uz"
+        for lg in ("ky", "tg", "ru"):
+            sc[lg] += 2 if votes.get(lg, 0.0) - max(votes.get(x, 0.0) for x in ("ru", "ky", "tg") if x != lg) >= 1.0 else 0
+        top = max(sc.values())
+        if top == 0:
+            return "ru" if site_lang not in ("ky", "tg") else site_lang
+        best = [lg for lg, v in sc.items() if v == top]
+        if len(best) == 1:
+            return best[0]
+        return site_lang if site_lang in best else ("ru" if "ru" in best else best[0])
     sc = {lg: len(words & fw) for lg, fw in _FUNC.items()}
-    if votes:
-        vt = {lg: votes.get(lg, 0.0) for lg in ("uz", "en")}
-        if abs(vt["uz"] - vt["en"]) >= 1.0:
-            sc[max(vt, key=vt.get)] += 2
-    if sc["uz"] != sc["en"] and max(sc.values()) >= 1 and (letters and not _CYR.search(str(text))):
-        return max(sc, key=sc.get)
+    if _TR_LETTERS.search(text):
+        sc["tr"] += 3
+    elif re.search("[öüç]", str(text).lower()):
+        sc["tr"] += 1
+    vt = {lg: votes.get(lg, 0.0) for lg in ("uz", "en", "tr")}
+    ordered = sorted(vt.values(), reverse=True)
+    if ordered[0] - ordered[1] >= 1.0:
+        sc[max(vt, key=vt.get)] += 2
+    top = max(sc.values())
+    if letters and top >= 1 and not _CYR.search(str(text)):
+        best = [lg for lg, v in sc.items() if v == top]
+        if len(best) == 1:
+            return best[0]
     return site_lang
 
 
@@ -514,6 +561,7 @@ def _calc_arith(raw, lang):
 
 def calculator(raw, lang):
     """(answer, id) for a question that is really a small calculation, else None. Pure text work: no database, no network."""
+    lang = FALLBACK.get(lang, lang)  # the calculators' sentences exist in uz / ru / en only: Turkish gets English, Kyrgyz and Tajik get Russian
     for fn in (_calc_time, _calc_arith, _calc_units, _calc_1rm, _calc_body):
         res = fn(raw, lang)
         if res:
@@ -601,7 +649,7 @@ TXT = {
 
 
 def tx(key, lang, **kw):
-    s = TXT[key].get(lang) or TXT[key]["uz"]
+    s = pick(TXT[key], lang)
     return s.format(**kw) if kw else s
 
 
@@ -676,7 +724,7 @@ class Facts:
         gs = self.gs
         if not gs.delivery_on:
             return tx("deliv_off", self.lang)
-        kw = {"fee": money(gs.delivery_fee, self.lang) if gs.delivery_fee else {"uz": "bepul", "ru": "бесплатно", "en": "free"}[self.lang],
+        kw = {"fee": money(gs.delivery_fee, self.lang) if gs.delivery_fee else pick({"uz": "bepul", "ru": "бесплатно", "en": "free", "tr": "ücretsiz"}, self.lang),
               "free": money(gs.free_delivery_from, self.lang), "area": gs.delivery_area}
         return tx("deliv_on" if gs.free_delivery_from else "deliv_on_nofree", self.lang, **kw)
 
@@ -743,15 +791,15 @@ class Facts:
 
     # ---- live answers (gym/assistant_live.py)
     def f_weather(self):
-        return live.weather_answer(self.lang, self.gs)
+        return live.weather_answer(FALLBACK.get(self.lang, self.lang), self.gs)
 
     def f_admin_help(self):
-        return live.admin_answer(self.lang, self.user)
+        return live.admin_answer(FALLBACK.get(self.lang, self.lang), self.user)
 
     def f_hours_per_day(self):
         u = self.user
         goal = u.goal if (u is not None and u.goal) else None
-        return live.hours_answer(self.lang, goal, self._goal_name(u) if goal else "")
+        return live.hours_answer(FALLBACK.get(self.lang, self.lang), goal, self._goal_name(u) if goal else "")
 
     def f_goal_tip(self):
         u, lang = self.user, self.lang
@@ -791,7 +839,7 @@ def detect_lang(text, lang):
 
 
 def title_of(entry, lang):
-    first = entry["kw"][lang][0].lstrip("!")
+    first = kb.title_text(entry, lang).lstrip("!")
     return first[:1].upper() + first[1:]
 
 
@@ -1018,10 +1066,16 @@ def _fallback(text, site_lang, lang, user, rows, script, scored):
         best = cand[0][3]
         lang = guess_lang(text, site_lang, script, _lang_votes(best, qlist))
         others = [(0.0, c[3]) for c in cand[1:12] if c[3]["id"] != best["id"] and c[1] >= APPROX_MIN_COVER * 0.5]
-        body = fill(tx("approx", lang, title=title_of(best, lang)) + "\n\n" + best["a"][lang], Facts(lang, user))
+        body = fill(tx("approx", lang, title=title_of(best, lang)) + "\n\n" + kb.answer_text(best, lang), Facts(lang, user))
         return _result(True, body, _links(best, lang), suggestions(others, lang, skip=best["id"], n=3, entry=best), best["id"], best["topic"],
                        approx=True, kind="approx")
     return _result(False, fill(tx("unk", lang), facts), _chat_links(lang), suggestions(scored, lang), None, None, kind="unknown")
+
+
+from .assistant_txt_x import TXT_X  # noqa: E402
+
+for _k, _v in TXT_X.items():  # Turkish / Kyrgyz / Tajik sentences join the three-language table (missing keys fall back along i18n.CHAIN)
+    TXT[_k].update(_v)
 
 
 def answer(text, lang="uz", user=None):
@@ -1050,5 +1104,5 @@ def answer(text, lang="uz", user=None):
     links = _links(best, lang)
     if best["id"] == "mx_admin_panel" and authed and user.is_staff:  # staff get the real link; everybody else only Dashboard / Account
         links = [{"label": _t(lang, "nav_admin"), "url": "/django-admin/"}] + links
-    return _result(True, fill(best["a"][lang], facts), links, suggestions(scored, lang, skip=best["id"], entry=best),
+    return _result(True, fill(kb.answer_text(best, lang), facts), links, suggestions(scored, lang, skip=best["id"], entry=best),
                    best["id"], best["topic"])

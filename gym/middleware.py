@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django.http import Http404
 from django.shortcuts import redirect
 
-from .i18n import LANGS
+from .i18n import EXTRA_LANGS, LANGS
 
 CSP = ("default-src 'self'; script-src 'self' https://accounts.google.com https://appleid.cdn-apple.com; "
        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com; "
@@ -13,13 +13,26 @@ CSP = ("default-src 'self'; script-src 'self' https://accounts.google.com https:
        "frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
 
 
+def browser_lang(header):
+    """First visit (no fz_lang cookie): Turkish, Kyrgyz and Tajik browsers get their own language; everybody else keeps the default (Uzbek)."""
+    for part in str(header or "").split(",")[:6]:
+        tag = part.split(";")[0].strip().lower()[:2]
+        if tag in EXTRA_LANGS:
+            return tag
+        if tag in ("uz", "ru", "en"):
+            return "uz"  # the first language the visitor listed is a known one: stop here
+    return "uz"
+
+
 class LangMiddleware:
     """request.lang comes from the fz_lang cookie (uz by default)."""
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        lang = request.COOKIES.get("fz_lang", "uz")
+        lang = request.COOKIES.get("fz_lang")
+        if lang not in LANGS:
+            lang = browser_lang(request.headers.get("Accept-Language", ""))
         request.lang = lang if lang in LANGS else "uz"
         u = getattr(request, "user", None)
         if u is not None and u.is_authenticated and u.lang != request.lang:  # the Telegram bot and reminders speak the member's language
