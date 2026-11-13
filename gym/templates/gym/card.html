@@ -1,6 +1,7 @@
 {% extends "gym/base.html" %}{% load gym_tags %}
 {% block title %}{% t 'member_card' %}{% endblock %}
 {% block content %}
+{% include "gym/_member_hero.html" with active="card" %}
 <div class="qr-page">
   <div class="seg qr-mode" role="tablist">
     <button type="button" role="tab" aria-selected="true" data-mode="2d">▣ {% t 'qr_2d' %}</button>

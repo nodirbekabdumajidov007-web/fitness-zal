@@ -1,6 +1,7 @@
 {% extends "gym/base.html" %}{% load gym_tags %}
 {% block title %}{% t 'achievements' %}{% endblock %}
 {% block content %}
+{% include "gym/_member_hero.html" with active="achievements" %}
 <div class="inline" style="align-items:center"><h2>{% t 'achievements' %}</h2><span class="pill good" style="flex:none">{{ got }} / {{ ach|length }}</span></div>
 <div class="grid g3">
   <div class="card stat"><span class="muted">{% t 'points' %}</span><b class="num">{{ points }}</b></div>

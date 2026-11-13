@@ -7,27 +7,7 @@
   <button type="button" class="btn small primary" data-pwa-install-btn>{% t 'pwa_install' %}</button>
   <button type="button" class="pwa-x" data-pwa-dismiss aria-label="{% t 'pwa_later' %}">{% icon 'x' %}</button>
 </div>
-<section class="db-hero">
-  <form class="db-ava-form" method="post" action="{% url 'profile' %}" enctype="multipart/form-data" data-avatar-form>{% csrf_token %}
-    <input type="hidden" name="form" value="avatar"><input type="hidden" name="next" value="{% url 'dashboard' %}">
-    <label class="db-ava{% if user.avatar %} has-img{% endif %}" title="{% t 'avatar_change' %}">
-      {% if user.avatar %}<img src="{{ user.avatar_src }}" alt="{{ user.full_name }}">{% else %}<span>{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>{% endif %}
-      <i class="db-ava-cam" aria-hidden="true">{% icon 'camera' %}</i>
-      <input type="file" name="avatar" accept="image/jpeg,image/png,image/webp" class="sr-only" aria-label="{% t 'avatar_change' %}">
-    </label>
-  </form>
-  <div class="db-who">
-    <span class="eyebrow">{% t 'hello' %} · {% now "d.m.Y" %}</span>
-    <h1>{{ user.first_name }} {{ user.last_name }}</h1>
-  </div>
-  <div class="db-quick">
-    <a href="{% url 'card' %}" data-card-open aria-haspopup="dialog"><i>▣</i>{% t 'member_card' %}</a>
-    <a href="{% url 'membership' %}"><i>{% icon 'ticket' %}</i>{% t 'ms_title' %}</a>
-    <a href="{% url 'entry_history' %}"><i>{% icon 'clock' %}</i>{% t 'entry_title' %}</a>
-    <a href="{% url 'records' %}"><i>{% icon 'trophy' %}</i>{% t 'records' %}</a>
-    <a href="{% url 'achievements' %}"><i>{% icon 'award' %}</i>{% t 'achievements' %}</a>
-  </div>
-</section>
+{% include "gym/_member_hero.html" %}
 
 {% for kind, text in notes %}<div class="note {{ kind }}">{{ text }}</div>{% endfor %}
 

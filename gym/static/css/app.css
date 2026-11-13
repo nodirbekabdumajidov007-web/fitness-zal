@@ -2993,3 +2993,12 @@ label.db-ava.busy{opacity:.6}
 @media (max-width:700px){.app-hero{flex-direction:column;align-items:center;text-align:center;padding:20px}.app-txt p{margin-inline:auto}.app-cta{justify-content:center}.app-cta .btn{width:100%;justify-content:center}.app-grid{grid-template-columns:1fr}}
 .app-trouble{grid-column:1/-1}
 .app-trouble .app-steps{list-style:disc;margin-bottom:0}
+
+/* member header on the card / membership / history / records / achievements pages: same bar, open page highlighted */
+.db-hero-sub{margin-bottom:18px}
+.db-who .db-name{margin:0;font-family:var(--display);font-size:clamp(1.25rem,2.2vw,1.75rem);line-height:1.15;text-transform:uppercase;overflow-wrap:anywhere}
+.db-who .db-name a{color:#fff;text-decoration:none}
+.db-who .db-name a:hover{color:#ffb4a8}
+a.db-ava{text-decoration:none}
+.db-quick a[aria-current="page"]{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 6px 18px rgba(240,80,61,.35)}
+@media (max-width:700px){.db-hero-sub .db-quick{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:-4px;padding:2px 4px}.db-hero-sub .db-quick::-webkit-scrollbar{display:none}.db-hero-sub .db-quick a{flex:none}}

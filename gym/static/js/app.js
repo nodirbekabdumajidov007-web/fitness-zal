@@ -360,3 +360,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 })();
+
+/* Member header on sub-pages: on phones the quick links scroll sideways, so start the row at the open page's link. */
+(function () {
+  var row = document.querySelector('.db-hero-sub .db-quick'), cur = row && row.querySelector('[aria-current="page"]');
+  if (!cur || row.scrollWidth <= row.clientWidth) return;
+  row.scrollLeft = Math.max(0, cur.offsetLeft - row.offsetLeft - (row.clientWidth - cur.offsetWidth) / 2);
+})();

@@ -1,6 +1,7 @@
 {% extends "gym/base.html" %}{% load gym_tags %}
 {% block title %}{% t 'entry_title' %}{% endblock %}
 {% block content %}
+{% include "gym/_member_hero.html" with active="entries" %}
 <div class="eyebrow"><a href="{% url 'card' %}">{% t 'member_card' %}</a></div>
 <h2>{% t 'entry_title' %}</h2>
 <div class="grid g2">

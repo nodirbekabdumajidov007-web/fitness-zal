@@ -1,0 +1,28 @@
+{% load gym_tags %}{# Member header with the quick links; the dashboard shows it with the avatar upload, sub-pages with the open page highlighted. #}
+<section class="db-hero{% if active %} db-hero-sub{% endif %}">
+  {% if active %}
+  <a class="db-ava{% if user.avatar %} has-img{% endif %}" href="{% url 'profile' %}" title="{% t 'avatar_change' %}">
+    {% if user.avatar %}<img src="{{ user.avatar_src }}" alt="">{% else %}<span>{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>{% endif %}
+  </a>
+  {% else %}
+  <form class="db-ava-form" method="post" action="{% url 'profile' %}" enctype="multipart/form-data" data-avatar-form>{% csrf_token %}
+    <input type="hidden" name="form" value="avatar"><input type="hidden" name="next" value="{% url 'dashboard' %}">
+    <label class="db-ava{% if user.avatar %} has-img{% endif %}" title="{% t 'avatar_change' %}">
+      {% if user.avatar %}<img src="{{ user.avatar_src }}" alt="{{ user.full_name }}">{% else %}<span>{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>{% endif %}
+      <i class="db-ava-cam" aria-hidden="true">{% icon 'camera' %}</i>
+      <input type="file" name="avatar" accept="image/jpeg,image/png,image/webp" class="sr-only" aria-label="{% t 'avatar_change' %}">
+    </label>
+  </form>
+  {% endif %}
+  <div class="db-who">
+    <span class="eyebrow">{% t 'hello' %} · {% now "d.m.Y" %}</span>
+    {% if active %}<p class="db-name"><a href="{% url 'dashboard' %}">{{ user.first_name }} {{ user.last_name }}</a></p>{% else %}<h1>{{ user.first_name }} {{ user.last_name }}</h1>{% endif %}
+  </div>
+  <nav class="db-quick" aria-label="{% t 'nav_dash' %}">
+    <a href="{% url 'card' %}"{% if not active %} data-card-open aria-haspopup="dialog"{% endif %}{% if active == 'card' %} aria-current="page"{% endif %}><i>▣</i>{% t 'member_card' %}</a>
+    <a href="{% url 'membership' %}"{% if active == 'membership' %} aria-current="page"{% endif %}><i>{% icon 'ticket' %}</i>{% t 'ms_title' %}</a>
+    <a href="{% url 'entry_history' %}"{% if active == 'entries' %} aria-current="page"{% endif %}><i>{% icon 'clock' %}</i>{% t 'entry_title' %}</a>
+    <a href="{% url 'records' %}"{% if active == 'records' %} aria-current="page"{% endif %}><i>{% icon 'trophy' %}</i>{% t 'records' %}</a>
+    <a href="{% url 'achievements' %}"{% if active == 'achievements' %} aria-current="page"{% endif %}><i>{% icon 'award' %}</i>{% t 'achievements' %}</a>
+  </nav>
+</section>

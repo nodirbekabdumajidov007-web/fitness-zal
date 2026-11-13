@@ -1,6 +1,7 @@
 {% extends "gym/base.html" %}{% load gym_tags %}
 {% block title %}{% t 'records' %}{% endblock %}
 {% block content %}
+{% include "gym/_member_hero.html" with active="records" %}
 <section class="tl-hero">
   <span class="eyebrow">{% t 'nav_progress' %}</span>
   <h1>{% icon 'trophy' %} {% t 'records' %}</h1>

@@ -1,6 +1,7 @@
 {% extends "gym/base.html" %}{% load gym_tags %}
 {% block title %}{% t 'ms_title' %}{% endblock %}
 {% block content %}
+{% include "gym/_member_hero.html" with active="membership" %}
 <h2>{% t 'ms_title' %}</h2>
 
 <section class="card grid">
