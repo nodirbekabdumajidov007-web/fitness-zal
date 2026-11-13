@@ -367,3 +367,12 @@ document.addEventListener('DOMContentLoaded', function () {
   if (!cur || row.scrollWidth <= row.clientWidth) return;
   row.scrollLeft = Math.max(0, cur.offsetLeft - row.offsetLeft - (row.clientWidth - cur.offsetWidth) / 2);
 })();
+
+/* Shop: an external product photo that fails to load shows a quiet logo placeholder instead of an empty white box. */
+document.addEventListener('error', function (e) {
+  var img = e.target, box = img && img.tagName === 'IMG' && img.closest('.prod-img');
+  if (box) box.classList.add('img-broken');
+}, true);
+document.querySelectorAll('.prod-img img').forEach(function (img) {
+  if (img.complete && img.naturalWidth === 0 && img.getAttribute('src')) img.closest('.prod-img').classList.add('img-broken');
+});

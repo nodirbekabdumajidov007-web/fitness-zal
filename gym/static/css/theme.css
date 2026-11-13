@@ -1,0 +1,100 @@
+/* Fitnes Zal design layer (2026-11). Loaded after app.css: one place for the look of every member page.
+   Keeps the brand (Spartan logo, red accent, Big Shoulders headings) and tidies the rest: calm solid background instead of the
+   photo veil, softer surfaces, one radius/shadow scale, consistent buttons, fields, chips, tables and notes. Remove the <link> to revert. */
+
+:root{
+  --bg:#f4f5f7; --surface:#ffffff; --surface-2:#f8f9fb; --ink:#12161d; --muted:#5a6271; --line:#e3e6eb; --line-strong:#cfd4dc;
+  --accent:#d6301f; --accent-soft:#fdeceA; --veil:transparent;
+  --r:12px; --r-lg:18px; --r-sm:9px;
+  --sh-1:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.06);
+  --sh-2:0 4px 10px -2px rgba(16,24,40,.07),0 2px 4px -2px rgba(16,24,40,.05);
+  --sh-3:0 18px 40px -12px rgba(16,24,40,.18);
+  --ring:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0c0e12; --surface:#15181e; --surface-2:#1a1e25; --ink:#eef0f3; --muted:#9aa3b0; --line:#252a33; --line-strong:#333a45;
+  --accent-soft:rgba(240,80,61,.14); --veil:transparent;
+  --sh-1:0 0 0 1px rgba(255,255,255,.02); --sh-2:0 6px 16px -6px rgba(0,0,0,.6); --sh-3:0 24px 50px -16px rgba(0,0,0,.75)}}
+:root[data-theme="dark"]{
+  --bg:#0c0e12; --surface:#15181e; --surface-2:#1a1e25; --ink:#eef0f3; --muted:#9aa3b0; --line:#252a33; --line-strong:#333a45;
+  --accent-soft:rgba(240,80,61,.14); --veil:transparent;
+  --sh-1:0 0 0 1px rgba(255,255,255,.02); --sh-2:0 6px 16px -6px rgba(0,0,0,.6); --sh-3:0 24px 50px -16px rgba(0,0,0,.75)}
+
+/* ---- canvas: solid, quiet background; the gym photo stays only behind the landing hero ---- */
+body{background:var(--bg);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+#bg{background:var(--bg)}
+#bg::after{background:radial-gradient(1200px 500px at 85% -10%,color-mix(in srgb,var(--accent) 6%,transparent),transparent 60%)}
+body.hero-page #bg{background:var(--bg) url("../img/gym-bg.webp") center/cover no-repeat}
+body.hero-page #bg::after{background:linear-gradient(90deg,rgba(8,10,14,.84),rgba(8,10,14,.45))}
+header.top{background-color:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);border-bottom-color:var(--line)}
+.wrap{max-width:1180px}
+main.wrap{padding-block:8px 40px}
+
+/* ---- type ---- */
+h1,h2,h3{letter-spacing:.01em}
+main h2{font-size:clamp(1.6rem,2.6vw,2.05rem)}
+main h3{font-size:1.15rem;letter-spacing:.02em}
+.eyebrow{letter-spacing:.14em;font-size:.7rem}
+p{text-wrap:pretty}
+
+/* ---- surfaces ---- */
+.card{background-color:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--sh-1);padding:20px}
+.card.lift:hover,a.card:hover{transform:translateY(-2px);box-shadow:var(--sh-2);border-color:var(--line-strong)}
+.tbl{border-radius:var(--r-lg);border-color:var(--line);box-shadow:var(--sh-1)}
+th{background-color:var(--surface-2);color:var(--muted)}
+tbody tr{transition:background-color .15s}
+tbody tr:hover{background-color:var(--surface-2)}
+tbody tr:last-child td{border-bottom:0}
+
+/* ---- buttons: filled primary, quiet secondary (no heavy ink outline) ---- */
+.btn{border-radius:var(--r);font-weight:600;letter-spacing:.005em;border:1px solid var(--line-strong);background-color:var(--surface);color:var(--ink);box-shadow:var(--sh-1)}
+.btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:var(--sh-2);border-color:color-mix(in srgb,var(--ink) 30%,var(--line-strong))}
+.btn:active:not(:disabled){transform:translateY(0) scale(.98)}
+.btn.primary{background-color:var(--accent);border-color:var(--accent);color:var(--accent-ink);box-shadow:0 1px 2px rgba(16,24,40,.08),inset 0 1px 0 rgba(255,255,255,.14)}
+.btn.primary:hover:not(:disabled){filter:brightness(1.06);box-shadow:0 8px 20px -6px color-mix(in srgb,var(--accent) 55%,transparent);border-color:var(--accent)}
+.btn.primary::after{display:none}
+.btn.danger{background-color:var(--surface);border-color:color-mix(in srgb,var(--bad) 45%,var(--line));color:var(--bad)}
+.btn.small{border-radius:var(--r-sm)}
+.btn.pill{border-radius:99px}
+
+/* ---- fields ---- */
+input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),select,textarea,.phone{background-color:var(--surface);border:1px solid var(--line-strong);border-radius:var(--r);transition:border-color .15s,box-shadow .15s}
+input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):hover,select:hover,textarea:hover{border-color:color-mix(in srgb,var(--ink) 28%,var(--line-strong))}
+input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):focus,select:focus,textarea:focus,.phone:focus-within{outline:none;border-color:var(--accent);box-shadow:var(--ring)}
+.phone input{box-shadow:none!important;border:0!important}
+input::placeholder,textarea::placeholder{color:color-mix(in srgb,var(--muted) 80%,transparent)}
+input[type=checkbox],input[type=radio]{accent-color:var(--accent)}
+label{font-weight:600;color:var(--ink)}
+
+/* ---- small parts ---- */
+.pill.good,.pill.bad,.pill.warn,.pill.mute{background-color:color-mix(in srgb,currentColor 10%,transparent);border-color:color-mix(in srgb,currentColor 30%,transparent)}
+.chips a,.chips button,.chip,button.chip{border-radius:99px;border-color:var(--line-strong);background-color:var(--surface);transition:background-color .15s,border-color .15s,color .15s}
+.chips a:hover,.chip:hover{border-color:color-mix(in srgb,var(--ink) 30%,var(--line-strong))}
+.chips a[aria-current="true"],.chips a[aria-current="page"]{background-color:var(--ink);border-color:var(--ink);color:var(--bg)}
+.seg{border-radius:var(--r);border-color:var(--line-strong);background-color:var(--surface-2);padding:3px;gap:3px}
+.seg a,.seg button{border-radius:var(--r-sm)}
+.seg a[aria-current="page"],.seg button[aria-selected="true"]{background-color:var(--surface);color:var(--ink);box-shadow:var(--sh-2)}
+.note{border-radius:var(--r);border:1px solid var(--line);border-left:3px solid var(--line-strong);background-color:var(--surface);color:var(--muted);padding:12px 14px}
+.note.info{border-color:var(--line);border-left-color:var(--focus);color:var(--ink)}
+.note.warn{border-color:var(--line);border-left-color:var(--warn);color:var(--ink)}
+.note.good,.note.ok,.note.success{border-color:var(--line);border-left-color:var(--good);color:var(--ink)}
+.note.bad,.note.error{border-color:var(--line);border-left-color:var(--bad);color:var(--ink)}
+hr{border:0;border-top:1px solid var(--line)}
+
+/* ---- sidebar: calmer active state ---- */
+.sb{background-color:var(--surface);border-right-color:var(--line)}
+.sb-nav a{border-radius:var(--r-sm)}
+.sb-nav a:hover{background-color:var(--surface-2)}
+.sb-nav a[aria-current="page"]{background-color:var(--accent-soft);color:var(--ink);font-weight:600}
+.sb-grp{border-bottom-color:var(--line)}
+
+/* ---- shop: a tidy placeholder when an external product photo fails to load ---- */
+.prod-img{background-color:var(--surface-2)}
+.prod-img.img-broken img{visibility:hidden}
+.prod-img.img-broken::before{content:"";position:absolute;inset:22%;background:url("../img/logo.png") center/contain no-repeat;opacity:.14}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .prod-img.img-broken::before{filter:invert(1);opacity:.1}}
+:root[data-theme="dark"] .prod-img.img-broken::before{filter:invert(1);opacity:.1}
+
+/* ---- motion: shorter, calmer entrance ---- */
+main>*{animation-duration:.35s}
+@media (prefers-reduced-motion:reduce){main>*{animation:none}.btn,.card{transition:none}}
