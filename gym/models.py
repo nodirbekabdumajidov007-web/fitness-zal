@@ -265,7 +265,12 @@ class GymSettings(models.Model):
 
     @classmethod
     def load(cls):
-        return cls.objects.get_or_create(pk=1)[0]
+        obj, created = cls.objects.get_or_create(pk=1)
+        if created:
+            # a fresh row still holds the raw defaults ("06:00" as text): read it back so open_time/close_time are real times,
+            # otherwise the open/closed check on every page fails with str <= time
+            obj.refresh_from_db()
+        return obj
 
     def __str__(self):
         return "Zal sozlamalari"

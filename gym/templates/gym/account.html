@@ -27,7 +27,7 @@
     <form class="acc-form" method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
       <label>{% t 'username' %} *<input name="username" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="30" value="{{ form.username.value|default:'' }}">
         {% for e in form.username.errors %}<span class="field-err">{% t e %}</span>{% endfor %}</label>
-      <label>Email *<input name="email" type="email" autocomplete="email" maxlength="254" value="{{ form.email.value|default:'' }}">
+      <label>Email<input name="email" type="email" autocomplete="email" maxlength="254" value="{{ form.email.value|default:'' }}">
         {% for e in form.email.errors %}<span class="field-err">{% t e %}</span>{% endfor %}</label>
       <label>{% t 'first_name' %}<input name="first_name" maxlength="40" autocomplete="given-name" value="{{ form.first_name.value|default:'' }}"></label>
       <label>{% t 'last_name' %}<input name="last_name" maxlength="40" autocomplete="family-name" value="{{ form.last_name.value|default:'' }}"></label>

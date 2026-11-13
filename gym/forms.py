@@ -146,7 +146,7 @@ class AccountForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ["username", "email", "first_name", "last_name", "phone"]
-        error_messages = {"username": REQUIRED, "email": {"required": "err_fields", "invalid": "err_email"}}
+        error_messages = {"username": REQUIRED, "email": {"invalid": "err_email"}}
 
     def clean_username(self):
         u = (self.cleaned_data.get("username") or "").strip()
@@ -157,9 +157,11 @@ class AccountForm(forms.ModelForm):
         return u
 
     def clean_email(self):
+        # optional: members who signed up by phone (and the seeded admin) have none, and must still be able to save their name,
+        # phone or password here. Empty is stored as NULL: the column is unique, so two "" values would clash.
         e = (self.cleaned_data.get("email") or "").strip().lower()
         if not e:
-            raise ValidationError("err_fields")
+            return None
         if User.objects.filter(email__iexact=e).exclude(pk=self.instance.pk).exists():
             raise ValidationError("err_email_taken")
         return e
