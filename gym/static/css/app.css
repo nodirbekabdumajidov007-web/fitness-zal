@@ -2991,3 +2991,5 @@ label.db-ava.busy{opacity:.6}
 .app-grid h3{display:flex;align-items:center;gap:8px;margin:0 0 10px}
 .app-steps{margin:0 0 12px;padding-left:1.3em;display:grid;gap:8px}
 @media (max-width:700px){.app-hero{flex-direction:column;align-items:center;text-align:center;padding:20px}.app-txt p{margin-inline:auto}.app-cta{justify-content:center}.app-cta .btn{width:100%;justify-content:center}.app-grid{grid-template-columns:1fr}}
+.app-trouble{grid-column:1/-1}
+.app-trouble .app-steps{list-style:disc;margin-bottom:0}
