@@ -238,7 +238,7 @@ ai_q1||En iyi 5 karın egzersizi nedir?||Эң мыкты 5 пресс көнүг
 ai_q2||Antrenmandan sonra ne yemeliyim?||Машыгуудан кийин эмне жеш керек?||Пас аз машқ чӣ бояд хӯрам?
 ai_q3||Doğru formla nasıl squat yaparım?||Туура техника менен кантип отуруп турам?||Чӣ тавр сквотро бо техникаи дуруст иҷро кунам?
 ai_thinking||Düşünüyor…||Ойлонууда…||Андеша мекунад…
-ai_placeholder||Sorunuzu yazın… (göndermek için Enter)||Суроо жазыңыз… (жөнөтүү үчүн Enter)||Саволатонро нависед… (барои фиристодан Enter)
+ai_placeholder||Sorunuzu yazın…||Суроо жазыңыз…||Саволатонро нависед…
 ai_send||Gönder||Жөнөтүү||Фиристодан
 ai_disclaimer||Asistan doktor değildir: ağrı veya hastalıkta doktora ve antrenöre başvurun.||Жардамчы дарыгер эмес: оору же ооруда дарыгерге жана машыктыруучуга кайрылыңыз.||Ёвар духтур нест: ҳангоми дард ё беморӣ ба духтур ва мураббӣ муроҷиат кунед.
 ai_plan_title||Haftalık antrenman planı||Жумалык машыгуу планы||Нақшаи машқи ҳафтаина

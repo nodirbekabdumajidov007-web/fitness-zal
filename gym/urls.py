@@ -39,6 +39,7 @@ urlpatterns = [
     path("manifest.webmanifest", pwa.manifest, name="manifest"),
     path("sw.js", pwa.service_worker, name="sw"),
     path("offline/", pwa.offline, name="offline"),
+    path("app/", pwa.app_download, name="app_download"),
     path(".well-known/assetlinks.json", pwa.assetlinks, name="assetlinks"),
     path("favicon.ico", RedirectView.as_view(url="/static/img/favicon.ico", permanent=False)),
     path("push/subscribe/", pwa.push_subscribe, name="push_subscribe"),

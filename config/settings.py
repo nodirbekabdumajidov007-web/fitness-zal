@@ -1,3 +1,4 @@
+import mimetypes
 import os
 import secrets
 import warnings
@@ -22,6 +23,7 @@ def _load_dotenv(path):
 
 
 _load_dotenv(BASE_DIR / ".env")
+mimetypes.add_type("application/vnd.android.package-archive", ".apk")  # /app/ download: Android recognises the file as an app to install
 
 # Under uvicorn (ASGI) every static file / photo served by WhiteNoise or FileResponse logs this warning: the file is
 # streamed from a worker thread instead of an async iterator. It works fine and only floods the Render logs.

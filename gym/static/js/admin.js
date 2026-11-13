@@ -136,3 +136,13 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 })();
+
+/* Header search: the long example placeholder only where it fits (phones get "Qidirish…", the examples stay in the tooltip). */
+(function () {
+  var q = document.getElementById('fz-q');
+  if (!q || !q.dataset.phWide) return;
+  var short = q.placeholder, mq = window.matchMedia('(min-width: 900px)');
+  function set() { q.placeholder = mq.matches ? q.dataset.phWide : short; }
+  set();
+  if (mq.addEventListener) mq.addEventListener('change', set);
+})();

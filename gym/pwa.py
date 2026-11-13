@@ -2,6 +2,7 @@
 import hashlib
 import json
 import logging
+import os
 from urllib.parse import urlparse
 
 from django.conf import settings as dj
@@ -78,6 +79,17 @@ def offline(request):
     resp = render(request, "gym/offline.html")
     resp["Cache-Control"] = "no-cache"
     return resp
+
+
+APK_STATIC = "app/fitnes-zal.apk"
+APK_VERSION = "1.0"
+
+
+def app_download(request):
+    """Android app page: one button for the APK (the same TWA as on Google Play), the install steps and the iPhone way."""
+    path = finders.find(APK_STATIC)
+    size = round(os.path.getsize(path) / 1048576, 1) if path else None
+    return render(request, "gym/app.html", {"apk": static(APK_STATIC) if path else "", "size_mb": size, "version": APK_VERSION})
 
 
 def assetlinks(request):

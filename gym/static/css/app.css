@@ -2976,3 +2976,18 @@ label.db-ava.busy{opacity:.6}
 .pf-goalpick{grid-auto-rows:1fr}
 /* profile tabs on phones: drop the icons so all four labels fit in full */
 @media (max-width:480px){.pf-tabs{gap:2px;padding:4px}.pf-tabs a{padding:8px 6px;font-size:.84rem;overflow:visible;text-overflow:clip}.pf-tabs a .ico{display:none}}
+/* progress: "measurements needed" links are tappable */
+.tk-need{display:inline-block;padding:6px 0;min-height:32px}
+
+/* Android app download page */
+.app-hero{display:flex;gap:20px;align-items:flex-start;padding:24px}
+.app-ico{width:88px;height:88px;border-radius:22px;flex:none;box-shadow:0 10px 28px rgba(0,0,0,.25)}
+.app-txt{display:grid;gap:8px;min-width:0}
+.app-txt h1{margin:0}
+.app-txt p{margin:0;max-width:52ch}
+.app-cta{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:6px}
+.app-cta .btn{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:12px 22px}
+.app-grid{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-top:16px}
+.app-grid h3{display:flex;align-items:center;gap:8px;margin:0 0 10px}
+.app-steps{margin:0 0 12px;padding-left:1.3em;display:grid;gap:8px}
+@media (max-width:700px){.app-hero{flex-direction:column;align-items:center;text-align:center;padding:20px}.app-txt p{margin-inline:auto}.app-cta{justify-content:center}.app-cta .btn{width:100%;justify-content:center}.app-grid{grid-template-columns:1fr}}

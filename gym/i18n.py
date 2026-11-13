@@ -758,7 +758,7 @@ ai_q1||Qorin uchun eng yaxshi 5 ta mashq qaysi?||Какие 5 лучших уп�
 ai_q2||Mashqdan keyin nima yeyish kerak?||Что есть после тренировки?||What should I eat after training?
 ai_q3||Skvatni qanday to'g'ri bajaraman?||Как правильно делать присед?||How do I squat with good form?
 ai_thinking||O'ylayapman…||Думаю…||Thinking…
-ai_placeholder||Savolingizni yozing… (Enter — yuborish)||Напишите вопрос… (Enter — отправить)||Type your question… (Enter to send)
+ai_placeholder||Savolingizni yozing…||Напишите вопрос…||Type your question…
 ai_send||Yuborish||Отправить||Send
 ai_disclaimer||Yordamchi shifokor emas: og'riq yoki kasallikda shifokor va murabbiyga murojaat qiling.||Помощник не врач: при боли или болезни обратитесь к врачу и тренеру.||The assistant is not a doctor: for pain or illness, see a doctor and a trainer.
 ai_plan_title||Haftalik mashq rejasi||Недельный план тренировок||Weekly workout plan
@@ -1518,6 +1518,18 @@ reset_mail_open||Yangi parol o'rnatish uchun quyidagi havolani oching (3 soat am
 reset_mail_ignore||Agar buni siz so'ramagan bo'lsangiz, bu xatga e'tibor bermang: parolingiz o'zgarmaydi.||Если вы этого не запрашивали, просто проигнорируйте письмо: пароль не изменится.||If you did not ask for this, ignore this e-mail: your password will not change.
 reset_subject||Fitnes Zal: parolni tiklash||Fitnes Zal: восстановление пароля||Fitnes Zal: password reset
 sw_write||Yozish||Написать||Message
+nav_plans_short||Tariflar||Тарифы||Plans
+app_link||Android ilova||Приложение для Android||Android app
+app_title||Fitnes Zal ilovasi||Приложение Fitnes Zal||Fitnes Zal app
+app_sub||Abonement, QR karta, jadval va do'kon telefoningizda: bosh ekrandan bir bosishda ochiladi.||Абонемент, QR-карта, расписание и магазин в телефоне: открывается одним касанием с главного экрана.||Membership, QR card, schedule and shop on your phone, one tap from the home screen.
+app_btn||APK'ni yuklab olish||Скачать APK||Download the APK
+app_how||Qanday o'rnatiladi||Как установить||How to install
+app_s1||«APK'ni yuklab olish» tugmasini bosing.||Нажмите «Скачать APK».||Tap “Download the APK”.
+app_s2||Yuklangan faylni oching. Telefon so'rasa, shu brauzerdan o'rnatishga ruxsat bering.||Откройте скачанный файл. Если телефон спросит, разрешите установку из этого браузера.||Open the downloaded file. If your phone asks, allow installs from this browser.
+app_s3||«O'rnatish»ni bosing: ilova bosh ekranda paydo bo'ladi.||Нажмите «Установить»: приложение появится на главном экране.||Tap “Install”: the app appears on your home screen.
+app_warn||Ilova Google Play'dan tashqarida tarqatilgani uchun Android ogohlantirish ko'rsatishi mumkin, bu odatiy hol. Faylni faqat shu sahifadan yuklab oling.||Android может показать предупреждение, так как приложение распространяется не через Google Play, это нормально. Скачивайте файл только с этой страницы.||Android may show a warning because the app is not from Google Play; that is normal. Download the file only from this page.
+app_ios||iPhone'da Safari'da saytni oching, «Ulashish» → «Uy ekraniga qo'shish» ni tanlang.||На iPhone откройте сайт в Safari и выберите «Поделиться» → «На экран Домой».||On iPhone open the site in Safari and choose Share → Add to Home Screen.
+app_soon||Ilova fayli tez orada shu yerga qo'yiladi.||Файл приложения скоро появится здесь.||The app file will be available here soon.
 scan_session||Sessiya tugagan: sahifani yangilab, admin sifatida qayta kiring||Сессия истекла: обновите страницу и войдите снова как администратор||Session ended: reload the page and sign in again as admin
 """
 

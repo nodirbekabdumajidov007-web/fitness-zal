@@ -141,7 +141,7 @@
 
 <nav class="tabbar" aria-label="Menu">
   <a href="{% url 'home' %}"{% if p == '/' %} aria-current="page"{% endif %}>{% icon 'home' %}<span>{% t 'nav_home' %}</span></a>
-  <a href="{% url 'plans' %}"{% if '/plans' in p %} aria-current="page"{% endif %}>{% icon 'ticket' %}<span>{% t 'nav_plans' %}</span></a>
+  <a href="{% url 'plans' %}"{% if '/plans' in p %} aria-current="page"{% endif %}>{% icon 'ticket' %}<span>{% t 'nav_plans_short' %}</span></a>
   <a href="{% url 'shop' %}"{% if '/shop' in p or '/cart' in p %} aria-current="page"{% endif %}>{% icon 'bag' %}<span>{% t 'nav_shop' %}</span></a>
   {% if user.is_authenticated %}<a href="{% url 'chat' %}"{% if '/chat' in p %} aria-current="page"{% endif %}>{% icon 'message' %}<span>{% t 'chat' %}</span>{% if chat_unread %}<b class="badge">{{ chat_unread }}</b>{% endif %}</a>
   {% else %}<a href="{% url 'login' %}"{% if '/login' in p %} aria-current="page"{% endif %}>{% icon 'user' %}<span>{% t 'login' %}</span></a>{% endif %}
@@ -184,6 +184,7 @@
       <a href="{% url 'tools' %}">{% t 'tools' %}</a>
       <a href="{% url 'reviews' %}">{% t 'nav_reviews' %}</a>
       <a href="{% url 'faq' %}">{% t 'faq_title' %}</a>
+      <a href="{% url 'app_download' %}">{% t 'app_link' %}</a>
       <a href="{% url 'oferta' %}">{% t 'ft_oferta' %}</a>
       <a href="{% url 'privacy' %}">{% t 'ft_privacy' %}</a>
       <a href="{% url 'refund' %}">{% t 'ft_refund' %}</a>

@@ -71,7 +71,7 @@
       {% endblock %}
       {% if has_permission %}
       <form class="fz-search" action="{% url 'admin:search' %}" method="get" role="search">
-        {% aicon 'search' %}<input name="q" type="search" placeholder="Qidirish: ism, telefon, FZ-0001, #to'lov" value="{{ q|default:'' }}" aria-label="Qidirish" id="fz-q" autocomplete="off"><kbd aria-hidden="true">/</kbd>
+        {% aicon 'search' %}<input name="q" type="search" placeholder="Qidirish…" data-ph-wide="Qidirish: ism, telefon, FZ-0001, #to'lov" title="Ism, telefon, FZ-0001 yoki #to'lov raqami" value="{{ q|default:'' }}" aria-label="Qidirish" id="fz-q" autocomplete="off"><kbd aria-hidden="true">/</kbd>
       </form>
       {% endif %}
       <div class="fz-tools">

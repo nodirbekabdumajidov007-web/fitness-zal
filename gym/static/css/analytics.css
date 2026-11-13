@@ -167,3 +167,7 @@ html[data-theme="light"] .an{--an-1:#d6301f;--an-2:#a9780f;--an-3:#16a34a;--an-4
   .an-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.an-kpi-val{font-size:1.7rem}.an-card{padding:14px}
 }
 @media (max-width:420px){.an-kpis{grid-template-columns:1fr 1fr;gap:8px}.an-kpi{padding:12px 12px 8px}.an-delta{font-size:.68rem;padding:1px 6px}.an-kpi-label{font-size:.66rem;letter-spacing:.04em}}
+
+/* insight action links: a real tap target on phones (they were 16px tall text) */
+.an-ins .an-cta{min-height:36px;padding:6px 10px;margin-left:-10px;border-radius:8px}
+.an-ins .an-cta:hover{background:color-mix(in srgb,var(--tone) 10%,transparent);text-decoration:none!important}

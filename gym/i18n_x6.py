@@ -186,6 +186,18 @@ sw_qa_member||Üyeliğim||Менин абонементим||Абонемент�
 sw_qa_coach||Antrenör asistanı||Машыктыруучу жардамчысы||Ёвари мураббӣ
 sw_call||Bizi arayın||Бизге чалыңыз||Ба мо занг занед
 sw_write||Yaz||Жазуу||Навиштан
+nav_plans_short||Tarifeler||Тарифтер||Тарифҳо
+app_link||Android uygulaması||Android тиркемеси||Барномаи Android
+app_title||Fitnes Zal uygulaması||Fitnes Zal тиркемеси||Барномаи Fitnes Zal
+app_sub||Üyelik, QR kart, program ve mağaza telefonunuzda: ana ekrandan tek dokunuşla açılır.||Абонемент, QR карта, расписание жана дүкөн телефонуңузда: башкы экрандан бир басуу менен ачылат.||Обуна, корти QR, ҷадвал ва мағоза дар телефони шумо: аз экрани асосӣ бо як ламс кушода мешавад.
+app_btn||APK'yı indir||APK жүктөп алуу||APK-ро боргирӣ кунед
+app_how||Nasıl kurulur||Кантип орнотуу керек||Чӣ тавр насб кардан
+app_s1||“APK'yı indir” düğmesine dokunun.||«APK жүктөп алуу» баскычын басыңыз.||Тугмаи «APK-ро боргирӣ кунед»-ро пахш кунед.
+app_s2||İndirilen dosyayı açın. Telefon sorarsa bu tarayıcıdan kuruluma izin verin.||Жүктөлгөн файлды ачыңыз. Телефон сураса, ушул браузерден орнотууга уруксат бериңиз.||Файли боргиришударо кушоед. Агар телефон пурсад, аз ин браузер насб карданро иҷозат диҳед.
+app_s3||“Yükle”ye dokunun: uygulama ana ekranda görünür.||«Орнотуу» баскычын басыңыз: тиркеме башкы экранда пайда болот.||«Насб»-ро пахш кунед: барнома дар экрани асосӣ пайдо мешавад.
+app_warn||Uygulama Google Play dışında dağıtıldığı için Android uyarı gösterebilir, bu normaldir. Dosyayı yalnızca bu sayfadan indirin.||Тиркеме Google Play'ден тышкары таратылгандыктан Android эскертүү көрсөтүшү мүмкүн, бул кадимки көрүнүш. Файлды ушул беттен гана жүктөп алыңыз.||Азбаски барнома берун аз Google Play паҳн мешавад, Android метавонад огоҳӣ нишон диҳад, ин муқаррарӣ аст. Файлро танҳо аз ҳамин саҳифа боргирӣ кунед.
+app_ios||iPhone'da siteyi Safari'de açın, Paylaş → Ana Ekrana Ekle'yi seçin.||iPhone'до сайтты Safari'де ачып, «Бөлүшүү» → «Башкы экранга кошуу» тандаңыз.||Дар iPhone сайтро дар Safari кушоед ва «Мубодила» → «Ба экрани асосӣ илова кардан»-ро интихоб кунед.
+app_soon||Uygulama dosyası yakında burada olacak.||Тиркеменин файлы жакында ушул жерде болот.||Файли барнома ба зудӣ дар ин ҷо хоҳад буд.
 sw_ask_title||Asistana sorun||Жардамчыдан сураңыз||Аз ёвар пурсед
 sw_ask_ph||örn. üyeliğimi nasıl dondururum?||мис. абонементимди кантип тоңдурам?||масалан, абонементамро чӣ тавр яхбандӣ мекунам?
 sw_ask_go||Sor||Суроо||Пурсидан

@@ -340,3 +340,12 @@ msgstr[0] "Parol kamida %(min_length)d ta belgidan iborat bo'lishi kerak."
 msgid "This password is too short. It must contain at least %d character."
 msgid_plural "This password is too short. It must contain at least %d characters."
 msgstr[0] "Parol juda qisqa: kamida %d ta belgi kerak."
+
+msgid "Add %s"
+msgstr "%s qo'shish"
+
+msgid "Add %(name)s"
+msgstr "%(name)s qo'shish"
+
+msgid "View %s"
+msgstr "%s: ko'rish"

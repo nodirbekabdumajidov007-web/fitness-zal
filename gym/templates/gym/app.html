@@ -1,0 +1,27 @@
+{% extends "gym/base.html" %}{% load static gym_tags %}
+{% block title %}{% t 'app_title' %}{% endblock %}
+{% block content %}
+<section class="card app-hero">
+  <img class="app-ico" src="{% static 'img/icon-192.png' %}" alt="" width="88" height="88">
+  <div class="app-txt">
+    <span class="eyebrow">Android</span>
+    <h1>{% t 'app_title' %}</h1>
+    <p class="muted">{% t 'app_sub' %}</p>
+    {% if apk %}<div class="app-cta">
+      <a class="btn primary pill" href="{{ apk }}" download="fitnes-zal.apk">{% icon 'download' %} {% t 'app_btn' %}</a>
+      <small class="muted num">APK · {{ size_mb }} MB · v{{ version }}</small>
+    </div>{% else %}<p class="note info">{% t 'app_soon' %}</p>{% endif %}
+  </div>
+</section>
+<div class="app-grid">
+  <section class="card">
+    <h3>{% icon 'download' %} {% t 'app_how' %}</h3>
+    <ol class="app-steps"><li>{% t 'app_s1' %}</li><li>{% t 'app_s2' %}</li><li>{% t 'app_s3' %}</li></ol>
+    <small class="muted">{% t 'app_warn' %}</small>
+  </section>
+  <section class="card">
+    <h3>iPhone</h3>
+    <p class="muted" style="margin:0">{% t 'app_ios' %}</p>
+  </section>
+</div>
+{% endblock %}
