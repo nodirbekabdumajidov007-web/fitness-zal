@@ -658,7 +658,7 @@ html[data-theme="dark"] .mini-bars i{background:linear-gradient(180deg,#c3c9d2,#
 .bc-tg-ava{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#d6301f;color:#fff;font-weight:800;font-size:.75rem}
 .bc-bubble{justify-self:start;max-width:92%;background:#fff;border-radius:16px 16px 16px 4px;padding:10px 12px;display:grid;gap:4px;box-shadow:0 2px 6px rgba(0,0,0,.12)}
 .bc-bubble b{color:#0d2233}.bc-bubble p{color:#2c3e50}
-.bc-bubble time{justify-self:end;font-size:.68rem;color:#4fa3e0}
+.bc-bubble time{justify-self:end;font-size:.72rem;color:#1f6fa8}
 @media (max-width:1100px){.bc-grid{grid-template-columns:minmax(0,1fr)}}
 .msg-meta{color:var(--fz-muted);font-weight:500;margin-left:6px}
 .msg-to{display:flex;flex-wrap:wrap;gap:8px;max-height:220px;overflow-y:auto;padding:2px}
