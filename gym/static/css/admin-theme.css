@@ -1,0 +1,51 @@
+/* Admin design layer (2026-11): brings the staff panel into the same family as the member site's theme.css: the same neutral
+   palette, radius scale, soft shadows, quiet secondary buttons and the red focus ring. Loaded after admin.css; remove the <link> to revert. */
+
+:root,html[data-theme="light"]{
+  --fz-bg:#f4f5f7; --fz-card:#ffffff; --fz-soft:#f8f9fb; --fz-line:#e3e6eb; --border-color:#cfd4dc; --fz-muted:#5a6271; --fz-text:#12161d;
+  --fz-shadow:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.06);
+  --fz-shadow-2:0 4px 10px -2px rgba(16,24,40,.08),0 2px 4px -2px rgba(16,24,40,.05);
+  --fz-ring:0 0 0 3px rgba(214,48,31,.2);
+  --fz-r:16px; --fz-r-md:10px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --fz-bg:#0c0e12; --fz-card:#15181e; --fz-soft:#1a1e25; --fz-line:#252a33; --border-color:#333a45; --fz-text:#eef0f3;
+  --fz-shadow:0 0 0 1px rgba(255,255,255,.02); --fz-shadow-2:0 6px 16px -6px rgba(0,0,0,.6); --fz-ring:0 0 0 3px rgba(240,80,61,.28);
+  --delete-button-bg:#15181e}}
+html[data-theme="dark"]{
+  --fz-bg:#0c0e12; --fz-card:#15181e; --fz-soft:#1a1e25; --fz-line:#252a33; --border-color:#333a45; --fz-text:#eef0f3;
+  --fz-shadow:0 0 0 1px rgba(255,255,255,.02); --fz-shadow-2:0 6px 16px -6px rgba(0,0,0,.6); --fz-ring:0 0 0 3px rgba(240,80,61,.28);
+  --delete-button-bg:#15181e}
+
+body{-webkit-font-smoothing:antialiased}
+
+/* ---- surfaces: one radius for panels, cards and lists ---- */
+.module,.fz-kpi,#changelist-form .results,#changelist .actions,#changelist-filter,.inline-group,.submit-row{border-radius:var(--fz-r)}
+.module,.fz-kpi,#changelist-form .results,#changelist-filter{border-color:var(--fz-line)}
+.fz-kpi{transition:transform .2s,box-shadow .2s}
+.fz-kpi:hover{transform:translateY(-2px);box-shadow:var(--fz-shadow-2)}
+#changelist table tbody tr{transition:background-color .15s}
+#changelist table tbody tr:hover td{background:var(--fz-soft)}
+
+/* ---- buttons: same weight and radius as the site ---- */
+.button,input[type=submit],input[type=button],a.button,button.button{border-radius:var(--fz-r-md);min-height:38px;transition:filter .15s,background-color .15s,box-shadow .2s,transform .15s}
+.button:hover,input[type=submit]:hover,input[type=button]:hover,a.button:hover,button.button:hover{transform:translateY(-1px);box-shadow:var(--fz-shadow-2)}
+.button:active,input[type=submit]:active,a.button:active,button.button:active{transform:none}
+input[type=submit].default,.submit-row input.default{box-shadow:0 1px 2px rgba(16,24,40,.08),inset 0 1px 0 rgba(255,255,255,.14)}
+#changelist .actions .button,#changelist .actions select{border-radius:var(--fz-r-md)}
+
+/* ---- fields: calm border, red focus ring ---- */
+input[type=text],input[type=password],input[type=email],input[type=url],input[type=number],input[type=tel],input[type=search],input[type=date],input[type=time],input[type=datetime-local],textarea,select,.vTextField{
+  border-radius:var(--fz-r-md);min-height:38px;transition:border-color .15s,box-shadow .15s}
+input[type=text]:hover,input[type=password]:hover,input[type=email]:hover,input[type=number]:hover,input[type=tel]:hover,input[type=search]:hover,textarea:hover,select:hover,.vTextField:hover{border-color:color-mix(in srgb,var(--fz-text) 28%,var(--border-color))}
+input[type=text]:focus,input[type=password]:focus,input[type=email]:focus,input[type=url]:focus,input[type=number]:focus,input[type=tel]:focus,input[type=search]:focus,input[type=date]:focus,input[type=time]:focus,input[type=datetime-local]:focus,textarea:focus,select:focus,.vTextField:focus{
+  outline:none;border-color:var(--fz-red);box-shadow:var(--fz-ring)}
+input[type=checkbox],input[type=radio]{accent-color:var(--fz-red)}
+
+/* ---- sidebar: a softer active item ---- */
+.fz-nav-a.on{box-shadow:0 6px 16px -6px rgba(214,48,31,.6)}
+
+/* ---- messages ---- */
+ul.messagelist li{border-radius:var(--fz-r-md)}
+
+@media (prefers-reduced-motion:reduce){.fz-kpi,.button,input[type=submit]{transition:none}.fz-kpi:hover,.button:hover{transform:none}}

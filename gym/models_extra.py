@@ -17,7 +17,7 @@ class MembershipFreeze(models.Model):
     end_date = models.DateField("Tugashi (shu kuni qaytadi)")
     planned_days = models.PositiveSmallIntegerField("Rejadagi kunlar", default=0)
     ended_early = models.BooleanField("Muddatidan oldin tugatilgan", default=False)
-    cancelled_at = models.DateTimeField(null=True, blank=True)
+    cancelled_at = models.DateTimeField(null=True, blank=True, verbose_name="Bekor qilingan vaqt")
     created = models.DateTimeField("Yaratilgan", auto_now_add=True)
 
     class Meta:
@@ -57,7 +57,7 @@ class ExpiryReminder(models.Model):
 class GuestPass(models.Model):
     """A friend's one-day entry given by a member. The QR carries a signed code (see extras.guest_code); it works once, on its date."""
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="guest_passes", verbose_name="A'zo")
-    membership = models.ForeignKey(Membership, null=True, blank=True, on_delete=models.SET_NULL, related_name="guest_passes")
+    membership = models.ForeignKey(Membership, null=True, blank=True, on_delete=models.SET_NULL, related_name="guest_passes", verbose_name="Abonement")
     guest_name = models.CharField("Mehmon ismi", max_length=60)
     guest_phone = models.CharField("Mehmon telefoni", max_length=13, blank=True)
     date = models.DateField("Qaysi kunga")
@@ -88,7 +88,7 @@ class ReferralReward(models.Model):
     referrer = models.ForeignKey(User, on_delete=models.CASCADE, related_name="referral_rewards", verbose_name="Taklif qilgan")
     referred = models.OneToOneField(User, on_delete=models.CASCADE, related_name="referral_reward", verbose_name="Taklif qilingan")
     days = models.PositiveSmallIntegerField("Bonus kunlar", default=0)
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan")
 
     class Meta:
         ordering = ["-created"]
@@ -99,8 +99,8 @@ class ReferralReward(models.Model):
 
 
 class ClassWaitlist(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="waitlist")
-    gym_class = models.ForeignKey(GymClass, on_delete=models.CASCADE, related_name="waitlist")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="waitlist", verbose_name="A'zo")
+    gym_class = models.ForeignKey(GymClass, on_delete=models.CASCADE, related_name="waitlist", verbose_name="Mashg'ulot")
     date = models.DateField("Sana")
     created = models.DateTimeField("Navbatga turgan vaqti", auto_now_add=True)
 
@@ -114,13 +114,13 @@ class ClassWaitlist(models.Model):
 
 
 class TrainerReview(models.Model):
-    trainer = models.ForeignKey(Trainer, on_delete=models.CASCADE, related_name="reviews")
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="trainer_reviews")
+    trainer = models.ForeignKey(Trainer, on_delete=models.CASCADE, related_name="reviews", verbose_name="Murabbiy")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="trainer_reviews", verbose_name="A'zo")
     rating = models.PositiveSmallIntegerField("Baho", validators=[MinValueValidator(1), MaxValueValidator(5)])
     comment = models.TextField("Fikr", max_length=500, blank=True)
     hidden = models.BooleanField("Yashirilgan (saytda ko'rinmaydi)", default=False)
     created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
+    updated = models.DateTimeField(auto_now=True, verbose_name="Yangilangan")
 
     class Meta:
         unique_together = [("trainer", "user")]
@@ -272,7 +272,7 @@ class AdminQuery(models.Model):
     text = models.CharField("Savol", max_length=200)
     intent = models.CharField("Aniqlangan maqsad", max_length=40, blank=True)
     matched = models.BooleanField("Tushunildi", default=True)
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan")
 
     class Meta:
         ordering = ["-created", "-id"]

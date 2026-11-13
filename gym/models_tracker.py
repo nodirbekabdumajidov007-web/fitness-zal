@@ -13,7 +13,7 @@ __all__ = ["WorkoutSession", "WorkoutSet", "TrackerGoal"]
 
 class WorkoutSession(models.Model):
     """One training day a member logged: a date, optionally the weekday of the plan it follows, and a note."""
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="workout_sessions")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="workout_sessions", verbose_name="A'zo")
     date = models.DateField("Sana", default=timezone.localdate, db_index=True)
     plan_day = models.PositiveSmallIntegerField("Reja kuni", null=True, blank=True, validators=[MaxValueValidator(6)])
     note = models.CharField("Izoh", max_length=200, blank=True)
@@ -63,13 +63,13 @@ class TrackerGoal(models.Model):
         MEASURE = "measure", "O'lcham"
         STRENGTH = "strength", "Kuch"
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="tracker_goals")
-    kind = models.CharField(max_length=10, choices=Kind.choices)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="tracker_goals", verbose_name="A'zo")
+    kind = models.CharField(max_length=10, choices=Kind.choices, verbose_name="Turi")
     metric = models.CharField("Ko'rsatkich", max_length=80, help_text="weight | BodyLog maydoni | mashq nomi")
     target = models.DecimalField("Maqsad", max_digits=6, decimal_places=1)
     target_date = models.DateField("Muddat", null=True, blank=True)
     start_value = models.DecimalField("Boshlang'ich qiymat", max_digits=6, decimal_places=1, null=True, blank=True)
-    start_date = models.DateField(default=timezone.localdate)
+    start_date = models.DateField(default=timezone.localdate, verbose_name="Boshlanish sanasi")
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:

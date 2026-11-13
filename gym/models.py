@@ -291,12 +291,12 @@ class Plan(models.Model):
 
 
 class Membership(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="memberships")
-    plan = models.ForeignKey(Plan, on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="memberships", verbose_name="A'zo")
+    plan = models.ForeignKey(Plan, on_delete=models.PROTECT, verbose_name="Abonement turi")
     starts = models.DateTimeField("Boshlanishi")
     expires = models.DateTimeField("Tugashi")
     freeze_used = models.BooleanField("Muzlatilgan", default=False)
-    frozen_until = models.DateTimeField(null=True, blank=True)
+    frozen_until = models.DateTimeField(null=True, blank=True, verbose_name="Muzlatish tugashi")
     reminded = models.BooleanField(default=False, editable=False)
     created = models.DateTimeField(auto_now_add=True)
 
@@ -331,7 +331,7 @@ class PromoCode(models.Model):
     valid_until = models.DateField("Amal qilish muddati", null=True, blank=True)
     max_uses = models.PositiveIntegerField("Eng ko'p ishlatish", null=True, blank=True)
     used = models.PositiveIntegerField("Ishlatilgan", default=0)
-    active = models.BooleanField(default=True)
+    active = models.BooleanField(default=True, verbose_name="Faol")
 
     class Meta:
         verbose_name, verbose_name_plural = "Promokod", "Promokodlar"
@@ -353,7 +353,7 @@ class PromoCode(models.Model):
 
 class Category(models.Model):
     name = models.CharField("Nomi", max_length=40)
-    order = models.PositiveSmallIntegerField(default=0)
+    order = models.PositiveSmallIntegerField(default=0, verbose_name="Tartib")
 
     class Meta:
         ordering = ["order", "id"]
@@ -364,7 +364,7 @@ class Category(models.Model):
 
 
 class Product(models.Model):
-    category = models.ForeignKey(Category, null=True, blank=True, on_delete=models.SET_NULL, related_name="products")
+    category = models.ForeignKey(Category, null=True, blank=True, on_delete=models.SET_NULL, related_name="products", verbose_name="Kategoriya")
     name = models.CharField("Nomi", max_length=60)
     price = models.BigIntegerField("Narx")
     stock = models.PositiveIntegerField("Omborda", default=0)
@@ -440,7 +440,7 @@ class Order(models.Model):
         PICKUP = "pickup", "Zaldan olib ketadi"
         COURIER = "courier", "Yetkazib berish"
 
-    user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL, related_name="orders")
+    user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL, related_name="orders", verbose_name="A'zo")
     total = models.BigIntegerField("Jami")
     method = models.CharField("To'lov usuli", max_length=8)
     status = models.CharField("Holat", max_length=10, choices=Status.choices, default=Status.NEW)
@@ -451,7 +451,7 @@ class Order(models.Model):
     delivery_fee = models.BigIntegerField("Yetkazish narxi", default=0)
     shipped_at = models.DateTimeField("Yo'lga chiqdi", null=True, blank=True)
     done_at = models.DateTimeField("Topshirildi", null=True, blank=True)
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan")
 
     @property
     def subtotal(self):
@@ -533,10 +533,10 @@ class Payment(models.Model):
         PAID = "paid", "To'langan"
         CANCELLED = "cancelled", "Bekor qilingan"
 
-    user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL, related_name="payments")
+    user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL, related_name="payments", verbose_name="A'zo")
     kind = models.CharField("Turi", max_length=8)  # plan | shop | gift
-    plan = models.ForeignKey(Plan, null=True, blank=True, on_delete=models.SET_NULL)
-    order = models.ForeignKey(Order, null=True, blank=True, on_delete=models.SET_NULL, related_name="payments")
+    plan = models.ForeignKey(Plan, null=True, blank=True, on_delete=models.SET_NULL, verbose_name="Abonement turi")
+    order = models.ForeignKey(Order, null=True, blank=True, on_delete=models.SET_NULL, related_name="payments", verbose_name="Buyurtma")
     amount = models.BigIntegerField("Summa")
     discount = models.BigIntegerField("Chegirma", default=0)
     promo = models.CharField("Promokod", max_length=20, blank=True)
@@ -567,7 +567,7 @@ class Payment(models.Model):
 
 
 class Visit(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="visits")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="visits", verbose_name="A'zo")
     ts = models.DateTimeField("Vaqt", auto_now_add=True)
 
     class Meta:
@@ -584,7 +584,7 @@ class Trainer(models.Model):
     photo = models.FileField("Rasm (jpg, png, webp)", upload_to="trainers/", blank=True, validators=[validate_image])
     photo_url = models.URLField("Yoki rasm havolasi (https)", blank=True, validators=[RegexValidator(r"^https://", "Faqat https:// havola")])
     pt_price = models.BigIntegerField("Shaxsiy mashg'ulot narxi (so'm)", default=0)
-    active = models.BooleanField(default=True)
+    active = models.BooleanField(default=True, verbose_name="Faol")
     user = models.OneToOneField(User, null=True, blank=True, on_delete=models.SET_NULL, related_name="trainer_profile",
                                 verbose_name="Saytdagi akkaunti",
                                 help_text="Shu a'zo «Murabbiy» bo'lib kirsa, murabbiy paneli ochiladi: mijozlari, mashg'ulotlari, reja tuzish.")
@@ -603,12 +603,12 @@ class Trainer(models.Model):
 class GymClass(models.Model):
     WEEKDAYS = [(0, "Dushanba"), (1, "Seshanba"), (2, "Chorshanba"), (3, "Payshanba"), (4, "Juma"), (5, "Shanba"), (6, "Yakshanba")]
     name = models.CharField("Mashg'ulot", max_length=60)
-    trainer = models.ForeignKey(Trainer, null=True, blank=True, on_delete=models.SET_NULL)
+    trainer = models.ForeignKey(Trainer, null=True, blank=True, on_delete=models.SET_NULL, verbose_name="Murabbiy")
     weekday = models.PositiveSmallIntegerField("Hafta kuni", choices=WEEKDAYS)
     start_time = models.TimeField("Boshlanish")
     duration_min = models.PositiveSmallIntegerField("Davomiyligi (daqiqa)", default=60)
     capacity = models.PositiveSmallIntegerField("Joylar soni", default=15)
-    active = models.BooleanField(default=True)
+    active = models.BooleanField(default=True, verbose_name="Faol")
 
     class Meta:
         ordering = ["weekday", "start_time"]
@@ -626,13 +626,13 @@ class GymClass(models.Model):
 
 
 class Booking(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bookings")
-    gym_class = models.ForeignKey(GymClass, on_delete=models.CASCADE, related_name="bookings")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bookings", verbose_name="A'zo")
+    gym_class = models.ForeignKey(GymClass, on_delete=models.CASCADE, related_name="bookings", verbose_name="Mashg'ulot")
     date = models.DateField("Sana")
     reminded = models.BooleanField(default=False, editable=False)
     no_show = models.BooleanField("Kelmadi", default=False)
     checked_in_at = models.DateTimeField("Qabulxonada belgilandi", null=True, blank=True)
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan")
 
     class Meta:
         unique_together = [("user", "gym_class", "date")]
@@ -644,8 +644,8 @@ class Announcement(models.Model):
     title = models.CharField("Sarlavha", max_length=100)
     body = models.TextField("Matn")
     pinned = models.BooleanField("Tepada turadi", default=False)
-    active = models.BooleanField(default=True)
-    created = models.DateTimeField(auto_now_add=True)
+    active = models.BooleanField(default=True, verbose_name="Faol")
+    created = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan")
 
     class Meta:
         ordering = ["-pinned", "-created"]
@@ -656,11 +656,11 @@ class Announcement(models.Model):
 
 
 class Review(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reviews")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reviews", verbose_name="A'zo")
     rating = models.PositiveSmallIntegerField("Baho", validators=[MinValueValidator(1), MaxValueValidator(5)])
     comment = models.TextField("Fikr", max_length=500, blank=True)
     approved = models.BooleanField("Tasdiqlangan", default=False)
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan")
 
     class Meta:
         ordering = ["-created"]
@@ -668,7 +668,7 @@ class Review(models.Model):
 
 
 class BodyLog(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bodylogs")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bodylogs", verbose_name="A'zo")
     date = models.DateField("Sana", default=timezone.localdate)
     weight = models.DecimalField("Vazn (kg)", max_digits=5, decimal_places=1, validators=[MinValueValidator(Decimal("20")), MaxValueValidator(400)])
     height_cm = models.PositiveSmallIntegerField("Bo'y (sm)", null=True, blank=True, validators=[MinValueValidator(100), MaxValueValidator(250)])
@@ -711,12 +711,12 @@ class OtpCode(models.Model):
 
 
 class WorkoutPlan(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="workout_plans")
-    trainer = models.ForeignKey(Trainer, null=True, blank=True, on_delete=models.SET_NULL)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="workout_plans", verbose_name="A'zo")
+    trainer = models.ForeignKey(Trainer, null=True, blank=True, on_delete=models.SET_NULL, verbose_name="Murabbiy")
     title = models.CharField("Reja nomi", max_length=80)
     notes = models.TextField("Izoh", blank=True)
     active = models.BooleanField("Joriy reja", default=True)
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan")
 
     class Meta:
         ordering = ["-active", "-created"]
@@ -758,13 +758,13 @@ class PTSession(models.Model):
         CONFIRMED = "confirmed", "Tasdiqlangan"
         CANCELLED = "cancelled", "Bekor qilingan"
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="pt_sessions")
-    trainer = models.ForeignKey(Trainer, on_delete=models.CASCADE, related_name="pt_sessions")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="pt_sessions", verbose_name="A'zo")
+    trainer = models.ForeignKey(Trainer, on_delete=models.CASCADE, related_name="pt_sessions", verbose_name="Murabbiy")
     starts = models.DateTimeField("Vaqt")
     note = models.CharField("Izoh", max_length=200, blank=True)
     status = models.CharField("Holat", max_length=10, choices=Status.choices, default=Status.REQUESTED)
     reminded = models.BooleanField(default=False, editable=False)
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan")
 
     class Meta:
         ordering = ["starts"]
@@ -829,11 +829,11 @@ class Lesson(models.Model):
 
 class Notification(models.Model):
     """A personal message to one member: written by the admin, or sent by the system (birthday, plan, low stock...)."""
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notifications")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notifications", verbose_name="A'zo")
     sender = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name="+", verbose_name="Kimdan")
     title = models.CharField("Sarlavha", max_length=120)
     body = models.TextField("Matn", max_length=2000, blank=True)
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan")
     read_at = models.DateTimeField("O'qilgan", null=True, blank=True)
 
     class Meta:
@@ -846,12 +846,12 @@ class Notification(models.Model):
 
 class PushSubscription(models.Model):
     """One browser/device that agreed to receive Web Push notifications (the Push API's subscription: endpoint + two keys)."""
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="push_subscriptions")
-    endpoint = models.CharField(max_length=600, unique=True)
-    p256dh = models.CharField(max_length=255)
-    auth = models.CharField(max_length=100)
-    created = models.DateTimeField(auto_now_add=True)
-    user_agent = models.CharField(max_length=300, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="push_subscriptions", verbose_name="A'zo")
+    endpoint = models.CharField(max_length=600, unique=True, verbose_name="Manzil (endpoint)")
+    p256dh = models.CharField(max_length=255, verbose_name="Kalit (p256dh)")
+    auth = models.CharField(max_length=100, verbose_name="Kalit (auth)")
+    created = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan")
+    user_agent = models.CharField(max_length=300, blank=True, verbose_name="Qurilma")
 
     class Meta:
         ordering = ["-created"]
@@ -865,7 +865,7 @@ class PersonalRecord(models.Model):
     """A member's best lift on a day; the estimated one-rep max (Epley) lets different rep counts be compared."""
     LIFTS = [("bench", "Jim yotib itarish (Bench press)"), ("squat", "O'tirib turish (Squat)"), ("deadlift", "Stanovoy (Deadlift)"),
              ("ohp", "Yelka uchun itarish (OHP)"), ("pullup", "Turnikda tortilish (Pull-up)"), ("row", "Shtanga bilan eshkak (Row)")]
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="records")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="records", verbose_name="A'zo")
     lift = models.CharField("Mashq", max_length=10, choices=LIFTS)
     weight = models.DecimalField("Og'irlik (kg)", max_digits=5, decimal_places=1, validators=[MinValueValidator(Decimal("0")), MaxValueValidator(500)])
     reps = models.PositiveSmallIntegerField("Takror", default=1, validators=[MinValueValidator(1), MaxValueValidator(30)])
@@ -918,12 +918,12 @@ class ChatRoom(models.Model):
 
 
 class ChatMessage(models.Model):
-    room = models.ForeignKey(ChatRoom, on_delete=models.CASCADE, related_name="messages")
-    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="chat_messages")
+    room = models.ForeignKey(ChatRoom, on_delete=models.CASCADE, related_name="messages", verbose_name="Xona")
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="chat_messages", verbose_name="Yuboruvchi")
     body = models.TextField("Xabar", max_length=1000, blank=True)
     image = models.FileField("Rasm", upload_to="chat/%Y/%m/", blank=True, validators=[validate_image])
     deleted = models.BooleanField("O'chirilgan", default=False)
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan")
     reply_to = models.ForeignKey("self", null=True, blank=True, on_delete=models.SET_NULL, related_name="replies", verbose_name="Javob")
     edited_at = models.DateTimeField("Tahrirlangan", null=True, blank=True)
 
@@ -984,11 +984,11 @@ class ChatBlock(models.Model):
 
 
 class ChatReport(models.Model):
-    message = models.ForeignKey(ChatMessage, on_delete=models.CASCADE, related_name="reports")
-    reporter = models.ForeignKey(User, on_delete=models.CASCADE, related_name="+")
+    message = models.ForeignKey(ChatMessage, on_delete=models.CASCADE, related_name="reports", verbose_name="Xabar")
+    reporter = models.ForeignKey(User, on_delete=models.CASCADE, related_name="+", verbose_name="Shikoyat qilgan")
     reason = models.CharField("Sabab", max_length=200, blank=True)
     resolved = models.BooleanField("Ko'rib chiqilgan", default=False)
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan")
 
     class Meta:
         unique_together = [("message", "reporter")]
@@ -998,10 +998,10 @@ class ChatReport(models.Model):
 
 class AIMessage(models.Model):
     """One turn of a member's conversation with the coach assistant (kept so the page can show the history)."""
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="ai_messages")
-    role = models.CharField(max_length=10, choices=[("user", "A'zo"), ("assistant", "AI")])
-    content = models.TextField()
-    created = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="ai_messages", verbose_name="A'zo")
+    role = models.CharField(max_length=10, choices=[("user", "A'zo"), ("assistant", "AI")], verbose_name="Rol")
+    content = models.TextField(verbose_name="Matn")
+    created = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan")
 
     class Meta:
         ordering = ["id"]
@@ -1011,7 +1011,7 @@ class AIMessage(models.Model):
 class FoodEntry(models.Model):
     """One thing a member ate (calorie tracker). The numbers are for the whole portion, not per 100 g."""
     MEALS = [("breakfast", "Nonushta"), ("lunch", "Tushlik"), ("dinner", "Kechki ovqat"), ("snack", "Perekus")]
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="food_entries")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="food_entries", verbose_name="A'zo")
     date = models.DateField("Sana", default=timezone.localdate, db_index=True)
     meal = models.CharField("Ovqat vaqti", max_length=10, choices=MEALS, default="snack")
     name = models.CharField("Nomi", max_length=80)
@@ -1032,14 +1032,14 @@ class FoodEntry(models.Model):
 
 class UserFood(models.Model):
     """A food a member added to their own list of the calorie tracker. Numbers are per 100 g; portion_g is the usual serving."""
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="my_foods")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="my_foods", verbose_name="A'zo")
     name = models.CharField("Nomi", max_length=60)
     kcal = models.DecimalField("Kaloriya (100 g da)", max_digits=5, decimal_places=1, validators=[MinValueValidator(0), MaxValueValidator(900)])
     protein = models.DecimalField("Oqsil (100 g da)", max_digits=4, decimal_places=1, default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
     fat = models.DecimalField("Yog' (100 g da)", max_digits=4, decimal_places=1, default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
     carbs = models.DecimalField("Uglevod (100 g da)", max_digits=4, decimal_places=1, default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
     portion_g = models.PositiveIntegerField("Odatiy porsiya (g)", default=100, validators=[MinValueValidator(1), MaxValueValidator(5000)])
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan")
 
     class Meta:
         ordering = ["name"]

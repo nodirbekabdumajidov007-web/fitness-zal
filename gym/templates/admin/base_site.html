@@ -9,4 +9,5 @@
 {% block extrabody %}{{ block.super }}{% if fz_ai and not is_popup %}{% include "admin/_ai_panel.html" %}{% endif %}{% endblock %}
 {% block responsive %}{{ block.super }}
 <link rel="stylesheet" href="{% vstatic 'css/admin.css' %}">{# after Django's responsive.css, so our rules win at equal weight #}
+<link rel="stylesheet" href="{% vstatic 'css/admin-theme.css' %}">
 {% endblock %}
