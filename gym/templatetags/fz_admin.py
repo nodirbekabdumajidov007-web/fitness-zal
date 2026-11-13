@@ -47,6 +47,7 @@ ICONS = {
     "search": _c(11, 11, 7) + '<path d="m21 21-4.3-4.3"/>',
     "menu": '<path d="M4 6h16M4 12h16M4 18h16"/>',
     "panel": '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/>',
+    "chevrons-left": '<path d="m11 17-5-5 5-5M18 17l-5-5 5-5"/>',
     "globe": _c(12, 12, 10) + '<path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/>',
     "key": _c(7.5, 15.5, 4.5) + '<path d="m21 2-9.6 9.6M15.5 7.5 18 10"/>',
     "logout": '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/>',
