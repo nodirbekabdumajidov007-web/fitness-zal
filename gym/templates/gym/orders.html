@@ -2,6 +2,7 @@
 {% block title %}{% t 'orders' %}{% endblock %}
 {% block content %}
 <h2>{% t 'orders' %}</h2>
+<div class="orders-grid">
 {% for o in orders %}
 <article class="card grid order-card">
   <div class="inline" style="align-items:center"><b>#{{ o.pk }} · {{ o.created|dmyhm }}</b>
@@ -18,4 +19,5 @@
   <b class="num">{{ o.total|money }} {% t 'price_unit' %}</b>
 </article>
 {% empty %}<div class="card muted">{% t 'none_yet' %} · <a href="{% url 'shop' %}">{% t 'shop' %}</a></div>{% endfor %}
+</div>
 {% endblock %}
