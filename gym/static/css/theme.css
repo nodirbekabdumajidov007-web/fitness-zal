@@ -4,7 +4,7 @@
 
 :root{
   --bg:#f3f4f6; --surface:#ffffff; --surface-2:#f7f8fa; --ink:#0e1116; --muted:#565e6c; --line:#e2e5ea; --line-strong:#cdd2da;
-  --accent:#e0202e; --accent-2:#f2541b; --volt:#467300; --accent-soft:#fde9ea; --veil:transparent;
+  --accent:#d71a28; --accent-fill:#d71a28; --accent-2:#f2541b; --volt:#3f6a00; --good:#166534; --accent-soft:#fde9ea; --veil:transparent;
   --r:12px; --r-lg:18px; --r-sm:9px;
   --sh-1:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.06);
   --sh-2:0 4px 10px -2px rgba(16,24,40,.07),0 2px 4px -2px rgba(16,24,40,.05);
@@ -13,11 +13,11 @@
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#090a0c; --surface:#131519; --surface-2:#1a1d22; --ink:#f1f2f4; --muted:#9aa1ad; --line:#24272e; --line-strong:#343842;
-  --accent:#ff3d3d; --accent-2:#ff7a1a; --volt:#c6f135; --good:#a5e635; --accent-soft:rgba(255,61,61,.14); --veil:transparent;
+  --accent:#ff3d3d; --accent-fill:#d92b2b; --accent-2:#ff7a1a; --volt:#c6f135; --good:#a5e635; --accent-soft:rgba(255,61,61,.14); --veil:transparent;
   --sh-1:0 0 0 1px rgba(255,255,255,.02); --sh-2:0 6px 16px -6px rgba(0,0,0,.6); --sh-3:0 24px 50px -16px rgba(0,0,0,.75)}}
 :root[data-theme="dark"]{
   --bg:#090a0c; --surface:#131519; --surface-2:#1a1d22; --ink:#f1f2f4; --muted:#9aa1ad; --line:#24272e; --line-strong:#343842;
-  --accent:#ff3d3d; --accent-2:#ff7a1a; --volt:#c6f135; --good:#a5e635; --accent-soft:rgba(255,61,61,.14); --veil:transparent;
+  --accent:#ff3d3d; --accent-fill:#d92b2b; --accent-2:#ff7a1a; --volt:#c6f135; --good:#a5e635; --accent-soft:rgba(255,61,61,.14); --veil:transparent;
   --sh-1:0 0 0 1px rgba(255,255,255,.02); --sh-2:0 6px 16px -6px rgba(0,0,0,.6); --sh-3:0 24px 50px -16px rgba(0,0,0,.75)}
 
 /* ---- canvas: solid, quiet background; the gym photo stays only behind the landing hero ---- */
@@ -65,7 +65,7 @@ tbody tr:last-child td{border-bottom:0}
 .btn:active:not(:disabled){transform:translateY(0) scale(.98);box-shadow:inset 0 2px 5px rgba(16,24,40,.18)}
 
 /* primary: red glass. The body stays almost opaque so the white label keeps its contrast; the glass is in the gloss, rim and glow */
-.btn.primary{color:var(--accent-ink);background-color:color-mix(in srgb,var(--accent) 94%,transparent);border-color:color-mix(in srgb,var(--accent) 70%,#fff);
+.btn.primary{color:var(--accent-ink);background-color:color-mix(in srgb,var(--accent-fill) 94%,transparent);border-color:color-mix(in srgb,var(--accent-fill) 70%,#fff);
   background-image:linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,0) 46%,rgba(0,0,0,.14)),linear-gradient(115deg,transparent 35%,color-mix(in srgb,var(--accent-2) 70%,transparent));
   box-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 -1px 0 rgba(0,0,0,.18),0 1px 2px rgba(16,24,40,.1),0 8px 20px -8px color-mix(in srgb,var(--accent) 70%,transparent)}
 .btn.primary:hover:not(:disabled){filter:brightness(1.06);border-color:color-mix(in srgb,var(--accent) 60%,#fff);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -1px 0 rgba(0,0,0,.18),0 12px 26px -8px color-mix(in srgb,var(--accent) 75%,transparent)}
@@ -146,7 +146,6 @@ main h2{font-size:clamp(1.35rem,2.1vw,1.7rem)}
 
 /* ---- colour (2026-11-17): racing red + orange energy, deeper black in dark mode, volt-lime for "live/good" accents ---- */
 .eyebrow{color:var(--volt)}
-.chips a[aria-current="true"],.chips a[aria-current="page"]{background-color:var(--accent);border-color:var(--accent);color:#fff}
 .sb-nav a[aria-current="page"]{box-shadow:inset 3px 0 0 var(--accent)}
 ::selection{background:color-mix(in srgb,var(--accent) 30%,transparent)}
 
@@ -175,3 +174,42 @@ main h2{font-size:clamp(1.35rem,2.1vw,1.7rem)}
 
 /* .card padding (set above) must not push the product photo in from the tile edges */
 .card.prod{padding:0}
+
+/* ---- contrast fixes (2026-11-17), light theme: text on tinted pills and on the orange "paper" button must reach 4.5:1 ---- */
+.paper-btn{background-color:#c8401c}
+.paper-btn:hover{background-color:#b13616}
+
+/* white text sits on --accent-fill (4.5:1 in both themes); --accent stays the bright red for text, rings and glows */
+.tag-hot,
+.db-quick a[aria-current="page"],
+.pg-num.cur,
+.mine .bubble,
+.vmic[aria-expanded="true"],
+.vp-big,
+.vp-send,
+.tk-periods button[aria-pressed=true],
+.sw-fab,
+.sw-b.mine .sw-b-box,
+.sw-send,
+.ft-social a:hover,
+.ft-top:hover svg,
+.avatar,
+.qc-step,
+.m-send,
+.unread,
+.ticker,
+.fab,
+.tl-tabs button[aria-selected=true],
+.dk-scan,
+.dk-tabs i.hot,
+.bell b,
+.nf.new .nf-ico,
+.pf-tabs a[aria-selected="true"],
+.ai-msg.user,
+.um-badge,
+.ci-unread,
+.sb .badge,
+.tabbar .badge{background-color:var(--accent-fill)}
+.tag-hot,.db-quick a[aria-current="page"],.pg-num.cur,.mine .bubble,.vmic[aria-expanded="true"],.tk-periods button[aria-pressed=true],.sw-b.mine .sw-b-box,.m-send,.ft-social a:hover,.ft-top:hover svg{border-color:var(--accent-fill)}
+.receipt .pill.good{color:#166534}
+.receipt{--good:#166534}

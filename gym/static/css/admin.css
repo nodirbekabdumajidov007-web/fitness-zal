@@ -26,8 +26,8 @@
   --font-family-monospace:"JetBrains Mono",ui-monospace,Consolas,monospace;
   --nb-bg:var(--fz-bg); --nb-card:var(--fz-card); --nb-green:#16a34a; --nb-glow:rgba(22,163,74,.3);
   --nb-lo:rgba(16,24,40,.10); --nb-hi:transparent;
-  --st-ok:#137a40; --st-ok-bg:rgba(29,154,82,.13); --st-bad:#b42318; --st-bad-bg:rgba(214,48,31,.12);
-  --st-warn:#93670a; --st-warn-bg:rgba(201,154,46,.18); --st-info:#1f4fb8; --st-info-bg:rgba(31,91,214,.12); --st-mute:#5b6473; --st-mute-bg:rgba(127,127,127,.15);
+  --st-ok:#0f6b37; --st-ok-bg:rgba(29,154,82,.13); --st-bad:#b42318; --st-bad-bg:rgba(214,48,31,.12);
+  --st-warn:#7a540a; --st-warn-bg:rgba(201,154,46,.18); --st-info:#1f4fb8; --st-info-bg:rgba(31,91,214,.12); --st-mute:#5b6473; --st-mute-bg:rgba(127,127,127,.15);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --fz-bg:#0e1116; --fz-card:#171b22; --fz-soft:#1b2027; --fz-line:#272d37; --fz-text:#e8eaee; --fz-muted:#9aa3b0; --fz-grid:#232832;
