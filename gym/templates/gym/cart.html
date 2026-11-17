@@ -19,13 +19,29 @@
       <ol class="co-steps mini" aria-label="{% t 'checkout' %}"><li class="done"><i>✓</i>{% t 'cart' %}</li><li class="now"><i>2</i>{% t 'step_delivery' %}</li><li><i>3</i>{% t 'pay' %}</li></ol>
       <div class="co-line"><span class="muted">{% t 'subtotal' %}</span><b class="num" id="cart-total">{{ total|money }} {% t 'price_unit' %}</b></div>
       {% if gs.delivery_on %}
-      <fieldset class="dlv" id="dlv" data-fee="{{ gs.delivery_fee }}" data-free="{{ gs.free_delivery_from }}" data-unit="{% t 'price_unit' %}" data-free-label="{% t 'free' %}">
+      <fieldset class="dlv" id="dlv" data-fee="{{ gs.delivery_fee }}" data-free="{{ gs.free_delivery_from }}" data-unit="{% t 'price_unit' %}" data-free-label="{% t 'free' %}"
+                data-priced="{% if geo_priced %}1{% endif %}" data-quote-url="{% url 'delivery_quote' %}"
+                data-t-near="{% t 'dlv_near' place='@place' %}" data-t-km="{% t 'dlv_km' km='@km' %}" data-t-eta-min="{% t 'dlv_eta_min' a='@a' b='@b' %}" data-t-eta-days="{% t 'dlv_eta_days' a='@a' b='@b' %}"
+                data-t-mode-city="{% t 'dlv_mode_city' %}" data-t-mode-region="{% t 'dlv_mode_region' %}" data-t-region-note="{% t 'dlv_region_note' %}"
+                data-t-free-left="{% t 'dlv_free_left' n='@n' %}" data-t-free-done="{% t 'dlv_free_done' %}" data-t-closed="{% t 'dlv_closed' time='@time' %}"
+                data-t-map="{% t 'dlv_map' %}" data-t-approx="{% t 'dlv_approx' %}" data-t-loading="{% t 'dlv_loading' %}" data-t-detect="{% t 'dlv_detect' %}"
+                data-t-detecting="{% t 'dlv_detecting' %}" data-t-denied="{% t 'dlv_geo_denied' %}" data-t-fail="{% t 'dlv_geo_fail' %}" data-t-need="{% t 'err_geo' %}"
+                data-t-fee="{% t 'dlv_fee' %}" data-t-eta="{% t 'dlv_eta' %}">
         <legend>{% t 'step_delivery' %}</legend>
         <label class="dlv-opt"><input type="radio" name="delivery" value="pickup" checked><span class="dlv-ico" aria-hidden="true">{% icon 'dumbbell' %}</span>
           <span><b>{% t 'dlv_pickup' %}</b><small>{% t 'dlv_pickup_sub' %}</small></span><em>{% t 'free' %}</em></label>
         <label class="dlv-opt"><input type="radio" name="delivery" value="courier"><span class="dlv-ico moto" aria-hidden="true">{% icon 'truck' %}</span>
-          <span><b>{% t 'dlv_courier' %}</b><small>{{ gs.delivery_area }}{% if gs.free_delivery_from %} · {{ gs.free_delivery_from|money }} {% t 'dlv_free_from' %}{% endif %}</small></span><em class="num">{{ gs.delivery_fee|money }}</em></label>
+          <span><b>{% t 'dlv_courier' %}</b><small>{% if geo_priced %}{% t 'dlv_nationwide' %}{% else %}{{ gs.delivery_area }}{% if gs.free_delivery_from %} · {{ gs.free_delivery_from|money }} {% t 'dlv_free_from' %}{% endif %}{% endif %}</small></span>
+          <em class="num">{% if geo_priced %}{% t 'dlv_from_n' n=gs.delivery_fee|money %}{% else %}{{ gs.delivery_fee|money }}{% endif %}</em></label>
         <div class="dlv-addr grid" id="dlv-addr" hidden>
+          <div class="dg">
+            <button type="button" class="btn primary dg-detect" id="dg-detect">{% icon 'map-pin' %}<span>{% t 'dlv_detect' %}</span></button>
+            <span class="dg-or">{% t 'dlv_or_city' %}</span>
+            <select id="dg-city" name="geo_place" aria-label="{% t 'dlv_choose_city' %}"><option value="">{% t 'dlv_choose_city' %}</option>{% for key, name in places %}<option value="{{ key }}">{{ name }}</option>{% endfor %}</select>
+            <input type="hidden" name="geo_lat" id="dg-lat"><input type="hidden" name="geo_lng" id="dg-lng">
+          </div>
+          {% if last_order %}<button type="button" class="dg-last" id="dg-last" data-lat="{{ last_order.delivery_lat }}" data-lng="{{ last_order.delivery_lng }}" data-addr="{{ last_order.address }}">{% icon 'clock' %}<span>{% t 'dlv_last' place=last_order.address|truncatechars:34 %}</span></button>{% endif %}
+          <div class="dq" id="dq" aria-live="polite"><p class="dq-hint">{% t 'dlv_pick_first' %}</p></div>
           <label for="dlv-a">{% t 'address' %}<input id="dlv-a" name="address" maxlength="200" autocomplete="street-address" placeholder="{% t 'dlv_address_ph' %}"></label>
           <label for="dlv-p">{% t 'phone' %}<div class="phone"><span>+998</span><input id="dlv-p" name="delivery_phone" inputmode="numeric" autocomplete="tel-national" maxlength="17" value="{% if user.is_authenticated and user.phone %}{{ user.phone|slice:'4:' }}{% endif %}" data-phone></div></label>
           <label for="dlv-n">{% t 'dlv_note' %}<input id="dlv-n" name="delivery_note" maxlength="200" placeholder="{% t 'dlv_note_ph' %}"></label>

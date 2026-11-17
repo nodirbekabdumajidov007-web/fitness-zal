@@ -5,7 +5,7 @@
     <header><span class="dk-ava">{% if o.delivery == 'courier' %}{% aicon 'truck' %}{% else %}{% aicon 'bag' %}{% endif %}</span>
       <div><b>#{{ o.pk }} · {{ o.user.full_name|default:"—" }}</b><small class="num">{{ o.created|dmyhm }}</small></div><b class="dk-amount num">{{ o.total|money }}</b></header>
     <ul class="dk-items">{% for it in o.items.all %}<li><span>{{ it.name }}</span><b class="num">× {{ it.qty }}</b></li>{% endfor %}</ul>
-    {% if o.delivery == 'courier' %}<p class="dk-sub">{{ o.address }} · <a href="tel:{{ o.delivery_phone }}" class="num">{{ o.delivery_phone }}</a>{% if o.delivery_note %} · {{ o.delivery_note }}{% endif %}</p>
+    {% if o.delivery == 'courier' %}<p class="dk-sub">{{ o.address }} · <a href="tel:{{ o.delivery_phone }}" class="num">{{ o.delivery_phone }}</a>{% if o.delivery_note %} · {{ o.delivery_note }}{% endif %}{% if o.delivery_km is not None %} · <b class="num">{{ o.place_name }} {{ o.delivery_km }} km</b>{% endif %}{% if o.map_links %} · <a href="{{ o.map_links.yandex }}" target="_blank" rel="noopener noreferrer">{% icon 'map-pin' %} Xarita</a>{% endif %}</p>
       <span class="dk-st {% if o.status == 'shipping' %}good{% else %}warn{% endif %}">{% if o.status == 'shipping' %}Yo'lda{% else %}Kuryer yetkazadi{% endif %}</span>{% endif %}
     <div class="dk-row-acts">
       {% if o.delivery == 'courier' and o.status == 'new' %}<button type="button" class="dk-btn sm" data-act="post" data-url="{% url 'admin:desk_ship' o.pk %}">{% aicon 'truck' %}Yo'lga chiqarish</button>{% endif %}

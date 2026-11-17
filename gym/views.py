@@ -29,7 +29,7 @@ from django.utils.safestring import mark_safe
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
-from . import click, emailcode, extras, google_auth, services, sms, telegram
+from . import click, emailcode, extras, geo, google_auth, services, sms, telegram
 from .media import ranged_file_response, video_embed
 from .forms import AccountForm, BodyLogForm, LoginForm, PasswordForm, PhoneField, ProfileForm, RegisterForm, ReviewForm, find_user, normalize_phone
 from .i18n import LANGS
@@ -1034,8 +1034,44 @@ def cart_items(request):
 def cart_view(request):
     items, total = cart_items(request)
     gs = GymSettings.load()
+    last = None
+    if request.user.is_authenticated:  # the place of the last courier order is offered again: one tap instead of typing it all
+        last = (request.user.orders.filter(delivery=Order.Delivery.COURIER, delivery_lat__isnull=False).exclude(address="").first())
     return render(request, "gym/cart.html", {"items": items, "total": total, "methods": allowed_methods(gs),
-                                             "in_cart": {i["p"].pk: i["qty"] for i in items}})
+                                             "in_cart": {i["p"].pk: i["qty"] for i in items},
+                                             "places": geo.place_choices(request.lang), "geo_priced": geo.origin_of(gs) is not None, "last_order": last})
+
+
+def _point_from(data):
+    """(lat, lng) from the browser's position (geo_lat/geo_lng) or from a chosen city (geo_place); None when neither is usable."""
+    pt = geo.parse_point(data.get("geo_lat") or data.get("lat"), data.get("geo_lng") or data.get("lng"))
+    if pt is None:
+        pt = geo.place_point(data.get("geo_place") or data.get("place") or "")
+    return pt
+
+
+def _quote_json(request, q, subtotal):
+    """The quote in a form the cart's script can show: numbers, the place in the site language, nothing the browser must trust."""
+    if not q["ok"]:
+        return {"ok": False, "error": translate(request.lang, q["error"])}
+    eta = q["eta"]
+    return {"ok": True, "priced": q["priced"], "mode": q["mode"], "km": q["km"], "fee": q["fee"], "free": q["free"], "left": q["left_for_free"],
+            "place": geo.place_name(q["place"], request.lang), "lat": q["lat"], "lng": q["lng"],
+            "eta": {"kind": eta["kind"], "a": eta["a"], "b": eta["b"], "delayed": eta["delayed"], "opens": eta["opens"]} if eta else None,
+            "total": subtotal + q["fee"],
+            "map": f"https://yandex.uz/maps/?pt={q['lng']},{q['lat']}&z=15&l=map"}
+
+
+def delivery_quote(request):
+    """GET: the price and time of delivering the cart to a position or a city. Nothing is stored."""
+    pt = _point_from(request.GET)
+    if pt is None:
+        return JsonResponse({"ok": False, "error": translate(request.lang, "err_geo")}, status=400)
+    _items, total = cart_items(request)
+    gs = GymSettings.load()
+    if not gs.delivery_on:
+        return JsonResponse({"ok": False, "error": translate(request.lang, "delivery_off")}, status=400)
+    return JsonResponse(_quote_json(request, geo.quote(gs, pt[0], pt[1], total), total))
 
 
 CART_MAX = 50
@@ -1129,12 +1165,17 @@ def checkout(request):
             flash(request, messages.ERROR, "err_phone")
             return redirect("cart")
         delivery = {"address": address, "phone": phone, "note": request.POST.get("delivery_note", "").strip()}
+        pt = _point_from(request.POST)
+        if pt:
+            delivery["lat"], delivery["lng"] = pt
     order, err = services.place_order(request.user, cart, method, delivery)
     if err:
         flash(request, messages.ERROR, err)
         return redirect("cart")
     if delivery:
-        telegram.alert_admin(f"🛵 Yetkazish #{order.pk}: {order.total} so'm · {delivery['address']} · {delivery['phone']}")
+        where = f" · {order.place_name} {order.delivery_km} km" if order.delivery_km is not None else ""
+        link = (chr(10) + order.map_links["yandex"]) if order.map_links else ""
+        telegram.alert_admin(f"🛵 Yetkazish #{order.pk}: {order.total} so'm · {delivery['address']}{where} · {delivery['phone']}{link}")
     try:  # SMS to the owner when something runs low; a failing SMS provider must never break a paid checkout
         services.check_low_stock([it.product for it in order.items.select_related("product")])
     except Exception:
@@ -1145,7 +1186,7 @@ def checkout(request):
         return redirect(click.pay_url(order.payments.first(), abs_url(request, "orders")))
     if method == "card":
         return redirect("pay", pk=order.payments.first().pk)
-    flash(request, messages.SUCCESS, "order_ok")
+    flash(request, messages.SUCCESS, "order_ok_courier" if delivery else "order_ok")
     return redirect("orders")
 
 

@@ -24,6 +24,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from . import assistant_kb as kb
+from . import geo
 from . import assistant_live as live
 from .i18n import CHAIN, FALLBACK, T, pick
 
@@ -767,8 +768,11 @@ class Facts:
         gs = self.gs
         if not gs.delivery_on:
             return tx("deliv_off", self.lang)
-        kw = {"fee": money(gs.delivery_fee, self.lang) if gs.delivery_fee else pick({"uz": "bepul", "ru": "бесплатно", "en": "free", "tr": "ücretsiz"}, self.lang),
-              "free": money(gs.free_delivery_from, self.lang), "area": gs.delivery_area}
+        fee = money(gs.delivery_fee, self.lang) if gs.delivery_fee else pick({"uz": "bepul", "ru": "бесплатно", "en": "free", "tr": "ücretsiz"}, self.lang)
+        if gs.delivery_fee and geo.origin_of(gs) is not None:  # the price depends on the distance now: say "from"
+            fee = pick({"uz": f"{fee} dan (masofaga qarab)", "ru": f"от {fee} (зависит от расстояния)", "en": f"from {fee} (depends on distance)",
+                        "tr": f"{fee}'den başlayarak (mesafeye göre)", "ky": f"{fee} баштап (аралыкка жараша)", "tg": f"аз {fee} (вобаста ба масофа)"}, self.lang)
+        kw = {"fee": fee, "free": money(gs.free_delivery_from, self.lang), "area": gs.delivery_area}
         return tx("deliv_on" if gs.free_delivery_from else "deliv_on_nofree", self.lang, **kw)
 
     def f_pay_methods(self):

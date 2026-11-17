@@ -203,6 +203,36 @@ app_tr1||Telegram'ın bilinmeyen uygulama yüklemesine izin istenirse: Ayarlar �
 app_tr2||Play Protect engellerse: “Daha fazla ayrıntı” → “Yine de yükle”. Uygulama yalnızca bu siteyi açar.||Play Protect бөгөттөсө: «Кененирээк» → «Баары бир орнотуу». Тиркеме ушул сайтты гана ачат.||Агар Play Protect манъ кунад: «Тафсилот» → «Ба ҳар ҳол насб кардан». Барнома танҳо ҳамин сайтро мекушояд.
 app_tr3||“Uygulama yüklenmedi” derse: eski Fitnes Zal uygulamasını kaldırıp yeniden yükleyin.||«Тиркеме орнотулган жок» десе: эски Fitnes Zal тиркемесин өчүрүп, кайра орнотуңуз.||Агар «Барнома насб нашуд» гӯяд: барномаи кӯҳнаи Fitnes Zal-ро нест карда, аз нав насб кунед.
 ex_video||Video||Видео||Видео
+dlv_detect||Konumumu bul||Жайгашкан жеримди аныктоо||Муайян кардани ҷойгиршавӣ
+dlv_detecting||Konum bulunuyor…||Аныкталууда…||Муайян карда истодаам…
+dlv_or_city||veya şehri seçin||же шаарды тандаңыз||ё шаҳрро интихоб кунед
+dlv_choose_city||Şehir seçin||Шаарды тандаңыз||Шаҳрро интихоб кунед
+dlv_geo_denied||Konum izni verilmedi. Şehri listeden seçin.||Жайгашкан жерге уруксат берилген жок. Шаарды тизмеден тандаңыз.||Иҷозат ба ҷойгиршавӣ дода нашуд. Шаҳрро аз рӯйхат интихоб кунед.
+dlv_geo_fail||Konum bulunamadı. Şehri listeden seçin.||Жайгашкан жерди аныктоо мүмкүн болбоду. Шаарды тизмеден тандаңыз.||Ҷойгиршавӣ муайян нашуд. Шаҳрро аз рӯйхат интихоб кунед.
+err_geo_out||Yalnızca Özbekistan içine teslim ediyoruz||Биз Өзбекстан боюнча гана жеткиребиз||Мо танҳо дар Ӯзбекистон мерасонем
+err_geo_far||Şehirlerarası teslimat şu an kapalı||Шаарлар аралык жеткирүү азырынча өчүрүлгөн||Расонидани байни шаҳрҳо ҳоло хомӯш аст
+err_geo||Fiyat mesafeye bağlı: konumunuzu bulun veya şehri seçin||Баасы аралыкка жараша: жайгашкан жериңизди аныктаңыз же шаарды тандаңыз||Нарх ба масофа вобаста аст: ҷойгиршавиро муайян кунед ё шаҳрро интихоб кунед
+dlv_near||En yakın yer: {place}||Эң жакын жер: {place}||Наздиктарин ҷой: {place}
+dlv_km||~{km} km yol||~{km} км жол||~{km} км роҳ
+dlv_eta||Teslimat süresi||Жеткирүү убактысы||Вақти расонидан
+dlv_eta_min||{a}–{b} dakika||{a}–{b} мүнөт||{a}–{b} дақиқа
+dlv_eta_days||{a}–{b} gün||{a}–{b} күн||{a}–{b} рӯз
+dlv_mode_city||Şehir içi kurye||Шаар ичиндеги курьер||Курьер дар шаҳр
+dlv_mode_region||Şehirlerarası teslimat||Шаарлар аралык жеткирүү||Расонидани байни шаҳрҳо
+dlv_region_note||Sipariş nakliye şirketiyle gönderilir, kurye sizi arar.||Буйрутма транспорт компаниясы аркылуу жөнөтүлөт, курьер чалат.||Фармоиш тавассути ширкати нақлиётӣ фиристода мешавад, курьер занг мезанад.
+dlv_free_left||{n} so'm daha ekleyin, teslimat ücretsiz||Дагы {n} сом кошсоңуз, жеткирүү акысыз||Боз {n} сӯм илова кунед, расонидан ройгон
+dlv_free_done||Teslimat ücretsiz!||Жеткирүү акысыз!||Расонидан ройгон!
+dlv_closed||Salon şu an kapalı: kurye {time} sonrasında yola çıkar||Зал азыр жабык: курьер {time} кийин чыгат||Толор ҳоло баста аст: курьер баъди {time} равона мешавад
+dlv_map||Haritada||Картада||Дар харита
+dlv_est||Tahmini teslimat||Болжолдуу жеткирүү||Расонидани тахминӣ
+dlv_nationwide||Tüm Özbekistan · fiyat mesafeye göre||Бүт Өзбекстан боюнча · баасы аралыкка жараша||Дар тамоми Ӯзбекистон · нарх аз рӯи масофа
+dlv_from_n||{n}'den başlayarak||{n} баштап||аз {n}
+dlv_last||Son adresim: {place}||Акыркы дарегим: {place}||Суроғаи охирини ман: {place}
+order_ok_courier||Sipariş alındı. Kurye sizinle iletişime geçecek.||Буйрутма кабыл алынды. Курьер сиз менен байланышат.||Фармоиш қабул шуд. Курьер бо шумо тамос мегирад.
+dlv_pick_first||Fiyat ve süreyi görmek için konumunuzu bulun veya şehri seçin||Баа жана убакытты көрүү үчүн жайгашкан жериңизди аныктаңыз же шаарды тандаңыз||Барои дидани нарх ва вақт ҷойгиршавиро муайян кунед ё шаҳрро интихоб кунед
+dlv_loading||Hesaplanıyor…||Эсептелүүдө…||Ҳисоб карда истодаам…
+dlv_call||Ara||Чалуу||Занг задан
+dlv_approx||Mesafe ve süre yaklaşıktır||Аралык жана убакыт болжолдуу||Масофа ва вақт тахминӣ аст
 app_tr4||İlk açılışta site 30–60 saniye yüklenebilir: sunucu uyanıyor. Bekleyin, sonra hızlı açılır.||Биринчи ачылганда сайт 30–60 секунд жүктөлүшү мүмкүн: сервер ойгонот. Күтүңүз, кийин тез ачылат.||Дар кушодани аввал сайт метавонад 30–60 сония бор шавад: сервер бедор мешавад. Интизор шавед, баъд зуд кушода мешавад.
 sw_ask_title||Asistana sorun||Жардамчыдан сураңыз||Аз ёвар пурсед
 sw_ask_ph||örn. üyeliğimi nasıl dondururum?||мис. абонементимди кантип тоңдурам?||масалан, абонементамро чӣ тавр яхбандӣ мекунам?

@@ -213,3 +213,47 @@ main h2{font-size:clamp(1.35rem,2.1vw,1.7rem)}
 .tag-hot,.db-quick a[aria-current="page"],.pg-num.cur,.mine .bubble,.vmic[aria-expanded="true"],.tk-periods button[aria-pressed=true],.sw-b.mine .sw-b-box,.m-send,.ft-social a:hover,.ft-top:hover svg{border-color:var(--accent-fill)}
 .receipt .pill.good{color:#166534}
 .receipt{--good:#166534}
+
+/* ---- delivery (2026-11-17): share a position, see the distance, price and time ---- */
+.dg{display:grid;gap:8px}
+.dg-detect{justify-content:center;gap:8px;min-height:44px}
+.dg-detect .ico{width:18px;height:18px;flex:none}
+.dg-or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.76rem}
+.dg-or::before,.dg-or::after{content:"";flex:1;height:1px;background:var(--line)}
+.dg-last{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:99px;border:1px dashed var(--line-strong);background:transparent;color:var(--ink);font:inherit;font-size:.82rem;cursor:pointer;text-align:left;min-height:40px;transition:border-color .15s,background-color .15s}
+.dg-last:hover{border-color:var(--accent);background-color:var(--accent-soft)}
+.dg-last .ico{width:16px;height:16px;flex:none;color:var(--accent)}
+.dq-hint,.dq-err{margin:0;padding:10px 12px;border-radius:var(--r);font-size:.84rem;line-height:1.4}
+.dq-hint{background:var(--surface-2);color:var(--muted);border:1px dashed var(--line-strong)}
+.dq-err{background:color-mix(in srgb,var(--bad) 10%,var(--surface));color:var(--bad);border:1px solid color-mix(in srgb,var(--bad) 35%,var(--line))}
+.dq-card{display:grid;gap:10px;padding:12px;border-radius:var(--r-lg);border:1px solid var(--line);background:var(--surface);box-shadow:var(--sh-1);animation:slide .3s}
+.dq-top{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center}
+.dq-pin{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent)}
+.dq-pin .ico{width:18px;height:18px}
+.dq-who b{display:block;font-size:.92rem;line-height:1.25;overflow-wrap:anywhere}
+.dq-who small{display:block;color:var(--muted);font-size:.76rem}
+.dq-map{font-size:.76rem;font-weight:600;text-decoration:none;color:var(--accent);padding:4px 10px;border-radius:99px;border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);white-space:nowrap}
+.dq-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.dq-grid>div{padding:8px 10px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line)}
+.dq-grid small{display:block;color:var(--muted);font-size:.72rem}
+.dq-grid b{font-size:1rem}
+.dq-fee.free{color:var(--good)}
+.dq-bar{height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.dq-bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent-fill),var(--accent-2));transition:width .4s}
+.dq-note{margin:0;font-size:.8rem;color:var(--muted);line-height:1.4}
+.dq-note.good{color:var(--good);font-weight:600}
+.dq-note.warn{color:color-mix(in srgb,var(--warn) 55%,var(--ink))}
+.dq-fine{margin:0;font-size:.72rem;color:var(--muted)}
+.dq-card.region .dq-pin{background:color-mix(in srgb,var(--accent-2) 14%,transparent);color:var(--accent-2)}
+.dlv-addr select{width:100%}
+.dlv-opt em{white-space:nowrap}
+.dlv-opt>span:nth-of-type(2){min-width:0}
+
+/* order page: the arrival window, the distance and two quick actions */
+.ord-eta{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;padding:8px 12px;border-radius:var(--r);background:var(--surface-2);border:1px solid var(--line)}
+.ord-eta-ico{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent)}
+.ord-eta-ico .ico{width:16px;height:16px}
+.ord-eta small{display:block;color:var(--muted);font-size:.72rem}
+.ord-eta b{font-size:.95rem}
+.ord-acts{display:flex;gap:6px;margin-left:auto}
+.ord-acts .btn .ico{width:14px;height:14px}

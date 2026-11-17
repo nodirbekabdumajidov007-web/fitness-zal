@@ -15,7 +15,15 @@
   </ol>
   {% endif %}
   <div class="muted">{% for it in o.items.all %}{{ it.name }} × {{ it.qty }}{% if not forloop.last %}, {% endif %}{% endfor %}</div>
-  {% if o.delivery == 'courier' %}<div class="muted">{% icon 'map-pin' %} {{ o.address }} · {{ o.delivery_phone }}{% if o.delivery_fee %} · {% t 'dlv_fee' %}: <span class="num">{{ o.delivery_fee|money }}</span>{% endif %}</div>{% endif %}
+  {% if o.delivery == 'courier' %}<div class="muted">{% icon 'map-pin' %} {{ o.address }} · {{ o.delivery_phone }}{% if o.delivery_fee %} · {% t 'dlv_fee' %}: <span class="num">{{ o.delivery_fee|money }}</span>{% endif %}</div>
+  {% if o.delivery == 'courier' and o.status != 'done' and o.status != 'cancelled' and o.delivery_eta_from %}
+  <div class="ord-eta"><span class="ord-eta-ico" aria-hidden="true">{% icon 'clock' %}</span>
+    <span><small>{% t 'dlv_est' %}</small>
+      <b class="num">{% if o.delivery_region %}{{ o.delivery_eta_from|date:"d.m" }}–{{ o.delivery_eta_to|date:"d.m" }}{% else %}{{ o.delivery_eta_from|date:"H:i" }}–{{ o.delivery_eta_to|date:"H:i" }}{% if o.delivery_eta_from|date:"Ymd" != o.created|date:"Ymd" %} · {{ o.delivery_eta_from|date:"d.m" }}{% endif %}{% endif %}</b></span>
+    {% if o.delivery_km is not None %}<span class="ord-km"><small>{{ o.place_name }}</small><b class="num">~{{ o.delivery_km }} km</b></span>{% endif %}
+    <span class="ord-acts">{% if o.map_links %}<a class="btn small" href="{{ o.map_links.yandex }}" target="_blank" rel="noopener noreferrer">{% icon 'map-pin' %} {% t 'dlv_map' %}</a>{% endif %}{% if gs.phone %}<a class="btn small" href="tel:+998{{ gs.phone|cut:' ' }}">{% t 'dlv_call' %}</a>{% endif %}</span>
+  </div>
+  {% endif %}{% endif %}
   <b class="num">{{ o.total|money }} {% t 'price_unit' %}</b>
 </article>
 {% empty %}<div class="card muted">{% t 'none_yet' %} · <a href="{% url 'shop' %}">{% t 'shop' %}</a></div>{% endfor %}

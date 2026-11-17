@@ -8,7 +8,7 @@ from django.db import transaction
 from django.db.models import Count, F
 from django.utils import timezone
 
-from . import telegram
+from . import geo, telegram
 from .templatetags.gym_tags import translate
 from .models import (BodyLog, Booking, GymSettings, Membership, Order, Payment, PaymentCard, Plan, Product, PromoCode, ReferralReward, Review, User, Visit)
 
@@ -443,28 +443,44 @@ def expire_pending(hours=CARD_HOLD_HOURS):
 @transaction.atomic
 def place_order(user, cart, method, delivery=None):
     """cart: {product_id: qty}. Prices, stock and the delivery fee are always worked out here, never taken from the browser.
-    delivery: None for pickup at the gym, or {"address", "phone", "note"} for a courier."""
+    delivery: None for pickup at the gym, or {"address", "phone", "note"} for a courier, plus "lat"/"lng" when the customer gave a position
+    (then price and time come from the distance, see geo.quote)."""
     card = current_card() if method == "card" else None
     if method == "card" and not card:
         return None, "err_method"
     gs = GymSettings.load()
     if delivery is not None and not gs.delivery_on:
         return None, "delivery_off"
-    items, total = [], 0
-    for pid, qty in cart.items():
+    products, total = [], 0
+    for pid, qty in cart.items():  # first look, then touch the stock: nothing to undo if the cart or the delivery place is not acceptable
         p = Product.objects.filter(pk=pid, active=True).first()
         if not p or qty < 1:
             return None, "cart_bad"
-        if not Product.objects.filter(pk=pid, stock__gte=qty).update(stock=F("stock") - qty):
-            return None, "err_stock"  # atomic check-and-decrement; the whole order rolls back
-        items.append((p, qty))
+        products.append((p, qty))
         total += p.price * qty
-    fee = gs.delivery_cost(total) if delivery is not None else 0
-    total += fee
-    extra = {}
+    fee, extra = 0, {}
     if delivery is not None:
+        q = None
+        if delivery.get("lat") is not None and delivery.get("lng") is not None:
+            q = geo.quote(gs, delivery["lat"], delivery["lng"], total)
+            if not q["ok"]:
+                return None, q["error"]
+        elif geo.origin_of(gs) is not None:
+            return None, "err_geo"  # the price depends on the distance, so the place is needed
+        fee = q["fee"] if q else gs.delivery_cost(total)
         extra = {"delivery": Order.Delivery.COURIER, "address": delivery["address"][:200], "delivery_phone": delivery["phone"],
                  "delivery_note": delivery.get("note", "")[:200], "delivery_fee": fee}
+        if q:
+            extra.update(delivery_lat=q["lat"], delivery_lng=q["lng"], delivery_place=q["place"], delivery_km=q["km"], delivery_region=q["mode"] == "region")
+            if q["eta"]:
+                extra.update(delivery_eta_from=q["eta"]["from"], delivery_eta_to=q["eta"]["to"])
+    items = []
+    for p, qty in products:
+        if not Product.objects.filter(pk=p.pk, stock__gte=qty).update(stock=F("stock") - qty):
+            transaction.set_rollback(True)  # undo the stock already taken for the earlier items of this cart
+            return None, "err_stock"
+        items.append((p, qty))
+    total += fee
     order = Order.objects.create(user=user, total=total, method=method, **extra)
     for p, qty in items:
         order.items.create(product=p, name=p.name, price=p.price, qty=qty)

@@ -145,6 +145,7 @@ urlpatterns = [
     path("cart/add/<int:pid>/", v.cart_add, name="cart_add"),
     path("cart/update/<int:pid>/", v.cart_update, name="cart_update"),
     path("checkout/", v.checkout, name="checkout"),
+    path("delivery/quote/", v.delivery_quote, name="delivery_quote"),
     path("orders/", v.orders_view, name="orders"),
     path("payments/", v.payments_view, name="payments"),
     path("receipt/<int:pk>/", v.receipt, name="receipt"),

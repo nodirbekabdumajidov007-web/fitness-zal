@@ -641,6 +641,36 @@ dlv_note||Kuryerga izoh||Комментарий курьеру||Note for the cou
 dlv_note_ph||Masalan: 3-qavat, domofon 25||Например: 3 этаж, домофон 25||e.g. 3rd floor, intercom 25
 dlv_fee||Yetkazish||Доставка||Delivery
 err_address||Yetkazish uchun manzilni to'liq yozing||Укажите полный адрес доставки||Please enter the full delivery address
+dlv_detect||Joylashuvimni aniqlash||Определить моё местоположение||Detect my location
+dlv_detecting||Aniqlanmoqda…||Определяем…||Locating…
+dlv_or_city||yoki shaharni tanlang||или выберите город||or choose a city
+dlv_choose_city||Shaharni tanlang||Выберите город||Choose a city
+dlv_geo_denied||Joylashuvga ruxsat berilmadi. Shaharni ro'yxatdan tanlang.||Доступ к геолокации не разрешён. Выберите город из списка.||Location access was denied. Choose a city from the list.
+dlv_geo_fail||Joylashuvni aniqlab bo'lmadi. Shaharni ro'yxatdan tanlang.||Не удалось определить местоположение. Выберите город из списка.||Could not detect your location. Choose a city from the list.
+err_geo_out||Faqat O'zbekiston bo'ylab yetkazamiz||Доставляем только по Узбекистану||We deliver within Uzbekistan only
+err_geo_far||Viloyatlararo yetkazish hozir o'chirilgan||Междугородняя доставка сейчас отключена||Intercity delivery is switched off for now
+err_geo||Yetkazish narxi masofaga bog'liq: joylashuvni aniqlang yoki shaharni tanlang||Цена зависит от расстояния: определите местоположение или выберите город||The price depends on the distance: detect your location or choose a city
+dlv_near||Eng yaqin joy: {place}||Ближайший пункт: {place}||Nearest place: {place}
+dlv_km||~{km} km yo'l||~{km} км пути||~{km} km by road
+dlv_eta||Yetkazish vaqti||Время доставки||Delivery time
+dlv_eta_min||{a}–{b} daqiqa||{a}–{b} мин||{a}–{b} min
+dlv_eta_days||{a}–{b} kun||{a}–{b} дн.||{a}–{b} days
+dlv_mode_city||Shahar ichida kuryer||Курьер по городу||City courier
+dlv_mode_region||Viloyatlararo yetkazish||Междугородняя доставка||Intercity delivery
+dlv_region_note||Buyurtma transport kompaniyasi orqali jo'natiladi, kuryer qo'ng'iroq qiladi.||Заказ отправляется транспортной компанией, курьер позвонит.||The order ships with a carrier, and they will call you.
+dlv_free_left||Yana {n} so'm qo'shsangiz, yetkazish bepul||Добавьте ещё {n} сум — доставка бесплатная||Add {n} UZS more and delivery is free
+dlv_free_done||Yetkazish bepul!||Доставка бесплатная!||Delivery is free!
+dlv_closed||Zal hozir yopiq: kuryer {time} dan keyin yo'lga chiqadi||Зал сейчас закрыт: курьер выедет после {time}||The gym is closed now: the courier leaves after {time}
+dlv_map||Xaritada||На карте||On map
+dlv_est||Taxminiy yetkazish||Ориентировочная доставка||Estimated delivery
+dlv_nationwide||Butun O'zbekiston bo'ylab · narx masofaga qarab||По всему Узбекистану · цена зависит от расстояния||All over Uzbekistan · price by distance
+dlv_from_n||{n} dan||от {n}||from {n}
+dlv_last||Oxirgi manzilim: {place}||Мой прошлый адрес: {place}||My last address: {place}
+order_ok_courier||Buyurtma qabul qilindi. Kuryer siz bilan bog'lanadi.||Заказ принят. Курьер свяжется с вами.||Order received. The courier will contact you.
+dlv_pick_first||Narx va vaqtni ko'rish uchun joylashuvni aniqlang yoki shaharni tanlang||Определите местоположение или выберите город, чтобы увидеть цену и время||Detect your location or choose a city to see the price and time
+dlv_loading||Hisoblanmoqda…||Считаем…||Calculating…
+dlv_call||Qo'ng'iroq||Позвонить||Call
+dlv_approx||Masofa va vaqt taxminiy||Расстояние и время приблизительные||Distance and time are approximate
 delivery_off||Hozircha yetkazib berish yo'q, zaldan olib keting||Доставка сейчас недоступна, заберите в зале||Delivery is off for now; please pick up at the gym
 st_shipping||Yo'lda||В пути||On the way
 ship_do||Yo'lga chiqdi||Отправлен||Out for delivery

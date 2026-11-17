@@ -9,6 +9,7 @@ from django.db import models
 from django.db.models.functions import Lower
 from django.utils import timezone
 
+from . import geo
 from .media import validate_image, validate_video_file, validate_video_url, video_storage
 
 PHONE_VALIDATOR = RegexValidator(r"^\+998\d{9}$", "+998 bilan boshlanib, 9 ta raqam bo'lishi kerak")
@@ -188,9 +189,24 @@ class GymSettings(models.Model):
     alert_phone = models.CharField("Ogohlantirish SMS keladigan telefon (9 raqam)", max_length=20, blank=True,
                                    help_text="Bo'sh bo'lsa, zal telefoniga yuboriladi.")
     delivery_on = models.BooleanField("Mahsulotlarni yetkazib berish yoqilgan", default=True)
-    delivery_fee = models.BigIntegerField("Yetkazish narxi (so'm)", default=15000, validators=[MinValueValidator(0)])
-    free_delivery_from = models.BigIntegerField("Shu summadan bepul yetkaziladi (so'm, 0 = hech qachon)", default=300000, validators=[MinValueValidator(0)])
-    delivery_area = models.CharField("Yetkazish hududi", max_length=120, default="Shahar ichida, 1–2 soatda")
+    delivery_fee = models.BigIntegerField("Shahar ichida: boshlang'ich narx (so'm)", default=15000, validators=[MinValueValidator(0)],
+                                          help_text="Birinchi «bazaviy km» uchun narx. Undan uzoqqa har km uchun «1 km narxi» qo'shiladi.")
+    free_delivery_from = models.BigIntegerField("Shahar ichida shu summadan bepul (so'm, 0 = hech qachon)", default=300000, validators=[MinValueValidator(0)])
+    delivery_area = models.CharField("Yetkazish hududi (matn)", max_length=120, default="Shahar ichida 1–2 soat, butun O'zbekiston bo'ylab 1–3 kun")
+    delivery_origin = models.CharField("Zal shahri (masofa shu nuqtadan o'lchanadi)", max_length=20, blank=True,
+                                       choices=[(k, v[0]) for k, v in geo.PLACES.items()],
+                                       help_text="Xaritada aniq koordinatalar kiritilgan bo'lsa, o'sha ishlatiladi. Ikkalasi ham bo'sh bo'lsa, narx masofaga qarab emas, "
+                                                 "bitta qat'iy narxda hisoblanadi.")
+    delivery_base_km = models.PositiveSmallIntegerField("Bazaviy masofa (km)", default=3, help_text="Boshlang'ich narx shu masofagacha amal qiladi.")
+    delivery_per_km = models.BigIntegerField("Shahar ichida 1 km narxi (so'm)", default=1500, validators=[MinValueValidator(0)])
+    delivery_city_km = models.PositiveSmallIntegerField("Shahar zonasi (km, yo'l bo'yicha)", default=20,
+                                                        help_text="Shu masofagacha kuryer o'zi olib boradi (daqiqalarda). Undan uzoqqa viloyatlararo yetkaziladi (kunlarda).")
+    region_delivery_on = models.BooleanField("Viloyatlararo yetkazish yoqilgan", default=True)
+    region_extra_fee = models.BigIntegerField("Viloyatlararo: qo'shimcha to'lov (so'm)", default=15000, validators=[MinValueValidator(0)],
+                                              help_text="Transport kompaniyasiga topshirish uchun. Shahar zonasi chetidagi narxga qo'shiladi.")
+    region_per_km = models.BigIntegerField("Viloyatlararo 1 km narxi (so'm)", default=40, validators=[MinValueValidator(0)])
+    free_region_from = models.BigIntegerField("Viloyatlararo shu summadan bepul (so'm, 0 = hech qachon)", default=0, validators=[MinValueValidator(0)])
+    delivery_prep_min = models.PositiveSmallIntegerField("Buyurtmani tayyorlash (daqiqa)", default=20)
     map_lat = models.DecimalField("Zal joylashuvi: kenglik (lat)", max_digits=9, decimal_places=6, null=True, blank=True,
                                   help_text="Google xaritada zalni bosing → koordinatalar chiqadi (masalan 41.311081). Bo'sh bo'lsa, manzil bo'yicha qidiriladi.")
     map_lng = models.DecimalField("Zal joylashuvi: uzunlik (lng)", max_digits=9, decimal_places=6, null=True, blank=True)
@@ -468,6 +484,13 @@ class Order(models.Model):
     delivery_phone = models.CharField("Qabul qiluvchi telefoni", max_length=13, blank=True)
     delivery_note = models.CharField("Kuryerga izoh", max_length=200, blank=True)
     delivery_fee = models.BigIntegerField("Yetkazish narxi", default=0)
+    delivery_lat = models.DecimalField("Kenglik", max_digits=9, decimal_places=6, null=True, blank=True)
+    delivery_lng = models.DecimalField("Uzunlik", max_digits=9, decimal_places=6, null=True, blank=True)
+    delivery_km = models.DecimalField("Masofa (km)", max_digits=6, decimal_places=1, null=True, blank=True)
+    delivery_place = models.CharField("Eng yaqin shahar", max_length=20, blank=True)
+    delivery_region = models.BooleanField("Viloyatlararo", default=False)
+    delivery_eta_from = models.DateTimeField("Taxminiy yetkazish: dan", null=True, blank=True)
+    delivery_eta_to = models.DateTimeField("Taxminiy yetkazish: gacha", null=True, blank=True)
     shipped_at = models.DateTimeField("Yo'lga chiqdi", null=True, blank=True)
     done_at = models.DateTimeField("Topshirildi", null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan")
@@ -475,6 +498,18 @@ class Order(models.Model):
     @property
     def subtotal(self):
         return self.total - self.delivery_fee
+
+    @property
+    def map_links(self):
+        """Where the courier is going, on Yandex and Google maps; empty for pickup or when the customer gave no position."""
+        if self.delivery_lat is None or self.delivery_lng is None:
+            return {}
+        return {"yandex": f"https://yandex.uz/maps/?pt={self.delivery_lng},{self.delivery_lat}&z=16&l=map",
+                "google": f"https://www.google.com/maps/search/?api=1&query={self.delivery_lat},{self.delivery_lng}"}
+
+    @property
+    def place_name(self):
+        return geo.place_name(self.delivery_place) if self.delivery_place else ""
 
     class Meta:
         ordering = ["-created"]
