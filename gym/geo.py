@@ -111,7 +111,9 @@ def parse_point(lat, lng):
 
 
 def origin_of(gs):
-    """Where deliveries start: the gym's coordinates, else the chosen city; None when the owner has set neither."""
+    """Where deliveries start: the delivery point, else the gym's map coordinates, else the chosen city; None when the owner has set none."""
+    if gs.delivery_lat is not None and gs.delivery_lng is not None:
+        return float(gs.delivery_lat), float(gs.delivery_lng)
     if gs.map_lat is not None and gs.map_lng is not None:
         return float(gs.map_lat), float(gs.map_lng)
     return place_point(gs.delivery_origin) if gs.delivery_origin else None

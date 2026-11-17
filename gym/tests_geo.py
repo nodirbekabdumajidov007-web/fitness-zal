@@ -313,3 +313,23 @@ class AssistantDeliveryAnswerTests(TestCase):
         self.assertIn("depends on distance", self.ask("how much does delivery cost?", "en"))
         GymSettings.objects.filter(pk=1).update(delivery_origin="", map_lat=None, map_lng=None)
         self.assertNotIn("masofaga qarab", self.ask("yetkazib berish narxi qancha?"))
+
+
+class DeliveryPointTests(TestCase):
+    def test_delivery_point_wins_over_map_coordinates_and_city(self):
+        gs = gym(delivery_lat="41.293341", delivery_lng="69.222725", map_lat="39.654200", map_lng="66.959700")  # map pin is in Samarkand
+        self.assertEqual(geo.origin_of(gs), (41.293341, 69.222725))
+        self.assertEqual(geo.quote(gs, *SAMARKAND, 1000)["mode"], "region")  # measured from Tashkent, not from the map pin
+        gs = gym(delivery_lat=None, delivery_lng=None, map_lat="39.654200", map_lng="66.959700")
+        self.assertEqual(geo.origin_of(gs), (39.6542, 66.9597))
+        gs = gym(delivery_lat=None, delivery_lng=None, map_lat=None, map_lng=None)
+        self.assertEqual(geo.origin_of(gs), geo.place_point("tashkent"))
+
+    def test_delivery_point_does_not_change_the_route_button(self):
+        gym(delivery_lat="41.293341", delivery_lng="69.222725", map_lat=None, map_lng=None)
+        self.assertNotContains(Client().get("/"), "route-btn")  # the public «Zalga yo'l» still needs the map coordinates
+
+    def test_migration_filled_the_point_for_an_untouched_gym(self):
+        # the dev/test database was migrated with no settings row yet, so only the rule itself is checked here
+        gs = GymSettings.load()
+        self.assertIsNone(gs.map_lat)

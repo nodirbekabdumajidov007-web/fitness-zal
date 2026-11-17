@@ -197,6 +197,11 @@ class GymSettings(models.Model):
                                        choices=[(k, v[0]) for k, v in geo.PLACES.items()],
                                        help_text="Xaritada aniq koordinatalar kiritilgan bo'lsa, o'sha ishlatiladi. Ikkalasi ham bo'sh bo'lsa, narx masofaga qarab emas, "
                                                  "bitta qat'iy narxda hisoblanadi.")
+    delivery_lat = models.DecimalField("Yetkazish boshlanadigan nuqta: kenglik (lat)", max_digits=9, decimal_places=6, null=True, blank=True,
+                                       help_text="Google Xaritada joyni o'ng tugma bilan bosing → birinchi qatordagi raqamlar koordinatalar (masalan 41.293341, 69.222725). "
+                                                 "Bu faqat yetkazish masofasi uchun: bosh sahifadagi «Zalga yo'l» tugmasiga ta'sir qilmaydi. Bo'sh bo'lsa, «Xaritada zal» koordinatalari, "
+                                                 "ular ham bo'lmasa «Zal shahri» ishlatiladi.")
+    delivery_lng = models.DecimalField("Yetkazish boshlanadigan nuqta: uzunlik (lng)", max_digits=9, decimal_places=6, null=True, blank=True)
     delivery_base_km = models.PositiveSmallIntegerField("Bazaviy masofa (km)", default=3, help_text="Boshlang'ich narx shu masofagacha amal qiladi.")
     delivery_per_km = models.BigIntegerField("Shahar ichida 1 km narxi (so'm)", default=1500, validators=[MinValueValidator(0)])
     delivery_city_km = models.PositiveSmallIntegerField("Shahar zonasi (km, yo'l bo'yicha)", default=20,

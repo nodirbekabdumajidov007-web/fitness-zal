@@ -453,12 +453,12 @@ class GymSettingsAdmin(admin.ModelAdmin):
         ("Kirish xavfsizligi", {"fields": ("google_client_id", "apple_client_id", "require_google", "login_sms_code", "require_phone_verify"), "description": GOOGLE_HELP}),
         ("Abonement va bonuslar", {"fields": (("freeze_min_days", "freeze_max_days"), "class_cancel_hours", "reminder_email", "referral_bonus_days", "referral_newcomer_percent", "revenue_goal", "gym_capacity"),
                                   "description": "Muzlatish: eng ko'p kun 0 bo'lsa, a'zolar muzlata olmaydi. Eslatmalar 7, 3 va 1 kun oldin avtomatik ketadi."}),
-        ("Yetkazib berish", {"fields": ("delivery_on", "delivery_origin", "delivery_area", ("delivery_fee", "delivery_base_km", "delivery_per_km"),
+        ("Yetkazib berish", {"fields": ("delivery_on", "delivery_origin", ("delivery_lat", "delivery_lng"), "delivery_area", ("delivery_fee", "delivery_base_km", "delivery_per_km"),
                                          ("free_delivery_from", "delivery_city_km", "delivery_prep_min"),
                                          ("region_delivery_on", "region_extra_fee", "region_per_km", "free_region_from")),
                              "description": "Mijoz joylashuvini aniqlaydi (yoki shaharni tanlaydi), narx va vaqt masofaga qarab hisoblanadi. "
-                                            "MUHIM: masofa zaldan o'lchanadi, shuning uchun pastdagi «Xaritada zal» bo'limida koordinatalarni kiriting "
-                                            "yoki yuqorida «Zal shahri»ni tanlang. Ikkalasi ham bo'sh bo'lsa, hamma uchun bitta narx (boshlang'ich narx) olinadi. "
+                                            "MUHIM: masofa zaldan o'lchanadi: «Yetkazish boshlanadigan nuqta» koordinatalarini kiriting (eng aniq) "
+                                            "yoki «Zal shahri»ni tanlang. Hammasi bo'sh bo'lsa, hamma uchun bitta narx (boshlang'ich narx) olinadi. "
                                             "Shahar zonasida kuryer soatlarda, undan uzoqqa transport kompaniyasi orqali kunlarda yetkazadi. Yo'l masofasi "
                                             "to'g'ri chiziqdan 1,3 marta uzun deb olinadi."}),
         ("Xaritada zal", {"fields": ("yandex_map_url", ("map_lat", "map_lng")),
