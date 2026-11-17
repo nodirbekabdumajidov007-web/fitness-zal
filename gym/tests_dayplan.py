@@ -34,6 +34,15 @@ class DayPassTests(TestCase):
         self.assertTrue(Category.objects.filter(name="Aksessuarlar").exists())
         self.assertGreaterEqual(Product.objects.count(), 27)
 
+    def test_every_seeded_product_has_a_photo_file(self):
+        from django.contrib.staticfiles import finders
+        call_command("setup_gym")
+        for p in Product.objects.all():
+            self.assertTrue(p.stock_photo, p.name)
+            self.assertTrue(finders.find(p.stock_photo), p.stock_photo)
+        photos = [p.stock_photo for p in Product.objects.all()]
+        self.assertGreaterEqual(len(set(photos)), 24)  # hardly any picture is shared
+
 
 class ExerciseVideoTests(TestCase):
     def test_library_names_map_to_english_in_every_language(self):

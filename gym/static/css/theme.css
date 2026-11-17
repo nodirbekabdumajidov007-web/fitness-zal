@@ -172,3 +172,6 @@ main h2{font-size:clamp(1.35rem,2.1vw,1.7rem)}
 .orders-grid .track i svg{width:11px;height:11px}
 .orders-grid .track small{font-size:.7rem;color:var(--muted)}
 @media (max-width:420px){.orders-grid{grid-template-columns:1fr}.orders-grid .track li::before{width:12px;margin:0 5px}}
+
+/* .card padding (set above) must not push the product photo in from the tile edges */
+.card.prod{padding:0}

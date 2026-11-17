@@ -420,12 +420,17 @@ class Product(models.Model):
     def stock_photo(self):
         """A free-licence stock photo (static/img/products/photos, see CREDITS.md) shown until the gym uploads its own picture."""
         n = self.name.lower()
-        for keys, pic in ((("shaker", "kokteyl"), "shaker-shake"), (("izotonik", "isotonic"), "can-isotonic"),
+        for keys, pic in ((("sochi", "towel"), "towel"), (("qo'lqop", "glove"), "gloves"), (("bint", "wrap"), "wraps"), (("kamar", "belt"), "belt"),
+                          (("butilka",), "bottle-sport"), (("skakalka", "arqon", "rope"), "rope"), (("rezina", "band"), "bands"),
+                          (("choy", "tea"), "tea-iced"), (("sut ", "milk"), "milk-protein"), (("pechenye", "cookie"), "cookie-protein"),
+                          (("karnitin",), "bottle-carnitine"), (("omega",), "caps-omega"), (("vitamin",), "tabs-vitamin"),
+                          (("mashqdan oldingi", "predtren", "pre-workout"), "powder-preworkout"), (("bcaa",), "caps-bcaa"),
+                          (("kazein", "casein"), "tub-casein"), (("geyner", "gainer"), "tub-gainer"),
+                          (("shaker", "kokteyl"), "shaker-shake"), (("izotonik", "isotonic"), "can-isotonic"),
                           (("energetik", "energy"), "can-energy"), (("batonchik", "bar"), "bar-protein"),
-                          (("pechenye", "sut "), ""), (("kreatin", "creatine", "glutamin"), "tub-creatine"),
-                          (("whey", "protein", "bcaa", "gainer", "geyner", "kazein"), "tub-whey")):
+                          (("kreatin", "creatine", "glutamin"), "tub-creatine"), (("whey", "protein"), "tub-whey")):
             if any(k in n for k in keys):
-                return f"img/products/photos/{pic}.jpg" if pic else ""
+                return f"img/products/photos/{pic}.jpg"
         if "suv" in n or "water" in n:
             big = re.search(r"(\d+(?:[.,]\d+)?)\s*(l|litr)\b", n)
             return "img/products/photos/bottle-large.jpg" if big and float(big.group(1).replace(",", ".")) >= 1 else "img/products/photos/bottle-small.jpg"
