@@ -71,7 +71,7 @@ def info(request):
             "phone": "+998 " + gs.phone, "address": gs.address, "instagram": gs.instagram, "telegram": gs.telegram,
             "crowd": crowd["level"], "crowd_pct": crowd["pct"],
             "plans": [{"code": p.code, "name": _t(lang, "plan_" + p.code) if ("plan_" + p.code) in T["uz"] else p.name,
-                       "months": p.months, "price": int(p.price)} for p in Plan.objects.filter(active=True)],
+                       "months": p.months, "days": p.days, "price": int(p.price)} for p in Plan.objects.filter(active=True)],
         }
         cache.set(key, data, 60)
     gs = GymSettings.load()

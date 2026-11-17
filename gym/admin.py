@@ -347,7 +347,7 @@ class ProductAdmin(admin.ModelAdmin):
 class PlanAdmin(admin.ModelAdmin):
     search_fields = ("name", "code")
     list_filter = ("active",)
-    list_display = ("name", "code", "months", "price", "guest_passes", "active", "order")
+    list_display = ("name", "code", "months", "days", "price", "guest_passes", "active", "order")
     list_editable = ("price", "guest_passes", "active", "order")
 
 

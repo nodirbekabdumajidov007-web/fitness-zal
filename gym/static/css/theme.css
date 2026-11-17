@@ -3,8 +3,8 @@
    photo veil, softer surfaces, one radius/shadow scale, consistent buttons, fields, chips, tables and notes. Remove the <link> to revert. */
 
 :root{
-  --bg:#f4f5f7; --surface:#ffffff; --surface-2:#f8f9fb; --ink:#12161d; --muted:#5a6271; --line:#e3e6eb; --line-strong:#cfd4dc;
-  --accent:#d6301f; --accent-soft:#fdeceA; --veil:transparent;
+  --bg:#f3f4f6; --surface:#ffffff; --surface-2:#f7f8fa; --ink:#0e1116; --muted:#565e6c; --line:#e2e5ea; --line-strong:#cdd2da;
+  --accent:#e0202e; --accent-2:#f2541b; --volt:#467300; --accent-soft:#fde9ea; --veil:transparent;
   --r:12px; --r-lg:18px; --r-sm:9px;
   --sh-1:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.06);
   --sh-2:0 4px 10px -2px rgba(16,24,40,.07),0 2px 4px -2px rgba(16,24,40,.05);
@@ -12,12 +12,12 @@
   --ring:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0c0e12; --surface:#15181e; --surface-2:#1a1e25; --ink:#eef0f3; --muted:#9aa3b0; --line:#252a33; --line-strong:#333a45;
-  --accent-soft:rgba(240,80,61,.14); --veil:transparent;
+  --bg:#090a0c; --surface:#131519; --surface-2:#1a1d22; --ink:#f1f2f4; --muted:#9aa1ad; --line:#24272e; --line-strong:#343842;
+  --accent:#ff3d3d; --accent-2:#ff7a1a; --volt:#c6f135; --good:#a5e635; --accent-soft:rgba(255,61,61,.14); --veil:transparent;
   --sh-1:0 0 0 1px rgba(255,255,255,.02); --sh-2:0 6px 16px -6px rgba(0,0,0,.6); --sh-3:0 24px 50px -16px rgba(0,0,0,.75)}}
 :root[data-theme="dark"]{
-  --bg:#0c0e12; --surface:#15181e; --surface-2:#1a1e25; --ink:#eef0f3; --muted:#9aa3b0; --line:#252a33; --line-strong:#333a45;
-  --accent-soft:rgba(240,80,61,.14); --veil:transparent;
+  --bg:#090a0c; --surface:#131519; --surface-2:#1a1d22; --ink:#f1f2f4; --muted:#9aa1ad; --line:#24272e; --line-strong:#343842;
+  --accent:#ff3d3d; --accent-2:#ff7a1a; --volt:#c6f135; --good:#a5e635; --accent-soft:rgba(255,61,61,.14); --veil:transparent;
   --sh-1:0 0 0 1px rgba(255,255,255,.02); --sh-2:0 6px 16px -6px rgba(0,0,0,.6); --sh-3:0 24px 50px -16px rgba(0,0,0,.75)}
 
 /* ---- canvas: solid, quiet background; the gym photo stays only behind the landing hero ---- */
@@ -46,16 +46,41 @@ tbody tr{transition:background-color .15s}
 tbody tr:hover{background-color:var(--surface-2)}
 tbody tr:last-child td{border-bottom:0}
 
-/* ---- buttons: filled primary, quiet secondary (no heavy ink outline) ---- */
-.btn{border-radius:var(--r);font-weight:600;letter-spacing:.005em;border:1px solid var(--line-strong);background-color:var(--surface);color:var(--ink);box-shadow:var(--sh-1)}
-.btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:var(--sh-2);border-color:color-mix(in srgb,var(--ink) 30%,var(--line-strong))}
-.btn:active:not(:disabled){transform:translateY(0) scale(.98)}
-.btn.primary{background-color:var(--accent);border-color:var(--accent);color:var(--accent-ink);box-shadow:0 1px 2px rgba(16,24,40,.08),inset 0 1px 0 rgba(255,255,255,.14)}
-.btn.primary:hover:not(:disabled){filter:brightness(1.06);box-shadow:0 8px 20px -6px color-mix(in srgb,var(--accent) 55%,transparent);border-color:var(--accent)}
+/* ---- buttons: glass. Translucent body + backdrop blur, a light top edge, a soft gloss, a thin rim.
+   Gloss is a background-image, so .gold and .portal (which have their own gradients) are left out. ---- */
+:root{--glass-bg:rgba(255,255,255,.58);--glass-rim:rgba(18,22,29,.16);--glass-edge:rgba(255,255,255,.9);--glass-gloss:rgba(255,255,255,.7);--glass-shade:rgba(16,24,40,.05);
+  --glass-drop:0 1px 2px rgba(16,24,40,.06),0 6px 16px -6px rgba(16,24,40,.16)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--glass-bg:rgba(255,255,255,.07);--glass-rim:rgba(255,255,255,.18);--glass-edge:rgba(255,255,255,.22);--glass-gloss:rgba(255,255,255,.12);--glass-shade:rgba(0,0,0,.18);
+  --glass-drop:0 1px 2px rgba(0,0,0,.4),0 8px 20px -8px rgba(0,0,0,.7)}}
+:root[data-theme="dark"]{--glass-bg:rgba(255,255,255,.07);--glass-rim:rgba(255,255,255,.18);--glass-edge:rgba(255,255,255,.22);--glass-gloss:rgba(255,255,255,.12);--glass-shade:rgba(0,0,0,.18);
+  --glass-drop:0 1px 2px rgba(0,0,0,.4),0 8px 20px -8px rgba(0,0,0,.7)}
+
+.btn{border-radius:var(--r);font-weight:600;letter-spacing:.005em;color:var(--ink);border:1px solid var(--glass-rim);background-color:var(--glass-bg);
+  -webkit-backdrop-filter:blur(14px) saturate(1.6);backdrop-filter:blur(14px) saturate(1.6);
+  box-shadow:inset 0 1px 0 var(--glass-edge),inset 0 -1px 0 var(--glass-shade),var(--glass-drop)}
+.btn:not(.gold):not(.portal){background-image:linear-gradient(180deg,var(--glass-gloss),transparent 52%,var(--glass-shade))}
+.btn:hover:not(:disabled){transform:translateY(-1px);border-color:color-mix(in srgb,var(--ink) 30%,var(--glass-rim));box-shadow:inset 0 1px 0 var(--glass-edge),inset 0 -1px 0 var(--glass-shade),0 10px 24px -8px rgba(16,24,40,.28)}
+/* same selector as the app.css hover (its background shorthand would wipe the gloss) */
+.btn:not(.primary):not(.danger):not(.gold):not(.frost):not(.frost-dark):not(.ghost):hover:not(:disabled){background:linear-gradient(180deg,var(--glass-gloss),transparent 52%,var(--glass-shade)),color-mix(in srgb,var(--glass-bg) 80%,var(--surface))}
+.btn:active:not(:disabled){transform:translateY(0) scale(.98);box-shadow:inset 0 2px 5px rgba(16,24,40,.18)}
+
+/* primary: red glass. The body stays almost opaque so the white label keeps its contrast; the glass is in the gloss, rim and glow */
+.btn.primary{color:var(--accent-ink);background-color:color-mix(in srgb,var(--accent) 94%,transparent);border-color:color-mix(in srgb,var(--accent) 70%,#fff);
+  background-image:linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,0) 46%,rgba(0,0,0,.14)),linear-gradient(115deg,transparent 35%,color-mix(in srgb,var(--accent-2) 70%,transparent));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 -1px 0 rgba(0,0,0,.18),0 1px 2px rgba(16,24,40,.1),0 8px 20px -8px color-mix(in srgb,var(--accent) 70%,transparent)}
+.btn.primary:hover:not(:disabled){filter:brightness(1.06);border-color:color-mix(in srgb,var(--accent) 60%,#fff);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -1px 0 rgba(0,0,0,.18),0 12px 26px -8px color-mix(in srgb,var(--accent) 75%,transparent)}
 .btn.primary::after{display:none}
-.btn.danger{background-color:var(--surface);border-color:color-mix(in srgb,var(--bad) 45%,var(--line));color:var(--bad)}
+.btn.danger{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 45%,var(--glass-rim));background-color:color-mix(in srgb,var(--bad) 7%,var(--glass-bg))}
+.btn.armed{color:#fff;background-color:color-mix(in srgb,var(--bad) 94%,transparent);border-color:var(--bad)}
+/* on photos and dark heroes: clear glass with a white label */
+.hero .btn:not(.primary):not(.gold),.btn.ghost,.btn.frost,.btn.frost-dark{color:#fff;background-color:rgba(255,255,255,.12);border-color:rgba(255,255,255,.42);
+  background-image:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%);box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 8px 22px -10px rgba(0,0,0,.6)}
+.hero .btn:not(.primary):not(.gold):hover:not(:disabled),.btn.ghost:hover:not(:disabled),.btn.frost:hover:not(:disabled),.btn.frost-dark:hover:not(:disabled){background-color:rgba(255,255,255,.2);border-color:rgba(255,255,255,.6)}
 .btn.small{border-radius:var(--r-sm)}
 .btn.pill{border-radius:99px}
+.btn:disabled{-webkit-backdrop-filter:none;backdrop-filter:none}
+/* browsers without backdrop-filter: a more solid body so the label stays readable */
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.btn{background-color:var(--surface)}.hero .btn:not(.primary):not(.gold),.btn.ghost,.btn.frost,.btn.frost-dark{background-color:rgba(20,24,30,.55)}}
 
 /* ---- fields ---- */
 input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),select,textarea,.phone{background-color:var(--surface);border:1px solid var(--line-strong);border-radius:var(--r);transition:border-color .15s,box-shadow .15s}
@@ -98,3 +123,36 @@ hr{border:0;border-top:1px solid var(--line)}
 /* ---- motion: shorter, calmer entrance ---- */
 main>*{animation-duration:.35s}
 @media (prefers-reduced-motion:reduce){main>*{animation:none}.btn,.card{transition:none}}
+
+/* ---- density (2026-11-17): tighter cards, buttons, headings; compact order tracker ---- */
+.card{padding:16px}
+main h2{font-size:clamp(1.35rem,2.1vw,1.7rem)}
+@media (min-width:821px){.btn{padding:8px 14px;min-height:36px;font-size:.86rem}.btn.small{padding:4px 10px;min-height:30px}.btn.pill{padding:9px 18px}}
+.order-card{gap:8px;padding:14px 16px}
+.order-card .inline>.pill{min-width:0}
+.order-card .track{max-width:440px;margin:2px 0}
+.track li{font-size:.74rem;gap:2px}
+.track li::before{top:13px;height:2px}
+.track i{width:28px;height:28px;font-size:.8rem;border-width:1.5px}
+.track i svg{width:14px;height:14px}
+
+/* ---- shop: photo fills the tile, smaller cards, more per row ---- */
+@media (min-width:561px){.g4:has(>.prod){grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}}
+.prod .prod-img img.pp-photo{object-fit:cover;padding:0}
+.prod-body{padding:10px 12px 12px;gap:6px}
+.prod-name{min-height:0;font-size:.92rem}
+.prod-price{font-size:1.15rem}
+.prod-img .badges{left:8px;top:8px}
+
+/* ---- colour (2026-11-17): racing red + orange energy, deeper black in dark mode, volt-lime for "live/good" accents ---- */
+.eyebrow{color:var(--volt)}
+.chips a[aria-current="true"],.chips a[aria-current="page"]{background-color:var(--accent);border-color:var(--accent);color:#fff}
+.sb-nav a[aria-current="page"]{box-shadow:inset 3px 0 0 var(--accent)}
+::selection{background:color-mix(in srgb,var(--accent) 30%,transparent)}
+
+/* ---- "Video" link next to every exercise ---- */
+.ex-vid{display:inline-flex;align-items:center;gap:4px;margin-left:6px;padding:2px 9px 2px 6px;border-radius:99px;font-size:.74rem;font-weight:600;line-height:1.5;text-decoration:none;
+  color:var(--accent);background-color:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);vertical-align:middle;white-space:nowrap}
+.ex-vid:hover{background-color:color-mix(in srgb,var(--accent) 20%,transparent)}
+.ex-vid .ico{width:14px;height:14px}
+@media (pointer:coarse){.ex-vid{padding:6px 12px 6px 8px;min-height:32px}}

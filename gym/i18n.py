@@ -71,6 +71,7 @@ contacts||Aloqa||Контакты||Contact
 address||Manzil||Адрес||Address
 price_unit||so'm||сум||UZS
 months_n||{n} oy||{n} мес.||{n} mo
+days_n||{n} kun||{n} дн.||{n} d
 buy||Sotib olish||Купить||Buy
 pay||To'lov||Оплата||Payment
 pay_method||To'lov usuli||Способ оплаты||Payment method
@@ -85,6 +86,7 @@ perk_consult||Murabbiy konsultatsiyasi||Консультация тренера|
 perk_locker||Shaxsiy shkaf||Личный шкафчик||Personal locker
 perk_sauna||Sauna||Сауна||Sauna
 perk_vip||VIP zona||VIP-зона||VIP zone
+plan_d1||1 kunlik||1 день||1 day
 plan_m1||1 oylik||1 месяц||1 month
 plan_m3||3 oylik||3 месяца||3 months
 plan_vip||VIP 1 oylik||VIP 1 месяц||VIP 1 month
@@ -1534,6 +1536,7 @@ app_tr_h||O'rnatilmasa||Если не устанавливается||If it won'
 app_tr1||«Telegram'ga noma'lum ilovalarni o'rnatishga ruxsat» so'ralsa: Sozlamalar → Ruxsat berish → orqaga qayting va faylni qayta oching.||Если спросит разрешение для Telegram на установку неизвестных приложений: Настройки → Разрешить → вернитесь и откройте файл снова.||If asked to let Telegram install unknown apps: Settings → Allow, then go back and open the file again.
 app_tr2||«Play Protect bloklandi» yoki «xavfli ilova» chiqsa: «Batafsil» → «Baribir o'rnatish». Ilova faqat shu saytni ochadi.||Если «Заблокировано Play Защитой»: «Подробнее» → «Всё равно установить». Приложение только открывает этот сайт.||If Play Protect blocks it: “More details” → “Install anyway”. The app only opens this site.
 app_tr3||«Ilova o'rnatilmadi» chiqsa: telefoningizdagi eski Fitnes Zal ilovasini o'chirib, qaytadan o'rnating.||Если «Приложение не установлено»: удалите старое приложение Fitnes Zal и установите заново.||If it says “App not installed”: remove any older Fitnes Zal app and install again.
+ex_video||Video||Видео||Video
 app_tr4||Birinchi ochilishda sayt 30–60 soniya yuklanishi mumkin: server uyqudan uyg'onadi. Kuting, keyingi safar tez ochiladi.||При первом запуске сайт может грузиться 30–60 секунд: сервер просыпается. Подождите, дальше откроется быстро.||The first launch can take 30–60 seconds while the server wakes up; after that it opens fast.
 scan_session||Sessiya tugagan: sahifani yangilab, admin sifatida qayta kiring||Сессия истекла: обновите страницу и войдите снова как администратор||Session ended: reload the page and sign in again as admin
 """

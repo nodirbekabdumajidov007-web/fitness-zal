@@ -24,7 +24,7 @@
         <form class="card wo-ex{% if x.done %} done{% endif %}" method="post" action="{% url 'workout_toggle' x.e.pk %}">
           {% csrf_token %}
           <span class="wo-n num">{{ forloop.counter }}</span>
-          <span class="wo-info"><b>{{ x.e.name }}</b><span class="muted num">{{ x.e.sets }} × {{ x.e.reps }}{% if x.e.note %} · {{ x.e.note }}{% endif %}</span>
+          <span class="wo-info"><b>{{ x.e.name }}</b> <a class="ex-vid" href="{{ x.e.name|ex_video }}" target="_blank" rel="noopener noreferrer">{% icon 'play' %} {% t 'ex_video' %}</a><span class="muted num">{{ x.e.sets }} × {{ x.e.reps }}{% if x.e.note %} · {{ x.e.note }}{% endif %}</span>
             <span class="wo-sets" aria-hidden="true">{% for i in "x"|ljust:x.e.sets %}<i></i>{% endfor %}</span></span>
           {% if d.today %}<button class="wo-check" type="submit" aria-label="{% if x.done %}{% t 'done_mark' %}{% else %}{% t 'mark_done' %}{% endif %}">{% if x.done %}✓{% endif %}</button>{% endif %}
         </form>
@@ -129,7 +129,7 @@
         {% for d in p.schedule %}
         <section class="prog-day">
           <h5>{% t 'weekday_'|add:d.wd %} <span class="muted">· {{ d.label }}</span></h5>
-          <ul>{% for e in d.ex %}<li><span>{{ e.name }}</span><span class="num muted">{{ e.sets }} × {{ e.reps }}{% if e.rest %} · {% t 'pg_rest' %} {{ e.rest }}{% endif %}</span></li>{% endfor %}</ul>
+          <ul>{% for e in d.ex %}<li><span>{{ e.name }} <a class="ex-vid" href="{{ e.name|ex_video }}" target="_blank" rel="noopener noreferrer">{% icon 'play' %} {% t 'ex_video' %}</a></span><span class="num muted">{{ e.sets }} × {{ e.reps }}{% if e.rest %} · {% t 'pg_rest' %} {{ e.rest }}{% endif %}</span></li>{% endfor %}</ul>
         </section>
         {% endfor %}
         <h4>{% t 'pg_tips' %}</h4>

@@ -8,7 +8,7 @@
   {% for p in plans %}
   <form id="plan-{{ p.code }}" class="card plan lift{% if renew == p.code %} renew-hl{% endif %}" method="post" action="{% url 'buy_plan' p.code %}">
     {% csrf_token %}
-    <div class="eyebrow">{% t 'months_n' n=p.months %}</div>
+    <div class="eyebrow">{% if p.days %}{% t 'days_n' n=p.days %}{% else %}{% t 'months_n' n=p.months %}{% endif %}</div>
     <h3>{% plan_name p %}</h3>
     <div class="price num">{{ p.price|money }} <small>{% t 'price_unit' %}</small></div>
     <ul class="perks">{% plan_perks p as perks %}{% for x in perks %}<li>{{ x }}</li>{% endfor %}</ul>

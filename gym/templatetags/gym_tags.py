@@ -6,6 +6,7 @@ from ..i18n import T
 
 register = template.Library()
 DEFAULT_PERKS = {
+    "d1": ["perk_all"],
     "m1": ["perk_all"],
     "m3": ["perk_all", "perk_save", "perk_consult"],
 }
@@ -53,6 +54,13 @@ def short_money(value):
     if v >= 1000:
         return f"{v // 1000} ming"
     return str(v)
+
+
+@register.filter
+def ex_video(name):
+    """Link to how-to videos of an exercise (see programs.video_url)."""
+    from .. import programs
+    return programs.video_url(name)
 
 
 @register.filter
@@ -133,6 +141,7 @@ ICONS = {
     "calculator": '<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M16 14h.01M12 14h.01M8 14h.01M12 18h.01M8 18h.01M16 18h.01M12 10h.01M8 10h.01M16 10h.01"/>',
     "megaphone": '<path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>',
     "sparkles": '<path d="M12 3l1.9 5.8L20 10l-6.1 1.2L12 17l-1.9-5.8L4 10l6.1-1.2z"/><path d="M19 15v4M17 17h4"/>',
+    "play": '<circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5z"/>',
     "dumbbell": '<path d="M6.5 6.5v11M17.5 6.5v11M3 9v6M21 9v6M6.5 12h11"/>',
     "cart": _c(8, 21, 1) + _c(19, 21, 1) + '<path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>',
     "flame": '<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',

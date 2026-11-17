@@ -17,12 +17,22 @@ def admin_password_from_env():
     pw = os.environ.get("FZ_ADMIN_PASSWORD", "").strip()
     return pw[:-len(".admin")] if pw.endswith(".admin") else pw
 
-PLANS = [("m1", "1 oylik", 1, 400000, 1), ("m3", "3 oylik", 3, 1000000, 2)]
+PLANS = [("d1", "1 kunlik", 1, 1, 50000, 0), ("m1", "1 oylik", 1, 0, 400000, 1), ("m3", "3 oylik", 3, 0, 1000000, 2)]  # code, name, months, days, price, order
 PRODUCTS = [
-    ("Ichimliklar", [("Suv 0.5 l", 5000, 120), ("Suv 1.5 l", 8000, 80), ("Energetik ichimlik", 18000, 60), ("Izotonik ichimlik", 15000, 50)]),
-    ("Protein", [("Protein kokteyl", 25000, 40), ("Whey protein 900 g", 450000, 12), ("Proteinli batonchik", 20000, 70)]),
-    ("Qo'shimchalar", [("Kreatin 300 g", 220000, 15), ("BCAA 200 g", 180000, 10), ("Shaker", 45000, 25)]),
+    ("Ichimliklar", [("Suv 0.5 l", 5000, 120), ("Suv 1.5 l", 8000, 80), ("Energetik ichimlik", 18000, 60), ("Izotonik ichimlik", 15000, 50),
+                     ("Sovuq choy 0.5 l", 9000, 60), ("Proteinli sut 330 ml", 22000, 40)]),
+    ("Protein", [("Protein kokteyl", 25000, 40), ("Whey protein 900 g", 450000, 12), ("Proteinli batonchik", 20000, 70),
+                 ("Kazein protein 900 g", 480000, 8), ("Geyner 1 kg", 280000, 10), ("Proteinli pechenye", 18000, 50)]),
+    ("Qo'shimchalar", [("Kreatin 300 g", 220000, 15), ("BCAA 200 g", 180000, 10), ("Shaker", 45000, 25),
+                       ("Glutamin 300 g", 170000, 10), ("L-karnitin 500 ml", 160000, 12), ("Omega-3, 90 kapsula", 150000, 15),
+                       ("Vitamin kompleks, 60 tabletka", 120000, 15), ("Mashqdan oldingi kompleks 300 g", 250000, 8)]),
+    ("Aksessuarlar", [("Sport sochig'i", 60000, 30), ("Mashq qo'lqopi", 90000, 20), ("Bilak bintlari", 70000, 20), ("Atletik kamar", 250000, 8),
+                      ("Sport butilkasi 0.75 l", 55000, 25), ("Skakalka", 40000, 20), ("Fitnes rezinasi", 50000, 25)]),
 ]
+# Added on 2026-11-17: migration 0044 adds exactly these to shops that were seeded before that date.
+NEW_2026_11 = {"Sovuq choy 0.5 l", "Proteinli sut 330 ml", "Kazein protein 900 g", "Geyner 1 kg", "Proteinli pechenye", "Glutamin 300 g", "L-karnitin 500 ml",
+               "Omega-3, 90 kapsula", "Vitamin kompleks, 60 tabletka", "Mashqdan oldingi kompleks 300 g", "Sport sochig'i", "Mashq qo'lqopi", "Bilak bintlari",
+               "Atletik kamar", "Sport butilkasi 0.75 l", "Skakalka", "Fitnes rezinasi"}
 
 
 class Command(BaseCommand):
@@ -33,8 +43,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **opts):
         GymSettings.load()
-        for code, name, months, price, order in PLANS:
-            Plan.objects.get_or_create(code=code, defaults=dict(name=name, months=months, price=price, order=order))
+        for code, name, months, days, price, order in PLANS:
+            Plan.objects.get_or_create(code=code, defaults=dict(name=name, months=months, days=days, price=price, order=order))
         if not Product.objects.exists():
             for i, (cat, items) in enumerate(PRODUCTS):
                 c = Category.objects.create(name=cat, order=i)

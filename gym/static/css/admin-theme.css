@@ -2,7 +2,7 @@
    palette, radius scale, soft shadows, quiet secondary buttons and the red focus ring. Loaded after admin.css; remove the <link> to revert. */
 
 :root,html[data-theme="light"]{
-  --fz-bg:#f4f5f7; --fz-card:#ffffff; --fz-soft:#f8f9fb; --fz-line:#e3e6eb; --border-color:#cfd4dc; --fz-muted:#5a6271; --fz-text:#12161d;
+  --fz-red:#e0202e; --fz-bg:#f3f4f6; --fz-card:#ffffff; --fz-soft:#f8f9fb; --fz-line:#e3e6eb; --border-color:#cfd4dc; --fz-muted:#5a6271; --fz-text:#12161d;
   --fz-shadow:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.06);
   --fz-shadow-2:0 4px 10px -2px rgba(16,24,40,.08),0 2px 4px -2px rgba(16,24,40,.05);
   --fz-ring:0 0 0 3px rgba(214,48,31,.2);

@@ -202,6 +202,7 @@ app_tr_h||Kurulmazsa||Орнотулбаса||Агар насб нашавад
 app_tr1||Telegram'ın bilinmeyen uygulama yüklemesine izin istenirse: Ayarlar → İzin ver, sonra geri dönüp dosyayı yeniden açın.||Telegram'га белгисиз тиркемелерди орнотууга уруксат суралса: Жөндөөлөр → Уруксат берүү, анан артка кайтып файлды кайра ачыңыз.||Агар барои Telegram иҷозати насби барномаҳои номаълум пурсида шавад: Танзимот → Иҷозат, баъд баргардед ва файлро аз нав кушоед.
 app_tr2||Play Protect engellerse: “Daha fazla ayrıntı” → “Yine de yükle”. Uygulama yalnızca bu siteyi açar.||Play Protect бөгөттөсө: «Кененирээк» → «Баары бир орнотуу». Тиркеме ушул сайтты гана ачат.||Агар Play Protect манъ кунад: «Тафсилот» → «Ба ҳар ҳол насб кардан». Барнома танҳо ҳамин сайтро мекушояд.
 app_tr3||“Uygulama yüklenmedi” derse: eski Fitnes Zal uygulamasını kaldırıp yeniden yükleyin.||«Тиркеме орнотулган жок» десе: эски Fitnes Zal тиркемесин өчүрүп, кайра орнотуңуз.||Агар «Барнома насб нашуд» гӯяд: барномаи кӯҳнаи Fitnes Zal-ро нест карда, аз нав насб кунед.
+ex_video||Video||Видео||Видео
 app_tr4||İlk açılışta site 30–60 saniye yüklenebilir: sunucu uyanıyor. Bekleyin, sonra hızlı açılır.||Биринчи ачылганда сайт 30–60 секунд жүктөлүшү мүмкүн: сервер ойгонот. Күтүңүз, кийин тез ачылат.||Дар кушодани аввал сайт метавонад 30–60 сония бор шавад: сервер бедор мешавад. Интизор шавед, баъд зуд кушода мешавад.
 sw_ask_title||Asistana sorun||Жардамчыдан сураңыз||Аз ёвар пурсед
 sw_ask_ph||örn. üyeliğimi nasıl dondururum?||мис. абонементимди кантип тоңдурам?||масалан, абонементамро чӣ тавр яхбандӣ мекунам?

@@ -28,7 +28,7 @@
     </aside>{% endwith %}
     {% elif cheapest_plan %}
     <aside class="paper ai-paper" aria-label="{% t 'nav_plans' %}">
-      <div class="paper-top"><span>✦</span><span>{% t 'months_n' n=cheapest_plan.months %}</span></div>
+      <div class="paper-top"><span>✦</span><span>{% if cheapest_plan.days %}{% t 'days_n' n=cheapest_plan.days %}{% else %}{% t 'months_n' n=cheapest_plan.months %}{% endif %}</span></div>
       <h3>{% plan_name cheapest_plan %}</h3>
       <div class="paper-price"><b class="num">{{ cheapest_plan.price|money }}</b> <small>{% t 'price_unit' %}</small></div>
       <a class="paper-btn" href="{% url 'plans' %}">{% t 'nav_plans' %} →</a>
@@ -68,7 +68,7 @@
     <div class="grid g3">
       {% for p in plans %}
       <div class="card plan lift reveal">
-        <div class="eyebrow">{% t 'months_n' n=p.months %}</div>
+        <div class="eyebrow">{% if p.days %}{% t 'days_n' n=p.days %}{% else %}{% t 'months_n' n=p.months %}{% endif %}</div>
         <h3>{% plan_name p %}</h3>
         <div class="price num">{{ p.price|money }} <small>{% t 'price_unit' %}</small></div>
         <ul class="perks">{% plan_perks p as perks %}{% for x in perks %}<li>{{ x }}</li>{% endfor %}</ul>

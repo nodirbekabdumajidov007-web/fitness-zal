@@ -71,6 +71,7 @@ contacts||İletişim||Байланыш||Тамос
 address||Adres||Дарек||Суроға
 price_unit||UZS||UZS||сӯм
 months_n||{n} ay||{n} ай||{n} моҳ
+days_n||{n} gün||{n} күн||{n} рӯз
 buy||Satın al||Сатып алуу||Харидан
 pay||Ödeme||Төлөм||Пардохт
 pay_method||Ödeme yöntemi||Төлөм ыкмасы||Усули пардохт
@@ -85,6 +86,7 @@ perk_consult||Antrenör danışmanlığı||Машыктыруучунун кең
 perk_locker||Kişisel dolap||Жеке шкаф||Шкафи шахсӣ
 perk_sauna||Sauna||Сауна||Сауна
 perk_vip||VIP alan||VIP зона||Минтақаи VIP
+plan_d1||1 günlük||1 күндүк||1 рӯза
 plan_m1||1 aylık||1 айлык||1 моҳа
 plan_m3||3 aylık||3 айлык||3 моҳа
 plan_vip||VIP 1 aylık||VIP 1 айлык||VIP 1 моҳа

@@ -280,6 +280,8 @@ class Plan(models.Model):
     code = models.SlugField("Kod", unique=True)
     name = models.CharField("Nomi", max_length=60)
     months = models.PositiveSmallIntegerField("Oylar soni", default=1)
+    days = models.PositiveSmallIntegerField("Kunlar soni (kunlik abonement)", default=0,
+                                            help_text="0 dan katta bo'lsa, abonement shuncha kun amal qiladi va «Oylar soni» hisobga olinmaydi. Masalan, 1 = bir kunlik.")
     price = models.BigIntegerField("Narx (so'm)")
     perks = models.TextField("Imkoniyatlar (har qatorda bittadan)", blank=True)
     active = models.BooleanField("Sotuvda", default=True)
@@ -293,6 +295,11 @@ class Plan(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.price:,} so'm)".replace(",", " ")
+
+    @property
+    def duration_days(self):
+        """How long one purchase lasts: `days` for day passes, else 30 days per month."""
+        return self.days or 30 * self.months
 
 
 class Membership(models.Model):
@@ -399,7 +406,8 @@ class Product(models.Model):
         n = self.name.lower()
         for keys, pic in ((("shaker",), "shaker"), (("kokteyl",), "shaker"), (("suv", "water"), "bottle"),
                           (("energetik", "izotonik", "energy"), "can"), (("batonchik", "bar"), "bar"),
-                          (("whey", "protein", "kreatin", "bcaa", "gainer"), "tub")):
+                          (("pechenye",), "bar"), (("sut", "choy"), "bottle"), (("butilka",), "shaker"),
+                          (("whey", "protein", "kreatin", "bcaa", "gainer", "geyner", "kazein", "glutamin", "kompleks", "omega", "karnitin"), "tub")):
             if any(k in n for k in keys):
                 return pic
         return "box"
@@ -414,9 +422,10 @@ class Product(models.Model):
         n = self.name.lower()
         for keys, pic in ((("shaker", "kokteyl"), "shaker-shake"), (("izotonik", "isotonic"), "can-isotonic"),
                           (("energetik", "energy"), "can-energy"), (("batonchik", "bar"), "bar-protein"),
-                          (("kreatin", "creatine"), "tub-creatine"), (("whey", "protein", "bcaa", "gainer"), "tub-whey")):
+                          (("pechenye", "sut "), ""), (("kreatin", "creatine", "glutamin"), "tub-creatine"),
+                          (("whey", "protein", "bcaa", "gainer", "geyner", "kazein"), "tub-whey")):
             if any(k in n for k in keys):
-                return f"img/products/photos/{pic}.jpg"
+                return f"img/products/photos/{pic}.jpg" if pic else ""
         if "suv" in n or "water" in n:
             big = re.search(r"(\d+(?:[.,]\d+)?)\s*(l|litr)\b", n)
             return "img/products/photos/bottle-large.jpg" if big and float(big.group(1).replace(",", ".")) >= 1 else "img/products/photos/bottle-small.jpg"

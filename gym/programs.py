@@ -192,6 +192,28 @@ def schedule(prog, lang="uz"):
     return sorted(days, key=lambda d: int(d["wd"]))
 
 
+_EN_NAME = None
+
+
+def video_url(name):
+    """A YouTube search for how-to videos of this exercise. `name` may be in any site language: library exercises are mapped to their
+    English gym name, a trainer's own exercise uses the name in brackets ("... (Squat)") or the name as written."""
+    global _EN_NAME
+    from urllib.parse import quote_plus
+    if _EN_NAME is None:
+        _EN_NAME = {}
+        for prog in PROGRAMS.values():
+            for _label, _days, exs in prog["sessions"]:
+                for n, *_rest in exs:
+                    for lang in LANGS:
+                        _EN_NAME[tr(n, lang)] = tr(n, "en")
+    name = (name or "").strip()
+    m = re.search(r"\(([^)]+)\)\s*$", name)
+    en = _EN_NAME.get(name) or (m.group(1) if m else name)
+    en = re.sub(r":.*$", "", en)  # "Exercise bike: 1 min fast, 1 min slow" -> "Exercise bike"
+    return "https://www.youtube.com/results?search_query=" + quote_plus(f"{en} exercise proper form tutorial")
+
+
 def days_list(prog):
     return sorted({wd for _l, wds, _e in prog["sessions"] for wd in wds})
 

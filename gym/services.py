@@ -61,7 +61,7 @@ def add_membership(user, plan):
     now = timezone.now()
     last = user.memberships.order_by("-expires").first()
     start = max(now, last.expires) if last else now
-    m = Membership.objects.create(user=user, plan=plan, starts=start, expires=start + timedelta(days=30 * plan.months))
+    m = Membership.objects.create(user=user, plan=plan, starts=start, expires=start + timedelta(days=plan.duration_days))
     if user.referred_by_id and not user.referral_rewarded and Payment.objects.filter(user=user, kind="plan", status=Payment.Status.PAID, amount__gt=0).exists():
         reward_referral(user)
     return m
