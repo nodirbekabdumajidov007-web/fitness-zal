@@ -264,3 +264,6 @@ main h2{font-size:clamp(1.35rem,2.1vw,1.7rem)}
 .tl-chart .s-bf3{fill:#c6f01a;opacity:1}
 .tl-chart .s-over,.tl-chart .s-bf4{fill:#ffb300}
 .tl-chart .s-obese,.tl-chart .s-bf5{fill:#ff3b3b}
+/* scale numbers (18.5 / 25 / 30): larger, bold, full-contrast; the class name "tk" must not pick up the receipt styles */
+.tl-chart text.tk{fill:var(--ink);font-size:14px;font-weight:700;font-family:var(--body);padding:0;margin:0;background:none;opacity:1;letter-spacing:0}
+.tl-chart .tl-svg{margin-bottom:6px}
