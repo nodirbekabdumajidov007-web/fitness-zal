@@ -1600,7 +1600,7 @@ def ai_ask(request):
     history = [(m.role, m.content) for m in request.user.ai_messages.order_by("-id")[:6][::-1]] if request.user.is_authenticated else ()
     data = ask_payload(request, q, image, history)
     if request.user.is_authenticated:
-        AIMessage.objects.create(user=request.user, role="user", content=q + (" [📷]" if image else ""))
+        AIMessage.objects.create(user=request.user, role="user", content=q + (" [photo]" if image else ""))
         AIMessage.objects.create(user=request.user, role="assistant", content=data["answer"])
     if wants_json(request):
         return JsonResponse(data)

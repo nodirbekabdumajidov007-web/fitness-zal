@@ -20,7 +20,7 @@
     <form class="ai-form" method="post" enctype="multipart/form-data" action="{% url 'ai_ask' %}" data-ai-form data-thinking="{% t 'ai_thinking' %}" data-err="{% t 'ai_error' %}" data-imgerr="{% t 'ai_img_err' %}">
       {% csrf_token %}
       <textarea name="q" rows="2" maxlength="1500" placeholder="{% t 'ai_placeholder' %}"></textarea>
-      {% if user.is_authenticated %}<label class="ai-attach" title="{% t 'ai_attach' %}" aria-label="{% t 'ai_attach' %}">📷<input type="file" name="image" accept="image/jpeg,image/png,image/webp" hidden></label>{% endif %}
+      {% if user.is_authenticated %}<label class="ai-attach" title="{% t 'ai_attach' %}" aria-label="{% t 'ai_attach' %}">{% icon 'camera' %}<input type="file" name="image" accept="image/jpeg,image/png,image/webp" hidden></label>{% endif %}
       <button class="btn primary" type="submit">{% t 'ai_send' %} ➤</button>
     </form>
     <span class="ai-pic" data-ai-pic hidden></span>
