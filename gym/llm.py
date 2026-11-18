@@ -113,6 +113,13 @@ def ask(question, lang="uz", facts="", history=(), image=None, timeout=25):
             continue
         try:
             text = (fn(question, lang, facts, turns, image, timeout) or "").strip()
+        except urllib.error.HTTPError as e:  # the provider answered with an error: log its status and reason (never the key)
+            try:
+                why = e.read(300).decode("utf-8", "replace").replace(chr(10), " ")
+            except OSError:
+                why = ""
+            log.warning("llm: %s HTTP %s: %s", key, e.code, why)
+            continue
         except (urllib.error.URLError, OSError, ValueError, KeyError, TypeError) as e:
             log.warning("llm: %s failed: %s", key, e.__class__.__name__)
             continue

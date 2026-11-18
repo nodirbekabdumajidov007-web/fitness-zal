@@ -292,4 +292,5 @@ ai_attach||Fotoğraf ekle||Сүрөт тиркөө||Расм замима кар
 ai_img_err||Fotoğraf .jpg, .png veya .webp olmalı ve 4 MB'ı geçmemeli.||Сүрөт .jpg, .png же .webp болуп, 4 МБдан чоң болбошу керек.||Расм бояд .jpg, .png ё .webp бошад ва аз 4 МБ зиёд набошад.
 ai_img_off||Fotoğraf analizi henüz açık değil. Sorunuzu yazın.||Сүрөттү талдоо азырынча иштебейт. Суроону жазыңыз.||Таҳлили расм ҳоло фаъол нест. Саволро нависед.
 ai_img_q||Bu fotoğrafta ne var? Bana nasıl yardımcı olur?||Бул сүрөттө эмне бар? Мага кандай пайдасы бар?||Дар ин расм чӣ ҳаст? Ба ман чӣ фоида дорад?
+ai_img_fail||Fotoğraf şu an analiz edilemedi. Daha sonra tekrar deneyin veya sorunuzu yazın.||Сүрөттү азыр талдоо мүмкүн болбоду. Кийинчерээк кайра аракет кылыңыз же суроону жазыңыз.||Расмро ҳоло таҳлил карда натавонистам. Баъдтар кӯшиш кунед ё саволро нависед.
 """

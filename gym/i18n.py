@@ -981,6 +981,7 @@ ai_attach||Rasm biriktirish||Прикрепить фото||Attach a photo
 ai_img_err||Rasm .jpg, .png yoki .webp bo'lsin va 4 MB dan oshmasin.||Фото должно быть .jpg, .png или .webp, не больше 4 МБ.||The photo must be .jpg, .png or .webp and up to 4 MB.
 ai_img_off||Rasmni tahlil qilish hozircha yoqilmagan. Savolni yozib yuboring.||Анализ фото пока не включён. Напишите вопрос текстом.||Photo analysis is not switched on yet. Please type your question.
 ai_img_q||Bu rasmda nima bor? Menga qanday foydasi bor?||Что на этом фото? Чем это мне полезно?||What is in this photo? How does it help me?
+ai_img_fail||Rasmni hozir tahlil qilib bo'lmadi. Birozdan keyin qayta urinib ko'ring yoki savolni yozib yuboring.||Сейчас не удалось разобрать фото. Попробуйте позже или напишите вопрос текстом.||The photo could not be analysed right now. Try again later or type your question.
 asst_rate||Juda ko'p savol yuborildi. Bir daqiqadan keyin qayta urinib ko'ring.||Слишком много вопросов. Попробуйте через минуту.||Too many questions. Try again in a minute.
 asst_suggest||Shuni so'rab ko'ring:||Попробуйте спросить:||Try asking:
 cal_txt_title||Matn bilan yozish||Записать текстом||Type it in

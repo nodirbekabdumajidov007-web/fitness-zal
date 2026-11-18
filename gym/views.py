@@ -1552,6 +1552,8 @@ def ask_payload(request, q, image=None, history=()):
         text = llm.ask(q, lang, llm_facts(), history, image)
         if text:
             out.update(answer=text, matched=True, approx=False, links=res["links"] if res["matched"] else [], suggest=[])
+        elif image:  # the offline answer to a photo would be nonsense: say plainly that the analysis failed
+            out.update(answer=translate(lang, "ai_img_fail"), matched=True, links=[], suggest=[])
     return out
 
 
