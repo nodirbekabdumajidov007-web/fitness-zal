@@ -96,7 +96,7 @@ def _gemini(question, lang, facts, turns, image, timeout):
     contents.append({"role": "user", "parts": parts})
     body = {"systemInstruction": {"parts": [{"text": _system(lang, facts)}]}, "contents": contents,
             "generationConfig": {"maxOutputTokens": 800, "temperature": 0.6}}
-    url = GEMINI_URL.format(model=getattr(settings, "GEMINI_MODEL", "gemini-2.5-flash"))
+    url = GEMINI_URL.format(model=getattr(settings, "GEMINI_MODEL", "gemini-3.8-flash"))
     data = _post(url, body, {"x-goog-api-key": settings.GEMINI_API_KEY}, timeout)
     cands = data.get("candidates") or [{}]
     return "".join(p.get("text", "") for p in (cands[0].get("content") or {}).get("parts", []))
