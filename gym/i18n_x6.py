@@ -293,4 +293,7 @@ ai_img_err||Fotoğraf .jpg, .png veya .webp olmalı ve 4 MB'ı geçmemeli.||Сү
 ai_img_off||Fotoğraf analizi henüz açık değil. Sorunuzu yazın.||Сүрөттү талдоо азырынча иштебейт. Суроону жазыңыз.||Таҳлили расм ҳоло фаъол нест. Саволро нависед.
 ai_img_q||Bu fotoğrafta ne var? Bana nasıl yardımcı olur?||Бул сүрөттө эмне бар? Мага кандай пайдасы бар?||Дар ин расм чӣ ҳаст? Ба ман чӣ фоида дорад?
 ai_img_fail||Fotoğraf şu an analiz edilemedi. Daha sonra tekrar deneyin veya sorunuzu yazın.||Сүрөттү азыр талдоо мүмкүн болбоду. Кийинчерээк кайра аракет кылыңыз же суроону жазыңыз.||Расмро ҳоло таҳлил карда натавонистам. Баъдтар кӯшиш кунед ё саволро нависед.
+fav_title||Favoriler||Тандалгандар||Дӯстдошта
+fav_add||Favorilere ekle / çıkar||Тандалгандарга кошуу / алып салуу||Илова ба дӯстдошта / тоза кардан
+fav_empty||Henüz favori ürün yok. Mağazada ♡ simgesine dokunun.||Азырынча тандалган товар жок. Дүкөндө ♡ басыңыз.||Ҳоло маҳсулоти дӯстдошта нест. Дар мағоза ♡ -ро пахш кунед.
 """

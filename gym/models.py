@@ -469,6 +469,17 @@ class Product(models.Model):
         return f"{m.group(1).replace(',', '.')} {m.group(2)}" if m else ""
 
 
+class Favorite(models.Model):
+    """A product a member marked with the heart in the shop."""
+    user = models.ForeignKey("User", on_delete=models.CASCADE, related_name="favorites")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="fans")
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "product")
+        ordering = ["-created"]
+
+
 class Order(models.Model):
     class Status(models.TextChoices):
         NEW = "new", "Yangi"

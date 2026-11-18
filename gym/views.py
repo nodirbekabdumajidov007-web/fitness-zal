@@ -973,10 +973,34 @@ def shop(request):
     keep = urllib.parse.urlencode({k: v for k, v in (("cat", cat or ""), ("q", q)) if v})  # the pager links keep the filters
     return render(request, "gym/shop.html", {"products": page, "page": page, "pages": page_window(page), "keep": keep and keep + "&",
                                              "categories": Category.objects.all(), "cat": cat or "", "q": q,
-                                             "popular": popular_ids(), **cart_context(request)})
+                                             "popular": popular_ids(), "fav": fav_ids(request), "fav_count": len(fav_ids(request)), **cart_context(request)})
 
 
 SHOP_PAGE_SIZE = 20
+
+
+def fav_ids(request):
+    return set(request.user.favorites.values_list("product_id", flat=True)) if request.user.is_authenticated else set()
+
+
+@require_POST
+@login_required
+def favorite_toggle(request, pk):
+    """The heart in the shop: adds the product to the member's favourites, or removes it when it is already there."""
+    product = get_object_or_404(Product, pk=pk, active=True)
+    fav, created = request.user.favorites.get_or_create(product=product)
+    if not created:
+        fav.delete()
+    if wants_json(request):
+        return JsonResponse({"ok": True, "on": created, "count": request.user.favorites.count()})
+    nxt = request.POST.get("next", "")
+    return redirect(nxt if url_has_allowed_host_and_scheme(nxt, allowed_hosts={request.get_host()}) else "shop")
+
+
+@login_required
+def favorites_view(request):
+    products = [f.product for f in request.user.favorites.select_related("product__category").filter(product__active=True)]
+    return render(request, "gym/favorites.html", {"products": products, "fav": {p.pk for p in products}, "popular": popular_ids(), **cart_context(request)})
 
 
 def page_window(page, around=2):

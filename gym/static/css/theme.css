@@ -311,3 +311,12 @@ dialog{border-radius:22px}
 /* the logo is a coloured mark now: never invert it in the dark theme */
 .logo-mark,.auth-logo{filter:none!important}
 .logo-mark{border-radius:22%}
+
+/* shop hearts */
+.card.prod{position:relative}
+.fav-form{position:absolute;top:10px;right:10px;z-index:3;margin:0}
+.fav-btn{width:38px;height:38px;display:grid;place-items:center;border-radius:50%;border:1px solid var(--glass-rim,var(--line));background:var(--glass-bg,var(--surface));backdrop-filter:blur(8px);color:var(--ink);cursor:pointer;transition:transform .2s,color .2s,background .2s}
+.fav-btn .ico{width:19px;height:19px}
+.fav-btn:hover{transform:scale(1.1);color:var(--accent)}
+.fav-btn.on{color:#fff;background:var(--accent-fill,var(--accent));border-color:transparent}
+.fav-btn.on .ico{fill:currentColor}

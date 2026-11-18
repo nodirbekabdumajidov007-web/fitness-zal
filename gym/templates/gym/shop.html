@@ -1,7 +1,7 @@
 {% extends "gym/base.html" %}{% load static gym_tags %}
 {% block title %}{% t 'shop' %}{% endblock %}
 {% block content %}
-<div class="inline" style="align-items:center;justify-content:space-between"><h2>{% t 'shop' %}</h2><a class="btn primary" href="{% url 'cart' %}" style="flex:none">{% t 'cart' %}{% if cart_count %} ({{ cart_count }}){% endif %}</a></div>
+<div class="inline" style="align-items:center;justify-content:space-between"><h2>{% t 'shop' %}</h2><span class="inline" style="flex:none;gap:8px">{% if user.is_authenticated %}<a class="btn" href="{% url 'favorites' %}">{% icon 'heart' %} {% t 'fav_title' %}{% if fav_count %} ({{ fav_count }}){% endif %}</a>{% endif %}<a class="btn primary" href="{% url 'cart' %}">{% t 'cart' %}{% if cart_count %} ({{ cart_count }}){% endif %}</a></span></div>
 <div class="chips">
   <a href="{% url 'shop' %}"{% if not cat %} aria-current="true"{% endif %}>{% t 'all' %}</a>
   {% for c in categories %}<a href="?cat={{ c.pk }}{% if q %}&amp;q={{ q|urlencode }}{% endif %}"{% if cat == c.pk|stringformat:"s" %} aria-current="true"{% endif %}>{{ c.name }}</a>{% endfor %}
@@ -9,20 +9,7 @@
 <form method="get" class="inline"><label for="q">{% t 'search' %}<input id="q" name="q" value="{{ q }}"></label>{% if cat %}<input type="hidden" name="cat" value="{{ cat }}">{% endif %}<button class="btn" type="submit">{% t 'search' %}</button></form>
 <div class="grid g4">
   {% for p in products %}
-  <div class="card lift prod">
-    <a class="prod-img" href="{% url 'product' p.pk %}">
-      {% include "gym/_prodpic.html" %}
-      {% if p.pk in popular %}<span class="badges"><span class="pill tag-hot">{% t 'popular' %}</span></span>{% endif %}
-    </a>
-    <div class="prod-body">
-    <a href="{% url 'product' p.pk %}" class="prod-name"><b>{{ p.name }}</b></a>
-    <span class="stock-badge {% if p.stock < 1 %}out{% elif p.stock <= 5 %}low{% endif %} num">{% if p.stock > 0 %}{% t 'in_stock' %}: {{ p.stock }}{% if p.stock <= 5 %} · {% t 'low_stock' %}{% endif %}{% else %}{% t 'sold_out' %}{% endif %}</span>
-    <div class="prod-foot">
-      <span class="num"><span class="price prod-price">{{ p.price|money }}</span></span>
-      {% with qty=in_cart|get_item:p.pk %}{% include "gym/_qty.html" %}{% endwith %}
-    </div>
-    </div>
-  </div>
+  {% include "gym/_prodcard.html" %}
   {% empty %}<div class="muted">{% t 'no_results' %}</div>{% endfor %}
 </div>
 {% if pages %}
@@ -34,3 +21,4 @@
 {% endif %}
 {% include "gym/_cartbar.html" %}
 {% endblock %}
+{% block scripts %}<script src="{% vstatic 'js/fav.js' %}"></script>{% endblock %}
