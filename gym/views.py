@@ -18,7 +18,7 @@ from django.contrib.staticfiles import finders
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import connection, transaction
-from django.db.models import Avg, Count, Q
+from django.db.models import Avg, Count, Q, Sum
 from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -1219,9 +1219,36 @@ def orders_view(request):
     return render(request, "gym/orders.html", {"orders": request.user.orders.prefetch_related("items")})
 
 
+def _csv_safe(v):
+    """A cell that a spreadsheet would read as a formula gets a leading apostrophe."""
+    v = str(v)
+    return "'" + v if v[:1] in ("=", "+", "-", "@") else v
+
+
 @login_required
 def payments_view(request):
-    return render(request, "gym/payments.html", {"payments": request.user.payments.select_related("plan", "order")})
+    """The member's payments: totals, a status filter and a CSV download (own payments only)."""
+    import csv
+    qs = request.user.payments.select_related("plan", "order")
+    paid = qs.filter(status=Payment.Status.PAID)
+    agg = paid.aggregate(total=Sum("amount"), saved=Sum("discount"), n=Count("id"))
+    status = request.GET.get("status", "")
+    shown = qs.filter(status=status) if status in Payment.Status.values else qs
+    if request.GET.get("export") == "csv":
+        resp = HttpResponse(content_type="text/csv; charset=utf-8")
+        resp["Content-Disposition"] = 'attachment; filename="fitnes-zal-payments.csv"'
+        resp.write("﻿")  # Excel reads the file as UTF-8
+        w = csv.writer(resp)
+        w.writerow(["id", "date", "type", "item", "amount", "discount", "promo", "method", "status"])
+        for p in shown:
+            item = p.plan.name if p.plan else (f"order #{p.order_id}" if p.order_id else "")
+            w.writerow([p.reference, timezone.localtime(p.created).strftime("%Y-%m-%d %H:%M"), p.kind, _csv_safe(item), p.amount, p.discount,
+                        _csv_safe(p.promo), p.method, p.status])
+        return resp
+    last = paid.first()
+    return render(request, "gym/payments.html", {"payments": shown, "status": status, "total": agg["total"] or 0, "saved": agg["saved"] or 0,
+                                                 "paid_n": agg["n"], "last": last.created if last else None,
+                                                 "statuses": [(v, "st_" + v) for v in Payment.Status.values]})
 
 
 @login_required

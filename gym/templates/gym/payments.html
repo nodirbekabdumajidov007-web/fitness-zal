@@ -1,13 +1,26 @@
 {% extends "gym/base.html" %}{% load gym_tags %}
 {% block title %}{% t 'payments' %}{% endblock %}
 {% block content %}
-<h2>{% t 'payments' %}</h2>
+<div class="inline" style="align-items:center;justify-content:space-between"><h2>{% t 'payments' %}</h2>
+  {% if payments %}<a class="btn" href="?{% if status %}status={{ status }}&amp;{% endif %}export=csv">{% icon 'download' %} {% t 'pay_export' %}</a>{% endif %}</div>
+{% if paid_n %}
+<div class="grid g3 pay-kpis">
+  <div class="card"><small class="muted">{% t 'pay_total' %}</small><b class="num">{{ total|money }}</b></div>
+  <div class="card"><small class="muted">{% t 'pay_count' %}</small><b class="num">{{ paid_n }}</b></div>
+  <div class="card"><small class="muted">{% t 'pay_last' %}</small><b class="num">{{ last|dmy }}</b>{% if saved %}<small class="muted">{% t 'pay_saved' %}: {{ saved|money }}</small>{% endif %}</div>
+</div>
+{% endif %}
+<div class="chips">
+  <a href="{% url 'payments' %}"{% if not status %} aria-current="true"{% endif %}>{% t 'all' %}</a>
+  {% for v, key in statuses %}<a href="?status={{ v }}"{% if status == v %} aria-current="true"{% endif %}>{% t key %}</a>{% endfor %}
+</div>
 {% if payments %}
 <div class="tbl"><table>
-  <thead><tr><th>{% t 'date' %}</th><th>{% t 'type' %}</th><th class="right">{% t 'amount' %}</th><th>{% t 'status' %}</th><th></th></tr></thead>
+  <thead><tr><th>{% t 'date' %}</th><th>{% t 'type' %}</th><th>{% t 'pay_method' %}</th><th class="right">{% t 'amount' %}</th><th>{% t 'status' %}</th><th></th></tr></thead>
   <tbody>{% for p in payments %}
     <tr><td class="num">{{ p.created|dmy }}</td>
-      <td>{% t 'kind_'|add:p.kind %}{% if p.plan %}: {% plan_name p.plan %}{% elif p.order %}: #{{ p.order.pk }}{% endif %}</td>
+      <td>{% t 'kind_'|add:p.kind %}{% if p.plan %}: {% plan_name p.plan %}{% elif p.order %}: #{{ p.order.pk }}{% endif %}{% if p.discount %}<br><small class="muted">{% t 'discount' %}: {{ p.discount|money }}{% if p.promo %} · {{ p.promo }}{% endif %}</small>{% endif %}</td>
+      <td>{% t 'pm_'|add:p.method %}</td>
       <td class="right num">{{ p.amount|money }}</td>
       <td><span class="pill {% if p.status == 'paid' %}good{% elif p.status == 'pending' %}warn{% else %}mute{% endif %}">{% t 'st_'|add:p.status %}</span></td>
       <td>{% if p.status == 'pending' and p.method == 'card' %}<a class="btn small primary" href="{% url 'pay' p.pk %}">{% t 'pay_now' %}</a>{% else %}<a class="btn small" href="{% url 'receipt' p.pk %}">{% t 'receipt' %}</a>{% endif %}</td></tr>

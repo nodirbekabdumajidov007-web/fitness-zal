@@ -296,4 +296,16 @@ ai_img_fail||Fotoğraf şu an analiz edilemedi. Daha sonra tekrar deneyin veya s
 fav_title||Favoriler||Тандалгандар||Дӯстдошта
 fav_add||Favorilere ekle / çıkar||Тандалгандарга кошуу / алып салуу||Илова ба дӯстдошта / тоза кардан
 fav_empty||Henüz favori ürün yok. Mağazada ♡ simgesine dokunun.||Азырынча тандалган товар жок. Дүкөндө ♡ басыңыз.||Ҳоло маҳсулоти дӯстдошта нест. Дар мағоза ♡ -ро пахш кунед.
+pay_export||CSV indir||CSV жүктөп алуу||Боргирии CSV
+pay_total||Toplam ödenen||Жалпы төлөнгөн||Ҷамъи пардохтшуда
+pay_count||Ödeme sayısı||Төлөмдөр саны||Шумораи пардохтҳо
+pay_last||Son ödeme||Акыркы төлөм||Пардохти охирин
+pay_saved||Tasarruf||Үнөмдөлдү||Сарфа шуд
+pm_cash||Nakit||Накта||Нақд
+pm_card||Kart havalesi||Картага которуу||Интиқол ба корт
+pm_click||Click||Click||Click
+pm_gift||Hediye çeki||Белек сертификаты||Сертификати тӯҳфа
+pm_Payme||Payme||Payme||Payme
+pm_Uzum||Uzum||Uzum||Uzum
+pm_Click||Click||Click||Click
 """

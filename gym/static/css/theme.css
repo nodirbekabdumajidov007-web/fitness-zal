@@ -320,3 +320,6 @@ dialog{border-radius:22px}
 .fav-btn:hover{transform:scale(1.1);color:var(--accent)}
 .fav-btn.on{color:#fff;background:var(--accent-fill,var(--accent));border-color:transparent}
 .fav-btn.on .ico{fill:currentColor}
+
+/* payment history */
+.pay-kpis{margin:14px 0}.pay-kpis .card{display:grid;gap:4px;padding:14px 16px}.pay-kpis b{font-size:1.5rem;line-height:1.2}

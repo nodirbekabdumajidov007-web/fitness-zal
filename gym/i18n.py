@@ -985,6 +985,18 @@ ai_img_fail||Rasmni hozir tahlil qilib bo'lmadi. Birozdan keyin qayta urinib ko'
 fav_title||Sevimlilar||Избранное||Favourites
 fav_add||Sevimlilarga qo'shish / olib tashlash||Добавить в избранное / убрать||Add to / remove from favourites
 fav_empty||Hali sevimli mahsulot yo'q. Do'konda ♡ tugmasini bosing.||Пока нет избранных товаров. Нажмите ♡ в магазине.||No favourites yet. Tap the ♡ in the shop.
+pay_export||CSV yuklab olish||Скачать CSV||Download CSV
+pay_total||Jami to'langan||Всего оплачено||Total paid
+pay_count||To'lovlar soni||Количество платежей||Payments
+pay_last||Oxirgi to'lov||Последний платёж||Last payment
+pay_saved||Tejaldi||Сэкономлено||Saved
+pm_cash||Naqd||Наличные||Cash
+pm_card||Karta o'tkazmasi||Перевод на карту||Card transfer
+pm_click||Click||Click||Click
+pm_gift||Sovg'a sertifikati||Подарочный сертификат||Gift certificate
+pm_Payme||Payme||Payme||Payme
+pm_Uzum||Uzum||Uzum||Uzum
+pm_Click||Click||Click||Click
 asst_rate||Juda ko'p savol yuborildi. Bir daqiqadan keyin qayta urinib ko'ring.||Слишком много вопросов. Попробуйте через минуту.||Too many questions. Try again in a minute.
 asst_suggest||Shuni so'rab ko'ring:||Попробуйте спросить:||Try asking:
 cal_txt_title||Matn bilan yozish||Записать текстом||Type it in
