@@ -1501,12 +1501,58 @@ def ask_text(request):
     return request.POST.get("q", "")
 
 
-def ask_payload(request, q):
-    from . import assistant
+LLM_LIMITS = (10, 40)  # Claude calls per hour: guest, member
+
+
+def llm_limited(request):
+    who = f"u{request.user.pk}" if request.user.is_authenticated else (request.session.session_key or client_ip(request) or "?")
+    key = f"llm:rl:{who}"
+    cache.add(key, 0, 3600)
+    try:
+        return cache.incr(key) > LLM_LIMITS[request.user.is_authenticated]
+    except ValueError:
+        cache.set(key, 1, 3600)
+        return False
+
+
+def llm_facts():
+    """A few live gym facts for Claude (no member data)."""
+    gs = GymSettings.load()
+    lines = [f"Opening hours: every day {gs.open_time:%H:%M}-{gs.close_time:%H:%M}", f"Phone: +998 {gs.phone}"]
+    if gs.address:
+        lines.append(f"Address: {gs.address}")
+    for p in Plan.objects.filter(active=True).order_by("price")[:8]:
+        lines.append(f"Plan: {p.name} - {int(p.price):,} so'm".replace(",", " "))
+    return chr(10).join(lines)
+
+
+def read_image(request):
+    """(image block or None, error key or None) from the uploaded `image` file: JPEG / PNG / WebP up to 4 MB, checked by its first bytes."""
+    from . import llm
+    from .media import image_type
+    f = request.FILES.get("image")
+    if not f:
+        return None, None
+    data = f.read(llm.MAX_IMAGE_BYTES + 1)
+    ctype = image_type(data[:16])
+    part = llm.image_part(data, ctype) if ctype else None
+    return (part, None) if part else (None, "ai_img_err")
+
+
+def ask_payload(request, q, image=None, history=()):
+    """The answer: the offline knowledge base first; Claude (when a key is set) for a photo, a question the base cannot answer or only guesses."""
+    from . import assistant, llm
     lang = request.POST.get("lang") if request.POST.get("lang") in LANGS else request.lang
     res = assistant.answer(q, lang, request.user)
-    return {"ok": True, "answer": res["answer"], "links": res["links"], "matched": res["matched"], "suggest": res["suggest"],
-            "approx": bool(res.get("approx"))}
+    out = {"ok": True, "answer": res["answer"], "links": res["links"], "matched": res["matched"], "suggest": res["suggest"],
+           "approx": bool(res.get("approx"))}
+    if image and not llm.enabled():
+        out.update(answer=translate(lang, "ai_img_off"), matched=True, links=[], suggest=[])
+    elif llm.enabled() and (image or not res["matched"] or res.get("approx")) and not llm_limited(request):
+        text = llm.ask(q, lang, llm_facts(), history, image)
+        if text:
+            out.update(answer=text, matched=True, approx=False, links=res["links"] if res["matched"] else [], suggest=[])
+    return out
 
 
 @require_POST
@@ -1538,15 +1584,21 @@ def ai_ask(request):
     """A question from the coach page; signed-in members get the conversation stored (AIMessage)."""
     from .models import AIMessage
     q = ask_text(request).strip()[:1500]
+    image, err = read_image(request) if request.user.is_authenticated else (None, None)
+    if err:
+        return JsonResponse({"ok": False, "error": translate(request.lang, err)}, status=400)
+    if image and not q:
+        q = translate(request.lang, "ai_img_q")  # a photo without words: "what is in this photo?"
     if ask_limited(request) or not q:
         key = "asst_rate" if q else "ai_empty"
         if wants_json(request):
             return JsonResponse({"ok": False, "error": translate(request.lang, key)}, status=429 if q else 400)
         flash(request, messages.ERROR, key)
         return redirect("/ai/#chat")
-    data = ask_payload(request, q)
+    history = [(m.role, m.content) for m in request.user.ai_messages.order_by("-id")[:6][::-1]] if request.user.is_authenticated else ()
+    data = ask_payload(request, q, image, history)
     if request.user.is_authenticated:
-        AIMessage.objects.create(user=request.user, role="user", content=q)
+        AIMessage.objects.create(user=request.user, role="user", content=q + (" [📷]" if image else ""))
         AIMessage.objects.create(user=request.user, role="assistant", content=data["answer"])
     if wants_json(request):
         return JsonResponse(data)

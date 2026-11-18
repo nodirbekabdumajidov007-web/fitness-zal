@@ -286,3 +286,9 @@ main h2{font-size:clamp(1.35rem,2.1vw,1.7rem)}
 @media (max-width:900px){.ft-grid{grid-template-columns:1fr 1fr}.ft-brand{grid-column:1/-1}}
 @media (max-width:520px){.ft-grid{gap:18px 14px;padding-block:24px 12px}.ft-contact{grid-column:1/-1}.ft-legal{justify-content:center}}
 .ft-made{display:none}
+
+/* coach chat: photo button and chip */
+.ai-attach{display:inline-grid;place-items:center;min-width:44px;min-height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-size:1.2rem}
+.ai-attach:hover,.ai-attach:focus-within{border-color:var(--accent)}
+.ai-pic{display:inline-flex;align-items:center;gap:6px;margin:6px 0;padding:4px 10px;border-radius:99px;background:var(--surface);border:1px solid var(--line);font-size:.85rem}
+.ai-pic[hidden]{display:none}.ai-pic button{border:0;background:none;color:var(--accent);font-size:1.1rem;cursor:pointer;line-height:1}

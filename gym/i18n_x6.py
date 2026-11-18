@@ -288,4 +288,8 @@ reset_subject||Fitnes Zal: şifre sıfırlama||Fitnes Zal: сырсөздү ка
 scan_session||Oturum sona erdi: sayfayı yenileyin ve yönetici olarak tekrar giriş yapın||Сессия бүттү: баракты жаңыртып, администратор катары кайра кириңиз||Ҷаласа анҷом ёфт: саҳифаро навсозӣ карда, ҳамчун администратор дубора ворид шавед
 cal_estimate||Yaklaşık hesap||Болжолдуу эсептөө||Ҳисоби тахминӣ
 cal_est_note||Listede yok, bu yüzden kalori yemeğin türüne göre yaklaşık hesaplandı. Kesin değeri biliyorsanız düzeltin.||Тизмеде жок, ошондуктан калория тамактын түрүнө карап болжолдуу эсептелди. Так маанини билсеңиз, оңдоңуз.||Дар феҳрист нест, бинобар ин калория аз рӯи намуди хӯрок тахминан ҳисоб шуд. Агар қимати дақиқро донед, ислоҳ кунед.
+ai_attach||Fotoğraf ekle||Сүрөт тиркөө||Расм замима кардан
+ai_img_err||Fotoğraf .jpg, .png veya .webp olmalı ve 4 MB'ı geçmemeli.||Сүрөт .jpg, .png же .webp болуп, 4 МБдан чоң болбошу керек.||Расм бояд .jpg, .png ё .webp бошад ва аз 4 МБ зиёд набошад.
+ai_img_off||Fotoğraf analizi henüz açık değil. Sorunuzu yazın.||Сүрөттү талдоо азырынча иштебейт. Суроону жазыңыз.||Таҳлили расм ҳоло фаъол нест. Саволро нависед.
+ai_img_q||Bu fotoğrafta ne var? Bana nasıl yardımcı olur?||Бул сүрөттө эмне бар? Мага кандай пайдасы бар?||Дар ин расм чӣ ҳаст? Ба ман чӣ фоида дорад?
 """

@@ -269,3 +269,46 @@ class AccountSettingsTests(Base):
         self.assertContains(self.post(username="VALI"), "field-err")
         self.assertContains(self.post(email="vali@x.uz"), "field-err")
         self.assertEqual(User.objects.filter(username="aziz_k").count(), 1)
+
+
+class LlmCoachTests(TestCase):
+    """Claude is only the second brain: no key = offline answers as before; with a key it takes photos and questions the base cannot answer."""
+
+    def setUp(self):
+        from django.core.cache import cache
+        cache.clear()
+        self.u = User.objects.create_user(username="llm1", password="x")
+        self.c = Client()
+        self.c.force_login(self.u)
+
+    def test_no_key_keeps_offline_answers(self):
+        from unittest import mock
+        with mock.patch("gym.llm.ask") as ask:
+            r = self.c.post("/ai/ask/", {"q": "ish vaqti qanaqa"}, HTTP_X_REQUESTED_WITH="fetch").json()
+        self.assertTrue(r["ok"])
+        ask.assert_not_called()
+
+    def test_unknown_question_goes_to_claude(self):
+        from unittest import mock
+        with self.settings(ANTHROPIC_API_KEY="k"), mock.patch("gym.llm.ask", return_value="Claude javobi") as ask:
+            r = self.c.post("/ai/ask/", {"q": "qwerty zzz bilmagan narsa"}, HTTP_X_REQUESTED_WITH="fetch").json()
+        self.assertEqual(r["answer"], "Claude javobi")
+        ask.assert_called_once()
+
+    def test_photo_needs_a_real_image_and_goes_to_claude(self):
+        from unittest import mock
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        png = b"\x89PNG\r\n\x1a\n" + b"0" * 64
+        bad = SimpleUploadedFile("a.png", b"not an image at all", content_type="image/png")
+        self.assertEqual(self.c.post("/ai/ask/", {"q": "x", "image": bad}, HTTP_X_REQUESTED_WITH="fetch").status_code, 400)
+        good = SimpleUploadedFile("a.png", png, content_type="image/png")
+        with self.settings(ANTHROPIC_API_KEY="k"), mock.patch("gym.llm.ask", return_value="Bu osh") as ask:
+            r = self.c.post("/ai/ask/", {"q": "", "image": good}, HTTP_X_REQUESTED_WITH="fetch").json()
+        self.assertEqual(r["answer"], "Bu osh")
+        self.assertEqual(ask.call_args.args[4]["type"], "image")
+
+    def test_photo_without_key_says_so(self):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        good = SimpleUploadedFile("a.png", b"\x89PNG\r\n\x1a\n" + b"0" * 64, content_type="image/png")
+        r = self.c.post("/ai/ask/", {"q": "bu nima", "image": good}, HTTP_X_REQUESTED_WITH="fetch").json()
+        self.assertIn("yoqilmagan", r["answer"])

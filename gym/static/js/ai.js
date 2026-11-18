@@ -4,7 +4,20 @@
   var form = document.querySelector('[data-ai-form]');
   var log = document.querySelector('[data-ai-log]');
   if (form && log) {
-    var box = form.querySelector('textarea'), btn = form.querySelector('button');
+    var box = form.querySelector('textarea'), btn = form.querySelector('button[type=submit]');
+    var pic = form.querySelector('input[type=file]'), picBox = document.querySelector('[data-ai-pic]');
+    function showPic() {  // the chosen photo: a small chip with a remove button
+      if (!picBox) return;
+      picBox.textContent = '';
+      if (!pic || !pic.files.length) { picBox.hidden = true; return; }
+      var x = document.createElement('button'); x.type = 'button'; x.textContent = '×'; x.setAttribute('aria-label', 'remove');
+      x.addEventListener('click', function () { pic.value = ''; showPic(); });
+      picBox.appendChild(document.createTextNode('📷 ' + pic.files[0].name.slice(0, 30) + ' ')); picBox.appendChild(x); picBox.hidden = false;
+    }
+    if (pic) pic.addEventListener('change', function () {
+      if (pic.files[0] && pic.files[0].size > 4 * 1024 * 1024) { pic.value = ''; bubble('assistant error', form.dataset.imgerr || ''); }
+      showPic();
+    });
     function csrf() { return form.querySelector('[name=csrfmiddlewaretoken]').value; }
     function bubble(role, text, extra) {
       var empty = log.querySelector('[data-ai-empty]'); if (empty) empty.remove();
@@ -37,12 +50,13 @@
     });
     form.addEventListener('submit', function (e) {
       e.preventDefault();
-      var q = box.value.trim();
-      if (!q || btn.disabled) return;
-      bubble('user', q);
+      var q = box.value.trim(), hasPic = !!(pic && pic.files.length);
+      if ((!q && !hasPic) || btn.disabled) return;
+      bubble('user', (hasPic ? '📷 ' : '') + q);
       var wait = bubble('assistant typing', form.dataset.thinking);
       box.value = ''; btn.disabled = true; btn.classList.add('loading');
-      var body = new FormData(); body.append('q', q);
+      var body = new FormData(); body.append('q', q); if (hasPic) body.append('image', pic.files[0]);
+      if (pic) { pic.value = ''; showPic(); }
       fetch(form.action, { method: 'POST', body: body, credentials: 'same-origin', headers: { 'X-CSRFToken': csrf(), 'X-Requested-With': 'fetch' } })
         .then(function (r) { return r.json(); })
         .then(function (d) {

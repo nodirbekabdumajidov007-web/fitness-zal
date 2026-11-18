@@ -977,6 +977,10 @@ ai_equip_gym||Zalda (trenajyor va shtanga)||В зале (тренажёры и �
 ai_equip_home||Uyda (jihozsiz yoki gantel)||Дома (без инвентаря или гантели)||At home (bodyweight or dumbbells)
 asst_unknown||Bu savolga aniq javob topa olmadim. Quyidagilardan birini so'rab ko'ring yoki murabbiydan so'rang.||Не нашёл точного ответа на этот вопрос. Попробуйте один из вариантов ниже или спросите тренера.||I could not find an exact answer to that. Try one of the questions below or ask a trainer.
 asst_login||Bu ma'lumot sizning hisobingizga tegishli: avval tizimga kiring.||Это информация вашего аккаунта: сначала войдите в систему.||That is information from your own account: please sign in first.
+ai_attach||Rasm biriktirish||Прикрепить фото||Attach a photo
+ai_img_err||Rasm .jpg, .png yoki .webp bo'lsin va 4 MB dan oshmasin.||Фото должно быть .jpg, .png или .webp, не больше 4 МБ.||The photo must be .jpg, .png or .webp and up to 4 MB.
+ai_img_off||Rasmni tahlil qilish hozircha yoqilmagan. Savolni yozib yuboring.||Анализ фото пока не включён. Напишите вопрос текстом.||Photo analysis is not switched on yet. Please type your question.
+ai_img_q||Bu rasmda nima bor? Menga qanday foydasi bor?||Что на этом фото? Чем это мне полезно?||What is in this photo? How does it help me?
 asst_rate||Juda ko'p savol yuborildi. Bir daqiqadan keyin qayta urinib ko'ring.||Слишком много вопросов. Попробуйте через минуту.||Too many questions. Try again in a minute.
 asst_suggest||Shuni so'rab ko'ring:||Попробуйте спросить:||Try asking:
 cal_txt_title||Matn bilan yozish||Записать текстом||Type it in

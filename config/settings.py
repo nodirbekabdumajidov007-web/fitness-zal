@@ -171,6 +171,8 @@ SERVER_EMAIL = DEFAULT_FROM_EMAIL
 PASSWORD_RESET_TIMEOUT = 60 * 60 * 3  # e-mailed reset links work for 3 hours
 MAX_VIDEO_MB = int(os.environ.get("FZ_MAX_VIDEO_MB", "500"))
 MAX_IMAGE_MB = int(os.environ.get("FZ_MAX_IMAGE_MB", "5"))
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "").strip()  # the coach chat answers free questions and photos with Claude when set
+ANTHROPIC_MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-haiku-5-5").strip()
 
 # logging: console always, a rotating file when FZ_LOG_DIR is set, Telegram alerts for errors when a bot token + admin chat are configured
 _handlers = {
