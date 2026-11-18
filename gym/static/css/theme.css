@@ -292,3 +292,17 @@ main h2{font-size:clamp(1.35rem,2.1vw,1.7rem)}
 .ai-attach:hover,.ai-attach:focus-within{border-color:var(--accent)}
 .ai-pic{display:inline-flex;align-items:center;gap:6px;margin:6px 0;padding:4px 10px;border-radius:99px;background:var(--surface);border:1px solid var(--line);font-size:.85rem}
 .ai-pic[hidden]{display:none}.ai-pic button{border:0;background:none;color:var(--accent);font-size:1.1rem;cursor:pointer;line-height:1}
+
+/* ---- modern surface: rounder shapes, soft depth, calmer backgrounds ---- */
+:root{--r:16px;--shadow-1:0 1px 2px rgba(16,24,40,.05),0 6px 20px -8px rgba(16,24,40,.12);--shadow-2:0 2px 4px rgba(16,24,40,.06),0 18px 40px -14px rgba(16,24,40,.22)}
+:root[data-theme="dark"]{--shadow-1:0 1px 2px rgba(0,0,0,.4),0 8px 24px -10px rgba(0,0,0,.55);--shadow-2:0 2px 4px rgba(0,0,0,.45),0 22px 46px -16px rgba(0,0,0,.7)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--shadow-1:0 1px 2px rgba(0,0,0,.4),0 8px 24px -10px rgba(0,0,0,.55);--shadow-2:0 2px 4px rgba(0,0,0,.45),0 22px 46px -16px rgba(0,0,0,.7)}}
+body{background-image:radial-gradient(900px 480px at 8% -8%,color-mix(in srgb,var(--accent) 9%,transparent),transparent 70%),radial-gradient(800px 520px at 100% 0,color-mix(in srgb,var(--focus,#3b82f6) 7%,transparent),transparent 70%);background-attachment:fixed}
+.card{border-radius:20px;border-color:color-mix(in srgb,var(--line) 70%,transparent);box-shadow:var(--shadow-1)}
+.card.lift:hover,a.card:hover{transform:translateY(-3px);box-shadow:var(--shadow-2)}
+input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=range]),select,textarea{border-radius:12px}
+.pill,.chip{border-radius:999px}
+.prod,.plan,.cl{border-radius:20px}
+img.prod-img,.prod-img{border-radius:16px 16px 0 0}
+dialog{border-radius:22px}
+.ft{border-radius:28px 28px 0 0;overflow:hidden}
