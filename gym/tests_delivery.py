@@ -195,8 +195,8 @@ class AppleTests(Base):
         self.assertEqual(c.get("/dashboard/").status_code, 200)
 
     def test_buttons(self):
+        self.assertNotContains(Client().get("/login/"), 'id="abtn"')  # not set up yet: no dead "coming soon" button
+        GymSettings.objects.filter(pk=1).update(apple_client_id=CID)
         r = Client().get("/login/")
         self.assertContains(r, 'id="abtn"')
-        self.assertContains(r, "Apple")
-        GymSettings.objects.filter(pk=1).update(apple_client_id=CID)
-        self.assertContains(Client().get("/login/"), f'data-client="{CID}"')
+        self.assertContains(r, f'data-client="{CID}"')
