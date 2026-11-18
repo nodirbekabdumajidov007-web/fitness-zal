@@ -8,7 +8,7 @@
     <button type="button" role="tab" aria-selected="false" data-mode="3d">✦ {% t 'qr_3d' %}</button>
   </div>
   <div class="receipt grid qr-card" style="text-align:center;justify-items:center">
-    <h3 style="color:#111" class="card-brand"><img src="{% vstatic 'img/logo.png' %}" alt="" width="219" height="320">FITNES.ZAL</h3>
+    <h3 style="color:#111" class="card-brand"><img src="{% vstatic 'img/logo.png' %}" alt="" width="256" height="256">FITNES.ZAL</h3>
     <div class="qr" data-view="2d">{{ qr }}</div>
     <div class="qr3d" data-view="3d" hidden>
       <canvas id="qr3d" data-modules="{{ modules }}" width="520" height="420" aria-label="{% t 'qr_3d' %}"></canvas>

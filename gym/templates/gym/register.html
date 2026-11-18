@@ -7,7 +7,7 @@
   <form class="card grid glass" method="post" novalidate data-warp>
     {% csrf_token %}
     <i class="glare" aria-hidden="true"></i>
-    <div class="auth-head"><img class="auth-logo" src="{% vstatic 'img/logo.png' %}" alt="" width="219" height="320"><span class="eyebrow">Fitnes Zal</span><h1>{% t 'join_us' %}</h1></div>
+    <div class="auth-head"><img class="auth-logo" src="{% vstatic 'img/logo.png' %}" alt="" width="256" height="256"><span class="eyebrow">Fitnes Zal</span><h1>{% t 'join_us' %}</h1></div>
     <div class="seg"><a href="{% url 'login' %}">{% t 'login' %}</a><a href="{% url 'register' %}" aria-current="page">{% t 'register' %}</a></div>
     {% if referrer %}<div class="note info">{% t 'invited_by' name=referrer.first_name bonus='' %}</div>{% endif %}
     {% if google_only %}

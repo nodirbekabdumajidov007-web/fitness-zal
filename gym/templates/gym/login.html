@@ -8,7 +8,7 @@
     {% csrf_token %}
     <i class="glare" aria-hidden="true"></i>
     <input type="hidden" name="next" value="{{ next }}">
-    <div class="auth-head"><img class="auth-logo" src="{% vstatic 'img/logo.png' %}" alt="" width="219" height="320"><span class="eyebrow">Fitnes Zal · {{ gs.open_time|hm }}–{{ gs.close_time|hm }}</span><h1>{% t 'welcome_back' %}</h1></div>
+    <div class="auth-head"><img class="auth-logo" src="{% vstatic 'img/logo.png' %}" alt="" width="256" height="256"><span class="eyebrow">Fitnes Zal · {{ gs.open_time|hm }}–{{ gs.close_time|hm }}</span><h1>{% t 'welcome_back' %}</h1></div>
     <div class="seg"><a href="{% url 'login' %}" aria-current="page">{% t 'login' %}</a><a href="{% url 'register' %}">{% t 'register' %}</a></div>
     <div class="role-pick" role="radiogroup" aria-label="{% t 'login_as' %}">
       <label><input type="radio" name="role" value="member"{% if role != 'trainer' %} checked{% endif %}><span><i aria-hidden="true">{% icon 'activity' %}</i>{% t 'role_member' %}</span></label>

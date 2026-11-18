@@ -27,7 +27,7 @@
 <header class="top"><div class="wrap">
   <div class="top-row">
     <button type="button" class="navtoggle" data-sb-open aria-controls="sidebar" aria-expanded="false" aria-label="{% t 'nav_menu' %}">{% icon 'menu' %}</button>
-    <a class="logo" href="{% url 'home' %}"><img class="logo-mark" src="{% vstatic 'img/logo.png' %}" alt="" width="219" height="320"><span class="logo-txt">FITNES<span>.</span>ZAL</span></a>
+    <a class="logo" href="{% url 'home' %}"><img class="logo-mark" src="{% vstatic 'img/logo.png' %}" alt="" width="256" height="256"><span class="logo-txt">FITNES<span>.</span>ZAL</span></a>
     <span class="pill {% if is_open %}good{% else %}bad{% endif %}"><i class="dot"></i>{% if is_open %}{% t 'open' %}{% else %}{% t 'closed' %}{% endif %} · {{ gs.open_time|hm }}–{{ gs.close_time|hm }}</span>
     <div class="tools">
       <details class="langpick">
@@ -89,7 +89,7 @@
 <div class="sb-backdrop" id="sb-backdrop" hidden></div>
 <aside class="sb" id="sidebar" aria-label="Menu">
   <div class="sb-head">
-    <a class="logo" href="{% url 'home' %}"><img class="logo-mark" src="{% vstatic 'img/logo.png' %}" alt="" width="219" height="320"><span class="logo-txt">FITNES<span>.</span>ZAL</span></a>
+    <a class="logo" href="{% url 'home' %}"><img class="logo-mark" src="{% vstatic 'img/logo.png' %}" alt="" width="256" height="256"><span class="logo-txt">FITNES<span>.</span>ZAL</span></a>
     <button type="button" class="sb-x" data-sb-close aria-label="{% t 'nav_close' %}">{% icon 'x' %}</button>
   </div>
   <nav class="sb-nav" aria-label="Menu">
@@ -161,7 +161,7 @@
   {% endif %}
   <div class="wrap ft-grid">
     <section class="ft-brand">
-      <a class="ft-logo" href="{% url 'home' %}"><img src="{% vstatic 'img/logo.png' %}" alt="" width="219" height="320"><span>FITNES<i>.</i>ZAL</span></a>
+      <a class="ft-logo" href="{% url 'home' %}"><img src="{% vstatic 'img/logo.png' %}" alt="" width="256" height="256"><span>FITNES<i>.</i>ZAL</span></a>
       <p>{% t 'ft_about' %}</p>
     </section>
     <nav class="ft-col" aria-label="{% t 'ft_gym' %}">
