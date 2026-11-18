@@ -38,3 +38,31 @@ class LlmProvidersTests(TestCase):
         with self.settings(GEMINI_API_KEY="g", ANTHROPIC_API_KEY="a"):
             with mock.patch("gym.llm._gemini", side_effect=OSError("down")), mock.patch("gym.llm._claude", return_value="C javob"):
                 self.assertEqual(llm.ask("salom"), "C javob")
+
+    def test_busy_provider_is_retried_once(self):
+        import io
+        import urllib.error
+        calls = []
+
+        def flaky(*a):
+            calls.append(1)
+            if len(calls) == 1:
+                raise urllib.error.HTTPError("u", 503, "busy", {}, io.BytesIO(b"high demand"))
+            return "Salom"
+
+        with self.settings(GEMINI_API_KEY="g", ANTHROPIC_API_KEY=""), mock.patch("gym.llm._gemini", side_effect=flaky), mock.patch("gym.llm.time.sleep"):
+            self.assertEqual(llm.ask("salom"), "Salom")
+        self.assertEqual(len(calls), 2)
+
+    def test_auth_errors_are_not_retried(self):
+        import io
+        import urllib.error
+        calls = []
+
+        def bad(*a):
+            calls.append(1)
+            raise urllib.error.HTTPError("u", 403, "no", {}, io.BytesIO(b"key"))
+
+        with self.settings(GEMINI_API_KEY="g", ANTHROPIC_API_KEY=""), mock.patch("gym.llm._gemini", side_effect=bad):
+            self.assertIsNone(llm.ask("salom"))
+        self.assertEqual(len(calls), 1)

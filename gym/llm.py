@@ -8,6 +8,7 @@ No extra package: the APIs are called with urllib. Any failure returns None and 
 import base64
 import json
 import logging
+import time
 import urllib.error
 import urllib.request
 
@@ -102,7 +103,7 @@ def _gemini(question, lang, facts, turns, image, timeout):
     return "".join(p.get("text", "") for p in (cands[0].get("content") or {}).get("parts", []))
 
 
-def ask(question, lang="uz", facts="", history=(), image=None, timeout=25):
+def ask(question, lang="uz", facts="", history=(), image=None, timeout=20):
     """The answer text, or None (no key, network error, API error, empty answer). Gemini first (free tier), then Claude.
 
     history: [(role, text)] of the last chat lines, oldest first; image: an `image_part()` block or None."""
@@ -111,18 +112,24 @@ def ask(question, lang="uz", facts="", history=(), image=None, timeout=25):
     for key, fn in (("GEMINI_API_KEY", _gemini), ("ANTHROPIC_API_KEY", _claude)):
         if not getattr(settings, key, ""):
             continue
-        try:
-            text = (fn(question, lang, facts, turns, image, timeout) or "").strip()
-        except urllib.error.HTTPError as e:  # the provider answered with an error: log its status and reason (never the key)
+        for attempt in (1, 2):  # a busy provider (503 / 429) or a slow answer is tried once more
+            retry = False
             try:
-                why = e.read(300).decode("utf-8", "replace").replace(chr(10), " ")
-            except OSError:
-                why = ""
-            log.warning("llm: %s HTTP %s: %s", key, e.code, why)
-            continue
-        except (urllib.error.URLError, OSError, ValueError, KeyError, TypeError) as e:
-            log.warning("llm: %s failed: %s", key, e.__class__.__name__)
-            continue
-        if text:
-            return text[:3000]
+                text = (fn(question, lang, facts, turns, image, timeout) or "").strip()
+                if text:
+                    return text[:3000]
+                break
+            except urllib.error.HTTPError as e:  # the provider answered with an error: log its status and reason (never the key)
+                try:
+                    why = e.read(300).decode("utf-8", "replace").replace(chr(10), " ")
+                except OSError:
+                    why = ""
+                log.warning("llm: %s HTTP %s (try %s): %s", key, e.code, attempt, why)
+                retry = e.code in (429, 500, 502, 503, 504)
+            except (urllib.error.URLError, OSError, ValueError, KeyError, TypeError) as e:
+                log.warning("llm: %s failed (try %s): %s", key, attempt, e.__class__.__name__)
+                retry = isinstance(e, (TimeoutError, urllib.error.URLError))
+            if not retry or attempt == 2:
+                break
+            time.sleep(1.5)
     return None
