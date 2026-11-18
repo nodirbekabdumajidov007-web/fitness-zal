@@ -163,12 +163,6 @@
     <section class="ft-brand">
       <a class="ft-logo" href="{% url 'home' %}"><img src="{% vstatic 'img/logo.png' %}" alt="" width="219" height="320"><span>FITNES<i>.</i>ZAL</span></a>
       <p>{% t 'ft_about' %}</p>
-      <div class="ft-social">
-        <a href="https://instagram.com/{{ gs.instagram }}" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram @{{ gs.instagram }}"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" class="fill"/></svg></a>
-        <a href="{{ gs.telegram }}" target="_blank" rel="noopener" aria-label="Telegram" title="Telegram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 4 3 11l6 2 2 6 3-4 5 4z"/><path d="m9 13 8-6"/></svg></a>
-        {% if gs.telegram_bot %}<a href="https://t.me/{{ gs.telegram_bot|cut:'@' }}" target="_blank" rel="noopener" aria-label="Telegram bot" title="@{{ gs.telegram_bot|cut:'@' }}"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="7" width="16" height="12" rx="3"/><path d="M12 3v4M9 12h.01M15 12h.01M9 16h6"/></svg></a>{% endif %}
-        <a href="tel:+998{{ gs.phone|cut:' ' }}" aria-label="{% t 'phone' %}" title="+998 {{ gs.phone }}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></a>
-      </div>
     </section>
     <nav class="ft-col" aria-label="{% t 'ft_gym' %}">
       <h3>{% t 'ft_gym' %}</h3>
@@ -183,12 +177,6 @@
       {% else %}<a href="{% url 'login' %}">{% t 'login' %}</a><a href="{% url 'register' %}">{% t 'register' %}</a>{% endif %}
       <a href="{% url 'ai' %}">{% t 'ai_coach' %}</a>
       <a href="{% url 'tools' %}">{% t 'tools' %}</a>
-      <a href="{% url 'reviews' %}">{% t 'nav_reviews' %}</a>
-      <a href="{% url 'faq' %}">{% t 'faq_title' %}</a>
-      <a href="{% url 'app_download' %}">{% t 'app_link' %}</a>
-      <a href="{% url 'oferta' %}">{% t 'ft_oferta' %}</a>
-      <a href="{% url 'privacy' %}">{% t 'ft_privacy' %}</a>
-      <a href="{% url 'refund' %}">{% t 'ft_refund' %}</a>
     </nav>
     <section class="ft-col ft-contact">
       <h3>{% t 'ft_contact' %}</h3>
@@ -202,6 +190,7 @@
     </section>
   </div>
   <div class="ft-bottom"><div class="wrap">
+    <nav class="ft-legal" aria-label="{% t 'ft_oferta' %}"><a href="{% url 'reviews' %}">{% t 'nav_reviews' %}</a><a href="{% url 'faq' %}">{% t 'faq_title' %}</a><a href="{% url 'app_download' %}">{% t 'app_link' %}</a><a href="{% url 'oferta' %}">{% t 'ft_oferta' %}</a><a href="{% url 'privacy' %}">{% t 'ft_privacy' %}</a><a href="{% url 'refund' %}">{% t 'ft_refund' %}</a></nav>
     <span>© {% now "Y" %} Fitnes Zal · {% t 'ft_rights' %}</span>
     <span class="ft-made">{% t 'ft_made' %}</span>
     <a class="ft-top" href="#" aria-label="{% t 'ft_top' %}">{% t 'ft_top' %} <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></a>
