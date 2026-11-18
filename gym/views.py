@@ -1746,8 +1746,12 @@ def calories_search(request):
         limited = False
     if limited:
         return JsonResponse({"ok": False, "items": [], "error": translate(request.lang, "asst_rate")}, status=429)
-    items = food_db.search(request.GET.get("q", ""), calories.user_foods(request.user), 10)
-    resp = JsonResponse({"ok": True, "items": [f.as_dict(request.lang) | ({"pk": f.id} if f.mine else {}) for f in items]})
+    q = request.GET.get("q", "")
+    items = food_db.search(q, calories.user_foods(request.user), 10)
+    data = {"ok": True, "items": [f.as_dict(request.lang) | ({"pk": f.id} if f.mine else {}) for f in items]}
+    if not items and q.strip():
+        data["estimate"] = food_db.estimate(q)  # not in any table: a rough guess by the kind of dish, so that every food gets calories
+    resp = JsonResponse(data)
     resp["Cache-Control"] = "private, no-store"
     return resp
 

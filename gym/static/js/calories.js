@@ -21,6 +21,7 @@
   var mine = [];
   try { mine = JSON.parse(data.textContent) || []; } catch (e) { mine = []; }
   var picked = null, active = -1, seq = 0, timer = 0, ctl = null, cache = {};
+  var est = null;  // a rough guess for a food that is in no table: {name, kcal, p, f, c per 100 g}; fills the quick-add fields
 
   function T(k) { return root.getAttribute('data-i18n-' + k) || ''; }
   function fill(tpl, o) { return tpl.replace(/%([gkpfc])/g, function (m, c) { return o[c]; }); }
@@ -39,7 +40,23 @@
     prev.textContent = fill(T('live'), { g: g, k: num(picked.kcal * m), p: num(picked.p * m), f: num(picked.f * m), c: num(picked.c * m) });
   }
 
+  function applyEstimate() {
+    if (!est) return;
+    var g = parseInt(grams.value, 10) || 0, m = g / 100, fe = form.elements;
+    fe['name'].value = est.name; fe['kcal'].value = num(est.kcal * m); fe['protein'].value = num(est.p * m);
+    fe['fat'].value = num(est.f * m); fe['carbs'].value = num(est.c * m);
+  }
+
+  function pickEstimate(e) {
+    est = e; picked = null; hidden.value = ''; clear(); show(errBox, '');
+    grams.value = e.portion || 100;
+    if (custom) custom.open = true;
+    applyEstimate();
+    prev.hidden = false; prev.textContent = T('estnote');
+  }
+
   function pick(f) {
+    est = null;
     picked = f; hidden.value = f.id; search.value = f.name; clear(); show(errBox, '');
     grams.value = f.portion || 100;
     if (custom) custom.open = false;
@@ -70,7 +87,7 @@
     opts[active].scrollIntoView({ block: 'nearest' });
   }
 
-  function render(items, q) {
+  function render(items, q, e) {
     list.textContent = ''; active = -1;
     items.forEach(function (f, i) {
       var li = el('li'); li.id = 'calOpt' + i; li.setAttribute('role', 'option'); li.setAttribute('aria-selected', 'false');
@@ -83,6 +100,13 @@
       li.addEventListener('mousemove', function () { if (active !== i) setActive(i); });
       list.appendChild(li);
     });
+    if (!items.length && e) {
+      var le = el('li', 'cal-est'); le.id = 'calOptEst'; le.setAttribute('role', 'option'); le.setAttribute('aria-selected', 'false');
+      le.appendChild(el('span', null, '≈ ' + T('est') + ': ' + e.name));
+      le.appendChild(el('small', null, fill(T('row'), { k: num(e.kcal) }) + ' · ' + fill(T('portion'), { g: e.portion, k: num(e.kcal * e.portion / 100) })));
+      le.addEventListener('mousedown', function (ev) { ev.preventDefault(); pickEstimate(e); });
+      list.appendChild(le);
+    }
     if (!items.length && q.trim()) {
       var li = el('li', 'cal-none'); li.id = 'calOptNone'; li.setAttribute('role', 'option'); li.setAttribute('aria-selected', 'false');
       li.appendChild(el('span', null, T('none')));
@@ -96,7 +120,7 @@
 
   function query(q) {
     var key = q.trim().toLowerCase();
-    if (cache[key]) { render(cache[key], q); return; }
+    if (cache[key]) { render(cache[key].items, q, cache[key].est); return; }
     var mySeq = ++seq;
     if (ctl && ctl.abort) ctl.abort();
     ctl = window.AbortController ? new AbortController() : null;
@@ -108,13 +132,13 @@
         if (!j.ok) { show(errBox, j.error || T('net')); return; }
         show(errBox, '');
         if (Object.keys(cache).length > 60) cache = {};
-        cache[key] = j.items; render(j.items, q);
+        cache[key] = { items: j.items, est: j.estimate || null }; render(j.items, q, j.estimate || null);
       })
       .catch(function (e) { if (e && e.name === 'AbortError') return; if (mySeq === seq) show(errBox, T('net')); });
   }
 
   search.addEventListener('input', function () {
-    picked = null; hidden.value = ''; showPreview();
+    picked = null; est = null; hidden.value = ''; showPreview();
     clearTimeout(timer);
     if (!search.value.trim()) { query(''); return; }
     timer = setTimeout(function () { query(search.value); }, 140);
@@ -131,7 +155,7 @@
       list.children[active < 0 ? 0 : active].dispatchEvent(new MouseEvent('mousedown', { cancelable: true }));
     } else if (e.key === 'Escape') { clear(); }
   });
-  grams.addEventListener('input', showPreview);
+  grams.addEventListener('input', function () { showPreview(); if (est) { applyEstimate(); prev.hidden = false; prev.textContent = T('estnote'); } });
 
   form.addEventListener('submit', function (e) {
     // a food from the list needs no typed numbers; without one the quick-add block must have a name and calories

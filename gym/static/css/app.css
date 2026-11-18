@@ -2128,6 +2128,7 @@ main{gap:16px;padding-block:22px 48px}
 .cal-results small{text-align:right;white-space:normal}
 .cal-badge{font-style:normal;font-size:.7rem;font-weight:800;margin-left:8px;padding:2px 8px;border-radius:99px;color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,var(--surface));vertical-align:middle;white-space:nowrap}
 .cal-none{color:var(--accent);font-weight:700}
+.cal-est{font-weight:700}.cal-est>span:first-child{color:var(--volt,var(--accent))}
 .cal-newfood summary,.cal-mine summary{cursor:pointer;font-weight:700;color:var(--accent)}
 .cal-newfood,.cal-mine{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
 .cal-newfood form{margin-top:10px}.cal-custom-grid .wide{grid-column:1/-1}

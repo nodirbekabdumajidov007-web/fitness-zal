@@ -286,4 +286,6 @@ reset_mail_open||Yeni şifre belirlemek için aşağıdaki bağlantıyı açın 
 reset_mail_ignore||Bunu siz istemediyseniz bu e-postayı yok sayın: şifreniz değişmeyecek.||Муну сиз сурабаган болсоңуз, катты эске албаңыз: сырсөзүңүз өзгөрбөйт.||Агар шумо инро дархост накарда бошед, ин мактубро нодида гиред: рамзи шумо тағйир намеёбад.
 reset_subject||Fitnes Zal: şifre sıfırlama||Fitnes Zal: сырсөздү калыбына келтирүү||Fitnes Zal: барқарор кардани рамз
 scan_session||Oturum sona erdi: sayfayı yenileyin ve yönetici olarak tekrar giriş yapın||Сессия бүттү: баракты жаңыртып, администратор катары кайра кириңиз||Ҷаласа анҷом ёфт: саҳифаро навсозӣ карда, ҳамчун администратор дубора ворид шавед
+cal_estimate||Yaklaşık hesap||Болжолдуу эсептөө||Ҳисоби тахминӣ
+cal_est_note||Listede yok, bu yüzden kalori yemeğin türüne göre yaklaşık hesaplandı. Kesin değeri biliyorsanız düzeltin.||Тизмеде жок, ошондуктан калория тамактын түрүнө карап болжолдуу эсептелди. Так маанини билсеңиз, оңдоңуз.||Дар феҳрист нест, бинобар ин калория аз рӯи намуди хӯрок тахминан ҳисоб шуд. Агар қимати дақиқро донед, ислоҳ кунед.
 """

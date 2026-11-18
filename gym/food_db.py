@@ -8,6 +8,7 @@ import re
 
 from .food_data1 import RAW as _RAW1
 from .food_data2 import RAW as _RAW2
+from .food_data3 import RAW as _RAW3
 from .food_names import NAMES as _NAMES
 from .food_names import NAMES_X as _NAMES_X
 
@@ -63,7 +64,7 @@ def _n(v):
 
 def _load():
     rows = []
-    for raw in (_RAW1, _RAW2):
+    for raw in (_RAW1, _RAW2, _RAW3):
         for line in raw.splitlines():
             line = line.strip()
             if not line or line.startswith("#"):
@@ -232,3 +233,46 @@ def find_foods(toks, extra=()):
         out.append((a, b, f))
     out.sort(key=lambda x: x[0])
     return out
+
+
+# ------------------------------------------------------------------------------------------------ estimate for unknown foods
+# (words that may appear in a name, kcal protein fat carbs per 100 g, usual portion g): a rough value by the kind of dish, used when the
+# food is in no table, so that any dish gets some calories instead of an empty answer. Checked in this order; the first kind that fits wins.
+_KINDS = (
+    (("shorva", "sho'rva", "shurpa", "sup", "суп", "soup", "borsh", "борщ", "bulyon", "бульон", "mastava", "мастава"), (60, 3.5, 3, 5), 300),
+    (("lagmon", "лагман", "makaron", "макарон", "pasta", "паста", "lapsha", "лапша", "noodle", "spagetti", "спагетти", "udon", "ramen"), (150, 6, 4.5, 22), 300),
+    (("osh", "oshi", "palov", "плов", "plov", "guruch", "рис", "rice", "risotto", "bo'tqa", "botqa", "каша", "porridge", "kasha"), (170, 5, 6, 24), 250),
+    (("somsa", "самса", "samsa", "pirog", "пирог", "pirojki", "пирожки", "cheburek", "чебурек", "belyash", "беляш", "pie", "pastry", "xachapuri", "хачапури"), (280, 8, 15, 28), 120),
+    (("manti", "манты", "chuchvara", "пельмени", "pelmeni", "dumpling", "vareniki", "вареники", "xinkali", "хинкали", "xonim", "ханум"), (210, 9, 9, 24), 220),
+    (("burger", "бургер", "pizza", "pitsa", "пицца", "shaurma", "shawarma", "шаурма", "sendvich", "sandwich", "сэндвич", "hotdog", "hot dog", "xot dog", "хот дог", "fri", "fries", "nuggets", "наггетс", "taco", "burrito", "doner", "донер", "lavash", "лаваш"), (255, 11, 12, 27), 220),
+    (("kabob", "kebab", "кебаб", "shashlik", "шашлык", "steak", "steyk", "стейк", "kotlet", "котлета", "gosht", "go'sht", "goshtli", "мясо", "meat", "tovuq", "курица", "chicken", "jigar", "печень", "baliq", "рыба", "fish", "kolbasa", "колбаса", "sosiska"), (230, 21, 15, 3), 180),
+    (("salat", "salati", "салат", "salad", "achichuk", "ачичук", "vinegret", "винегрет", "olivye", "оливье"), (95, 2.5, 6.5, 7), 200),
+    (("tort", "торт", "cake", "pirojnoe", "пирожное", "muzqaymoq", "мороженое", "ice cream", "shokolad", "шоколад", "chocolate", "konfet", "конфет", "candy", "halva", "халва", "xalvo", "pechenye", "печенье", "cookie", "vafli", "вафли", "dessert", "shirinlik", "desert", "murabbo", "варенье", "jam", "napoleon", "medovik", "brauni", "donut", "pyaniki", "baklava", "пахлава"), (390, 5, 17, 54), 100),
+    (("non", "нон", "хлеб", "bread", "bulochka", "булочка", "bulka", "лепешка", "patir", "кулча", "kulcha", "baton", "батон", "lavash non", "tandir non"), (265, 8, 4, 50), 100),
+    (("choy", "чай", "tea", "qahva", "кофе", "coffee", "sok", "сок", "juice", "kompot", "компот", "ichimlik", "напиток", "drink", "kola", "кола", "limonad", "лимонад", "kokteyl", "коктейль", "smuzi", "smoothie", "sharbat", "шербет"), (40, 0.5, 0.5, 9), 250),
+    (("sut", "молоко", "milk", "qatiq", "катык", "yogurt", "йогурт", "kefir", "кефир", "pishloq", "сыр", "cheese", "tvorog", "творог", "ayron", "айран"), (95, 5, 5, 6), 150),
+    (("meva", "фрукт", "fruit", "olma", "яблоко", "banan", "банан", "apelsin", "апельсин", "uzum", "виноград", "qovun", "дыня", "tarvuz", "арбуз", "sabzavot", "овощ", "vegetable", "pomidor", "bodring", "sabzi"), (50, 1, 0.3, 11), 150),
+    (("qovurilgan", "qovurma", "жареный", "жареная", "fried", "kuydirilgan", "fry", "frayed"), (250, 12, 16, 14), 180),
+)
+_DEFAULT_KIND = ((180, 8, 8, 18), 250)
+
+
+def estimate(q):
+    """A rough guess {name, kcal, p, f, c (per 100 g), portion, est: True} for a food that is in no table, by the kind of dish its name
+    suggests; None for an empty name. Never exact: the page tells the member to correct it."""
+    shown = " ".join(str(q or "").split())[:60]
+    q = plain(shown)
+    if not q:
+        return None
+    toks = q.split()
+    best = None
+    for words, vals, portion in _KINDS:
+        for w in words:
+            ww = plain(w).split()
+            if ww and any(toks[i:i + len(ww)] == ww or (len(ww) == 1 and len(ww[0]) >= 3 and any(t.startswith(ww[0]) for t in toks)) for i in range(len(toks))):
+                best = (vals, portion)
+                break
+        if best:
+            break
+    (kcal, p, f, c), portion = best or _DEFAULT_KIND
+    return {"id": "est", "name": shown[:1].upper() + shown[1:], "kcal": kcal, "p": p, "f": f, "c": c, "portion": portion, "piece": 0, "mine": False, "est": True}

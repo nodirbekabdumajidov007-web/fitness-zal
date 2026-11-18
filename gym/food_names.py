@@ -621,9 +621,11 @@ Kreatin | Креатин | Creatine
 BCAA | BCAA (аминокислоты) | BCAA (amino acids)
 """
 
+from .food_names3 import RAW as _RAW3  # noqa: E402
+
 # {Uzbek name: (Russian, English)}
 NAMES = {}
-for _line in RAW.strip().splitlines():
+for _line in (RAW.strip().splitlines() + _RAW3.strip().splitlines()):
     _uz, _ru, _en = (x.strip() for x in _line.split("|"))
     if _uz in NAMES:
         raise ValueError(f"duplicate food name: {_uz}")

@@ -164,7 +164,7 @@ cal_txt_busy||Tanınıyor...||Таанылууда...||Шинохта мешав
 cal_txt_found||Tanınan:||Таанылды:||Шинохта шуд:
 cal_txt_add||Hepsini ekle||Баарын кошуу||Ҳамаро илова кардан
 cal_txt_none||Hiçbir şey tanınmadı. Örneğin: «2 samsa», «200 g pilav», «3 yumurta».||Эч нерсе таанылган жок. Мисалы: «2 самса», «200 г палоо», «3 жумуртка».||Ҳеҷ чиз шинохта нашуд. Масалан: «2 самбӯса», «200 г палав», «3 тухм».
-cal_txt_hint||600'den fazla yerleşik yiyecek ve kendi yiyecekleriniz tanınır; gramı ayarlayabilirsiniz.||600дөн ашык камтылган тамак жана өз тамактарыңыз таанылат; граммды тууралай аласыз.||Зиёда аз 600 хӯроки дарунсохт ва хӯрокҳои худатон шинохта мешаванд; граммро танзим карда метавонед.
+cal_txt_hint||750'den fazla yerleşik yiyecek ve kendi yiyecekleriniz tanınır; gramı ayarlayabilirsiniz.||750дөн ашык камтылган тамак жана өз тамактарыңыз таанылат; граммды тууралай аласыз.||Зиёда аз 750 хӯроки дарунсохт ва хӯрокҳои худатон шинохта мешаванд; граммро танзим карда метавонед.
 tl_range||{n}: {min} ile {max} arasında bir değer girin||{n}: {min}ден {max}ге чейинки маанини киргизиңиз||{n}: қиматеро аз {min} то {max} ворид кунед
 tl_from_profile||Profilinizden dolduruldu: kilo, boy ve doğum tarihi.||Профилиңизден толтурулду: салмак, бой жана туулган күн.||Аз профили шумо пур шуд: вазн, қад ва санаи таваллуд.
 act2_1||Hareketsiz: masa başı iş, antrenman yok (×1,2)||Аз кыймылдуу: кеңсе иши, машыгуу жок (×1,2)||Камҳаракат: кори мизӣ, бе машқ (×1,2)

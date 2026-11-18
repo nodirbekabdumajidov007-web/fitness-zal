@@ -986,7 +986,7 @@ cal_txt_busy||Aniqlanmoqda...||Распознаю...||Recognizing...
 cal_txt_found||Topildi:||Найдено:||Recognized:
 cal_txt_add||Hammasini qo'shish||Добавить всё||Add all
 cal_txt_none||Hech narsa topilmadi. Masalan: «2 ta somsa», «200 g osh», «3 tuxum».||Ничего не найдено. Например: «2 самсы», «200 г плова», «3 яйца».||Nothing recognized. For example: «2 samsas», «200 g plov», «3 eggs».
-cal_txt_hint||Ma'lumotlar bazasidagi 600 dan ortiq taom va o'z ovqatlaringiz taniladi, grammni o'zingiz to'g'rilashingiz mumkin.||Распознаются более 600 блюд из базы и ваша еда, граммы можно поправить.||Over 600 built-in foods and your own foods are recognized; you can adjust the grams.
+cal_txt_hint||Ma'lumotlar bazasidagi 750 dan ortiq taom va o'z ovqatlaringiz taniladi, grammni o'zingiz to'g'rilashingiz mumkin.||Распознаются более 750 блюд из базы и ваша еда, граммы можно поправить.||Over 750 built-in foods and your own foods are recognized; you can adjust the grams.
 tl_range||{n}: {min}–{max} oralig'ida kiriting||{n}: введите от {min} до {max}||{n}: enter a value from {min} to {max}
 tl_from_profile||Profilingizdagi vazn, bo'y va tug'ilgan kun asosida to'ldirildi.||Заполнено по профилю: вес, рост и дата рождения.||Filled in from your profile: weight, height and birth date.
 act2_1||Kam harakat: ofis, mashg'ulotsiz (×1.2)||Минимум: офис, без тренировок (×1.2)||Sedentary: desk job, no workouts (×1.2)
@@ -1060,6 +1060,8 @@ cal_row||{k} kkal / 100 g||{k} ккал / 100 г||{k} kcal / 100 g
 cal_row_portion||porsiya {g} g = {k} kkal||порция {g} г = {k} ккал||portion {g} g = {k} kcal
 cal_mine||Mening ovqatim||Моя еда||My food
 cal_notfound||Topilmadi. O'zingiz qo'shing||Не найдено. Добавьте сами||Not found. Add it yourself
+cal_estimate||Taxminiy hisoblash||Примерный расчёт||Rough estimate
+cal_est_note||Ro'yxatda yo'q, shuning uchun taomning turiga qarab taxminiy kaloriya hisoblandi. Aniq qiymatni bilsangiz, o'zingiz tuzating.||Блюда нет в списке, поэтому калории посчитаны примерно по виду блюда. Если знаете точное значение, исправьте.||Not in the list, so the calories are a rough guess by the kind of dish. Correct them if you know the exact value.
 cal_searching||Qidirilmoqda...||Ищу...||Searching...
 cal_net_err||Tarmoq xatosi, qayta urinib ko'ring||Ошибка сети, попробуйте ещё раз||Network error, try again
 cal_pick_first||Ro'yxatdan ovqat tanlang yoki o'zingiz kiriting||Выберите еду из списка или введите свою||Pick a food from the list or enter your own

@@ -442,3 +442,30 @@ class FoodNamesLanguageTests(TestCase):
         # without JavaScript the recognised foods are saved at once, under the canonical name
         self.client.post(reverse("calories_parse"), {"text": "borsch 300 g"})
         self.assertEqual(list(FoodEntry.objects.values_list("name", flat=True)), ["Borsch"])
+
+
+class FoodEstimateTests(TestCase):
+    """A food that is in no table still gets a rough number, by the kind of dish its name suggests."""
+
+    def test_kinds(self):
+        from . import food_db
+        for q, lo, hi in (("qo'ziqorinli sho'rva", 30, 90), ("mevali tort", 300, 450), ("achchiq salat", 60, 130), ("xyzabc", 100, 300)):
+            e = food_db.estimate(q)
+            self.assertTrue(e and lo <= e["kcal"] <= hi, (q, e))
+            self.assertTrue(e["est"] and e["portion"] > 0)
+        self.assertIsNone(food_db.estimate("   "))
+
+    def test_search_returns_an_estimate_only_when_nothing_is_found(self):
+        u = User.objects.create_user(username="est1", password="x")
+        self.client.force_login(u)
+        none = self.client.get(reverse("calories_search"), {"q": "qwertyuiop zzz"}).json()
+        self.assertEqual(none["items"], [])
+        self.assertTrue(none["estimate"]["kcal"] > 0)
+        found = self.client.get(reverse("calories_search"), {"q": "osh"}).json()
+        self.assertTrue(found["items"])
+        self.assertNotIn("estimate", found)
+
+    def test_new_foods_are_found(self):
+        from . import food_db
+        for q in ("whopper", "xinkali", "pad thai", "xachapuri", "gijduvon non", "qutab", "kimchi", "mash sho'rva"):
+            self.assertTrue(food_db.search(q, limit=1), q)
