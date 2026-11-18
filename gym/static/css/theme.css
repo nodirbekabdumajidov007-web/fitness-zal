@@ -257,3 +257,10 @@ main h2{font-size:clamp(1.35rem,2.1vw,1.7rem)}
 .ord-eta b{font-size:.95rem}
 .ord-acts{display:flex;gap:6px;margin-left:auto}
 .ord-acts .btn .ico{width:14px;height:14px}
+
+/* BMI / body-fat scales: brighter, more saturated segments */
+.tl-chart .s-under,.tl-chart .s-bf1{fill:#2f8cff}
+.tl-chart .s-normal,.tl-chart .s-bf2{fill:#22e05a}
+.tl-chart .s-bf3{fill:#c6f01a;opacity:1}
+.tl-chart .s-over,.tl-chart .s-bf4{fill:#ffb300}
+.tl-chart .s-obese,.tl-chart .s-bf5{fill:#ff3b3b}
