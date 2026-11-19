@@ -364,3 +364,12 @@ dialog{border-radius:22px}
 .orders-grid .order-card>.muted:nth-last-child(2){grid-column:auto}
 .orders-grid .ord-track-wrap{margin-top:auto}
 .orders-grid .ord-track-wrap+b.num:last-child{margin-top:0}
+
+/* language menu: calm and compact - thin rows, small flags, a quiet tint and a plain check on the chosen language */
+.lp-menu{padding:6px;border-radius:14px;min-width:200px;border:1px solid var(--line);background:var(--surface);box-shadow:0 10px 28px -10px rgba(0,0,0,.35);display:grid;gap:1px}
+.lp-menu a{min-height:40px;padding:6px 10px;border-radius:9px;gap:10px;font-size:.9rem;font-weight:600;transition:background .15s}
+.lp-menu a:hover{background:color-mix(in srgb,var(--ink) 6%,transparent)}
+.lp-menu .flag{width:24px;height:17px;border-radius:3px;box-shadow:0 0 0 1px rgba(0,0,0,.15)}
+.lp-menu a[aria-checked="true"]{background:color-mix(in srgb,var(--ink) 7%,transparent);color:var(--ink)}
+.lp-menu a[aria-checked="true"] span{color:var(--ink);font-weight:700}
+.lp-menu a b{width:auto;height:auto;border-radius:0;background:none;color:var(--accent);font-size:.9rem;font-weight:800;line-height:1;display:block}
