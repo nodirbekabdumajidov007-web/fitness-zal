@@ -1660,7 +1660,7 @@ def ask_text(request):
     return request.POST.get("q", "")
 
 
-LLM_LIMITS = (10, 40)  # Claude calls per hour: guest, member
+LLM_LIMITS = (20, 80)  # AI calls per hour: guest, member
 
 
 def llm_limited(request):
