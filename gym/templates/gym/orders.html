@@ -14,7 +14,7 @@
     <li class="{% if o.status == 'done' %}on{% endif %}"><i>{% if o.delivery == 'courier' %}{% icon 'home' %}{% else %}{% icon 'dumbbell' %}{% endif %}</i><span>{% if o.delivery == 'courier' %}{% t 'trk_delivered' %}{% else %}{% t 'trk_picked' %}{% endif %}</span>{% if o.done_at %}<small class="num">{{ o.done_at|time:"H:i" }}</small>{% endif %}</li>
   </ol>
   {% endif %}
-  <div class="muted">{% for it in o.items.all %}{{ it.name }} × {{ it.qty }}{% if not forloop.last %}, {% endif %}{% endfor %}</div>
+  <div class="muted ord-items">{% for it in o.items.all %}{{ it.name }} × {{ it.qty }}{% if not forloop.last %}, {% endif %}{% endfor %}</div>
   {% if o.delivery == 'courier' %}<div class="muted">{% icon 'map-pin' %} {{ o.address }} · {{ o.delivery_phone }}{% if o.delivery_fee %} · {% t 'dlv_fee' %}: <span class="num">{{ o.delivery_fee|money }}</span>{% endif %}</div>
   {% if o.delivery == 'courier' and o.status != 'done' and o.status != 'cancelled' and o.delivery_eta_from %}
   <div class="ord-eta"><span class="ord-eta-ico" aria-hidden="true">{% icon 'clock' %}</span>

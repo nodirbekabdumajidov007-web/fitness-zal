@@ -354,3 +354,13 @@ dialog{border-radius:22px}
 @media (max-width:700px){
   header.top .um-menu,.um-menu{position:fixed;right:12px;left:auto;top:calc(env(safe-area-inset-top,0px) + 62px);width:min(320px,calc(100vw - 24px));min-width:0;max-width:none;max-height:calc(100dvh - 84px);overflow-y:auto;overscroll-behavior:contain}
 }
+
+/* orders: every card in a row has the same height and border; long item lists are cut to three lines; the total sits at the bottom */
+.orders-grid{align-items:stretch}
+.orders-grid .order-card{display:flex;flex-direction:column;align-items:stretch;height:100%;box-sizing:border-box}
+.orders-grid .order-card>*{grid-column:auto}
+.orders-grid .order-card .ord-items{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.orders-grid .order-card>b.num:last-child{margin-top:auto;align-self:flex-end;padding-top:6px}
+.orders-grid .order-card>.muted:nth-last-child(2){grid-column:auto}
+.orders-grid .ord-track-wrap{margin-top:auto}
+.orders-grid .ord-track-wrap+b.num:last-child{margin-top:0}
