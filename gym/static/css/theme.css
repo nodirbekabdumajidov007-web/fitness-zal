@@ -323,3 +323,7 @@ dialog{border-radius:22px}
 
 /* payment history */
 .pay-kpis{margin:14px 0}.pay-kpis .card{display:grid;gap:4px;padding:14px 16px}.pay-kpis b{font-size:1.5rem;line-height:1.2}
+
+/* back-to-top button: right side, stacked above the chat button */
+.totop{left:auto!important;right:21px!important;margin-bottom:60px}
+@media (max-width:900px){.totop{right:17px!important}}
