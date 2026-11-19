@@ -25,6 +25,12 @@ services:
         sync: false
       - key: LLM_MODEL              # the model name from that service's list (for photos pick one that supports images)
         sync: false
+      - key: LLM2_BASE_URL          # optional second OpenAI-compatible service (same three settings with a 2)
+        sync: false
+      - key: LLM2_API_KEY
+        sync: false
+      - key: LLM2_MODEL
+        sync: false
       - key: ANTHROPIC_API_KEY      # console.anthropic.com -> API keys; enables free questions and photos in the coach chat
         sync: false
       - key: CLOUDINARY_URL         # cloudinary://API_KEY:API_SECRET@CLOUD_NAME (cloudinary.com -> Dashboard -> API environment variable)

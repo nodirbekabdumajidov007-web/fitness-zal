@@ -179,6 +179,9 @@ GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.8-flash").strip()
 LLM_BASE_URL = os.environ.get("LLM_BASE_URL", "").strip()
 LLM_API_KEY = os.environ.get("LLM_API_KEY", "").strip()
 LLM_MODEL = os.environ.get("LLM_MODEL", "").strip()
+LLM2_BASE_URL = os.environ.get("LLM2_BASE_URL", "").strip()  # a second OpenAI-compatible service, tried after the first
+LLM2_API_KEY = os.environ.get("LLM2_API_KEY", "").strip()
+LLM2_MODEL = os.environ.get("LLM2_MODEL", "").strip()
 
 # logging: console always, a rotating file when FZ_LOG_DIR is set, Telegram alerts for errors when a bot token + admin chat are configured
 _handlers = {

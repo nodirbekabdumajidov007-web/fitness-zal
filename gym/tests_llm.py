@@ -165,3 +165,30 @@ class MealMarkerTests(TestCase):
         self.assertIn("Funksional", f)
         self.assertIn("Jasur Test", f)
         cache.clear()
+
+
+class SecondServiceTests(TestCase):
+    def test_second_openai_compatible_service_is_a_fallback(self):
+        from django.core.cache import cache
+        cache.clear()
+        calls = []
+
+        def post(url, body, headers, timeout):
+            calls.append(url)
+            if "first" in url:
+                raise OSError("down")
+            return {"choices": [{"message": {"content": "Ikkinchidan"}}]}
+
+        cfg = dict(GEMINI_API_KEY="", ANTHROPIC_API_KEY="", LLM_BASE_URL="https://first.example/v1", LLM_API_KEY="k1", LLM_MODEL="m1",
+                   LLM2_BASE_URL="https://second.example/v1", LLM2_API_KEY="k2", LLM2_MODEL="m2")
+        with self.settings(**cfg), mock.patch("gym.llm._post", side_effect=post):
+            self.assertTrue(llm.enabled())
+            self.assertEqual(llm.ask("salom"), "Ikkinchidan")
+        self.assertEqual(calls[0], "https://first.example/v1/chat/completions")
+        self.assertEqual(calls[-1], "https://second.example/v1/chat/completions")
+
+    def test_only_the_second_service_configured(self):
+        with self.settings(GEMINI_API_KEY="", ANTHROPIC_API_KEY="", LLM_BASE_URL="", LLM_API_KEY="", LLM_MODEL="",
+                           LLM2_BASE_URL="https://s.example/v1", LLM2_API_KEY="k", LLM2_MODEL="m"), \
+                mock.patch("gym.llm._post", return_value={"choices": [{"message": {"content": "Bor"}}]}):
+            self.assertEqual(llm.ask("salom"), "Bor")
