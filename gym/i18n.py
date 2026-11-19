@@ -1017,6 +1017,10 @@ courier_stop||Ulashishni to'xtatish||Остановить передачу||Stop
 map_road_km||Zaldan masofa: ~@km km||От зала: ~@km км||From the gym: ~@km km
 ai_meal_add||Kaloriya hisobiga qo'shish||Добавить в дневник калорий||Add to calorie diary
 ai_meal_done||Qo'shildi ✓||Добавлено ✓||Added ✓
+reorder_btn||Qayta buyurtma||Повторить заказ||Order again
+reorder_ok||Mahsulotlar savatga qo'shildi||Товары добавлены в корзину||Items added to the cart
+reorder_partial||Savatga qo'shildi, lekin ba'zi mahsulotlar tugagan yoki sotuvda yo'q||Добавлено, но некоторых товаров нет в наличии||Added, but some items are sold out or unavailable
+reorder_none||Bu buyurtmadagi mahsulotlar hozir mavjud emas||Товаров из этого заказа сейчас нет||The items of this order are not available now
 asst_rate||Juda ko'p savol yuborildi. Bir daqiqadan keyin qayta urinib ko'ring.||Слишком много вопросов. Попробуйте через минуту.||Too many questions. Try again in a minute.
 asst_suggest||Shuni so'rab ko'ring:||Попробуйте спросить:||Try asking:
 cal_txt_title||Matn bilan yozish||Записать текстом||Type it in

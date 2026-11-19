@@ -376,3 +376,8 @@ dialog{border-radius:22px}
 
 /* back-to-top: keep a clear gap above the (larger) chat button on phones */
 @media (max-width:900px){.totop{margin-bottom:78px}}
+
+/* orders: the reorder button sits beside the total */
+.orders-grid .order-card .ord-bottom{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;padding-top:6px}
+.orders-grid .order-card .ord-bottom form{margin:0}
+.orders-grid .order-card .ord-bottom>b.num{margin:0;white-space:nowrap}

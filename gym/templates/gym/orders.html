@@ -29,7 +29,8 @@
     <div class="ord-track" hidden><div class="ord-map"></div><p class="ord-track-info muted" aria-live="polite"></p></div></div>
   {% endif %}
   {% endif %}
-  <b class="num">{{ o.total|money }} {% t 'price_unit' %}</b>
+  <div class="ord-bottom"><form method="post" action="{% url 'order_reorder' o.pk %}">{% csrf_token %}<button class="btn small" type="submit">{% icon 'cart' %} {% t 'reorder_btn' %}</button></form>
+  <b class="num">{{ o.total|money }} {% t 'price_unit' %}</b></div>
 </article>
 {% empty %}<div class="card muted">{% t 'none_yet' %} · <a href="{% url 'shop' %}">{% t 'shop' %}</a></div>{% endfor %}
 </div>

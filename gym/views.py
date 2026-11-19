@@ -1306,6 +1306,33 @@ def _csv_safe(v):
     return "'" + v if v[:1] in ("=", "+", "-", "@") else v
 
 
+@require_POST
+@login_required
+def order_reorder(request, pk):
+    """"Order again": puts the items of one of the member's earlier orders back into the cart (only what is still on sale and in stock)."""
+    order = get_object_or_404(Order.objects.prefetch_related("items"), pk=pk, user=request.user)
+    cart = request.session.get("cart", {})
+    added = skipped = 0
+    for it in order.items.all():
+        p = it.product
+        if p is None or not p.active or p.stock < 1:
+            skipped += 1
+            continue
+        have = cart.get(str(p.pk), 0)
+        qty = min(have + it.qty, p.stock, CART_MAX)
+        if qty > have:
+            cart[str(p.pk)] = qty
+            added += 1
+        if qty < have + it.qty:
+            skipped += 1
+    request.session["cart"] = cart
+    if not added:
+        flash(request, messages.ERROR, "reorder_none")
+        return redirect("orders")
+    flash(request, messages.SUCCESS, "reorder_partial" if skipped else "reorder_ok")
+    return redirect("cart")
+
+
 @login_required
 def payments_view(request):
     """The member's payments: totals, a status filter and a CSV download (own payments only)."""
@@ -1750,7 +1777,7 @@ def ai_ask(request):
     history = [(m.role, m.content) for m in request.user.ai_messages.order_by("-id")[:6][::-1]] if request.user.is_authenticated else ()
     data = ask_payload(request, q, image, history)
     if request.user.is_authenticated:
-        AIMessage.objects.create(user=request.user, role="user", content=q + (" [photo]" if image else ""))
+        AIMessage.objects.create(user=request.user, role="user", content=q)
         AIMessage.objects.create(user=request.user, role="assistant", content=data["answer"])
     if wants_json(request):
         return JsonResponse(data)

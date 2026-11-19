@@ -153,6 +153,7 @@ urlpatterns = [
     path("courier/<int:pk>/", v.courier_view, name="courier"),
     path("courier/<int:pk>/ping/", v.courier_ping, name="courier_ping"),
     path("orders/", v.orders_view, name="orders"),
+    path("orders/<int:pk>/reorder/", v.order_reorder, name="order_reorder"),
     path("payments/", v.payments_view, name="payments"),
     path("receipt/<int:pk>/", v.receipt, name="receipt"),
     path("pay/<int:pk>/", v.pay_view, name="pay"),

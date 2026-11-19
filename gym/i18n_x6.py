@@ -328,4 +328,8 @@ courier_stop||Paylaşımı durdur||Бөлүшүүнү токтотуу||Қатъ
 map_road_km||Salondan: ~@km km||Залдан: ~@km км||Аз толор: ~@km км
 ai_meal_add||Kalori günlüğüne ekle||Калория күндөлүгүнө кошуу||Илова ба рӯзномаи калория
 ai_meal_done||Eklendi ✓||Кошулду ✓||Илова шуд ✓
+reorder_btn||Tekrar sipariş||Кайра буйрутма||Фармоиши такрорӣ
+reorder_ok||Ürünler sepete eklendi||Товарлар себетке кошулду||Маҳсулот ба сабад илова шуд
+reorder_partial||Eklendi, ancak bazı ürünler tükendi||Кошулду, бирок кээ бир товарлар түгөнгөн||Илова шуд, аммо баъзе маҳсулот тамом шудааст
+reorder_none||Bu siparişteki ürünler şu an mevcut değil||Бул буйрутмадагы товарлар азыр жок||Маҳсулоти ин фармоиш ҳоло нест
 """
