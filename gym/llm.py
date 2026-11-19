@@ -13,6 +13,7 @@ import urllib.error
 import urllib.request
 
 from django.conf import settings
+from django.core.cache import cache
 
 log = logging.getLogger(__name__)
 API_URL = "https://api.anthropic.com/v1/messages"
@@ -130,7 +131,7 @@ def ask(question, lang="uz", facts="", history=(), image=None, timeout=20):
     question = (question or "").strip()[:1500] or "?"
     turns = _turns(history)
     for key, fn in (("GEMINI_API_KEY", _gemini), ("LLM_API_KEY", _compat), ("ANTHROPIC_API_KEY", _claude)):
-        if not getattr(settings, key, "") or (key == "LLM_API_KEY" and not _compat_ready()):
+        if not getattr(settings, key, "") or (key == "LLM_API_KEY" and not _compat_ready()) or cache.get(f"llm:skip:{key}"):
             continue
         for attempt in (1, 2):  # a busy provider (503 / 429) or a slow answer is tried once more
             retry = False
@@ -145,7 +146,9 @@ def ask(question, lang="uz", facts="", history=(), image=None, timeout=20):
                 except OSError:
                     why = ""
                 log.warning("llm: %s HTTP %s (try %s): %s", key, e.code, attempt, why)
-                retry = e.code in (429, 500, 502, 503, 504)
+                retry = e.code in (500, 502, 503, 504)
+                if e.code == 429:  # the quota is used up: do not retry, and skip this provider for a few minutes so answers stay fast
+                    cache.set(f"llm:skip:{key}", 1, 300)
             except (urllib.error.URLError, OSError, ValueError, KeyError, TypeError) as e:
                 log.warning("llm: %s failed (try %s): %s", key, attempt, e.__class__.__name__)
                 retry = isinstance(e, (TimeoutError, urllib.error.URLError))

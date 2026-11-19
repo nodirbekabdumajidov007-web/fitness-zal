@@ -107,3 +107,21 @@ class LlmProvidersTests(TestCase):
                 mock.patch("gym.llm._post", side_effect=fake):
             llm.ask("bu nima", "uz", "", (), img)
         self.assertIsInstance(seen["body"]["messages"][-1]["content"][1]["image_url"], str)
+
+    def test_quota_exhausted_provider_is_not_retried_and_is_skipped_for_a_while(self):
+        import io
+        import urllib.error
+        from django.core.cache import cache
+        cache.clear()
+        calls = []
+
+        def quota(*a):
+            calls.append(1)
+            raise urllib.error.HTTPError("u", 429, "quota", {}, io.BytesIO(b"quota exceeded"))
+
+        with self.settings(GEMINI_API_KEY="g", ANTHROPIC_API_KEY="a"), mock.patch("gym.llm._gemini", side_effect=quota), \
+                mock.patch("gym.llm._claude", return_value="C javob"):
+            self.assertEqual(llm.ask("salom"), "C javob")
+            self.assertEqual(llm.ask("yana"), "C javob")
+        self.assertEqual(len(calls), 1)  # one try, then Gemini is skipped
+        cache.clear()
