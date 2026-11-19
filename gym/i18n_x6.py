@@ -326,4 +326,6 @@ courier_err||Gönderilemedi: GPS iznini kontrol edin||Жөнөтүлгөн жо�
 courier_start||Konum paylaşmayı başlat||Жайгашкан жерди бөлүшүүнү баштоо||Оғози мубодилаи ҷойгиршавӣ
 courier_stop||Paylaşımı durdur||Бөлүшүүнү токтотуу||Қатъи мубодила
 map_road_km||Salondan: ~@km km||Залдан: ~@km км||Аз толор: ~@km км
+ai_meal_add||Kalori günlüğüne ekle||Калория күндөлүгүнө кошуу||Илова ба рӯзномаи калория
+ai_meal_done||Eklendi ✓||Кошулду ✓||Илова шуд ✓
 """

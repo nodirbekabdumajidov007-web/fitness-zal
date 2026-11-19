@@ -1649,13 +1649,30 @@ def llm_limited(request):
 
 def llm_facts():
     """A few live gym facts for Claude (no member data)."""
+    hit = cache.get("llm:facts")
+    if hit:
+        return hit
     gs = GymSettings.load()
     lines = [f"Opening hours: every day {gs.open_time:%H:%M}-{gs.close_time:%H:%M}", f"Phone: +998 {gs.phone}"]
     if gs.address:
         lines.append(f"Address: {gs.address}")
+    if gs.instagram:
+        lines.append(f"Instagram: @{gs.instagram}")
     for p in Plan.objects.filter(active=True).order_by("price")[:8]:
-        lines.append(f"Plan: {p.name} - {int(p.price):,} so'm".replace(",", " "))
-    return chr(10).join(lines)
+        lines.append(f"Plan: {p.name} ({p.duration_days} days) - {int(p.price):,} so'm".replace(",", " "))
+    days = dict(GymClass.WEEKDAYS) if hasattr(GymClass, "WEEKDAYS") else {}
+    for c in GymClass.objects.filter(active=True).select_related("trainer").order_by("weekday", "start_time")[:30]:
+        lines.append(f"Class: {c.name}, {days.get(c.weekday, c.weekday)} {c.start_time:%H:%M}, {c.duration_min} min" + (f", trainer {c.trainer.name}" if c.trainer else ""))
+    for t in Trainer.objects.filter(active=True)[:12]:
+        lines.append(f"Trainer: {t.name} - {t.specialty}, {t.experience_years} years" + (f", personal session {int(t.pt_price):,} so'm".replace(",", " ") if t.pt_price else ""))
+    cats = ", ".join(Category.objects.values_list("name", flat=True)[:12])
+    if cats:
+        lines.append(f"Shop categories: {cats} (the shop has protein, drinks, supplements and accessories)")
+    if gs.delivery_on:
+        lines.append(f"Courier delivery in town and across Uzbekistan; price depends on the distance, from {int(gs.delivery_fee):,} so'm; the price and the time are shown in the cart".replace(",", " "))
+    out = chr(10).join(lines)
+    cache.set("llm:facts", out, 300)
+    return out
 
 
 def read_image(request):
@@ -1683,7 +1700,8 @@ def ask_payload(request, q, image=None, history=()):
     elif llm.enabled() and (image or not res["matched"] or res.get("approx")) and not llm_limited(request):
         text = llm.ask(q, lang, llm_facts(), history, image)
         if text:
-            out.update(answer=text, matched=True, approx=False, links=res["links"] if res["matched"] else [], suggest=[])
+            text, meal = llm.split_meal(text)
+            out.update(answer=text, matched=True, approx=False, links=res["links"] if res["matched"] else [], suggest=[], meal=meal)
         elif image:  # the offline answer to a photo would be nonsense: say plainly that the analysis failed
             out.update(answer=translate(lang, "ai_img_fail"), matched=True, links=[], suggest=[])
     return out

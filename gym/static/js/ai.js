@@ -19,11 +19,36 @@
       showPic();
     });
     function csrf() { return form.querySelector('[name=csrfmiddlewaretoken]').value; }
+    var PAGES = /(\/(?:calories|shop|plans|classes|trainers|workouts|tools|orders|payments|card|records|faq)\/)/g;
+    function linkify(p, text) {  // a page path in the answer ("/calories/") becomes a link; everything else stays plain text
+      text.split(PAGES).forEach(function (part, i) {
+        if (i % 2) { var a = document.createElement('a'); a.href = part; a.textContent = part; p.appendChild(a); } else p.appendChild(document.createTextNode(part));
+      });
+    }
+    function mealButton(m) {  // photo or question about a dish: one click puts the estimate into the calorie diary
+      var wrap = document.createElement('div'), b = document.createElement('button');
+      wrap.className = 'ai-chips'; b.type = 'button'; b.className = 'btn small';
+      b.textContent = form.dataset.mealAdd + ' · ≈' + m.kcal + ' kkal';
+      b.addEventListener('click', function () {
+        if (b.disabled) return; b.disabled = true;
+        var h = new Date().getHours(), d = new Date(), body = new FormData();
+        body.append('name', m.name); body.append('grams', m.grams); body.append('kcal', m.kcal); body.append('protein', m.p); body.append('fat', m.f); body.append('carbs', m.c);
+        body.append('meal', h < 11 ? 'breakfast' : h < 16 ? 'lunch' : h < 21 ? 'dinner' : 'snack');
+        body.append('d', d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2));
+        fetch(form.dataset.calAdd, { method: 'POST', body: body, credentials: 'same-origin', headers: { 'X-CSRFToken': csrf(), 'X-Requested-With': 'fetch' } })
+          .then(function (r) { return r.json(); })
+          .then(function (j) { b.textContent = j.ok ? form.dataset.mealDone : form.dataset.err; if (!j.ok) b.disabled = false; })
+          .catch(function () { b.textContent = form.dataset.err; b.disabled = false; });
+      });
+      wrap.appendChild(b); return wrap;
+    }
     function bubble(role, text, extra) {
       var empty = log.querySelector('[data-ai-empty]'); if (empty) empty.remove();
       var d = document.createElement('div'), p = document.createElement('p');
-      d.className = 'ai-msg ' + role; p.textContent = text;  // textContent: the answer is never treated as HTML
+      d.className = 'ai-msg ' + role;
+      if (role === 'assistant') linkify(p, text); else p.textContent = text;  // text nodes only: the answer is never treated as HTML
       d.appendChild(p);
+      if (extra && extra.meal && form.dataset.auth) d.appendChild(mealButton(extra.meal));
       if (extra && extra.links && extra.links.length) {
         var l = document.createElement('p');
         extra.links.forEach(function (k) { var a = document.createElement('a'); a.href = k.url; a.textContent = k.label + ' \u2192'; l.appendChild(a); l.appendChild(document.createTextNode(' ')); });

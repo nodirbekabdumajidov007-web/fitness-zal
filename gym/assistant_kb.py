@@ -75,8 +75,9 @@ def title_text(entry, lang):
 def _merge_alias(entries):
     """Everyday phrasings (assistant_kb_alias.py) are added to the entries' own keywords; an unknown id is a mistake, not a silent no-op."""
     from .assistant_kb_alias import ALIAS
+    from .assistant_kb_alias2 import ALIAS2
     by_id = {e["id"]: e for e in entries}
-    for eid, row in ALIAS.items():
+    for eid, row in [*ALIAS.items(), *ALIAS2.items()]:
         e = by_id.get(eid)
         if e is None:
             raise ValueError(f"assistant_kb_alias: unknown entry id {eid}")

@@ -17,7 +17,7 @@
       {% empty %}<div class="ai-empty" data-ai-empty><b>{% t 'ai_try_title' %}</b>
         <div class="ai-chips">{% for k in "123" %}{% with key='ai_q'|add:k %}<button type="button" class="chip" data-ai-chip>{% t key %}</button>{% endwith %}{% endfor %}</div></div>{% endfor %}
     </div>
-    <form class="ai-form" method="post" enctype="multipart/form-data" action="{% url 'ai_ask' %}" data-ai-form data-thinking="{% t 'ai_thinking' %}" data-err="{% t 'ai_error' %}" data-imgerr="{% t 'ai_img_err' %}">
+    <form class="ai-form" method="post" enctype="multipart/form-data" action="{% url 'ai_ask' %}" data-ai-form data-thinking="{% t 'ai_thinking' %}" data-err="{% t 'ai_error' %}" data-imgerr="{% t 'ai_img_err' %}" data-cal-add="{% url 'calories_add' %}" data-meal-add="{% t 'ai_meal_add' %}" data-meal-done="{% t 'ai_meal_done' %}"{% if user.is_authenticated %} data-auth="1"{% endif %}>
       {% csrf_token %}
       <textarea name="q" rows="2" maxlength="1500" placeholder="{% t 'ai_placeholder' %}"></textarea>
       {% if user.is_authenticated %}<label class="ai-attach" title="{% t 'ai_attach' %}" aria-label="{% t 'ai_attach' %}">{% icon 'camera' %}<input type="file" name="image" accept="image/jpeg,image/png,image/webp" hidden></label>{% endif %}

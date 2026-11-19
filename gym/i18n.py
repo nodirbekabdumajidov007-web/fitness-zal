@@ -1015,6 +1015,8 @@ courier_err||Joylashuv yuborilmadi: GPS ruxsatini tekshiring||Не удалос�
 courier_start||Joylashuvni ulashishni boshlash||Начать передачу местоположения||Start sharing my location
 courier_stop||Ulashishni to'xtatish||Остановить передачу||Stop sharing
 map_road_km||Zaldan masofa: ~@km km||От зала: ~@km км||From the gym: ~@km km
+ai_meal_add||Kaloriya hisobiga qo'shish||Добавить в дневник калорий||Add to calorie diary
+ai_meal_done||Qo'shildi ✓||Добавлено ✓||Added ✓
 asst_rate||Juda ko'p savol yuborildi. Bir daqiqadan keyin qayta urinib ko'ring.||Слишком много вопросов. Попробуйте через минуту.||Too many questions. Try again in a minute.
 asst_suggest||Shuni so'rab ko'ring:||Попробуйте спросить:||Try asking:
 cal_txt_title||Matn bilan yozish||Записать текстом||Type it in

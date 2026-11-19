@@ -412,7 +412,7 @@ SITE = [
      "Здравствуйте! Я помощник зала: отвечаю на вопросы о зале, абонементах, тренировках и питании. Что вас интересует?",
      "Hello! I am the gym assistant: I answer questions about the gym, memberships, training and nutrition. What would you like to know?", ()),
     ("how_are_you", "chat",
-     "ahvollaring qalay|ishlar qalay|nima gap|yaxshimisan|qalaysan|qalaysiz|ishlaring yaxshimi",
+     "ahvollaring qalay|ishlar qalay|nima gap|yaxshimisan|qalaysan|qalaysiz|ishlaring yaxshimi|ishlaring qanday|ishlaringiz qanday|ahvollaring qanday|ahvolingiz qanday|ahvol qanday|qalaysizlar",
      "как дела|как ты|что нового|как жизнь|kak dela|как поживаешь",
      "how are you|how is it going|whats up|how are you doing|how are you today",
      "Yaxshi, rahmat! Sizga qanday yordam bera olaman: zal, mashq yoki ovqatlanish haqida so'rang.",

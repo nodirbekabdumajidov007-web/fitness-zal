@@ -1,6 +1,6 @@
 from unittest import mock
 
-from django.test import TestCase
+from django.test import Client, TestCase
 
 from . import llm
 
@@ -124,4 +124,44 @@ class LlmProvidersTests(TestCase):
             self.assertEqual(llm.ask("salom"), "C javob")
             self.assertEqual(llm.ask("yana"), "C javob")
         self.assertEqual(len(calls), 1)  # one try, then Gemini is skipped
+        cache.clear()
+
+
+class MealMarkerTests(TestCase):
+    def test_marker_is_parsed_and_removed(self):
+        text = "Bu osh, taxminan 600 kkal.\n[[meal|Osh|620|22|24|75|300]]"
+        clean, meal = llm.split_meal(text)
+        self.assertEqual(clean, "Bu osh, taxminan 600 kkal.")
+        self.assertEqual(meal, {"name": "Osh", "kcal": 620, "p": 22.0, "f": 24.0, "c": 75.0, "grams": 300})
+
+    def test_absurd_or_broken_markers_give_no_meal_but_are_still_hidden(self):
+        for bad in ("[[meal|Osh|999999|1|1|1|300]]", "[[meal|Osh|500|1|1|1|0]]", "[[meal|Osh|abc]]", "[[meal|Osh|500"):
+            clean, meal = llm.split_meal("Javob " + bad)
+            self.assertIsNone(meal, bad)
+            self.assertNotIn("[[", clean)
+        self.assertEqual(llm.split_meal("Oddiy javob"), ("Oddiy javob", None))
+
+    def test_view_returns_the_meal_and_a_clean_answer(self):
+        from django.core.cache import cache
+        from django.urls import reverse
+        from .models import User
+        cache.clear()
+        u = User.objects.create_user(username="mealu", password="x")
+        c = Client()
+        c.force_login(u)
+        with self.settings(GEMINI_API_KEY="g"), mock.patch("gym.llm.ask", return_value="Lag'mon.\n[[meal|Lag'mon|480|20|16|60|350]]"):
+            r = c.post(reverse("ai_ask"), {"q": "zzqx vbnmk ttyrq wwpl"}, HTTP_X_REQUESTED_WITH="fetch").json()
+        self.assertEqual(r["answer"], "Lag'mon.")
+        self.assertEqual(r["meal"]["kcal"], 480)
+
+    def test_facts_include_classes_and_trainers(self):
+        from django.core.cache import cache
+        from .models import GymClass, Trainer
+        from .views import llm_facts
+        cache.clear()
+        t = Trainer.objects.create(name="Jasur Test", specialty="Kuch", experience_years=5)
+        GymClass.objects.create(name="Funksional", trainer=t, weekday=1, start_time="18:30")
+        f = llm_facts()
+        self.assertIn("Funksional", f)
+        self.assertIn("Jasur Test", f)
         cache.clear()
