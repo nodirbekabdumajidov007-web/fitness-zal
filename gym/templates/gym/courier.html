@@ -1,0 +1,19 @@
+{% extends "gym/base.html" %}{% load gym_tags %}
+{% block title %}{% t 'courier_title' %} #{{ o.pk }}{% endblock %}
+{% block content %}
+<h2>{% icon 'truck' %} {% t 'courier_title' %} #{{ o.pk }}</h2>
+<div class="card courier-card">
+  <p><b>{{ o.address }}</b></p>
+  <p class="muted">{% if o.delivery_note %}{{ o.delivery_note }} &middot; {% endif %}<a class="num" href="tel:{{ o.delivery_phone }}">{{ o.delivery_phone }}</a></p>
+  <p><b class="num">{{ o.total|money }} {% t 'price_unit' %}</b> &middot; {% t 'pm_'|add:o.method %}{% if o.delivery_km is not None %} &middot; <span class="num">~{{ o.delivery_km }} km</span>{% endif %}</p>
+  {% if o.delivery_lat is not None and gym_pt %}
+  <div id="courier-map" data-gym="{{ gym_pt.0|stringformat:'f' }},{{ gym_pt.1|stringformat:'f' }}" data-client="{{ o.delivery_lat|stringformat:'f' }},{{ o.delivery_lng|stringformat:'f' }}"
+       data-route="{% url 'delivery_route' %}" data-ping="{% url 'courier_ping' o.pk %}"></div>
+  <p class="courier-state muted" id="courier-state" aria-live="polite">{% t 'courier_idle' %}</p>
+  <div class="inline"><button type="button" class="btn primary" id="courier-go" data-start="{% t 'courier_start' %}" data-stop="{% t 'courier_stop' %}">{% icon 'map-pin' %} <span>{% t 'courier_start' %}</span></button>
+    {% if o.map_links %}<a class="btn" href="{{ o.map_links.yandex }}" target="_blank" rel="noopener noreferrer">{% t 'dlv_map' %} &rarr;</a>{% endif %}</div>
+  {% else %}<p class="muted">{% t 'err_geo' %}</p>{% endif %}
+</div>
+{% endblock %}
+{% block scripts %}<script src="{% vstatic 'js/fzmap.js' %}"></script><script src="{% vstatic 'js/courier.js' %}"
+  data-gym="{% t 'map_gym' %}" data-you="{% t 'map_you' %}" data-courier="{% t 'map_courier' %}" data-on="{% t 'courier_on' %}" data-err="{% t 'courier_err' %}" data-idle="{% t 'courier_idle' %}"></script>{% endblock %}

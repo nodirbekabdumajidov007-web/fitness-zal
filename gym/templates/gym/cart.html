@@ -24,7 +24,7 @@
                 data-t-near="{% t 'dlv_near' place='@place' %}" data-t-km="{% t 'dlv_km' km='@km' %}" data-t-eta-min="{% t 'dlv_eta_min' a='@a' b='@b' %}" data-t-eta-days="{% t 'dlv_eta_days' a='@a' b='@b' %}"
                 data-t-mode-city="{% t 'dlv_mode_city' %}" data-t-mode-region="{% t 'dlv_mode_region' %}" data-t-region-note="{% t 'dlv_region_note' %}"
                 data-t-free-left="{% t 'dlv_free_left' n='@n' %}" data-t-free-done="{% t 'dlv_free_done' %}" data-t-closed="{% t 'dlv_closed' time='@time' %}"
-                data-t-map="{% t 'dlv_map' %}" data-t-approx="{% t 'dlv_approx' %}" data-t-loading="{% t 'dlv_loading' %}" data-t-detect="{% t 'dlv_detect' %}"
+                data-route-url="{% url 'delivery_route' %}" data-t-gymlbl="{% t 'map_gym' %}" data-t-youlbl="{% t 'map_you' %}" data-t-road="{% t 'map_road' %}" data-t-roadkm="{% t 'map_road_km' %}" data-t-roadline="{% t 'map_road_line' %}" data-t-map="{% t 'dlv_map' %}" data-t-approx="{% t 'dlv_approx' %}" data-t-loading="{% t 'dlv_loading' %}" data-t-detect="{% t 'dlv_detect' %}"
                 data-t-detecting="{% t 'dlv_detecting' %}" data-t-denied="{% t 'dlv_geo_denied' %}" data-t-fail="{% t 'dlv_geo_fail' %}" data-t-need="{% t 'err_geo' %}"
                 data-t-fee="{% t 'dlv_fee' %}" data-t-eta="{% t 'dlv_eta' %}">
         <legend>{% t 'step_delivery' %}</legend>
@@ -42,6 +42,7 @@
           </div>
           {% if last_order %}<button type="button" class="dg-last" id="dg-last" data-lat="{{ last_order.delivery_lat }}" data-lng="{{ last_order.delivery_lng }}" data-addr="{{ last_order.address }}">{% icon 'clock' %}<span>{% t 'dlv_last' place=last_order.address|truncatechars:34 %}</span></button>{% endif %}
           <div class="dq" id="dq" aria-live="polite"><p class="dq-hint">{% t 'dlv_pick_first' %}</p></div>
+          <div class="dq-map" id="dq-map" hidden></div><p class="dq-road" id="dq-road" aria-live="polite" hidden></p>
           <label for="dlv-a">{% t 'address' %}<input id="dlv-a" name="address" maxlength="200" autocomplete="street-address" placeholder="{% t 'dlv_address_ph' %}"></label>
           <label for="dlv-p">{% t 'phone' %}<div class="phone"><span>+998</span><input id="dlv-p" name="delivery_phone" inputmode="numeric" autocomplete="tel-national" maxlength="17" value="{% if user.is_authenticated and user.phone %}{{ user.phone|slice:'4:' }}{% endif %}" data-phone></div></label>
           <label for="dlv-n">{% t 'dlv_note' %}<input id="dlv-n" name="delivery_note" maxlength="200" placeholder="{% t 'dlv_note_ph' %}"></label>
@@ -66,4 +67,4 @@
 <div class="cart-toast" id="cart-toast" role="status" hidden></div>
 <div id="cart-i18n" hidden data-added="{% t 'added_to_cart' %}" data-removed="{% t 'removed_from_cart' %}" data-unit="{% t 'price_unit' %}"></div>
 {% endblock %}
-{% block scripts %}<script src="{% vstatic 'js/delivery.js' %}"></script>{% endblock %}
+{% block scripts %}<script src="{% vstatic 'js/fzmap.js' %}"></script><script src="{% vstatic 'js/delivery.js' %}"></script>{% endblock %}

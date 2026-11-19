@@ -23,9 +23,17 @@
     {% if o.delivery_km is not None %}<span class="ord-km"><small>{{ o.place_name }}</small><b class="num">~{{ o.delivery_km }} km</b></span>{% endif %}
     <span class="ord-acts">{% if o.map_links %}<a class="btn small" href="{{ o.map_links.yandex }}" target="_blank" rel="noopener noreferrer">{% icon 'map-pin' %} {% t 'dlv_map' %}</a>{% endif %}{% if gs.phone %}<a class="btn small" href="tel:+998{{ gs.phone|cut:' ' }}">{% t 'dlv_call' %}</a>{% endif %}</span>
   </div>
-  {% endif %}{% endif %}
+  {% endif %}
+  {% if o.delivery_lat is not None and o.status != 'cancelled' %}
+  <div class="ord-track-wrap"><button type="button" class="btn small" data-track="{% url 'order_track' o.pk %}" data-open="{% t 'track_btn' %}" data-close="{% t 'track_hide' %}">{% icon 'map-pin' %} <span>{% t 'track_btn' %}</span></button>
+    <div class="ord-track" hidden><div class="ord-map"></div><p class="ord-track-info muted" aria-live="polite"></p></div></div>
+  {% endif %}
+  {% endif %}
   <b class="num">{{ o.total|money }} {% t 'price_unit' %}</b>
 </article>
 {% empty %}<div class="card muted">{% t 'none_yet' %} · <a href="{% url 'shop' %}">{% t 'shop' %}</a></div>{% endfor %}
 </div>
 {% endblock %}
+{% block scripts %}<script src="{% vstatic 'js/fzmap.js' %}"></script><script src="{% vstatic 'js/track.js' %}"
+  data-gym="{% t 'map_gym' %}" data-you="{% t 'map_you' %}" data-courier="{% t 'map_courier' %}" data-eta="{% t 'track_eta' %}" data-wait="{% t 'track_wait' %}"
+  data-offline="{% t 'track_offline' %}" data-done="{% t 'track_done' %}"></script>{% endblock %}

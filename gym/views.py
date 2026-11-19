@@ -1081,6 +1081,7 @@ def _quote_json(request, q, subtotal):
     eta = q["eta"]
     return {"ok": True, "priced": q["priced"], "mode": q["mode"], "km": q["km"], "fee": q["fee"], "free": q["free"], "left": q["left_for_free"],
             "place": geo.place_name(q["place"], request.lang), "lat": q["lat"], "lng": q["lng"],
+            "gym": list(geo.origin_of(GymSettings.load()) or ()) or None,
             "eta": {"kind": eta["kind"], "a": eta["a"], "b": eta["b"], "delayed": eta["delayed"], "opens": eta["opens"]} if eta else None,
             "total": subtotal + q["fee"],
             "map": f"https://yandex.uz/maps/?pt={q['lng']},{q['lat']}&z=15&l=map"}
@@ -1096,6 +1097,86 @@ def delivery_quote(request):
     if not gs.delivery_on:
         return JsonResponse({"ok": False, "error": translate(request.lang, "delivery_off")}, status=400)
     return JsonResponse(_quote_json(request, geo.quote(gs, pt[0], pt[1], total), total))
+
+
+def _rate_ok(request, name, limit, window=60):
+    who = f"u{request.user.pk}" if request.user.is_authenticated else (request.session.session_key or client_ip(request) or "?")
+    key = f"rl:{name}:{who}"
+    cache.add(key, 0, window)
+    try:
+        return cache.incr(key) <= limit
+    except ValueError:
+        cache.set(key, 1, window)
+        return True
+
+
+def delivery_route(request):
+    """GET ?lat&lng: the road from the gym to that point for the map (drawn from our server so the browser never calls a routing service)."""
+    from . import route
+    pt = _point_from(request.GET)
+    gs = GymSettings.load()
+    origin = geo.origin_of(gs)
+    if pt is None or origin is None or not geo.inside_bounds(*pt):
+        return JsonResponse({"ok": False, "error": translate(request.lang, "err_geo")}, status=400)
+    if not _rate_ok(request, "route", 30):
+        return JsonResponse({"ok": False, "error": translate(request.lang, "asst_rate")}, status=429)
+    res = route.road(origin, pt)
+    res["gym"] = list(origin)
+    return JsonResponse(res)
+
+
+COURIER_FRESH_S = 600  # a courier position older than this is shown as "offline"
+
+
+def _courier_info(order):
+    """{"lat", "lng", "age"} of the courier while the order is on its way and the position is fresh, else None."""
+    if order.status not in (Order.Status.NEW, Order.Status.SHIPPING) or order.courier_lat is None or not order.courier_at:
+        return None
+    age = (timezone.now() - order.courier_at).total_seconds()
+    return {"lat": order.courier_lat, "lng": order.courier_lng, "age": int(age)} if age <= COURIER_FRESH_S else None
+
+
+@login_required
+def order_track(request, pk):
+    """GET (owner only): where the gym, the customer and - while the order is on its way - the courier are, for the order page's map."""
+    from . import route
+    order = get_object_or_404(Order, pk=pk, user=request.user, delivery=Order.Delivery.COURIER)
+    gs = GymSettings.load()
+    origin = geo.origin_of(gs)
+    if order.delivery_lat is None or origin is None:
+        return JsonResponse({"ok": False, "error": translate(request.lang, "err_geo")}, status=404)
+    client = (float(order.delivery_lat), float(order.delivery_lng))  # Decimal would travel as a string
+    out = {"ok": True, "status": order.status, "gym": list(origin), "client": list(client), "courier": _courier_info(order), "eta_min": None}
+    if request.GET.get("route") == "1":
+        out["route"] = route.road(origin, client)
+    c = out["courier"]
+    if c:
+        out["eta_min"] = max(1, round(geo.haversine_km((c["lat"], c["lng"]), client) * geo.ROAD_FACTOR / route.CITY_SPEED_KMH * 60))
+    resp = JsonResponse(out)
+    resp["Cache-Control"] = "private, no-store"
+    return resp
+
+
+@staff_required
+def courier_view(request, pk):
+    """The courier's page (staff): the order's address on a map and a button that shares this phone's position with the customer."""
+    order = get_object_or_404(Order.objects.select_related("user"), pk=pk, delivery=Order.Delivery.COURIER)
+    return render(request, "gym/courier.html", {"o": order, "gs": GymSettings.load(), "gym_pt": geo.origin_of(GymSettings.load())})
+
+
+@require_POST
+@staff_required
+def courier_ping(request, pk):
+    """POST lat, lng (staff): saves the courier's position on the order; ignored once the order is done or cancelled."""
+    order = get_object_or_404(Order, pk=pk, delivery=Order.Delivery.COURIER)
+    pt = geo.parse_point(request.POST.get("lat"), request.POST.get("lng"))
+    if pt is None or order.status in (Order.Status.DONE, Order.Status.CANCELLED):
+        return JsonResponse({"ok": False}, status=400)
+    updates = {"courier_lat": pt[0], "courier_lng": pt[1], "courier_at": timezone.now()}
+    if order.status == Order.Status.NEW:
+        updates["status"] = Order.Status.SHIPPING  # the courier started the trip
+    Order.objects.filter(pk=order.pk).update(**updates)
+    return JsonResponse({"ok": True})
 
 
 CART_MAX = 50

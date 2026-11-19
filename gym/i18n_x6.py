@@ -308,4 +308,22 @@ pm_gift||Hediye çeki||Белек сертификаты||Сертификати
 pm_Payme||Payme||Payme||Payme
 pm_Uzum||Uzum||Uzum||Uzum
 pm_Click||Click||Click||Click
+map_gym||Salon||Зал||Толор
+map_you||Siz||Сиз||Шумо
+map_courier||Kurye||Курьер||Курйер
+map_road||Salondan: ~@km km · ~@min dk||Залдан: ~@km км · ~@min мин||Аз толор: ~@km км · ~@min дақ
+map_road_line||yaklaşık, düz çizgi||болжолдуу, түз сызык||тахминӣ, хати рост
+track_btn||Takip et||Көзөмөлдөө||Пайгирӣ
+track_hide||Kapat||Жабуу||Пӯшидан
+track_eta||Kurye yolda · ~@min dk içinde gelir||Курьер жолдо · ~@min мүнөттө жетет||Курйер дар роҳ · дар ~@min дақиқа мерасад
+track_wait||Kurye henüz yola çıkmadı||Курьер али жолго чыга элек||Курйер ҳанӯз набаромадааст
+track_offline||Kurye konumu şu an görünmüyor||Курьердин жайгашкан жери азыр көрүнбөйт||Ҷойгиршавии курйер ҳоло намоён нест
+track_done||Sipariş tamamlandı||Буюртма аяктады||Фармоиш анҷом ёфт
+courier_title||Kurye · sipariş||Курьер · буйрутма||Курйер · фармоиш
+courier_idle||Konum paylaşılmıyor||Жайгашкан жер бөлүшүлбөйт||Ҷойгиршавӣ мубодила намешавад
+courier_on||Konumunuz müşteriye görünüyor||Жайгашкан жериңиз кардарга көрүнүүдө||Ҷойгиршавии шумо ба муштарӣ намоён аст
+courier_err||Gönderilemedi: GPS iznini kontrol edin||Жөнөтүлгөн жок: GPS уруксатын текшериңиз||Фиристода нашуд: иҷозати GPS-ро санҷед
+courier_start||Konum paylaşmayı başlat||Жайгашкан жерди бөлүшүүнү баштоо||Оғози мубодилаи ҷойгиршавӣ
+courier_stop||Paylaşımı durdur||Бөлүшүүнү токтотуу||Қатъи мубодила
+map_road_km||Salondan: ~@km km||Залдан: ~@km км||Аз толор: ~@km км
 """

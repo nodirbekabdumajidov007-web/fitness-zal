@@ -33,9 +33,29 @@
   /* ---- the preview card ---- */
   function hint(text, bad) { dq.textContent = ''; dq.appendChild(el('p', bad ? 'dq-err' : 'dq-hint', text)); }
 
+  /* ---- the map: the gym, the customer and the road between them (the road comes from our server) ---- */
+  var mapBox = document.getElementById('dq-map'), roadP = document.getElementById('dq-road'), fz = null, routeSeq = 0;
+  function hideMap() { routeSeq++; if (mapBox) mapBox.hidden = true; if (roadP) roadP.hidden = true; }
+  function showRoute(q) {
+    if (!mapBox || !window.FZMap || !q.gym || !q.priced) { hideMap(); return; }
+    mapBox.hidden = false;
+    if (!fz) fz = window.FZMap(mapBox, { labels: { gym: T.tGymlbl, client: T.tYoulbl } });
+    var me = [q.lat, q.lng], my = ++routeSeq;
+    fz.set({ gym: q.gym, client: me, route: [q.gym, me], dashed: true });
+    if (roadP) roadP.hidden = true;
+    fetch(T.routeUrl + '?lat=' + q.lat + '&lng=' + q.lng, { headers: { 'X-Requested-With': 'fetch' }, credentials: 'same-origin' })
+      .then(function (r) { return r.json(); })
+      .then(function (r) {
+        if (my !== routeSeq || !r.ok) return;
+        fz.set({ route: r.coords, dashed: r.source !== 'road' });
+        if (roadP) { roadP.textContent = fill(q.mode === 'region' ? T.tRoadkm : T.tRoad, { km: String(r.km).replace('.', ','), min: r.min }) + (r.source === 'road' ? '' : ' · ' + T.tRoadline); roadP.hidden = false; }
+      })
+      .catch(function () {});
+  }
+
   function render(q) {
     dq.textContent = '';
-    if (!q.ok) { dq.appendChild(el('p', 'dq-err', q.error)); return; }
+    if (!q.ok) { hideMap(); dq.appendChild(el('p', 'dq-err', q.error)); return; }
     var card = el('div', 'dq-card' + (q.mode === 'region' ? ' region' : ''));
     var top = el('div', 'dq-top'), pin = el('span', 'dq-pin'), who = el('div', 'dq-who');
     var ico = btn && btn.querySelector('svg'); if (ico) pin.appendChild(ico.cloneNode(true));
@@ -68,6 +88,7 @@
     if (q.mode === 'region' && q.priced) card.appendChild(el('p', 'dq-note', T.tRegionNote));
     if (q.priced) card.appendChild(el('p', 'dq-fine', T.tApprox));
     dq.appendChild(card);
+    showRoute(q);
   }
 
   function ask(params) {
@@ -79,7 +100,7 @@
       .catch(function () { if (my !== seq) return; quote = null; hint(T.tFail, true); update(); });
   }
 
-  function reset() { seq++; cur = null; quote = null; hint(T.tPick || dq.dataset.pick || ''); update(); }
+  function reset() { seq++; hideMap(); cur = null; quote = null; hint(T.tPick || dq.dataset.pick || ''); update(); }
 
   /* ---- where the customer is ---- */
   function useCoords(lat, lng) {

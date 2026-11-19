@@ -997,6 +997,24 @@ pm_gift||Sovg'a sertifikati||Подарочный сертификат||Gift cer
 pm_Payme||Payme||Payme||Payme
 pm_Uzum||Uzum||Uzum||Uzum
 pm_Click||Click||Click||Click
+map_gym||Zal||Зал||Gym
+map_you||Siz||Вы||You
+map_courier||Kuryer||Курьер||Courier
+map_road||Zaldan yo'l: ~@km km · ~@min daqiqa||От зала: ~@km км · ~@min мин||From the gym: ~@km km · ~@min min
+map_road_line||taxminiy, to'g'ri chiziq||примерно, по прямой||approximate, straight line
+track_btn||Kuzatish||Отследить||Track
+track_hide||Yopish||Закрыть||Close
+track_eta||Kuryer yo'lda · ~@min daqiqada yetib keladi||Курьер в пути · прибудет через ~@min мин||Courier is on the way · arrives in ~@min min
+track_wait||Kuryer hali yo'lga chiqmadi||Курьер ещё не выехал||The courier has not set off yet
+track_offline||Kuryer joylashuvi vaqtincha ko'rinmayapti||Местоположение курьера временно недоступно||The courier's position is not available right now
+track_done||Buyurtma yakunlandi||Заказ завершён||The order is finished
+courier_title||Kuryer · buyurtma||Курьер · заказ||Courier · order
+courier_idle||Joylashuv ulashilmayapti||Местоположение не передаётся||Location is not being shared
+courier_on||Joylashuv mijozga ko'rinmoqda||Местоположение видно клиенту||The customer can see your location
+courier_err||Joylashuv yuborilmadi: GPS ruxsatini tekshiring||Не удалось отправить: проверьте доступ к GPS||Not sent: check the GPS permission
+courier_start||Joylashuvni ulashishni boshlash||Начать передачу местоположения||Start sharing my location
+courier_stop||Ulashishni to'xtatish||Остановить передачу||Stop sharing
+map_road_km||Zaldan masofa: ~@km km||От зала: ~@km км||From the gym: ~@km km
 asst_rate||Juda ko'p savol yuborildi. Bir daqiqadan keyin qayta urinib ko'ring.||Слишком много вопросов. Попробуйте через минуту.||Too many questions. Try again in a minute.
 asst_suggest||Shuni so'rab ko'ring:||Попробуйте спросить:||Try asking:
 cal_txt_title||Matn bilan yozish||Записать текстом||Type it in
