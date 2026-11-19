@@ -66,3 +66,31 @@ class LlmProvidersTests(TestCase):
         with self.settings(GEMINI_API_KEY="g", ANTHROPIC_API_KEY=""), mock.patch("gym.llm._gemini", side_effect=bad):
             self.assertIsNone(llm.ask("salom"))
         self.assertEqual(len(calls), 1)
+
+    def test_openai_compatible_provider_request_and_order(self):
+        img = llm.image_part(b"\x89PNG\r\n\x1a\n" + b"0" * 20, "image/png")
+        seen = {}
+
+        def fake(url, body, headers, timeout):
+            seen.update(url=url, body=body, headers=headers)
+            return {"choices": [{"message": {"content": "Bu osh"}}]}
+
+        cfg = dict(GEMINI_API_KEY="", ANTHROPIC_API_KEY="", LLM_BASE_URL="https://api.example.com/openai/v1/", LLM_API_KEY="k", LLM_MODEL="m1")
+        with self.settings(**cfg), mock.patch("gym.llm._post", side_effect=fake):
+            self.assertTrue(llm.enabled())
+            self.assertEqual(llm.ask("bu nima", "uz", "", [("user", "a"), ("assistant", "b")], img), "Bu osh")
+        self.assertEqual(seen["url"], "https://api.example.com/openai/v1/chat/completions")
+        self.assertEqual(seen["headers"]["authorization"], "Bearer k")
+        self.assertEqual(seen["body"]["model"], "m1")
+        self.assertEqual(seen["body"]["messages"][0]["role"], "system")
+        self.assertEqual(seen["body"]["messages"][-1]["content"][1]["type"], "image_url")
+        # Gemini first, then this service, then Claude
+        with self.settings(GEMINI_API_KEY="g", ANTHROPIC_API_KEY="a", LLM_BASE_URL="https://x/v1", LLM_API_KEY="k", LLM_MODEL="m"):
+            with mock.patch("gym.llm._gemini", return_value=""), mock.patch("gym.llm._compat", return_value="C1") as c, mock.patch("gym.llm._claude", return_value="C2"):
+                self.assertEqual(llm.ask("salom"), "C1")
+                c.assert_called_once()
+
+    def test_incomplete_openai_settings_are_ignored(self):
+        with self.settings(GEMINI_API_KEY="", ANTHROPIC_API_KEY="", LLM_BASE_URL="", LLM_API_KEY="k", LLM_MODEL="m"):
+            self.assertFalse(llm.enabled())
+            self.assertIsNone(llm.ask("salom"))

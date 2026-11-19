@@ -19,6 +19,12 @@ services:
         sync: false
       - key: GEMINI_API_KEY         # aistudio.google.com -> Get API key (free tier); enables free questions and photos in the coach chat
         sync: false
+      - key: LLM_BASE_URL           # another AI service with an OpenAI-compatible API, e.g. https://api.groq.com/openai/v1 or https://openrouter.ai/api/v1
+        sync: false
+      - key: LLM_API_KEY
+        sync: false
+      - key: LLM_MODEL              # the model name from that service's list (for photos pick one that supports images)
+        sync: false
       - key: ANTHROPIC_API_KEY      # console.anthropic.com -> API keys; enables free questions and photos in the coach chat
         sync: false
       - key: CLOUDINARY_URL         # cloudinary://API_KEY:API_SECRET@CLOUD_NAME (cloudinary.com -> Dashboard -> API environment variable)

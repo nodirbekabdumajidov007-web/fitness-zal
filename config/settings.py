@@ -175,6 +175,10 @@ ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "").strip()  # the coach
 ANTHROPIC_MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-haiku-5-5").strip()
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()  # Google AI Studio key (free tier): tried first, Claude is the backup
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.8-flash").strip()
+# any OpenAI-compatible service (Groq, OpenRouter, Mistral, ...): all three must be set; tried after Gemini, before Claude
+LLM_BASE_URL = os.environ.get("LLM_BASE_URL", "").strip()
+LLM_API_KEY = os.environ.get("LLM_API_KEY", "").strip()
+LLM_MODEL = os.environ.get("LLM_MODEL", "").strip()
 
 # logging: console always, a rotating file when FZ_LOG_DIR is set, Telegram alerts for errors when a bot token + admin chat are configured
 _handlers = {
