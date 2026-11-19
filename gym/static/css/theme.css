@@ -373,3 +373,6 @@ dialog{border-radius:22px}
 .lp-menu a[aria-checked="true"]{background:color-mix(in srgb,var(--ink) 7%,transparent);color:var(--ink)}
 .lp-menu a[aria-checked="true"] span{color:var(--ink);font-weight:700}
 .lp-menu a b{width:auto;height:auto;border-radius:0;background:none;color:var(--accent);font-size:.9rem;font-weight:800;line-height:1;display:block}
+
+/* back-to-top: keep a clear gap above the (larger) chat button on phones */
+@media (max-width:900px){.totop{margin-bottom:78px}}
