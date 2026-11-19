@@ -94,3 +94,16 @@ class LlmProvidersTests(TestCase):
         with self.settings(GEMINI_API_KEY="", ANTHROPIC_API_KEY="", LLM_BASE_URL="", LLM_API_KEY="k", LLM_MODEL="m"):
             self.assertFalse(llm.enabled())
             self.assertIsNone(llm.ask("salom"))
+
+    def test_mistral_gets_image_url_as_a_string(self):
+        img = llm.image_part(b"\x89PNG\r\n\x1a\n" + b"0" * 20, "image/png")
+        seen = {}
+
+        def fake(url, body, headers, timeout):
+            seen["body"] = body
+            return {"choices": [{"message": {"content": "ok"}}]}
+
+        with self.settings(GEMINI_API_KEY="", ANTHROPIC_API_KEY="", LLM_BASE_URL="https://api.mistral.ai/v1", LLM_API_KEY="k", LLM_MODEL="m"), \
+                mock.patch("gym.llm._post", side_effect=fake):
+            llm.ask("bu nima", "uz", "", (), img)
+        self.assertIsInstance(seen["body"]["messages"][-1]["content"][1]["image_url"], str)

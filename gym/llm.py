@@ -113,7 +113,9 @@ def _compat(question, lang, facts, turns, image, timeout):
     parts = [{"type": "text", "text": question}]
     if image:
         src = image["source"]
-        parts.append({"type": "image_url", "image_url": {"url": f"data:{src['media_type']};base64,{src['data']}"}})
+        uri = f"data:{src['media_type']};base64,{src['data']}"
+        # Mistral documents image_url as a plain string; the OpenAI shape is an object with a url
+        parts.append({"type": "image_url", "image_url": uri if "mistral.ai" in settings.LLM_BASE_URL else {"url": uri}})
     msgs.append({"role": "user", "content": parts if image else question})
     body = {"model": settings.LLM_MODEL, "messages": msgs, "max_tokens": 800, "temperature": 0.6}
     url = settings.LLM_BASE_URL.rstrip("/") + "/chat/completions"
