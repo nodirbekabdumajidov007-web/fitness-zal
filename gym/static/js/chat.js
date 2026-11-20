@@ -122,7 +122,7 @@
       if (m.reply) {
         var q = el('button', 'm-quote'); q.type = 'button'; q.dataset.jump = m.reply.id;
         q.appendChild(el('b', '', m.reply.name));
-        q.appendChild(el('span', '', m.reply.deleted ? d.tDeleted : (m.reply.text || d.tPhoto)));
+        q.appendChild(el('span', '', m.reply.deleted ? d.tDeleted : (m.reply.text || (m.reply.voice ? '\uD83C\uDFA4 ' + d.tVoice : d.tPhoto))));
         if (m.reply.image) { var qi = el('img'); qi.src = m.reply.image; qi.alt = ''; qi.loading = 'lazy'; q.appendChild(qi); }
         b.appendChild(q);
       }
@@ -131,6 +131,7 @@
         var im = el('img'); im.src = m.image; im.alt = d.tPhoto;
         im.addEventListener('load', function () { if (stickLoad) toBottom(); }); a.appendChild(im); b.appendChild(a);
       }
+      if (m.voice) b.appendChild(voiceEl(m));
       if (m.body) { var tx = el('div', 'm-text'); fillText(tx, m.body, m.mentions); b.appendChild(tx); }
     }
     var meta = el('div', 'm-meta');
@@ -170,7 +171,7 @@
   function setReactions(id, list) { var row = byId(id); if (row) renderChips(row.querySelector('.m-rx'), list); }
   function markDeleted(row) {
     var b = row.querySelector('.m-bubble');
-    b.querySelectorAll('.m-photo,.m-text,.m-quote,.m-tick,.m-edited').forEach(function (x) { x.remove(); });
+    b.querySelectorAll('.m-photo,.m-voice,.m-text,.m-quote,.m-tick,.m-edited').forEach(function (x) { x.remove(); });
     if (!b.querySelector('.m-del')) b.insertBefore(el('i', 'm-del', d.tDeleted), b.querySelector('.m-meta'));
     b.classList.remove('photo-only');
     var rx = row.querySelector('.m-rx'); if (rx) { rx.textContent = ''; rx.hidden = true; }
@@ -402,7 +403,7 @@
   log.addEventListener('touchcancel', endTouch);
 
   // ---- composer: reply / edit bar, photo pick / paste / drop, preview, auto-grow, Enter to send
-  var ctxBar = document.getElementById('chat-ctx'), ctxTitle = document.getElementById('ctx-title'), ctxText = document.getElementById('ctx-text'), attach = document.getElementById('chat-attach');
+  var mic = document.getElementById('chat-mic'), ctxBar = document.getElementById('chat-ctx'), ctxTitle = document.getElementById('ctx-title'), ctxText = document.getElementById('ctx-text'), attach = document.getElementById('chat-attach');
   var ctx = null;
   function snip(s) { s = (s || '').replace(/\s+/g, ' ').trim(); return s.length > 90 ? s.slice(0, 89) + '…' : s; }
   function grow() { body.style.height = 'auto'; body.style.height = Math.min(body.scrollHeight, 160) + 'px'; }
@@ -414,7 +415,7 @@
     ctxTitle.textContent = mode === 'reply' ? d.tReplying.replace('@', row.dataset.name) : d.tEditing;
     ctxText.textContent = snip(text) || d.tPhoto;
     ctxBar.hidden = false;
-    if (mode === 'edit') { body.value = text; setPicked(null); if (attach) attach.hidden = true; grow(); }
+    if (mode === 'edit') { body.value = text; setPicked(null); if (attach) attach.hidden = true; if (mic) mic.hidden = true; grow(); }
     body.focus();
   }
   function clearCtx() {
@@ -422,6 +423,7 @@
     ctx = null;
     if (ctxBar) ctxBar.hidden = true;
     if (attach) attach.hidden = false;
+    if (mic) mic.hidden = false;
   }
   var ctxX = document.getElementById('ctx-x'); if (ctxX) ctxX.addEventListener('click', function () { clearCtx(); body.focus(); });
 
@@ -510,7 +512,7 @@
       req.then(function (j) {
         if (j._ok) {
           if (wasEdit) replaceRow(j.message); else render(j.message);
-          ctx = null; if (ctxBar) ctxBar.hidden = true; if (attach) attach.hidden = false;
+          ctx = null; if (ctxBar) ctxBar.hidden = true; if (attach) attach.hidden = false; if (mic) mic.hidden = false;
           body.value = ''; grow(); setPicked(null); closeSuggest();
           if (!wasEdit) toBottom();
           if (j.notice) say(j.notice);
@@ -518,6 +520,85 @@
       }).catch(function () { say('!', true); }).then(function () { sending = false; form.classList.remove('sending'); body.focus(); });
     });
   }
+  // ---- voice notes: record with the microphone (MediaRecorder), play with our own small player
+  function fmtSecs(s) { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
+  function svgNode(cls, path) {
+    var s = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('class', cls); s.setAttribute('aria-hidden', 'true');
+    var p = document.createElementNS('http://www.w3.org/2000/svg', 'path'); p.setAttribute('d', path); s.appendChild(p); return s;
+  }
+  function voiceEl(m) {
+    var w = el('div', 'm-voice'); w.dataset.src = m.voice; w.dataset.secs = m.voice_secs || 0;
+    var btn = el('button', 'm-vplay'); btn.type = 'button'; btn.setAttribute('aria-label', d.tVoice || '');
+    btn.appendChild(svgNode('v-play', 'M8 5v14l11-7z')); btn.appendChild(svgNode('v-pause', 'M7 5h3.5v14H7zM13.5 5H17v14h-3.5z'));
+    var bar = el('div', 'm-vbar'); bar.appendChild(el('i'));
+    w.appendChild(btn); w.appendChild(bar); w.appendChild(el('span', 'm-vtime num', fmtSecs(m.voice_secs)));
+    return w;
+  }
+  var vAudio = null, vWrap = null;
+  function vReset(w) { w.classList.remove('playing'); var i = w.querySelector('.m-vbar i'); if (i) i.style.width = '0'; var t = w.querySelector('.m-vtime'); if (t) t.textContent = fmtSecs(+w.dataset.secs); }
+  function vStop() { if (vAudio) vAudio.pause(); if (vWrap) vReset(vWrap); vAudio = vWrap = null; }
+  log.addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('.m-vplay') : null; if (!b) return;
+    var w = b.parentNode;
+    if (vWrap === w) { if (vAudio.paused) vAudio.play().catch(vStop); else vAudio.pause(); return; }
+    vStop();
+    var a = new Audio(w.dataset.src), secs = +w.dataset.secs || 1;
+    vAudio = a; vWrap = w;
+    a.addEventListener('timeupdate', function () {
+      var i = w.querySelector('.m-vbar i'); if (i) i.style.width = Math.min(100, a.currentTime / secs * 100) + '%';
+      var t = w.querySelector('.m-vtime'); if (t) t.textContent = fmtSecs(secs - a.currentTime);
+    });
+    a.addEventListener('play', function () { w.classList.add('playing'); });
+    a.addEventListener('pause', function () { w.classList.remove('playing'); });
+    a.addEventListener('ended', vStop);
+    a.addEventListener('error', function () { vStop(); say(d.tVoiceBad || '!', true); });
+    a.play().catch(vStop);
+  });
+
+  var recBox = document.getElementById('chat-rec'), recT = document.getElementById('chat-rec-t'), rec = null, VOICE_MAX = 120;
+  function recFinish(cancel) { if (!rec) return; rec.cancel = cancel; if (rec.mr.state !== 'inactive') rec.mr.stop(); }
+  function sendVoice(blob, secs) {
+    var ext = /ogg/.test(blob.type) ? '.ogg' : (/mp4|aac/.test(blob.type) ? '.m4a' : '.webm');
+    var fd = new FormData(); fd.append('body', ''); fd.append('voice', blob, 'voice' + ext); fd.append('voice_secs', secs);
+    if (ctx && ctx.mode === 'reply') fd.append('reply_to', ctx.id);
+    sending = true; form.classList.add('sending');
+    post(d.send, fd).then(function (j) {
+      if (j._ok) { render(j.message); ctx = null; if (ctxBar) ctxBar.hidden = true; toBottom(); }
+      else say(j.error || '!', true);
+    }).catch(function () { say('!', true); }).then(function () { sending = false; form.classList.remove('sending'); });
+  }
+  function recStart() {
+    if (rec || sending) return;
+    if (!navigator.mediaDevices || !window.MediaRecorder) { say(d.tVoiceNo || '!', true); return; }
+    say('', true); say('');
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
+      var types = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', 'audio/mp4'];
+      var mt = types.filter(function (t) { return MediaRecorder.isTypeSupported(t); })[0] || '';
+      var mr = mt ? new MediaRecorder(stream, { mimeType: mt }) : new MediaRecorder(stream), chunks = [];
+      rec = { mr: mr, t0: Date.now(), cancel: false };
+      mr.addEventListener('dataavailable', function (ev) { if (ev.data && ev.data.size) chunks.push(ev.data); });
+      mr.addEventListener('stop', function () {
+        stream.getTracks().forEach(function (t) { t.stop(); });
+        clearInterval(rec.timer); form.classList.remove('recording'); recBox.hidden = true;
+        var r = rec; rec = null;
+        if (r.cancel || !chunks.length) return;
+        var secs = Math.max(1, Math.round((Date.now() - r.t0) / 1000));
+        sendVoice(new Blob(chunks, { type: mr.mimeType || mt || 'audio/webm' }), secs);
+      });
+      mr.start();
+      form.classList.add('recording'); recBox.hidden = false; recT.textContent = '0:00';
+      rec.timer = setInterval(function () {
+        var s = (Date.now() - rec.t0) / 1000; recT.textContent = fmtSecs(s);
+        if (s >= VOICE_MAX) recFinish(false);
+      }, 250);
+    }).catch(function () { say(d.tVoiceNo || '!', true); });
+  }
+  if (mic && form) {
+    mic.addEventListener('click', recStart);
+    document.getElementById('chat-rec-ok').addEventListener('click', function () { recFinish(false); });
+    document.getElementById('chat-rec-x').addEventListener('click', function () { recFinish(true); });
+  }
+
   if (lightbox) lightbox.addEventListener('click', function () { lightbox.hidden = true; });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && lightbox) lightbox.hidden = true; });
 

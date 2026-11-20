@@ -126,3 +126,31 @@ def is_local(field_file):
     """True when the file sits on this server's disk; False for Cloudinary, whose files are served from their own URL."""
     from django.core.files.storage import FileSystemStorage
     return isinstance(field_file.storage, FileSystemStorage)
+
+
+VOICE_MAX_BYTES = 3 * 1024 * 1024
+VOICE_EXT = {"audio/webm": ".webm", "audio/ogg": ".ogg", "audio/mp4": ".m4a", "audio/wav": ".wav"}
+
+
+def audio_type(head):
+    """Content type of a voice recording from its first bytes: WebM (Chrome), Ogg (Firefox), MP4/M4A (Safari), WAV."""
+    if head[:4] == b"\x1aE\xdf\xa3":
+        return "audio/webm"
+    if head[:4] == b"OggS":
+        return "audio/ogg"
+    if head[4:8] == b"ftyp":
+        return "audio/mp4"
+    if head[:4] == b"RIFF" and head[8:12] == b"WAVE":
+        return "audio/wav"
+    return None
+
+
+def validate_voice(f):
+    if f.size > VOICE_MAX_BYTES:
+        raise ValidationError("Ovozli xabar juda katta.")
+    pos = f.tell() if hasattr(f, "tell") else 0
+    f.seek(0)
+    head = f.read(16)
+    f.seek(pos)
+    if not audio_type(head):
+        raise ValidationError("Bu fayl ovozli xabar emas.")

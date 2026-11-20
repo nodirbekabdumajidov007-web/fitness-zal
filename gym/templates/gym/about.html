@@ -1,5 +1,6 @@
 {% extends "gym/base.html" %}{% load static gym_tags %}
 {% block title %}{% t 'about_title' %}{% endblock %}
+{% block meta_desc %}{% if gs.about_text %}{{ gs.about_text|truncatechars:155 }}{% else %}{% t 'meta_desc' %}{% endif %}{% endblock %}
 {% block content %}
 <section class="about-hero">
   <span class="eyebrow">Fitnes Zal</span>

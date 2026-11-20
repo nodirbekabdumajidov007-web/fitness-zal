@@ -30,7 +30,7 @@ from django.utils.safestring import mark_safe
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
-from . import click, emailcode, extras, geo, google_auth, services, sms, telegram
+from . import click, emailcode, extras, geo, google_auth, seo, services, sms, telegram
 from .media import ranged_file_response, video_embed
 from .forms import AccountForm, BodyLogForm, LoginForm, PasswordForm, PhoneField, ProfileForm, RegisterForm, ReviewForm, find_user, normalize_phone
 from .i18n import LANGS
@@ -144,7 +144,7 @@ def home(request):
     if promo:
         promo["poster"] = models_image_url("promo", gs) or promo["thumb"]
     return render(request, "gym/home.html", {
-        "promo": promo, "gym_photos": list(GymPhoto.objects.filter(active=True)[:6]),
+        "promo": promo, "gym_photos": list(GymPhoto.objects.filter(active=True)[:6]), "ld_json": seo.gym_ld_json(request, gs),
         "crowd": crowd_level(), "next_class": home_next_class(), "cheapest_plan": plans.order_by("price").first(),
         "plans": plans, "trainers": Trainer.objects.filter(active=True)[:3],
         "announcements": Announcement.objects.filter(active=True)[:3],
@@ -1325,7 +1325,7 @@ def about_view(request):
     if promo:
         promo["poster"] = models_image_url("promo", gs) or promo["thumb"]
     return render(request, "gym/about.html", {"photos": GymPhoto.objects.filter(active=True), "promo": promo, "embed": gs.map_embed,
-                                              "plans": Plan.objects.filter(active=True).order_by("price"),
+                                              "ld_json": seo.gym_ld_json(request, gs), "plans": Plan.objects.filter(active=True).order_by("price"),
                                               "trainers": Trainer.objects.filter(active=True)[:6]})
 
 

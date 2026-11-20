@@ -1,0 +1,16 @@
+{% extends "gym/base.html" %}{% load gym_tags %}
+{% block title %}{% t 'err404_title' %}{% endblock %}
+{% block content %}
+<section class="err-page">
+  <b class="err-code">404</b>
+  <h1>{% t 'err404_title' %}</h1>
+  <p class="muted">{% t 'err404_text' %}</p>
+  <div class="inline err-links">
+    <a class="btn primary pill" href="{% url 'home' %}">{% icon 'home' %} {% t 'err_home' %}</a>
+    <a class="btn pill" href="{% url 'plans' %}">{% t 'nav_plans' %}</a>
+    <a class="btn pill" href="{% url 'classes' %}">{% t 'nav_classes' %}</a>
+    <a class="btn pill" href="{% url 'shop' %}">{% t 'nav_shop' %}</a>
+    <a class="btn pill" href="{% url 'ai' %}">{% icon 'sparkles' %} {% t 'ai_coach' %}</a>
+  </div>
+</section>
+{% endblock %}

@@ -3,7 +3,7 @@
 {% block bodyclass %}auth-page{% endblock %}
 {% block outer %}
 {% include "gym/_auth_scene.html" %}
-<main class="wrap auth2"><div class="tilt" data-tilt>
+<main class="wrap auth2" id="main" tabindex="-1"><div class="tilt" data-tilt>
   <form class="card grid glass" method="post" novalidate data-warp>
     {% csrf_token %}
     <i class="glare" aria-hidden="true"></i>

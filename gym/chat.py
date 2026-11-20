@@ -12,7 +12,7 @@ from django.db.models import Count, F, OuterRef, Q, Subquery
 from django.db.models.functions import Coalesce
 from django.utils import timezone
 
-from .media import validate_image
+from .media import VOICE_EXT, audio_type, validate_image, validate_voice
 from .models import ChatBlock, ChatMessage, ChatRead, ChatRoom, Mention, MessageReaction, RoomMute, User
 
 MAX_LEN = 1000
@@ -209,20 +209,20 @@ def push_direct(msg):
         return
     try:
         from . import pwa
-        pwa.push_user(other, display_name(msg.sender), snippet(msg.body, 120) or "📷", f"/chat/{room.pk}/")
+        pwa.push_user(other, display_name(msg.sender), snippet(msg.body, 120) or ("🎤" if msg.voice else "📷"), f"/chat/{room.pk}/")
     except Exception:
         pass
 
 
 # ---- posting / editing ------------------------------------------------------------------------------------------------
-def post_message(user, room, body, image=None, reply_to_id=None):
+def post_message(user, room, body, image=None, reply_to_id=None, voice=None, voice_secs=0):
     """Returns (message, error_key). A message needs text, a photo, or both. `message.masked` tells that private data was hidden."""
     if user.chat_banned:
         return None, "chat_banned"
     if not can_access(user, room):
         return None, "chat_forbidden"
     body = normalize(body)
-    if not body and not image:
+    if not body and not image and not voice:
         return None, "chat_empty"
     if len(body) > MAX_LEN:
         return None, "chat_long"
@@ -231,6 +231,12 @@ def post_message(user, room, body, image=None, reply_to_id=None):
             validate_image(image)
         except ValidationError:
             return None, "chat_bad_image"
+    if voice is not None:
+        image = None  # a message is a voice note or a photo, not both
+        try:
+            validate_voice(voice)
+        except ValidationError:
+            return None, "chat_bad_voice"
     if room.kind == "direct":
         other = room.other(user)
         if not other.is_active or blocked_between(user, other):
@@ -250,6 +256,12 @@ def post_message(user, room, body, image=None, reply_to_id=None):
     msg = ChatMessage(room=room, sender=user, body=body, reply_to=reply)
     if image is not None:
         msg.image.save(image.name, image, save=False)
+    if voice is not None:
+        voice.seek(0)
+        ext = VOICE_EXT.get(audio_type(voice.read(16)), ".webm")
+        voice.seek(0)
+        msg.voice.save("voice" + ext, voice, save=False)  # our own name: the client's is never trusted
+        msg.voice_secs = max(1, min(int(voice_secs or 0), 180))
     msg.save()
     msg.masked = masked
     msg.new_mentions = sync_mentions(msg, find_mentions(room, user, body))
@@ -269,7 +281,7 @@ def edit_message(user, msg, body):
     if timezone.now() - msg.created > EDIT_WINDOW:
         return None, "chat_edit_expired"
     body = normalize(body)
-    if not body and not msg.image:
+    if not body and not msg.image and not msg.voice:
         return None, "chat_empty"
     if len(body) > MAX_LEN:
         return None, "chat_long"
@@ -354,7 +366,7 @@ def _reply_payload(r):
         return None
     alive = not r.deleted
     return {"id": r.id, "name": display_name(r.sender), "text": snippet(r.body, 90) if alive else "",
-            "image": f"/chat/photo/{r.id}/" if (alive and r.image) else "", "deleted": r.deleted}
+            "image": f"/chat/photo/{r.id}/" if (alive and r.image) else "", "voice": bool(alive and r.voice), "deleted": r.deleted}
 
 
 def context_for(msgs, viewer):
@@ -382,6 +394,7 @@ def serialize(msg, viewer, read_to=0, ctx=None):
     return {"id": msg.id, "mine": mine, "sender": msg.sender_id, "name": display_name(msg.sender), "initials": initials(msg.sender),
             "hue": hue(msg.sender), "body": msg.body if alive else "", "deleted": msg.deleted,
             "image": f"/chat/photo/{msg.id}/" if (alive and msg.image) else "",
+            "voice": f"/chat/voice/{msg.id}/" if (alive and msg.voice) else "", "voice_secs": msg.voice_secs if (alive and msg.voice) else 0,
             "ts": int(msg.created.timestamp()), "time": local.strftime("%H:%M"), "date": local.strftime("%d.%m.%Y"), "day": local.date().isoformat(),
             "read": mine and msg.id <= read_to, "can_delete": mine and alive, "can_report": (not mine) and alive,
             "can_edit": can_edit(msg, viewer), "edited": bool(msg.edited_at) and alive,

@@ -1,19 +1,20 @@
 import hashlib
 import json
+import re
 import time
 from datetime import datetime, timedelta, timezone as dtz
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-from django.http import FileResponse, Http404, JsonResponse
+from django.http import FileResponse, Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_GET, require_POST
 
 from . import chat
 from .consumers import announce
-from .media import image_type
+from .media import audio_type, image_type
 from .models import ChatBlock, ChatMessage, ChatReport, ChatRead, ChatRoom, RoomMute, User
 from .templatetags.gym_tags import translate
 from .views import flash
@@ -163,14 +164,16 @@ def start_direct(request, uid):
 @login_required
 def send(request, pk):
     room = get_room(request, pk)
-    image = None
+    image = voice = None
+    voice_secs = 0
     if request.content_type == "application/json":
         body, reply_to = jdata(request).get("body", ""), to_int(jdata(request).get("reply_to"))
         body = body if isinstance(body, str) else ""
     else:
         body, reply_to = request.POST.get("body", ""), to_int(request.POST.get("reply_to"))
         image = request.FILES.get("image")
-    msg, err = chat.post_message(request.user, room, body, image, reply_to or None)
+        voice, voice_secs = request.FILES.get("voice"), to_int(request.POST.get("voice_secs"))
+    msg, err = chat.post_message(request.user, room, body, image, reply_to or None, voice, voice_secs)
     chat.touch(request.user)
     if msg:
         announce(room.pk, {"type": "chat.new", "id": msg.id})  # open sockets in this room get it instantly
@@ -372,6 +375,42 @@ def photo(request, pk):
     return resp
 
 
+@login_required
+def voice(request, pk):
+    """A voice note: only people who can see the conversation get it. Byte ranges are served because Safari will not play audio without them."""
+    msg = get_object_or_404(ChatMessage.objects.select_related("room"), pk=pk)
+    if not chat.can_access(request.user, msg.room) or msg.deleted or not msg.voice:
+        raise Http404()
+    try:
+        with msg.voice.open("rb") as fh:
+            data = fh.read()
+    except (FileNotFoundError, ValueError):
+        raise Http404()
+    ctype = audio_type(data[:16])
+    if not ctype:
+        raise Http404()
+    size = len(data)
+    m = re.match(r"bytes=(\d*)-(\d*)$", request.headers.get("Range", ""))
+    if m and (m.group(1) or m.group(2)):
+        if m.group(1):
+            start, end = int(m.group(1)), int(m.group(2)) if m.group(2) else size - 1
+        else:
+            start, end = max(size - int(m.group(2)), 0), size - 1
+        end = min(end, size - 1)
+        if start > end:
+            resp = HttpResponse(status=416)
+            resp["Content-Range"] = f"bytes */{size}"
+            return resp
+        resp = HttpResponse(data[start:end + 1], status=206, content_type=ctype)
+        resp["Content-Range"] = f"bytes {start}-{end}/{size}"
+    else:
+        resp = HttpResponse(data, content_type=ctype)
+    resp["Accept-Ranges"] = "bytes"
+    resp["Cache-Control"] = "private, max-age=86400"
+    resp["X-Content-Type-Options"] = "nosniff"
+    return resp
+
+
 @require_POST
 @login_required
 def delete_message(request, pk):
@@ -381,7 +420,9 @@ def delete_message(request, pk):
     msg.deleted = True
     if msg.image:
         msg.image.delete(save=False)  # the photo is removed from the server, not just hidden
-    msg.save(update_fields=["deleted", "image"])
+    if msg.voice:
+        msg.voice.delete(save=False)
+    msg.save(update_fields=["deleted", "image", "voice"])
     if msg.room.pinned_message_id == msg.id:
         ChatRoom.objects.filter(pk=msg.room_id).update(pinned_message=None)
         announce(msg.room_id, {"type": "chat.pin"})

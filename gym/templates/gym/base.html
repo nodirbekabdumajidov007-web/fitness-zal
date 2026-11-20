@@ -4,6 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{% block title %}{% t 'brand' %}{% endblock %} · Fitnes Zal</title>
+<meta name="description" content="{% block meta_desc %}{% t 'meta_desc' %}{% endblock %}">
+<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Fitnes Zal"><meta property="og:locale" content="{{ lang }}">
+<meta property="og:title" content="{% t 'og_title' %}"><meta property="og:description" content="{% t 'meta_desc' %}">
+<meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-share.png' %}"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{% t 'og_title' %}"><meta name="twitter:description" content="{% t 'meta_desc' %}">
+{% if ld_json %}<script type="application/ld+json">{{ ld_json|safe }}</script>{% endif %}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
 <link rel="stylesheet" href="{% vstatic 'css/app.css' %}">
@@ -23,6 +31,7 @@
 <script src="{% vstatic 'js/theme.js' %}"></script>
 </head>
 <body class="{% block bodyclass %}{% endblock %}">
+<a class="skip-link" href="#main">{% t 'skip_main' %}</a>
 <div id="bg" aria-hidden="true"></div>
 <header class="top"><div class="wrap">
   <div class="top-row">
@@ -151,7 +160,7 @@
 </nav>
 {% endwith %}
 
-{% block outer %}<main class="wrap">{% block content %}{% endblock %}</main>{% endblock %}
+{% block outer %}<main class="wrap" id="main" tabindex="-1">{% block content %}{% endblock %}</main>{% endblock %}
 
 <footer class="ft">
   {% if request.path != '/' and not user.is_authenticated %}

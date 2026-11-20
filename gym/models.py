@@ -1017,6 +1017,8 @@ class ChatMessage(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="chat_messages", verbose_name="Yuboruvchi")
     body = models.TextField("Xabar", max_length=1000, blank=True)
     image = models.FileField("Rasm", upload_to="chat/%Y/%m/", blank=True, validators=[validate_image])
+    voice = models.FileField("Ovozli xabar", upload_to="chat/voice/%Y/%m/", blank=True)
+    voice_secs = models.PositiveSmallIntegerField("Ovoz davomiyligi (soniya)", default=0)
     deleted = models.BooleanField("O'chirilgan", default=False)
     created = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan")
     reply_to = models.ForeignKey("self", null=True, blank=True, on_delete=models.SET_NULL, related_name="replies", verbose_name="Javob")

@@ -352,4 +352,16 @@ about_c6_d||Üyelik veya tutar için hediye çeki. Arkadaşınız için misafir 
 about_plans||Üyelik fiyatları||Абонемент баалары||Нархи обунаҳо
 about_trainers||Antrenörlerimiz||Биздин машыктыруучулар||Мураббиёни мо
 about_ask||Sorunuz mu var?||Суроо барбы?||Савол доред?
+meta_desc||Fitnes Zal: modern ekipman, grup dersleri, deneyimli antrenörler, üyelikler ve spor mağazası. Her gün açık, siteden kaydolun.||Fitnes Zal: заманбап жабдуулар, топтук машыгуулар, тажрыйбалуу машыктыруучулар, абонементтер жана спорт дүкөнү. Күн сайын ачык, сайттан жазылыңыз.||Fitnes Zal: таҷҳизоти муосир, машғулотҳои гурӯҳӣ, мураббиёни ботаҷриба, обунаҳо ва мағозаи варзишӣ. Ҳар рӯз кушода, аз сайт сабт шавед.
+og_title||Fitnes Zal — güç, disiplin, sonuç||Fitnes Zal — күч, тартип, жыйынтык||Fitnes Zal — қувва, интизом, натиҷа
+err404_title||Sayfa bulunamadı||Бет табылган жок||Саҳифа ёфт нашуд
+err404_text||Adres yanlış ya da sayfa taşınmış. Aşağıdaki bağlantılardan birini seçin.||Дарек туура эмес же бет жылдырылган. Төмөнкү шилтемелердин бирин тандаңыз.||Суроға нодуруст аст ё саҳифа кӯчонида шудааст. Яке аз истинодҳои зеринро интихоб кунед.
+err403_title||Erişim yok||Уруксат жок||Иҷозат нест
+err403_text||Bu sayfayı görüntüleme izniniz yok. Hesabınıza giriş yaptığınızdan emin olun.||Бул бетти көрүүгө уруксатыңыз жок. Аккаунтка кирганыңызды текшериңиз.||Шумо барои дидани ин саҳифа иҷозат надоред. Ворид шуданатонро санҷед.
+err_home||Ana sayfa||Башкы бетке||Ба саҳифаи асосӣ
+skip_main||İçeriğe geç||Негизги мазмунга өтүү||Ба мазмуни асосӣ гузаштан
+chat_voice||Sesli mesaj||Үн билдирүүсү||Паёми овозӣ
+chat_voice_rec||Kaydediliyor… göndermek için dokunun||Жазылууда… жөнөтүү үчүн басыңыз||Сабт мешавад… барои фиристодан пахш кунед
+chat_voice_no||Mikrofon izni verilmedi ya da tarayıcı ses kaydını desteklemiyor.||Микрофонго уруксат берилген жок же браузер жазууну колдобойт.||Ба микрофон иҷозат дода нашуд ё браузер сабтро дастгирӣ намекунад.
+chat_bad_voice||Sesli mesaj gönderilemedi.||Үн билдирүүсүн жөнөтүү мүмкүн болбоду.||Паёми овозӣ фиристода нашуд.
 """

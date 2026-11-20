@@ -39,7 +39,7 @@
        data-delete="/chat/message/0/delete/" data-report="/chat/message/0/report/" data-react="/chat/message/0/react/" data-reactions="/chat/message/0/reactions/" data-edit="/chat/message/0/edit/"
        data-t-delete="{% t 'chat_delete' %}" data-t-report="{% t 'chat_report' %}" data-t-report-reason="{% t 'chat_report_reason' %}" data-t-deleted="{% t 'chat_deleted' %}" data-t-reported="{% t 'chat_report_sent' %}"
        data-t-today="{% t 'today_cap' %}" data-t-yesterday="{% t 'yesterday' %}" data-t-online="{% t 'online' %}" data-t-seen="{% t 'last_seen_at' time='@' %}"
-       data-t-sure="{% t 'sure' %}" data-t-bad-image="{% t 'chat_bad_image' %}" data-t-typing="{% t 'chat_typing' name='@' %}"       data-t-months="{% t 'chat_months' %}" data-t-dayfmt="{% t 'chat_day_fmt' d='@d' m='@m' %}" data-t-photo="{% t 'chat_photo' %}"
+       data-t-sure="{% t 'sure' %}" data-t-bad-image="{% t 'chat_bad_image' %}" data-t-typing="{% t 'chat_typing' name='@' %}"       data-t-months="{% t 'chat_months' %}" data-t-dayfmt="{% t 'chat_day_fmt' d='@d' m='@m' %}" data-t-photo="{% t 'chat_photo' %}" data-t-voice="{% t 'chat_voice' %}" data-t-voice-no="{% t 'chat_voice_no' %}" data-t-voice-bad="{% t 'chat_bad_voice' %}"
        data-t-reply="{% t 'chat_reply' %}" data-t-copy="{% t 'chat_copy' %}" data-t-copied="{% t 'chat_copied' %}" data-t-edit="{% t 'chat_edit' %}" data-t-edited="{% t 'chat_edited' %}" data-t-editing="{% t 'chat_editing' %}"
        data-t-pin="{% t 'chat_pin' %}" data-t-unpin="{% t 'chat_unpin' %}" data-t-new="{% t 'chat_new_msgs' %}" data-t-menu="{% t 'chat_menu' %}" data-t-react="{% t 'chat_react' %}"
        data-t-replying="{% t 'chat_replying' name='@' %}" data-t-none="{% t 'chat_search_none' %}" data-t-jump-fail="{% t 'chat_jump_fail' %}" data-t-members="{% t 'chat_members_n' n='@n' %}" data-t-online-n="{% t 'chat_online_n' n='@n' %}"
@@ -54,8 +54,9 @@
           <div class="m-bubble{% if m.image and not m.body %} photo-only{% endif %}">
             {% if room.kind == 'room' and not m.mine %}<div class="m-name" style="--h:{{ m.hue }}">{{ m.name }}</div>{% endif %}
             {% if m.deleted %}<i class="m-del">{% t 'chat_deleted' %}</i>{% else %}
-              {% if m.reply %}<button type="button" class="m-quote" data-jump="{{ m.reply.id }}"><b>{{ m.reply.name }}</b><span>{% if m.reply.deleted %}{% t 'chat_deleted' %}{% elif m.reply.text %}{{ m.reply.text }}{% else %}{% t 'chat_photo' %}{% endif %}</span>{% if m.reply.image %}<img src="{{ m.reply.image }}" alt="" loading="lazy">{% endif %}</button>{% endif %}
+              {% if m.reply %}<button type="button" class="m-quote" data-jump="{{ m.reply.id }}"><b>{{ m.reply.name }}</b><span>{% if m.reply.deleted %}{% t 'chat_deleted' %}{% elif m.reply.text %}{{ m.reply.text }}{% elif m.reply.voice %}🎤 {% t 'chat_voice' %}{% else %}{% t 'chat_photo' %}{% endif %}</span>{% if m.reply.image %}<img src="{{ m.reply.image }}" alt="" loading="lazy">{% endif %}</button>{% endif %}
               {% if m.image %}<a class="m-photo" href="{{ m.image }}" target="_blank" rel="noopener" data-lightbox><img src="{{ m.image }}" alt="{% t 'chat_photo' %}" loading="lazy"></a>{% endif %}
+              {% if m.voice %}<div class="m-voice" data-src="{{ m.voice }}" data-secs="{{ m.voice_secs }}"><button type="button" class="m-vplay" aria-label="{% t 'chat_voice' %}"><svg class="v-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><svg class="v-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg></button><div class="m-vbar"><i></i></div><span class="m-vtime num">{{ m.voice_secs|voice_time }}</span></div>{% endif %}
               {% if m.body %}<div class="m-text">{% for p, hit in m.parts %}{% if hit %}<mark class="m-mention">{{ p }}</mark>{% else %}{{ p }}{% endif %}{% endfor %}</div>{% endif %}
             {% endif %}
             <div class="m-meta">{% if m.edited %}<span class="m-edited">{% t 'chat_edited' %}</span>{% endif %}<span class="num">{{ m.time }}</span>{% if m.mine and room.kind == 'direct' and not m.deleted %}<span class="m-tick{% if m.read %} read{% endif %}" aria-label="{% if m.read %}{% t 'chat_read' %}{% else %}{% t 'chat_sent' %}{% endif %}">{% if m.read %}✓✓{% else %}✓{% endif %}</span>{% endif %}</div>
@@ -84,8 +85,10 @@
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5l-8.6 8.6a5 5 0 0 1-7.1-7.1l8.6-8.6a3.5 3.5 0 0 1 5 5l-8.6 8.6a2 2 0 0 1-2.8-2.8l7.9-7.9"/></svg><span class="sr">{% t 'chat_attach' %}</span></label>
       <label for="chat-body" class="sr">{% t 'chat_type' %}</label>
       <textarea id="chat-body" name="body" maxlength="1000" rows="1" placeholder="{% t 'chat_type' %}"></textarea>
+      <button type="button" class="m-mic" id="chat-mic" title="{% t 'chat_voice' %}" aria-label="{% t 'chat_voice' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
       <button class="m-send" type="submit" aria-label="{% t 'chat_send' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l18-8-8 18-2-8z"/></svg></button>
     </div>
+    <div class="m-rec" id="chat-rec" hidden><button type="button" class="m-rec-x" id="chat-rec-x" aria-label="{% t 'cancel' %}">×</button><i class="m-rec-dot" aria-hidden="true"></i><span class="m-rec-t num" id="chat-rec-t">0:00</span><span class="m-rec-hint">{% t 'chat_voice_rec' %}</span><button type="button" class="m-send" id="chat-rec-ok" aria-label="{% t 'chat_send' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l18-8-8 18-2-8z"/></svg></button></div>
     <span class="field-err" id="chat-err" role="alert"></span>
     <span class="m-note" id="chat-note" role="status"></span>
     <div class="m-drop" id="chat-drop" hidden>{% t 'chat_drop' %}</div>

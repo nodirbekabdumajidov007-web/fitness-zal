@@ -1041,6 +1041,18 @@ about_c6_d||Abonement yoki summa uchun sovg'a sertifikati. Do'stingizga mehmon t
 about_plans||Abonement narxlari||Цены на абонементы||Membership prices
 about_trainers||Murabbiylarimiz||Наши тренеры||Our trainers
 about_ask||Savolingiz bormi?||Есть вопросы?||Any questions?
+meta_desc||Fitnes Zal: zamonaviy jihozlar, guruh mashg'ulotlari, tajribali murabbiylar, abonementlar va sport do'koni. Har kuni ochiq, saytdan yoziling.||Fitnes Zal: современное оборудование, групповые занятия, опытные тренеры, абонементы и магазин спортпита. Открыто каждый день, запись на сайте.||Fitnes Zal: modern equipment, group classes, experienced trainers, memberships and a sports shop. Open every day, book on the site.
+og_title||Fitnes Zal — kuch, intizom, natija||Fitnes Zal — сила, дисциплина, результат||Fitnes Zal — strength, discipline, results
+err404_title||Sahifa topilmadi||Страница не найдена||Page not found
+err404_text||Manzil noto'g'ri yoki sahifa ko'chirilgan. Pastdagi havolalardan birini tanlang.||Адрес неверный или страница перемещена. Выберите одну из ссылок ниже.||The address is wrong or the page has moved. Pick one of the links below.
+err403_title||Ruxsat yo'q||Нет доступа||Access denied
+err403_text||Bu sahifani ko'rish uchun ruxsatingiz yetarli emas. Akkauntingizga kirganingizni tekshiring.||У вас нет прав для просмотра этой страницы. Проверьте, что вы вошли в аккаунт.||You do not have permission to view this page. Check that you are signed in.
+err_home||Bosh sahifaga||На главную||Home
+skip_main||Asosiy mazmunga o'tish||Перейти к содержимому||Skip to content
+chat_voice||Ovozli xabar||Голосовое сообщение||Voice message
+chat_voice_rec||Yozilmoqda… yuborish uchun bosing||Идёт запись… нажмите, чтобы отправить||Recording… tap to send
+chat_voice_no||Mikrofonga ruxsat berilmadi yoki brauzer ovoz yozishni qo'llamaydi.||Нет доступа к микрофону или браузер не поддерживает запись.||Microphone access was denied or the browser cannot record audio.
+chat_bad_voice||Ovozli xabarni yuborib bo'lmadi.||Не удалось отправить голосовое сообщение.||The voice message could not be sent.
 asst_rate||Juda ko'p savol yuborildi. Bir daqiqadan keyin qayta urinib ko'ring.||Слишком много вопросов. Попробуйте через минуту.||Too many questions. Try again in a minute.
 asst_suggest||Shuni so'rab ko'ring:||Попробуйте спросить:||Try asking:
 cal_txt_title||Matn bilan yozish||Записать текстом||Type it in

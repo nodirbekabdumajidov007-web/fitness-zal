@@ -257,3 +257,13 @@ def legal_text(text):
             para.append(line)
     flush()
     return mark_safe("".join(out))
+
+
+@register.filter
+def voice_time(secs):
+    """72 -> 1:12 (length of a voice note)."""
+    try:
+        s = max(int(secs), 0)
+    except (TypeError, ValueError):
+        return "0:00"
+    return f"{s // 60}:{s % 60:02d}"

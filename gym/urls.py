@@ -4,6 +4,7 @@ from django.views.generic import RedirectView
 
 from . import chat_views as c
 from . import desk
+from . import seo
 from . import instagram_views
 from . import coach_views as coach
 from . import tracker_views as tk
@@ -102,6 +103,7 @@ urlpatterns = [
     path("chat/message/<int:pk>/reactions/", c.reaction_users, name="chat_reaction_users"),
     path("chat/message/<int:pk>/edit/", c.edit_message, name="chat_edit"),
     path("chat/photo/<int:pk>/", c.photo, name="chat_photo"),
+    path("chat/voice/<int:pk>/", c.voice, name="chat_voice"),
     path("chat/<int:pk>/history/", c.history, name="chat_history"),
     path("chat/<int:pk>/search/", c.search, name="chat_search"),
     path("chat/<int:pk>/members/", c.members, name="chat_members"),
@@ -117,6 +119,8 @@ urlpatterns = [
     path("shop/favorites/", v.favorites_view, name="favorites"),
     path("trainers/<int:pk>/", v.trainer_detail, name="trainer"),
     path("about/", v.about_view, name="about"),
+    path("robots.txt", seo.robots, name="robots"),
+    path("sitemap.xml", seo.sitemap, name="sitemap"),
     path("plans/", v.plans_view, name="plans"),
     path("plans/<slug:code>/buy/", v.buy_plan, name="buy_plan"),
     path("pay/click/", v.click_callback, name="click_callback"),
