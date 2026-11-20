@@ -61,3 +61,15 @@ class AboutPageTests(TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r["Content-Type"], "image/png")
         self.assertContains(Client().get(reverse("about")), p.src)
+
+    def test_about_shows_plans_trainers_and_the_map_from_live_data(self):
+        from .models import Plan, Trainer
+        Plan.objects.create(code="ab_m", name="Oylik", price=400000, days=30)
+        Trainer.objects.create(name="Sardor Test", specialty="Kuch", experience_years=3)
+        GymSettings.load()
+        GymSettings.objects.filter(pk=1).update(map_lat="41.293341", map_lng="69.222725")
+        r = Client().get(reverse("about"))
+        self.assertContains(r, "400 000")
+        self.assertContains(r, "Sardor Test")
+        self.assertContains(r, "map-frame")
+        self.assertContains(r, reverse("classes"))

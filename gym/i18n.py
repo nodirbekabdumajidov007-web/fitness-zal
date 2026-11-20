@@ -1025,6 +1025,22 @@ about_title||Zal haqida||О зале||About the gym
 about_photos||Zalimiz rasmlari||Фото нашего зала||Photos of our gym
 about_more||Hammasi||Все||See all
 about_empty||Zal haqida ma'lumot tez orada qo'shiladi.||Информация о зале скоро появится.||Information about the gym will be added soon.
+about_what||Zalda nimalar bor||Что есть в зале||What you get
+about_c1_t||Guruh mashg'ulotlari||Групповые занятия||Group classes
+about_c1_d||Haftalik jadval. Saytdan yoziling: joylar cheklangan.||Недельное расписание. Записывайтесь на сайте: места ограничены.||A weekly timetable. Book on the site: places are limited.
+about_c2_t||Murabbiylar||Тренеры||Trainers
+about_c2_d||Tajribali murabbiylar. Shaxsiy mashg'ulotga saytdan so'rov yuboring.||Опытные тренеры. Запрос на персональную тренировку можно отправить на сайте.||Experienced trainers. Request a personal session on the site.
+about_c3_t||Abonementlar||Абонементы||Memberships
+about_c3_d||1 kunlikdan boshlab turli muddatlar. Kerak bo'lsa abonementni bir marta muzlatish mumkin.||Разные сроки, от 1 дня. При необходимости абонемент можно один раз заморозить.||Different terms from 1 day. A membership can be frozen once if needed.
+about_c4_t||Shaxsiy kabinet||Личный кабинет||Personal account
+about_c4_d||Natijalar, kaloriya hisobi, mashq rejalari va QR a'zo kartasi.||Результаты, подсчёт калорий, планы тренировок и QR-карта участника.||Progress, calorie diary, workout plans and a QR member card.
+about_c5_t||Do'kon||Магазин||Shop
+about_c5_d||Sport ovqatlari va aksessuarlar. O'zbekiston bo'ylab yetkazib berish.||Спортпит и аксессуары. Доставка по всему Узбекистану.||Sports nutrition and accessories. Delivery across Uzbekistan.
+about_c6_t||Sovg'a va mehmon||Подарок и гость||Gifts and guests
+about_c6_d||Abonement yoki summa uchun sovg'a sertifikati. Do'stingizga mehmon taklifnomasi.||Подарочный сертификат на абонемент или сумму. Гостевое приглашение для друга.||A gift certificate for a membership or an amount. A guest pass for a friend.
+about_plans||Abonement narxlari||Цены на абонементы||Membership prices
+about_trainers||Murabbiylarimiz||Наши тренеры||Our trainers
+about_ask||Savolingiz bormi?||Есть вопросы?||Any questions?
 asst_rate||Juda ko'p savol yuborildi. Bir daqiqadan keyin qayta urinib ko'ring.||Слишком много вопросов. Попробуйте через минуту.||Too many questions. Try again in a minute.
 asst_suggest||Shuni so'rab ko'ring:||Попробуйте спросить:||Try asking:
 cal_txt_title||Matn bilan yozish||Записать текстом||Type it in

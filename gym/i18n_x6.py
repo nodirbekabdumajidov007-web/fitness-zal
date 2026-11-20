@@ -336,4 +336,20 @@ about_title||Salon hakkında||Зал жөнүндө||Дар бораи толо�
 about_photos||Salonumuzdan fotoğraflar||Залыбыздын сүрөттөрү||Расмҳои толори мо
 about_more||Tümü||Баары||Ҳама
 about_empty||Salon bilgileri yakında eklenecek.||Зал жөнүндө маалымат жакында кошулат.||Маълумот дар бораи толор ба зудӣ илова мешавад.
+about_what||Salonda neler var||Залда эмнелер бар||Дар толор чӣ ҳаст
+about_c1_t||Grup dersleri||Топтук машыгуулар||Машғулотҳои гурӯҳӣ
+about_c1_d||Haftalık program. Siteden kaydolun: kontenjan sınırlı.||Жумалык жадыбал. Сайттан жазылыңыз: орундар чектелүү.||Ҷадвали ҳафтагӣ. Аз сайт сабт шавед: ҷойҳо маҳдуданд.
+about_c2_t||Antrenörler||Машыктыруучулар||Мураббиён
+about_c2_d||Deneyimli antrenörler. Kişisel seans için siteden istek gönderin.||Тажрыйбалуу машыктыруучулар. Жеке машыгууга сайттан суроо жөнөтүңүз.||Мураббиёни ботаҷриба. Дархости машғулоти шахсиро аз сайт фиристед.
+about_c3_t||Üyelikler||Абонементтер||Обунаҳо
+about_c3_d||1 günden başlayan farklı süreler. Gerekirse üyelik bir kez dondurulabilir.||1 күндөн баштап ар кандай мөөнөт. Керек болсо абонементти бир жолу тоңдурууга болот.||Мӯҳлатҳои гуногун аз 1 рӯз. Дар сурати зарурат обунаро як маротиба ях кардан мумкин аст.
+about_c4_t||Kişisel hesap||Жеке кабинет||Кабинети шахсӣ
+about_c4_d||Sonuçlar, kalori günlüğü, antrenman planları ve QR üye kartı.||Жыйынтыктар, калория эсеби, машыгуу пландары жана QR катышуучу картасы.||Натиҷаҳо, ҳисоби калория, нақшаҳои машқ ва корти QR.
+about_c5_t||Mağaza||Дүкөн||Мағоза
+about_c5_d||Spor besinleri ve aksesuarlar. Özbekistan genelinde teslimat.||Спорт тамактары жана аксессуарлар. Өзбекстан боюнча жеткирүү.||Хӯроки варзишӣ ва лавозимот. Таҳвил дар саросари Ӯзбекистон.
+about_c6_t||Hediye ve misafir||Белек жана конок||Тӯҳфа ва меҳмон
+about_c6_d||Üyelik veya tutar için hediye çeki. Arkadaşınız için misafir daveti.||Абонементке же сумма үчүн белек сертификаты. Досуңузга конок чакыруусу.||Сертификати тӯҳфа барои обуна ё маблағ. Даъватномаи меҳмон барои дӯстатон.
+about_plans||Üyelik fiyatları||Абонемент баалары||Нархи обунаҳо
+about_trainers||Antrenörlerimiz||Биздин машыктыруучулар||Мураббиёни мо
+about_ask||Sorunuz mu var?||Суроо барбы?||Савол доред?
 """

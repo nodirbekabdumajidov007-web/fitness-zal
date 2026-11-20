@@ -7,6 +7,32 @@
   {% if gs.about_text %}<div class="about-text">{{ gs.about_text|linebreaks }}</div>{% else %}<p class="muted">{% t 'about_empty' %}</p>{% endif %}
 </section>
 
+<section class="about-what" aria-labelledby="about-what-h">
+  <h2 id="about-what-h">{% t 'about_what' %}</h2>
+  <div class="about-cards">
+    <a class="card lift" href="{% url 'classes' %}"><i>{% icon 'calendar' %}</i><b>{% t 'about_c1_t' %}</b><span>{% t 'about_c1_d' %}</span></a>
+    <a class="card lift" href="{% url 'trainers' %}"><i>{% icon 'users' %}</i><b>{% t 'about_c2_t' %}</b><span>{% t 'about_c2_d' %}</span></a>
+    <a class="card lift" href="{% url 'plans' %}"><i>{% icon 'ticket' %}</i><b>{% t 'about_c3_t' %}</b><span>{% t 'about_c3_d' %}</span></a>
+    <a class="card lift" href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'register' %}{% endif %}"><i>{% icon 'activity' %}</i><b>{% t 'about_c4_t' %}</b><span>{% t 'about_c4_d' %}</span></a>
+    <a class="card lift" href="{% url 'shop' %}"><i>{% icon 'bag' %}</i><b>{% t 'about_c5_t' %}</b><span>{% t 'about_c5_d' %}</span></a>
+    <a class="card lift" href="{% url 'gift' %}"><i>{% icon 'gift' %}</i><b>{% t 'about_c6_t' %}</b><span>{% t 'about_c6_d' %}</span></a>
+  </div>
+</section>
+
+{% if plans %}
+<section class="about-plans" aria-labelledby="about-plans-h">
+  <h2 id="about-plans-h">{% t 'about_plans' %}</h2>
+  <div class="about-plan-list">{% for p in plans %}<a class="card lift" href="{% url 'plans' %}"><b>{% plan_name p %}</b><span class="num">{{ p.price|money }} {% t 'price_unit' %}</span></a>{% endfor %}</div>
+</section>
+{% endif %}
+
+{% if trainers %}
+<section class="about-trainers" aria-labelledby="about-tr-h">
+  <h2 id="about-tr-h">{% t 'about_trainers' %}</h2>
+  <div class="about-plan-list">{% for t in trainers %}<a class="card lift" href="{% url 'trainers' %}"><b>{{ t.name }}</b><span>{{ t.specialty }}</span></a>{% endfor %}</div>
+</section>
+{% endif %}
+
 {% if photos %}
 <section class="about-gallery" aria-label="{% t 'about_photos' %}">
   <h2>{% t 'about_photos' %}</h2>
@@ -43,5 +69,10 @@
   </div>
 </section>
 {% endif %}
+
+<section class="about-ask card">
+  <b>{% t 'about_ask' %}</b>
+  <div class="inline"><a class="btn pill" href="{% url 'faq' %}">{% t 'faq_title' %}</a><a class="btn pill primary" href="tel:+998{{ gs.phone|cut:' ' }}">{% icon 'phone' %} +998 {{ gs.phone }}</a></div>
+</section>
 {% endblock %}
 {% block scripts %}{% if promo %}<script src="{% vstatic 'js/promo.js' %}" defer></script>{% endif %}{% endblock %}

@@ -1314,7 +1314,9 @@ def about_view(request):
     promo = parse_promo(gs.promo_video_url)
     if promo:
         promo["poster"] = models_image_url("promo", gs) or promo["thumb"]
-    return render(request, "gym/about.html", {"photos": GymPhoto.objects.filter(active=True), "promo": promo, "embed": gs.map_embed})
+    return render(request, "gym/about.html", {"photos": GymPhoto.objects.filter(active=True), "promo": promo, "embed": gs.map_embed,
+                                              "plans": Plan.objects.filter(active=True).order_by("price"),
+                                              "trainers": Trainer.objects.filter(active=True)[:6]})
 
 
 @require_POST

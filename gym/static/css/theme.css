@@ -403,3 +403,13 @@ dialog{border-radius:22px}
 .gal-item:hover img{transform:scale(1.05)}
 .gal-item span{position:absolute;left:0;right:0;bottom:0;padding:18px 12px 9px;color:#fff;font-size:.85rem;font-weight:600;background:linear-gradient(transparent,rgba(0,0,0,.7))}
 .gal-strip .sec-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+
+.about-what,.about-plans,.about-trainers{margin-block:22px}.about-what h2,.about-plans h2,.about-trainers h2{margin:0 0 12px}
+.about-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.about-cards .card{display:grid;gap:6px;align-content:start;text-decoration:none;color:inherit;padding:16px}
+.about-cards .card i{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent)}
+.about-cards .card i .ico{width:22px;height:22px}.about-cards .card b{font-size:1.02rem}.about-cards .card span{color:var(--muted);font-size:.9rem;line-height:1.45}
+.about-plan-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.about-plan-list .card{display:grid;gap:4px;text-decoration:none;color:inherit;padding:14px 16px}.about-plan-list .card span{color:var(--muted)}
+.about-plans .about-plan-list .card .num{color:var(--ink);font-weight:700}
+.about-ask{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-block:22px}
