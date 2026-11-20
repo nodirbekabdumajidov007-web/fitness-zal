@@ -381,3 +381,15 @@ dialog{border-radius:22px}
 .orders-grid .order-card .ord-bottom{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;padding-top:6px}
 .orders-grid .order-card .ord-bottom form{margin:0}
 .orders-grid .order-card .ord-bottom>b.num{margin:0;white-space:nowrap}
+
+/* logo: the full lockup (mark + wordmark) in the header, sidebar and footer; the square tile (logo.png) everywhere else */
+.logo{display:inline-flex;align-items:center}
+.logo-wide{height:42px;width:auto;display:block;flex:none;transition:transform .3s}
+.logo:hover .logo-wide{transform:scale(1.04)}
+.sb-head .logo-wide{height:42px}
+.logo-on-light{display:none}
+:root[data-theme="light"] .logo-on-dark{display:none}:root[data-theme="light"] .logo-on-light{display:block}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .logo-on-dark{display:none}:root:not([data-theme="dark"]) .logo-on-light{display:block}}
+:root[data-theme="dark"] .logo-on-dark{display:block}:root[data-theme="dark"] .logo-on-light{display:none}
+.ft-logo .logo-wide-ft{height:52px;width:auto;display:block}
+.logo-mark{border-radius:22%;box-shadow:0 0 0 1px rgba(255,255,255,.1)}
