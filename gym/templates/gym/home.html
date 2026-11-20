@@ -86,6 +86,12 @@
   </section>
   {% endif %}
 
+  {% if gym_photos %}
+  <section class="gal-strip reveal" aria-label="{% t 'about_photos' %}">
+    <div class="sec-head"><h2>{% t 'about_photos' %}</h2><a class="btn small pill" href="{% url 'about' %}">{% t 'about_more' %} →</a></div>
+    <div class="gal-grid">{% for p in gym_photos %}<a class="gal-item" href="{% url 'about' %}"><img src="{{ p.src }}" alt="{{ p.caption }}" loading="lazy" decoding="async"></a>{% endfor %}</div>
+  </section>
+  {% endif %}
   {% with embed=gs.map_embed %}{% if embed or gs.address %}
   <section class="grid" id="map">
     <div class="sec-head reveal"><span class="eyebrow">04 · {% t 'find_us' %}</span><h2>{% icon 'map-pin' %} {% t 'find_us_title' %}</h2></div>

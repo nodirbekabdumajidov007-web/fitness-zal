@@ -1,0 +1,47 @@
+{% extends "gym/base.html" %}{% load static gym_tags %}
+{% block title %}{% t 'about_title' %}{% endblock %}
+{% block content %}
+<section class="about-hero">
+  <span class="eyebrow">Fitnes Zal</span>
+  <h1>{% t 'about_title' %}</h1>
+  {% if gs.about_text %}<div class="about-text">{{ gs.about_text|linebreaks }}</div>{% else %}<p class="muted">{% t 'about_empty' %}</p>{% endif %}
+</section>
+
+{% if photos %}
+<section class="about-gallery" aria-label="{% t 'about_photos' %}">
+  <h2>{% t 'about_photos' %}</h2>
+  <div class="gal-grid">{% for p in photos %}<a class="gal-item" href="{{ p.src }}" target="_blank" rel="noopener"><img src="{{ p.src }}" alt="{{ p.caption }}" loading="lazy" decoding="async">{% if p.caption %}<span>{{ p.caption }}</span>{% endif %}</a>{% endfor %}</div>
+</section>
+{% endif %}
+
+{% if promo %}
+<section class="promo" aria-labelledby="promo-h">
+  <div class="sec-head"><h2 id="promo-h">{% t 'promo_title' %}</h2></div>
+  <div class="promo-box{% if promo.vertical %} tall{% endif %}" data-promo data-kind="{{ promo.kind }}" data-src="{{ promo.src }}" data-label="{% t 'promo_play' %}">
+    {% if promo.poster %}<img class="promo-poster" src="{{ promo.poster }}" alt="" loading="lazy" decoding="async">{% endif %}
+    <button type="button" class="promo-play" aria-label="{% t 'promo_play' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l11-6.5a1 1 0 0 0 0-1.72l-11-6.5A1 1 0 0 0 8 5.5z"/></svg></button>
+  </div>
+  <noscript><p class="muted"><a href="{{ gs.promo_video_url }}" target="_blank" rel="noopener noreferrer">{% t 'promo_play' %}</a></p></noscript>
+</section>
+{% endif %}
+
+{% if embed or gs.address %}
+<section class="about-where">
+  <h2>{% t 'find_us_title' %}</h2>
+  <div class="map-wrap">
+    {% if embed %}<div class="map-frame"><iframe src="{{ embed }}" title="{% t 'find_us' %}" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe></div>{% endif %}
+    <aside class="card map-info">
+      <h3>Fitnes Zal</h3>
+      <div class="map-lines">
+        {% if gs.address %}<p class="map-line"><i aria-hidden="true">{% icon 'map-pin' %}</i><span>{{ gs.address }}</span></p>{% endif %}
+        <p class="map-line"><i aria-hidden="true">{% icon 'clock' %}</i><span>{{ gs.open_time|hm }}–{{ gs.close_time|hm }} <span class="pill {% if is_open %}good{% else %}bad{% endif %}">{% if is_open %}{% t 'open' %}{% else %}{% t 'closed' %}{% endif %}</span></span></p>
+        <a class="map-line" href="tel:+998{{ gs.phone|cut:' ' }}"><i aria-hidden="true">{% icon 'phone' %}</i><span>+998 {{ gs.phone }}</span></a>
+      </div>
+      {% include "gym/_route.html" %}
+      {% if gs.yandex_map_url %}<a class="btn pill" href="{{ gs.yandex_map_url }}" target="_blank" rel="noopener">{% icon 'map' %} {% t 'open_in_yandex' %}</a>{% endif %}
+    </aside>
+  </div>
+</section>
+{% endif %}
+{% endblock %}
+{% block scripts %}{% if promo %}<script src="{% vstatic 'js/promo.js' %}" defer></script>{% endif %}{% endblock %}

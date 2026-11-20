@@ -33,7 +33,7 @@ from . import click, emailcode, extras, geo, google_auth, services, sms, telegra
 from .media import ranged_file_response, video_embed
 from .forms import AccountForm, BodyLogForm, LoginForm, PasswordForm, PhoneField, ProfileForm, RegisterForm, ReviewForm, find_user, normalize_phone
 from .i18n import LANGS
-from .models import (Announcement, BodyLog, Booking, Category, ClassWaitlist, Exercise, ExerciseLog, GymClass, GymSettings, Membership, MembershipFreeze,
+from .models import (Announcement, BodyLog, Booking, Category, ClassWaitlist, Exercise, ExerciseLog, GymClass, GymPhoto, GymSettings, Membership, MembershipFreeze,
                      Order, Payment, Plan, Product, PTSession, Review, Trainer, User, Visit, WorkoutPlan)
 from .net import client_ip
 from .templatetags.gym_tags import translate
@@ -143,7 +143,7 @@ def home(request):
     if promo:
         promo["poster"] = models_image_url("promo", gs) or promo["thumb"]
     return render(request, "gym/home.html", {
-        "promo": promo,
+        "promo": promo, "gym_photos": list(GymPhoto.objects.filter(active=True)[:6]),
         "crowd": crowd_level(), "next_class": home_next_class(), "cheapest_plan": plans.order_by("price").first(),
         "plans": plans, "trainers": Trainer.objects.filter(active=True)[:3],
         "announcements": Announcement.objects.filter(active=True)[:3],
@@ -525,7 +525,7 @@ def image_view(request, kind, pk):
     """Serves an uploaded product/trainer picture. The type is read from the file's bytes, and the response can never run as a page."""
     from .media import image_type
     model, field = {"product": (Product, "image"), "trainer": (Trainer, "photo"), "avatar": (User, "avatar"),
-                          "promo": (GymSettings, "promo_video_poster")}.get(kind, (None, None))
+                          "promo": (GymSettings, "promo_video_poster"), "gym": (GymPhoto, "image")}.get(kind, (None, None))
     if not model:
         raise Http404()
     obj = get_object_or_404(model, pk=pk)
@@ -1304,6 +1304,17 @@ def _csv_safe(v):
     """A cell that a spreadsheet would read as a formula gets a leading apostrophe."""
     v = str(v)
     return "'" + v if v[:1] in ("=", "+", "-", "@") else v
+
+
+def about_view(request):
+    """"About the gym": the owner's text, a photo gallery, the intro video and where to find the gym (all managed in the admin; empty parts are hidden)."""
+    from .promo_video import parse_promo
+    from .models import image_url as models_image_url
+    gs = GymSettings.load()
+    promo = parse_promo(gs.promo_video_url)
+    if promo:
+        promo["poster"] = models_image_url("promo", gs) or promo["thumb"]
+    return render(request, "gym/about.html", {"photos": GymPhoto.objects.filter(active=True), "promo": promo, "embed": gs.map_embed})
 
 
 @require_POST

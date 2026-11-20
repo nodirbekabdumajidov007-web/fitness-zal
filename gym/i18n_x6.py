@@ -332,4 +332,8 @@ reorder_btn||Tekrar sipariş||Кайра буйрутма||Фармоиши та
 reorder_ok||Ürünler sepete eklendi||Товарлар себетке кошулду||Маҳсулот ба сабад илова шуд
 reorder_partial||Eklendi, ancak bazı ürünler tükendi||Кошулду, бирок кээ бир товарлар түгөнгөн||Илова шуд, аммо баъзе маҳсулот тамом шудааст
 reorder_none||Bu siparişteki ürünler şu an mevcut değil||Бул буйрутмадагы товарлар азыр жок||Маҳсулоти ин фармоиш ҳоло нест
+about_title||Salon hakkında||Зал жөнүндө||Дар бораи толор
+about_photos||Salonumuzdan fotoğraflar||Залыбыздын сүрөттөрү||Расмҳои толори мо
+about_more||Tümü||Баары||Ҳама
+about_empty||Salon bilgileri yakında eklenecek.||Зал жөнүндө маалымат жакында кошулат.||Маълумот дар бораи толор ба зудӣ илова мешавад.
 """

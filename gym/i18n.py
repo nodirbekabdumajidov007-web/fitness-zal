@@ -1021,6 +1021,10 @@ reorder_btn||Qayta buyurtma||Повторить заказ||Order again
 reorder_ok||Mahsulotlar savatga qo'shildi||Товары добавлены в корзину||Items added to the cart
 reorder_partial||Savatga qo'shildi, lekin ba'zi mahsulotlar tugagan yoki sotuvda yo'q||Добавлено, но некоторых товаров нет в наличии||Added, but some items are sold out or unavailable
 reorder_none||Bu buyurtmadagi mahsulotlar hozir mavjud emas||Товаров из этого заказа сейчас нет||The items of this order are not available now
+about_title||Zal haqida||О зале||About the gym
+about_photos||Zalimiz rasmlari||Фото нашего зала||Photos of our gym
+about_more||Hammasi||Все||See all
+about_empty||Zal haqida ma'lumot tez orada qo'shiladi.||Информация о зале скоро появится.||Information about the gym will be added soon.
 asst_rate||Juda ko'p savol yuborildi. Bir daqiqadan keyin qayta urinib ko'ring.||Слишком много вопросов. Попробуйте через минуту.||Too many questions. Try again in a minute.
 asst_suggest||Shuni so'rab ko'ring:||Попробуйте спросить:||Try asking:
 cal_txt_title||Matn bilan yozish||Записать текстом||Type it in

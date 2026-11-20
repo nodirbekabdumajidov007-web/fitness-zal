@@ -116,6 +116,7 @@ urlpatterns = [
     path("shop/<int:pk>/fav/", v.favorite_toggle, name="favorite_toggle"),
     path("shop/favorites/", v.favorites_view, name="favorites"),
     path("trainers/<int:pk>/", v.trainer_detail, name="trainer"),
+    path("about/", v.about_view, name="about"),
     path("plans/", v.plans_view, name="plans"),
     path("plans/<slug:code>/buy/", v.buy_plan, name="buy_plan"),
     path("pay/click/", v.click_callback, name="click_callback"),

@@ -18,7 +18,7 @@ PHONE_VALIDATOR = RegexValidator(r"^\+998\d{9}$", "+998 bilan boshlanib, 9 ta ra
 def image_url(kind, obj):
     """URL of an uploaded picture, with a version so browsers refetch it after a change."""
     import zlib
-    f = {"product": "image", "trainer": "photo", "avatar": "avatar", "promo": "promo_video_poster"}[kind]
+    f = {"product": "image", "trainer": "photo", "avatar": "avatar", "promo": "promo_video_poster", "gym": "image"}[kind]
     f = getattr(obj, f)
     return f"/img/{kind}/{obj.pk}/?v={zlib.crc32(f.name.encode())}" if f else ""
 
@@ -152,6 +152,8 @@ class GymSettings(models.Model):
     telegram = models.URLField("Telegram havola", default="https://t.me/+998908775505",
                                validators=[RegexValidator(r"^https://(t\.me|telegram\.me)/", "Faqat https://t.me/... havolasi")])
     address = models.CharField("Manzil", max_length=200, blank=True)
+    about_text = models.TextField("Zal haqida (matn)", max_length=3000, blank=True,
+                                  help_text="«Zal haqida» sahifasida ko'rinadi: zal tarixi, jihozlari, afzalliklari. Bo'sh qatordan yangi abzas boshlanadi.")
     freeze_min_days = models.PositiveSmallIntegerField("Muzlatish: bir martada eng kam kun", default=7)
     freeze_max_days = models.PositiveSmallIntegerField("Muzlatish: bitta abonement uchun jami eng ko'p kun (0 = o'chirilgan)", default=30)
     class_cancel_hours = models.PositiveSmallIntegerField("Bronni bekor qilish: mashg'ulotdan necha soat oldin gacha", default=2)
@@ -647,6 +649,26 @@ class Visit(models.Model):
         ordering = ["-ts"]
         verbose_name, verbose_name_plural = "Tashrif", "Tashriflar"
         indexes = [models.Index(fields=["ts"], name="visit_ts_idx"), models.Index(fields=["user", "ts"], name="visit_user_ts_idx")]
+
+
+class GymPhoto(models.Model):
+    """A photo of the gym for the gallery of the "About the gym" page and the home page."""
+    image = models.FileField("Rasm (jpg, png, webp)", upload_to="gym/", validators=[validate_image])
+    caption = models.CharField("Izoh", max_length=80, blank=True)
+    order = models.PositiveSmallIntegerField("Tartib", default=0)
+    active = models.BooleanField("Ko'rsatilsin", default=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["order", "-id"]
+        verbose_name, verbose_name_plural = "Zal rasmi", "Zal rasmlari"
+
+    def __str__(self):
+        return self.caption or f"Rasm #{self.pk}"
+
+    @property
+    def src(self):
+        return image_url("gym", self)
 
 
 class Trainer(models.Model):

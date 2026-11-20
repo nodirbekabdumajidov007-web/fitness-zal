@@ -9,7 +9,7 @@ from django.utils.safestring import mark_safe
 
 from . import extras, services, telegram
 from .models_tracker import TrackerGoal, WorkoutSession
-from .models import (Announcement, BodyLog, Booking, Category, ChatMessage, ChatReport, Exercise, GymClass, GymSettings, Membership, Order, OrderItem, Payment, PaymentCard, Plan,
+from .models import (Announcement, BodyLog, Booking, Category, ChatMessage, ChatReport, Exercise, GymClass, GymPhoto, GymSettings, Membership, Order, OrderItem, Payment, PaymentCard, Plan,
                      AdminQuery, ClassWaitlist, EntryLog, FaqItem, GiftCertificate, GuestPass, LegalPage, MembershipFreeze, ReferralReward, TrainerReview,
                      AIMessage, FoodEntry, Notification, PersonalRecord, Product, PromoCode, PTSession, PushSubscription, Review, Trainer, User, UserFood, Visit, WorkoutPlan)
 
@@ -445,7 +445,7 @@ GOOGLE_HELP = mark_safe(
 @admin.register(GymSettings)
 class GymSettingsAdmin(admin.ModelAdmin):
     fieldsets = (
-        ("Zal", {"fields": (("open_time", "close_time"), "phone", "address", "instagram", "telegram", "telegram_bot")}),
+        ("Zal", {"fields": (("open_time", "close_time"), "phone", "address", "about_text", "instagram", "telegram", "telegram_bot")}),
         ("Bosh sahifa ko'rinishi", {"fields": ("hero_video",)}),
         ("Bosh sahifa: tanishuv videosi", {"fields": ("promo_video_url", "promo_video_poster"),
                                           "description": "Zal haqida qisqa video. Havolani qo'ying: YouTube (youtube.com/watch?v=..., /shorts/... yoki youtu.be/...), "
@@ -691,6 +691,19 @@ class PersonalRecordAdmin(admin.ModelAdmin):
     @admin.display(description="1RM ≈")
     def rm(self, o):
         return o.one_rm
+
+
+@admin.register(GymPhoto)
+class GymPhotoAdmin(admin.ModelAdmin):
+    """Photos of the gym: shown on the «Zal haqida» page and as a strip on the home page. Order: smaller number first."""
+    list_display = ("thumb", "caption", "order", "active")
+    list_display_links = ("thumb", "caption")
+    list_editable = ("order", "active")
+    list_filter = ("active",)
+
+    @admin.display(description="Rasm")
+    def thumb(self, p):
+        return format_html('<img src="{}" alt="" style="height:44px;border-radius:6px">', p.src) if p.image else "-"
 
 
 @admin.register(Trainer)
