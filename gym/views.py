@@ -11,6 +11,7 @@ from django import forms
 from django.conf import settings as dj
 from django.contrib import messages
 from django.contrib.auth import views as auth_views
+from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
@@ -154,8 +155,17 @@ def home(request):
     })
 
 
+class AnyAccountResetForm(PasswordResetForm):
+    """Django's reset form also finds accounts that have no password yet (signed up with Google): the link lets them choose one."""
+    def get_users(self, email):
+        field = User.get_email_field_name()
+        return (u for u in User._default_manager.filter(**{f"{field}__iexact": email, "is_active": True}) if getattr(u, field))
+
+
 class LangPasswordResetView(auth_views.PasswordResetView):
     """Django's reset view, but the e-mail is written in the language the visitor uses on the site."""
+    form_class = AnyAccountResetForm
+
     def form_valid(self, form):
         self.extra_email_context = {"lang": getattr(self.request, "lang", "uz")}
         return super().form_valid(form)
