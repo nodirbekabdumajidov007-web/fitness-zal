@@ -1,6 +1,6 @@
 from unittest import mock
 
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 
 from . import llm
 
@@ -192,3 +192,26 @@ class SecondServiceTests(TestCase):
                            LLM2_BASE_URL="https://s.example/v1", LLM2_API_KEY="k", LLM2_MODEL="m"), \
                 mock.patch("gym.llm._post", return_value={"choices": [{"message": {"content": "Bor"}}]}):
             self.assertEqual(llm.ask("salom"), "Bor")
+
+
+class ExtraSlotsTests(TestCase):
+    def test_third_and_fourth_services_are_used_in_order(self):
+        from unittest import mock
+        from django.core.cache import cache
+        from . import llm
+        cache.clear()
+        cfg = dict(GEMINI_API_KEY="", ANTHROPIC_API_KEY="", LLM_API_KEY="", LLM2_API_KEY="",
+                   LLM3_BASE_URL="https://a.test/v1", LLM3_API_KEY="k3", LLM3_MODEL="m3",
+                   LLM4_BASE_URL="https://b.test/v1", LLM4_API_KEY="k4", LLM4_MODEL="m4")
+        with override_settings(**cfg):
+            self.assertTrue(llm.enabled())
+            seen = []
+
+            def fake(url, body, headers, timeout):
+                seen.append(url)
+                if "a.test" in url:
+                    raise OSError("down")
+                return {"choices": [{"message": {"content": "salom"}}]}
+            with mock.patch.object(llm, "_post", fake):
+                self.assertEqual(llm.ask("hi"), "salom")
+        self.assertTrue(seen[0].startswith("https://a.test") and seen[-1].startswith("https://b.test"))

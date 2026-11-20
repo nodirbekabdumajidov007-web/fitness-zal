@@ -58,6 +58,9 @@ def _cfg(n, name):
     return getattr(settings, f"LLM{n}_{name}", "")
 
 
+COMPAT_SLOTS = ("", "2", "3", "4")  # up to four OpenAI-compatible services: LLM_*, LLM2_*, LLM3_*, LLM4_*
+
+
 def _compat_ready(n=""):
     """An OpenAI-compatible service is configured: LLM_* (first) or LLM2_* (second) base url, key and model are all set."""
     return bool(_cfg(n, "API_KEY") and _cfg(n, "BASE_URL") and _cfg(n, "MODEL"))
@@ -89,7 +92,7 @@ def split_meal(text):
 
 
 def enabled():
-    return bool(getattr(settings, "GEMINI_API_KEY", "") or getattr(settings, "ANTHROPIC_API_KEY", "") or _compat_ready() or _compat_ready("2"))
+    return bool(getattr(settings, "GEMINI_API_KEY", "") or getattr(settings, "ANTHROPIC_API_KEY", "") or any(_compat_ready(n) for n in COMPAT_SLOTS))
 
 
 def image_part(data, media_type):
@@ -173,10 +176,11 @@ def ask(question, lang="uz", facts="", history=(), image=None, timeout=20):
     history: [(role, text)] of the last chat lines, oldest first; image: an `image_part()` block or None."""
     question = (question or "").strip()[:1500] or "?"
     turns = _turns(history)
-    chain = (("GEMINI_API_KEY", _gemini), ("LLM_API_KEY", lambda *a: _compat(*a, n="")), ("LLM2_API_KEY", lambda *a: _compat(*a, n="2")),
-             ("ANTHROPIC_API_KEY", _claude))
+    chain = [("GEMINI_API_KEY", _gemini)]
+    chain += [(f"LLM{n}_API_KEY", (lambda *a, n=n: _compat(*a, n=n))) for n in COMPAT_SLOTS]
+    chain.append(("ANTHROPIC_API_KEY", _claude))
     for key, fn in chain:
-        n = "2" if key == "LLM2_API_KEY" else ""
+        n = key[3:-8] if key.startswith("LLM") else ""
         if not getattr(settings, key, "") or (key.startswith("LLM") and not _compat_ready(n)) or cache.get(f"llm:skip:{key}"):
             continue
         for attempt in (1, 2):  # a busy provider (503 / 429) or a slow answer is tried once more

@@ -182,6 +182,9 @@ LLM_MODEL = os.environ.get("LLM_MODEL", "").strip()
 LLM2_BASE_URL = os.environ.get("LLM2_BASE_URL", "").strip()  # a second OpenAI-compatible service, tried after the first
 LLM2_API_KEY = os.environ.get("LLM2_API_KEY", "").strip()
 LLM2_MODEL = os.environ.get("LLM2_MODEL", "").strip()
+for _n in ("3", "4"):  # more OpenAI-compatible services, tried in order after the first two
+    for _k in ("BASE_URL", "API_KEY", "MODEL"):
+        globals()[f"LLM{_n}_{_k}"] = os.environ.get(f"LLM{_n}_{_k}", "").strip()
 
 # logging: console always, a rotating file when FZ_LOG_DIR is set, Telegram alerts for errors when a bot token + admin chat are configured
 _handlers = {

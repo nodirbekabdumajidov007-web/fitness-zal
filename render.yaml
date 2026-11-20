@@ -31,6 +31,18 @@ services:
         sync: false
       - key: LLM2_MODEL
         sync: false
+      - key: LLM3_BASE_URL
+        sync: false
+      - key: LLM3_API_KEY
+        sync: false
+      - key: LLM3_MODEL
+        sync: false
+      - key: LLM4_BASE_URL
+        sync: false
+      - key: LLM4_API_KEY
+        sync: false
+      - key: LLM4_MODEL
+        sync: false
       - key: ANTHROPIC_API_KEY      # console.anthropic.com -> API keys; enables free questions and photos in the coach chat
         sync: false
       - key: CLOUDINARY_URL         # cloudinary://API_KEY:API_SECRET@CLOUD_NAME (cloudinary.com -> Dashboard -> API environment variable)
