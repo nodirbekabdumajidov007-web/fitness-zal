@@ -10,8 +10,17 @@ from .models import GymSettings, Product
 # pages that belong to a signed-in member, the staff or a half-finished flow: not for the search index
 PRIVATE = ("/django-admin/", "/dashboard/", "/account/", "/cart/", "/checkout/", "/orders/", "/payments/", "/pay/", "/receipt/", "/card/", "/chat/", "/inbox/",
            "/progress/", "/calories/", "/workouts/", "/records/", "/coach/", "/courier/", "/login/", "/register/", "/forgot/", "/reset/", "/password/",
-           "/verify/", "/auth/", "/assistant/", "/ai/", "/support/", "/gift/", "/delivery/", "/export/")
+           "/verify/", "/auth/", "/healthz", "/assistant/", "/ai/", "/support/", "/gift/", "/delivery/", "/export/")
 PUBLIC_NAMES = ("home", "about", "plans", "classes", "trainers", "shop", "reviews", "faq", "tools", "app_download", "oferta", "privacy", "refund")
+
+
+def healthz(request):
+    """For uptime monitors and the host's health check: 200 when the app answers and the database is reachable, 503 otherwise. No private data."""
+    try:
+        GymSettings.objects.exists()
+    except Exception:
+        return HttpResponse("db down", status=503, content_type="text/plain")
+    return HttpResponse("ok", content_type="text/plain")
 
 
 def site_root(request):

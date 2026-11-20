@@ -81,3 +81,10 @@ class ErrorPageTests(TestCase):
         h = Client().get("/").content.decode()
         self.assertIn('class="skip-link" href="#main"', h)
         self.assertIn('id="main"', h)
+
+
+class HealthTests(TestCase):
+    def test_healthz_answers_without_login_and_is_not_indexed(self):
+        r = Client().get("/healthz")
+        self.assertEqual((r.status_code, r.content), (200, b"ok"))
+        self.assertIn("Disallow: /healthz", Client().get("/robots.txt").content.decode())

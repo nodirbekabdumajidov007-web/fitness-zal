@@ -5,6 +5,7 @@ services:
     name: fitnes-zal
     runtime: python
     buildCommand: "bash build.sh"   # works even when the file lost its executable bit (e.g. uploaded through GitHub's website)
+    healthCheckPath: /healthz
     startCommand: "uvicorn config.asgi:application --host 0.0.0.0 --port $PORT"
     envVars:
       - key: DJANGO_DEBUG

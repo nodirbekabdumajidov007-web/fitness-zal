@@ -120,6 +120,7 @@ urlpatterns = [
     path("trainers/<int:pk>/", v.trainer_detail, name="trainer"),
     path("about/", v.about_view, name="about"),
     path("robots.txt", seo.robots, name="robots"),
+    path("healthz", seo.healthz, name="healthz"),
     path("sitemap.xml", seo.sitemap, name="sitemap"),
     path("plans/", v.plans_view, name="plans"),
     path("plans/<slug:code>/buy/", v.buy_plan, name="buy_plan"),
