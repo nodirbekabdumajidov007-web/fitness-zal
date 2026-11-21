@@ -441,3 +441,9 @@ dialog{border-radius:22px}
 .m-vbar i{display:block;height:100%;width:0;background:currentColor;border-radius:3px}
 .m-vtime{font-size:.82rem;opacity:.85;min-width:2.4em;text-align:right}
 @media (prefers-reduced-motion:reduce){.m-rec-dot{animation:none}}
+
+/* Telegram button: between the chat button (below) and the back-to-top button (above) */
+.tg-fab{position:fixed;right:21px;bottom:calc(var(--vb) + 64px);z-index:30;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#229ED9;color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.3);transition:transform .2s}
+.tg-fab:hover{transform:translateY(-3px)}.tg-fab svg{width:24px;height:24px}
+@media (max-width:900px){.tg-fab{right:17px}}
+.totop{margin-bottom:116px!important}

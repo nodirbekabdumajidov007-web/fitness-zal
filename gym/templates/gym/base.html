@@ -208,6 +208,7 @@
 </footer>
 
 {% if messages %}<div class="msgs" role="status">{% for m in messages %}<div class="msg {{ m.level_tag }}{% if "celebrate" in m.extra_tags %} celebrate{% endif %}">{{ m }}</div>{% endfor %}</div>{% endif %}
+{% if gs.telegram and not no_widget %}<a class="tg-fab" href="{{ gs.telegram }}" target="_blank" rel="noopener" aria-label="Telegram" title="Telegram"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M5.4 11.9l11.2-4.3c.5-.2 1 .1.8.9l-1.9 9c-.1.6-.5.8-1 .5l-2.9-2.1-1.4 1.3c-.2.2-.3.3-.6.3l.2-3 5.4-4.9c.2-.2 0-.3-.4-.1l-6.7 4.2-2.9-.9c-.6-.2-.6-.6.100-.9z"/></svg></a>{% endif %}
 <button type="button" class="totop" id="totop" aria-label="{% t 'back_top' %}" title="{% t 'back_top' %}" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 {% include "gym/_voice.html" %}
 {% if not no_widget %}{% include "gym/_support.html" %}{% endif %}

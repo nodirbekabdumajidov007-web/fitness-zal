@@ -88,3 +88,15 @@ class HealthTests(TestCase):
         r = Client().get("/healthz")
         self.assertEqual((r.status_code, r.content), (200, b"ok"))
         self.assertIn("Disallow: /healthz", Client().get("/robots.txt").content.decode())
+
+
+class TelegramButtonTests(TestCase):
+    def test_floating_telegram_button_links_to_the_gym_channel(self):
+        from .models import GymSettings
+        gs = GymSettings.load()
+        gs.telegram = "https://t.me/fitneszal_test"
+        gs.save()
+        self.assertIn('class="tg-fab" href="https://t.me/fitneszal_test"', Client().get("/plans/").content.decode())
+        gs.telegram = ""
+        gs.save()
+        self.assertNotIn("tg-fab", Client().get("/plans/").content.decode())
