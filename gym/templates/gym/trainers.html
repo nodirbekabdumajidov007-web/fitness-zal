@@ -1,7 +1,7 @@
 {% extends "gym/base.html" %}{% load static gym_tags %}
 {% block title %}{% t 'trainers' %}{% endblock %}
 {% block content %}
-<h2>{% t 'trainers' %}</h2>
+<h1>{% t 'trainers' %}</h1>
 {% if sessions %}
 <div class="card grid"><h3>{% t 'pt_mine' %}</h3>
   {% for s in sessions %}<div class="cls"><span><b>{{ s.trainer.name }}</b> <span class="muted num">· {{ s.starts|dmyhm }}</span></span>

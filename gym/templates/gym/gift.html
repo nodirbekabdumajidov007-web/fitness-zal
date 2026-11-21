@@ -1,7 +1,7 @@
 {% extends "gym/base.html" %}{% load gym_tags %}
 {% block title %}{% t 'gift_title' %}{% endblock %}
 {% block content %}
-<h2>{% icon 'gift' %} {% t 'gift_title' %}</h2>
+<h1>{% icon 'gift' %} {% t 'gift_title' %}</h1>
 <div class="grid g2" style="align-items:start">
   <form class="card grid" method="post" action="{% url 'gift_buy' %}">{% csrf_token %}
     <h3>{% t 'gift_buy_title' %}</h3>

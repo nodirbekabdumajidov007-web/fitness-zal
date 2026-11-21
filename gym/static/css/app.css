@@ -1730,7 +1730,7 @@ a.map-line:hover>i,.ft-contact p:hover>i{transform:rotate(-8deg) scale(1.1);back
 
 /* ---------- calorie tracker ---------- */
 .cal{display:grid;gap:16px}
-.cal-top{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap}.cal-top h2,.cal-top p{margin:0}
+.cal-top{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap}.cal-top h1,.cal-top h2,.cal-top p{margin:0}
 .cal-days{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.cal-day{font-weight:800;padding:0 6px}.cal-days .off{opacity:.35}
 .cal-sum{display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:center}
 .cal-ring{--p:0;width:170px;height:170px;border-radius:50%;display:grid;place-items:center;

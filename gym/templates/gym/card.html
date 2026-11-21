@@ -1,6 +1,6 @@
 {% extends "gym/base.html" %}{% load gym_tags %}
 {% block title %}{% t 'member_card' %}{% endblock %}
-{% block content %}
+{% block content %}<h1 class="sr-only">{% t 'member_card' %}</h1>
 {% include "gym/_member_hero.html" with active="card" %}
 <div class="qr-page">
   <div class="seg qr-mode" role="tablist">

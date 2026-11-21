@@ -1,6 +1,6 @@
 {% extends "gym/base.html" %}{% load static gym_tags %}
 {% block title %}{% if other %}{{ other_name }}{% else %}{% t 'room_general' %}{% endif %} · {% t 'chat' %}{% endblock %}
-{% block content %}
+{% block content %}<h1 class="sr-only">{% if other %}{{ other_name }}{% else %}{% t 'room_general' %}{% endif %} · {% t 'chat' %}</h1>
 <section class="messenger{% if room.kind == 'room' %} is-room{% endif %}">
   <header class="m-head">
     <a class="m-back" href="{% url 'chat' %}" aria-label="{% t 'chat' %}">←</a>

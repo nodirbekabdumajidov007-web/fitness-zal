@@ -2,7 +2,7 @@
 {% block title %}{% t 'verify_phone' %}{% endblock %}
 {% block content %}
 <div class="card grid" style="max-width:460px;margin-inline:auto;width:100%">
-  <h2>{% t 'verify_phone' %}</h2>
+  <h1>{% t 'verify_phone' %}</h1>
   <p class="muted" style="margin:0">{% t 'verify_help' %} <b class="num">{{ user.phone }}</b></p>
   <form method="post">{% csrf_token %}<input type="hidden" name="action" value="send"><button class="btn" type="submit">{% t 'send_code' %}</button></form>
   <form class="grid" method="post" novalidate>

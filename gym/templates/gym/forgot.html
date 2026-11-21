@@ -3,7 +3,7 @@
 {% block content %}
 <form class="card grid" method="post" novalidate style="max-width:460px;margin-inline:auto;width:100%">
   {% csrf_token %}
-  <h2>{% t 'forgot' %}</h2>
+  <h1>{% t 'forgot' %}</h1>
   <p class="muted" style="margin:0">{% t 'forgot_help' %}</p>
   <label for="id_phone">{% t 'phone' %}<div class="phone"><span>+998</span><input id="id_phone" name="phone" inputmode="numeric" autocomplete="tel-national" placeholder="XX XXX XX XX" maxlength="17" value="{{ form.phone.value|default:'' }}" data-phone></div></label>
   {% for e in form.phone.errors %}<span class="field-err">{% t e %}</span>{% endfor %}

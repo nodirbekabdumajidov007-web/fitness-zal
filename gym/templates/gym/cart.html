@@ -1,7 +1,7 @@
 {% extends "gym/base.html" %}{% load static gym_tags %}
 {% block title %}{% t 'cart' %}{% endblock %}
 {% block content %}
-<h2>{% t 'cart' %}</h2>
+<h1>{% t 'cart' %}</h1>
 <div id="cart-page"{% if not items %} hidden{% endif %}>
   <div class="grid" style="grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:18px;align-items:start" id="cart-layout">
     <div class="cart-lines">

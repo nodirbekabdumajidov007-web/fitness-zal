@@ -1,7 +1,7 @@
 {% extends "gym/base.html" %}{% load gym_tags %}
 {% block title %}{% t 'payments' %}{% endblock %}
 {% block content %}
-<div class="inline" style="align-items:center;justify-content:space-between"><h2>{% t 'payments' %}</h2>
+<div class="inline" style="align-items:center;justify-content:space-between"><h1>{% t 'payments' %}</h1>
   {% if payments %}<a class="btn" href="?{% if status %}status={{ status }}&amp;{% endif %}export=csv">{% icon 'download' %} {% t 'pay_export' %}</a>{% endif %}</div>
 {% if paid_n %}
 <div class="grid g3 pay-kpis">

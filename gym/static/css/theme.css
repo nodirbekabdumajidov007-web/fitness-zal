@@ -447,3 +447,43 @@ dialog{border-radius:22px}
 .tg-fab:hover{transform:translateY(-3px)}.tg-fab svg{width:100%;height:100%;display:block}
 .totop{right:24px!important;width:44px!important;height:44px!important;margin-bottom:118px!important}
 @media (max-width:639.98px){.tg-fab{right:19px}.totop{right:20px!important}}
+
+/* phones: one compact header row instead of two (the bottom tab bar already has the menu button) */
+@media (max-width:639.98px){
+  header.top .navtoggle{display:none}
+  header.top .top-row{flex-wrap:nowrap;gap:8px;padding-block:8px;min-height:56px}
+  header.top .top-row>.logo{flex:0 1 auto;min-width:0;margin-right:auto}
+  header.top .top-row>.logo img{height:28px;width:auto;max-width:100%}
+  header.top .top-hours{flex:none;padding:4px 9px;font-size:.72rem;gap:6px}
+  header.top .top-hours .ph{display:none}
+  header.top .tools{gap:6px;flex:none}
+  header.top .langpick .lp-code,header.top .langpick .lp-caret,header.top .usermenu .lp-caret{display:none}
+  header.top .langpick summary{padding:4px 7px;min-height:36px}
+  header.top .usermenu{padding-left:0;margin-left:0;border-left:0}
+  header.top .usermenu summary{padding:2px;min-height:36px}
+  header.top .daynight{transform:scale(.92);transform-origin:center}
+}
+@media (max-width:380px){
+  header.top .top-hours{padding:0;width:26px;height:26px;justify-content:center;border-radius:50%}
+  header.top .top-hours .pill-st{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+}
+
+@media (max-width:639.98px){
+  header.top .hdr-login{display:none}  /* the tab bar has «Kirish» */
+  header.top .top-row>.logo{flex:none}
+}
+@media (max-width:380px){
+  header.top .top-row>.logo img{height:24px}
+  header.top .tools .hdr-reg{padding-inline:10px;font-size:.78rem}
+}
+@media (max-width:340px){header.top .daynight{display:none}}
+@media (max-width:639.98px){header.top:has(.hdr-reg) .daynight{display:none}}  /* signed-out phones: the theme follows the OS; room for «Ro'yxatdan o'tish» */
+
+/* home counters: an odd last tile fills the row on phones (no empty cell) */
+@media (max-width:639.98px){.counters>div:last-child:nth-child(odd){grid-column:1/-1}}
+/* chat: avatar initials and member names readable on every hue, in both themes */
+.m-ava:not(.room):not(.big){background-color:hsl(var(--h,210) 50% 36%)}
+:root[data-theme="dark"] .m-name{color:hsl(var(--h,210) 70% 72%)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .m-name{color:hsl(var(--h,210) 70% 72%)}}
+/* sidebar group captions were 10px */
+.sb-cap,.sb-cap .sb-fold{font-size:11.5px}

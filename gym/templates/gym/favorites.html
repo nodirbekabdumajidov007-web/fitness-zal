@@ -1,7 +1,7 @@
 {% extends "gym/base.html" %}{% load static gym_tags %}
 {% block title %}{% t 'fav_title' %}{% endblock %}
 {% block content %}
-<div class="inline" style="align-items:center;justify-content:space-between"><h2>{% t 'fav_title' %}</h2><a class="btn" href="{% url 'shop' %}">{% t 'shop' %}</a></div>
+<div class="inline" style="align-items:center;justify-content:space-between"><h1>{% t 'fav_title' %}</h1><a class="btn" href="{% url 'shop' %}">{% t 'shop' %}</a></div>
 <div class="grid g4">
   {% for p in products %}
   {% include "gym/_prodcard.html" %}

@@ -5,7 +5,7 @@
 <div class="grid g2" style="align-items:start">
   <div class="card trainer-hero" data-px="22">{% if tr.image_src %}<img data-fallback="{% static 'img/trainer.svg' %}" src="{{ tr.image_src }}" alt="{{ tr.name }}" referrerpolicy="no-referrer">{% else %}<img src="{% static 'img/trainer.svg' %}" alt="">{% endif %}<span class="px-name"><b>{{ tr.name }}</b><small>{{ tr.specialty }}</small></span></div>
   <div class="grid" style="align-content:start">
-    <h2>{{ tr.name }}</h2>
+    <h1>{{ tr.name }}</h1>
     <div class="chips"><span class="pill mute">{{ tr.specialty }}</span><span class="pill mute">{{ tr.experience_years }} {% t 'years_exp' %}</span>
       {% if tr.pt_price %}<span class="pill good num">{% t 'pt' %}: {{ tr.pt_price|money }} {% t 'price_unit' %}</span>{% endif %}</div>
     {% if tr.bio %}<p style="margin:0;white-space:pre-line">{{ tr.bio }}</p>{% endif %}

@@ -37,7 +37,7 @@
   <div class="top-row">
     <button type="button" class="navtoggle" data-sb-open aria-controls="sidebar" aria-expanded="false" aria-label="{% t 'nav_menu' %}">{% icon 'menu' %}</button>
     <a class="logo" href="{% url 'home' %}" aria-label="Fitnes Zal"><img class="logo-wide logo-on-dark" src="{% vstatic 'img/logo-wide-dark.png' %}" alt="Fitnes Zal" width="737" height="220"><img class="logo-wide logo-on-light" src="{% vstatic 'img/logo-wide-light.png' %}" alt="" width="737" height="220"></a>
-    <span class="pill {% if is_open %}good{% else %}bad{% endif %}"><i class="dot"></i>{% if is_open %}{% t 'open' %}{% else %}{% t 'closed' %}{% endif %} · {{ gs.open_time|hm }}–{{ gs.close_time|hm }}</span>
+    <span class="pill top-hours {% if is_open %}good{% else %}bad{% endif %}"><i class="dot"></i><span class="pill-st">{% if is_open %}{% t 'open' %}{% else %}{% t 'closed' %}{% endif %}</span><span class="ph"> · {{ gs.open_time|hm }}–{{ gs.close_time|hm }}</span></span>
     <div class="tools">
       <details class="langpick">
         <summary aria-label="{% t 'language' %}">{% include "gym/_flag.html" with code=lang uid="cur" %}<span class="lp-code">{{ lang|upper }}</span><i class="lp-caret" aria-hidden="true"></i></summary>
@@ -87,8 +87,8 @@
           </div>
         </details>
       {% else %}
-        <a class="btn small" href="{% url 'login' %}">{% t 'login' %}</a>
-        <a class="btn small primary" href="{% url 'register' %}">{% t 'register' %}</a>
+        <a class="btn small hdr-login" href="{% url 'login' %}">{% t 'login' %}</a>
+        <a class="btn small primary hdr-reg" href="{% url 'register' %}">{% t 'register' %}</a>
       {% endif %}
     </div>
   </div>

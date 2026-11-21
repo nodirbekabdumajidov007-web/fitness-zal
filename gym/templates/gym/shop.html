@@ -1,7 +1,7 @@
 {% extends "gym/base.html" %}{% load static gym_tags %}
 {% block title %}{% t 'shop' %}{% endblock %}
 {% block content %}
-<div class="inline" style="align-items:center;justify-content:space-between"><h2>{% t 'shop' %}</h2><span class="inline" style="flex:none;gap:8px">{% if user.is_authenticated %}<a class="btn" href="{% url 'favorites' %}">{% icon 'heart' %} {% t 'fav_title' %}{% if fav_count %} ({{ fav_count }}){% endif %}</a>{% endif %}<a class="btn primary" href="{% url 'cart' %}">{% t 'cart' %}{% if cart_count %} ({{ cart_count }}){% endif %}</a></span></div>
+<div class="inline" style="align-items:center;justify-content:space-between"><h1>{% t 'shop' %}</h1><span class="inline" style="flex:none;gap:8px">{% if user.is_authenticated %}<a class="btn" href="{% url 'favorites' %}">{% icon 'heart' %} {% t 'fav_title' %}{% if fav_count %} ({{ fav_count }}){% endif %}</a>{% endif %}<a class="btn primary" href="{% url 'cart' %}">{% t 'cart' %}{% if cart_count %} ({{ cart_count }}){% endif %}</a></span></div>
 <div class="chips">
   <a href="{% url 'shop' %}"{% if not cat %} aria-current="true"{% endif %}>{% t 'all' %}</a>
   {% for c in categories %}<a href="?cat={{ c.pk }}{% if q %}&amp;q={{ q|urlencode }}{% endif %}"{% if cat == c.pk|stringformat:"s" %} aria-current="true"{% endif %}>{{ c.name }}</a>{% endfor %}

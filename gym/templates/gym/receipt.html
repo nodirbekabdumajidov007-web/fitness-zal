@@ -1,6 +1,6 @@
 {% extends "gym/base.html" %}{% load gym_tags %}
 {% block title %}{% t 'receipt' %} #{{ p.pk }}{% endblock %}
-{% block content %}
+{% block content %}<h1 class="sr-only">{% t 'receipt' %} #{{ p.pk }}</h1>
 <div class="receipt grid">
   <div class="inline" style="align-items:center"><h3 style="color:#111">FITNES.ZAL</h3><span class="num" style="flex:none">{% t 'receipt' %} #{{ p.pk }}</span></div>
   <table>

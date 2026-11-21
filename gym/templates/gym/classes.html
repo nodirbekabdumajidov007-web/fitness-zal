@@ -1,7 +1,7 @@
 {% extends "gym/base.html" %}{% load gym_tags %}
 {% block title %}{% t 'classes' %}{% endblock %}
 {% block content %}
-<h2>{% t 'classes' %}</h2>
+<h1>{% t 'classes' %}</h1>
 {% if limited %}<div class="note warn">{% t 'noshow_limited' n=noshows %}</div>{% endif %}
 {% if cal_url %}<details class="card"><summary>{% icon 'calendar' %} {% t 'cal_title' %}</summary>
   <p class="muted">{% t 'cal_help' %}</p>

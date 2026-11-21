@@ -1,7 +1,7 @@
 {% extends "gym/base.html" %}{% load gym_tags %}
 {% block title %}{% t 'nav_plans' %}{% endblock %}
 {% block content %}
-<h2>{% t 'nav_plans' %}</h2>
+<h1>{% t 'nav_plans' %}</h1>
 {% if renew %}<div class="note info">{% t 'renew_note' %}</div>{% endif %}
 {% if welcome_pct %}<div class="note info">{% t 'welcome_disc' pct=welcome_pct %}</div>{% endif %}
 <div class="grid g3">

@@ -3,7 +3,7 @@
 {% block content %}
 <div class="cal">
   <div class="cal-top">
-    <div><h2>{% icon 'flame' %} {% t 'nav_calories' %}</h2><p class="muted">{% t 'cal_sub' %}</p></div>
+    <div><h1>{% icon 'flame' %} {% t 'nav_calories' %}</h1><p class="muted">{% t 'cal_sub' %}</p></div>
     <nav class="cal-days" aria-label="{% t 'date' %}">
       <a class="btn small" href="?d={{ prev_day|date:'Y-m-d' }}" aria-label="←">←</a>
       <span class="cal-day num">{% if is_today %}{% t 'cal_today' %} · {% endif %}{{ day|date:"d.m.Y" }}</span>
