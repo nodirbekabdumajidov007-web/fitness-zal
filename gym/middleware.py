@@ -71,3 +71,21 @@ class CspMiddleware:
             host = request.get_host()  # live chat may open a socket back to this same host only
             response.headers.setdefault("Content-Security-Policy", CSP.replace("connect-src 'self'", f"connect-src 'self' ws://{host} wss://{host}"))
         return response
+
+
+class GymSettingsCacheMiddleware:
+    """Lets GymSettings.load() read the settings row once per request instead of once per call."""
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        from .models import GS_REQUEST_CACHE
+        token = GS_REQUEST_CACHE.set({"obj": None})
+        try:
+            return self.get_response(request)
+        finally:
+            try:
+                GS_REQUEST_CACHE.reset(token)
+            except ValueError:  # reset from another context: the box dies with the request anyway
+                pass

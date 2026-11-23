@@ -172,6 +172,17 @@ def active_at(instant):
     return (Membership.objects.filter(user__is_superuser=False, starts__lte=instant, expires__gt=instant).values("user").distinct().count())
 
 
+def actives_at(instants):
+    """active_at() for many instants with one query: the memberships that overlap the whole span, counted in Python."""
+    from .models import Membership
+    instants = list(instants)
+    if not instants:
+        return []
+    rows = list(Membership.objects.filter(user__is_superuser=False, starts__lte=max(instants), expires__gt=min(instants))
+                .values_list("user_id", "starts", "expires"))
+    return [len({u for u, s, e in rows if s <= i < e}) for i in instants]
+
+
 def frozen_rows(p):
     from .models_extra import MembershipFreeze
     return list(MembershipFreeze.objects.filter(start_date__lte=p.end, end_date__gt=p.start - timedelta(days=1))
@@ -250,9 +261,7 @@ def _kpis(p):
         step = len(seq) / 24
         return [seq[min(len(seq) - 1, int((i + 1) * step) - 1)] for i in range(24)]
 
-    actives = [active_at(inst) for _, _, inst in sample(bs)]
-    act_now = active_at(min(now, p.end_dt))
-    act_prev = active_at(min(now, pv.end_dt))
+    *actives, act_now, act_prev = actives_at([inst for _, _, inst in sample(bs)] + [min(now, p.end_dt), min(now, pv.end_dt)])
     fro_now = frozen_at(frows, min(today, p.end))
     fro_prev = frozen_at(frows, pv.end)
     frozen_spark = [frozen_at(frows, min(today, timezone.localtime(inst - timedelta(microseconds=1)).date())) for _, _, inst in bs]

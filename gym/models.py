@@ -1,3 +1,4 @@
+import contextvars
 import re
 from datetime import timedelta
 from decimal import Decimal
@@ -143,6 +144,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.full_name.strip()
 
 
+# GymSettings.load() is called many times per page (header, footer, views, admin columns): inside a request the row is read once.
+# The middleware opens a fresh box per request; outside a request (tests, commands, shell) every call still reads the database.
+GS_REQUEST_CACHE = contextvars.ContextVar("fz_gymsettings", default=None)
+
+
 class GymSettings(models.Model):
     """Single row, edited in the admin."""
     open_time = models.TimeField("Ochilish vaqti", default="06:00")
@@ -285,14 +291,22 @@ class GymSettings(models.Model):
     def save(self, *args, **kwargs):
         self.pk = 1
         super().save(*args, **kwargs)
+        box = GS_REQUEST_CACHE.get()
+        if box is not None:
+            box["obj"] = None  # the next load() in this request reads the saved row
 
     @classmethod
     def load(cls):
+        box = GS_REQUEST_CACHE.get()
+        if box is not None and box.get("obj") is not None:
+            return box["obj"]
         obj, created = cls.objects.get_or_create(pk=1)
         if created:
             # a fresh row still holds the raw defaults ("06:00" as text): read it back so open_time/close_time are real times,
             # otherwise the open/closed check on every page fails with str <= time
             obj.refresh_from_db()
+        if box is not None:
+            box["obj"] = obj
         return obj
 
     def __str__(self):

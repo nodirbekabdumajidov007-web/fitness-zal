@@ -305,6 +305,14 @@ class LowStockFilter(admin.SimpleListFilter):
 class ProductAdmin(admin.ModelAdmin):
     list_display = ("thumb", "name", "category", "price", "stock", "need", "active")
     list_display_links = ("thumb", "name")
+    list_select_related = ("category",)
+
+    def get_queryset(self, request):
+        from django.db.models import IntegerField, OuterRef, Subquery, Sum
+        from .models import Order, OrderItem
+        sold = (OrderItem.objects.filter(product=OuterRef("pk"), order__created__gte=timezone.now() - timezone.timedelta(days=30))
+                .exclude(order__status=Order.Status.CANCELLED).values("product").annotate(s=Sum("qty")).values("s"))
+        return super().get_queryset(request).annotate(sold30=Subquery(sold, output_field=IntegerField()))
     list_editable = ("price", "stock", "active")
     list_filter = (LowStockFilter, "category", "active")
     search_fields = ("name",)
@@ -329,7 +337,7 @@ class ProductAdmin(admin.ModelAdmin):
     def need(self, o):
         if o.stock > GymSettings.load().low_stock_threshold:
             return format_html('<span class="fz-need ok">yetarli</span>')
-        n, sold = services.restock_need(o)
+        n, sold = services.restock_need(o, sold=(o.sold30 or 0) if hasattr(o, "sold30") else None)
         return format_html('<span class="fz-need" title="30 kunda {} ta sotildi">+{} ta</span>', sold, n)
 
     # a restock clears the "already alerted today" mark, so the next shortage is reported again

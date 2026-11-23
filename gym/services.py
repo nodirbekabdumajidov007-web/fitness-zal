@@ -237,14 +237,17 @@ def notify(user, title, body="", sender=None, telegram_too=True, sms_too=False, 
     return sent
 
 
-def restock_need(product, days=14):
-    """How many to bring: two weeks of the last month's sales, never less than 4× the alert threshold. Returns (need, sold_30d)."""
+def restock_need(product, days=14, sold=None):
+    """How many to bring: two weeks of the last month's sales, never less than 4× the alert threshold. Returns (need, sold_30d).
+    `sold` may be passed in when the caller already summed the 30-day sales (the admin list annotates it)."""
     import math
     from django.db.models import Sum
     from .models import OrderItem
-    since = timezone.now() - timedelta(days=30)
-    sold = (OrderItem.objects.filter(product=product, order__created__gte=since).exclude(order__status=Order.Status.CANCELLED)
-            .aggregate(s=Sum("qty"))["s"] or 0)
+    if sold is None:
+        since = timezone.now() - timedelta(days=30)
+        sold = (OrderItem.objects.filter(product=product, order__created__gte=since).exclude(order__status=Order.Status.CANCELLED)
+                .aggregate(s=Sum("qty"))["s"] or 0)
+    sold = sold or 0
     target = max(GymSettings.load().low_stock_threshold * 4, math.ceil(sold / 30 * days))
     return max(1, target - product.stock), sold
 
