@@ -8,6 +8,15 @@
   {% if gs.about_text %}<div class="about-text">{{ gs.about_text|linebreaks }}</div>{% else %}<p class="muted">{% t 'about_empty' %}</p>{% endif %}
 </section>
 
+{% if stats.members or stats.trainers or stats.classes %}
+<section class="counters about-stats" aria-label="{% t 'about_numbers' %}">
+  {% if stats.members %}<div><b class="num">{{ stats.members }}</b><span>{% t 'stat_members' %}</span></div>{% endif %}
+  {% if stats.trainers %}<div><b class="num">{{ stats.trainers }}</b><span>{% t 'trainers' %}</span></div>{% endif %}
+  {% if stats.classes %}<div><b class="num">{{ stats.classes }}</b><span>{% t 'stat_classes' %}</span></div>{% endif %}
+  {% if stats.kinds > 1 %}<div><b class="num">{{ stats.kinds }}</b><span>{% t 'about_kinds' %}</span></div>{% endif %}
+</section>
+{% endif %}
+
 <section class="about-what" aria-labelledby="about-what-h">
   <h2 id="about-what-h">{% t 'about_what' %}</h2>
   <div class="about-cards">
@@ -26,6 +35,43 @@
   <div class="about-plan-list">{% for p in plans %}<a class="card lift" href="{% url 'plans' %}"><b>{% plan_name p %}</b><span class="num">{{ p.price|money }} {% t 'price_unit' %}</span></a>{% endfor %}</div>
 </section>
 {% endif %}
+
+{% if week %}
+<section class="about-week" aria-labelledby="about-week-h">
+  <div class="about-sec-top"><h2 id="about-week-h">{% t 'about_week' %}</h2><a class="btn pill small" href="{% url 'classes' %}">{% t 'about_book' %} →</a></div>
+  <div class="week-grid">{% for d in week %}
+    <div class="card week-day{% if d.today %} today{% endif %}">
+      <b class="week-name">{% t d.key %}{% if d.today %} <span class="pill good">{% t 'today' %}</span>{% endif %}</b>
+      {% for c in d.items %}<a class="week-item" href="{% url 'classes' %}"><span class="num">{{ c.start_time|time:"H:i" }}</span><span>{{ c.name }}{% if c.trainer %}<small>{{ c.trainer.name }}</small>{% endif %}</span></a>
+      {% empty %}<span class="muted week-rest">{% t 'about_no_class' %}</span>{% endfor %}
+    </div>{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section class="about-first" aria-labelledby="about-first-h">
+  <h2 id="about-first-h">{% t 'about_first' %}</h2>
+  <ol class="first-steps">
+    <li class="card"><b class="num">1</b><div><b>{% t 'about_s1_t' %}</b><span>{% t 'about_s1_d' %}</span></div></li>
+    <li class="card"><b class="num">2</b><div><b>{% t 'about_s2_t' %}</b><span>{% t 'about_s2_d' %}</span></div></li>
+    <li class="card"><b class="num">3</b><div><b>{% t 'about_s3_t' %}</b><span>{% t 'about_s3_d' %}</span></div></li>
+    <li class="card"><b class="num">4</b><div><b>{% t 'about_s4_t' %}</b><span>{% t 'about_s4_d' %}</span></div></li>
+  </ol>
+  <div class="about-two">
+    <div class="card about-list">
+      <b>{% icon 'bag' %} {% t 'about_bring' %}</b>
+      <ul><li>{% t 'about_bring_1' %}</li><li>{% t 'about_bring_2' %}</li><li>{% t 'about_bring_3' %}</li><li>{% t 'about_bring_4' %}</li></ul>
+    </div>
+    <div class="card about-list">
+      <b>{% icon 'shield' %} {% t 'about_rules' %}</b>
+      <ul><li>{% t 'about_rule_1' %}</li><li>{% t 'about_rule_2' %}</li><li>{% t 'about_rule_3' %}</li><li>{% t 'about_rule_4' %}</li><li>{% t 'about_rule_5' %}</li></ul>
+    </div>
+    <div class="card about-list">
+      <b>{% icon 'ticket' %} {% t 'about_pay' %}</b>
+      <ul>{% if click_on %}<li>{% t 'about_pay_click' %}</li>{% endif %}<li>{% t 'about_pay_cash' %}</li><li>{% t 'about_pay_gift' %}</li></ul>
+    </div>
+  </div>
+</section>
 
 {% if trainers %}
 <section class="about-trainers" aria-labelledby="about-tr-h">
@@ -68,6 +114,13 @@
       {% if gs.yandex_map_url %}<a class="btn pill" href="{{ gs.yandex_map_url }}" target="_blank" rel="noopener">{% icon 'map' %} {% t 'open_in_yandex' %}</a>{% endif %}
     </aside>
   </div>
+</section>
+{% endif %}
+
+{% if faq %}
+<section class="about-faq" aria-labelledby="about-faq-h">
+  <div class="about-sec-top"><h2 id="about-faq-h">{% t 'faq_title' %}</h2><a class="btn pill small" href="{% url 'faq' %}">{% t 'about_all_q' %} →</a></div>
+  <div class="faq">{% for it in faq %}<details class="card faq-item"><summary>{{ it.q }}</summary><p>{{ it.a|linebreaksbr }}</p></details>{% endfor %}</div>
 </section>
 {% endif %}
 

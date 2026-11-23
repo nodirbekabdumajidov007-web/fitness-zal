@@ -364,4 +364,34 @@ chat_voice||Sesli mesaj||Үн билдирүүсү||Паёми овозӣ
 chat_voice_rec||Kaydediliyor… göndermek için dokunun||Жазылууда… жөнөтүү үчүн басыңыз||Сабт мешавад… барои фиристодан пахш кунед
 chat_voice_no||Mikrofon izni verilmedi ya da tarayıcı ses kaydını desteklemiyor.||Микрофонго уруксат берилген жок же браузер жазууну колдобойт.||Ба микрофон иҷозат дода нашуд ё браузер сабтро дастгирӣ намекунад.
 chat_bad_voice||Sesli mesaj gönderilemedi.||Үн билдирүүсүн жөнөтүү мүмкүн болбоду.||Паёми овозӣ фиристода нашуд.
+about_numbers||Rakamlarla||Сандар менен||Дар рақамҳо
+about_kinds||ders türü||машыгуу түрү||навъи машғулот
+about_week||Haftalık program||Жумалык жадыбал||Ҷадвали ҳафтаина
+about_book||Kaydol||Жазылуу||Сабт шудан
+about_no_class||Grup dersi yok — salon açık||Топтук машыгуу жок — зал ачык||Машғулоти гурӯҳӣ нест — толор кушода
+about_first||İlk kez mi geliyorsunuz?||Биринчи жолу келип жатасызбы?||Бори аввал меоед?
+about_s1_t||Kaydolun||Каттоодон өтүңүз||Сабти ном кунед
+about_s1_d||Bir dakikada: ad, telefon ve şifre. Hesabınız ve QR kartınız hemen hazır.||Бир мүнөттө: аты, телефон жана сырсөз. Кабинет жана QR карта дароо даяр.||Дар як дақиқа: ном, телефон ва парол. Кабинет ва корти QR дарҳол тайёр.
+about_s2_t||Üyelik seçin||Абонемент тандаңыз||Обуна интихоб кунед
+about_s2_d||Denemek için 1 günlükle başlayın. Ödeme sitede veya salonda.||Сынап көрүү үчүн 1 күндүктөн баштаңыз. Төлөм сайтта же залда.||Барои озмоиш аз 1-рӯза сар кунед. Пардохт дар сайт ё дар толор.
+about_s3_t||QR kartınızı gösterin||QR картаңызды көрсөтүңүз||Корти QR-ро нишон диҳед
+about_s3_d||Girişte telefonunuzdaki üye kartını tararız — plastik kart gerekmez.||Кирерде телефонуңуздагы мүчөлүк картаны скандайбыз — пластик карта керек эмес.||Дар даромадгоҳ корти аъзоро дар телефонатон скан мекунем — корти пластикӣ лозим нест.
+about_s4_t||Antrenörle başlayın||Машыктыруучу менен баштаңыз||Бо мураббӣ сар кунед
+about_s4_d||Egzersizleri ve aletlerin doğru kullanımını gösterir. Grup derslerine siteden kaydolun.||Көнүгүүлөрдү жана жабдууларды туура колдонууну көрсөтөт. Топтук машыгууга сайттан жазылыңыз.||Машқҳо ва истифодаи дурусти таҷҳизотро нишон медиҳад. Ба машғулоти гурӯҳӣ аз сайт сабт шавед.
+about_bring||Yanınıza alın||Өзүңүз менен алыңыз||Бо худ гиред
+about_bring_1||Spor kıyafeti||Спорттук кийим||Либоси варзишӣ
+about_bring_2||Temiz, yedek spor ayakkabı||Таза алмаштыруучу кроссовка||Пойафзоли тозаи ивазшаванда
+about_bring_3||Havlu||Сүлгү||Дастмол
+about_bring_4||Su şişesi||Суу идиши||Шишаи об
+about_rules||Salon adabı||Зал адеби||Одоби толор
+about_rule_1||Aleti kullandıktan sonra havluyla silin||Жабдууну колдонгондон кийин сүлгү менен сүртүңүз||Пас аз истифода таҷҳизотро бо дастмол пок кунед
+about_rule_2||Dambıl ve plakaları yerine koyun||Гантель жана дисктерди ордуна коюңуз||Гантел ва дискҳоро ба ҷояш баргардонед
+about_rule_3||Dolu aleti sırayla kullanın||Бош эмес жабдууну кезек менен колдонуңуз||Таҷҳизоти бандро навбат ба навбат истифода баред
+about_rule_4||Ağır kaldırırken bir yardımcı veya antrenörle çalışın||Оор салмак менен өнөктөш же машыктыруучу менен иштеңиз||Бо вазни вазнин бо ҳамроҳ ё мураббӣ кор кунед
+about_rule_5||Telefonda yüksek sesle konuşmayın||Телефондо катуу сүйлөбөңүз||Бо телефон баланд гап назанед
+about_pay||Ödeme||Төлөм||Пардохт
+about_pay_click||Sitede — Click ile, hemen aktif olur||Сайтта — Click аркылуу, дароо иштейт||Дар сайт — тавассути Click, фавран фаъол мешавад
+about_pay_cash||Salonda — nakit||Залда — накталай||Дар толор — бо пули нақд
+about_pay_gift||Hediye çekiyle||Белек сертификаты менен||Бо сертификати тӯҳфа
+about_all_q||Tüm sorular||Бардык суроолор||Ҳамаи саволҳо
 """

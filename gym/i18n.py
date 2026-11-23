@@ -1053,6 +1053,36 @@ chat_voice||Ovozli xabar||Голосовое сообщение||Voice message
 chat_voice_rec||Yozilmoqda… yuborish uchun bosing||Идёт запись… нажмите, чтобы отправить||Recording… tap to send
 chat_voice_no||Mikrofonga ruxsat berilmadi yoki brauzer ovoz yozishni qo'llamaydi.||Нет доступа к микрофону или браузер не поддерживает запись.||Microphone access was denied or the browser cannot record audio.
 chat_bad_voice||Ovozli xabarni yuborib bo'lmadi.||Не удалось отправить голосовое сообщение.||The voice message could not be sent.
+about_numbers||Raqamlarda||В цифрах||In numbers
+about_kinds||mashg'ulot turi||видов занятий||kinds of classes
+about_week||Haftalik jadval||Расписание на неделю||Weekly timetable
+about_book||Yozilish||Записаться||Book
+about_no_class||Guruh mashg'uloti yo'q — zal ochiq||Групповых занятий нет — зал открыт||No group class — the gym is open
+about_first||Birinchi marta kelyapsizmi?||Впервые у нас?||Coming for the first time?
+about_s1_t||Ro'yxatdan o'ting||Зарегистрируйтесь||Sign up
+about_s1_d||Bir daqiqada: ism, telefon va parol. Kabinet va QR karta darrov tayyor.||За минуту: имя, телефон и пароль. Кабинет и QR-карта готовы сразу.||In a minute: name, phone and a password. Your account and QR card are ready at once.
+about_s2_t||Abonement tanlang||Выберите абонемент||Pick a membership
+about_s2_d||Sinab ko'rish uchun 1 kunlikdan boshlang. To'lovni saytda yoki zalda qilasiz.||Для пробы начните с однодневного. Оплатить можно на сайте или в зале.||Start with a 1-day pass to try. Pay on the site or at the gym.
+about_s3_t||QR kartani ko'rsating||Покажите QR-карту||Show your QR card
+about_s3_d||Kirishda telefoningizdagi a'zo kartasini skanerlaymiz — plastik karta shart emas.||На входе сканируем карту участника в телефоне — пластиковая карта не нужна.||At the door we scan the member card on your phone — no plastic card needed.
+about_s4_t||Murabbiy bilan boshlang||Начните с тренером||Start with a trainer
+about_s4_d||Mashqlar va jihozlarni to'g'ri ishlatishni ko'rsatadi. Guruh mashg'ulotiga ham saytdan yoziling.||Покажет упражнения и как правильно пользоваться тренажёрами. На групповые занятия записывайтесь на сайте.||They show the exercises and how to use the machines safely. Book group classes on the site.
+about_bring||O'zingiz bilan oling||Что взять с собой||What to bring
+about_bring_1||Sport kiyim||Спортивную одежду||Sportswear
+about_bring_2||Toza, almashtiriladigan krossovka||Чистую сменную обувь||Clean indoor trainers
+about_bring_3||Sochiq||Полотенце||A towel
+about_bring_4||Suv idishi||Бутылку воды||A water bottle
+about_rules||Zal odobi||Правила этикета||Gym etiquette
+about_rule_1||Trenajyordan keyin o'rindiqni sochiq bilan arting||Протирайте тренажёр полотенцем после себя||Wipe the machine with your towel after use
+about_rule_2||Gantel va disklarni joyiga qaytaring||Возвращайте гантели и диски на место||Put dumbbells and plates back
+about_rule_3||Band jihozni boshqalar bilan navbatma-navbat ishlating||Чередуйтесь с другими на занятом тренажёре||Take turns on a busy machine
+about_rule_4||Og'ir vazn bilan yolg'iz emas, sherik yoki murabbiy bilan ishlang||С большим весом работайте со страховкой партнёра или тренера||Lift heavy with a spotter or a trainer
+about_rule_5||Telefonda baland ovozda gaplashmang||Не разговаривайте громко по телефону||Keep phone calls quiet
+about_pay||To'lov||Оплата||Payment
+about_pay_click||Saytda — Click orqali, darhol faollashadi||На сайте — через Click, активируется сразу||On the site — with Click, active at once
+about_pay_cash||Zalda — naqd pul bilan||В зале — наличными||At the gym — in cash
+about_pay_gift||Sovg'a sertifikati bilan||Подарочным сертификатом||With a gift certificate
+about_all_q||Barcha savollar||Все вопросы||All questions
 asst_rate||Juda ko'p savol yuborildi. Bir daqiqadan keyin qayta urinib ko'ring.||Слишком много вопросов. Попробуйте через минуту.||Too many questions. Try again in a minute.
 asst_suggest||Shuni so'rab ko'ring:||Попробуйте спросить:||Try asking:
 cal_txt_title||Matn bilan yozish||Записать текстом||Type it in

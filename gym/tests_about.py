@@ -73,3 +73,23 @@ class AboutPageTests(TestCase):
         self.assertContains(r, "Sardor Test")
         self.assertContains(r, "map-frame")
         self.assertContains(r, reverse("classes"))
+
+
+class AboutMoreInfoTests(TestCase):
+    def setUp(self):
+        from django.core.management import call_command
+        call_command("setup_gym", demo=True, verbosity=0)
+
+    def test_numbers_timetable_first_visit_and_questions(self):
+        from .models import GymClass
+        h = Client().get("/about/").content.decode()
+        for part in ('class="counters about-stats"', 'class="about-week"', 'class="first-steps"', 'class="about-two"'):
+            self.assertIn(part, h)
+        c = GymClass.objects.filter(active=True).first()
+        self.assertIn(c.name, h)
+        self.assertIn(c.start_time.strftime("%H:%M"), h)
+
+    def test_timetable_hidden_without_classes(self):
+        from .models import GymClass
+        GymClass.objects.update(active=False)
+        self.assertNotIn('class="about-week"', Client().get("/about/").content.decode())

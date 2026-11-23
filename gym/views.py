@@ -1324,9 +1324,18 @@ def about_view(request):
     promo = parse_promo(gs.promo_video_url)
     if promo:
         promo["poster"] = models_image_url("promo", gs) or promo["thumb"]
+    from . import click, extras
+    now = timezone.now()
+    classes = list(GymClass.objects.filter(active=True).select_related("trainer").order_by("weekday", "start_time"))
+    week = [{"wd": wd, "key": f"weekday_{wd}", "today": wd == timezone.localdate().weekday(), "items": [c for c in classes if c.weekday == wd]} for wd in range(7)]
+    stats = {"members": Membership.objects.filter(starts__lte=now, expires__gt=now).values("user").distinct().count(),
+             "trainers": Trainer.objects.filter(active=True).count(), "classes": len(classes),
+             "kinds": len({c.name.strip().lower() for c in classes})}
     return render(request, "gym/about.html", {"photos": GymPhoto.objects.filter(active=True), "promo": promo, "embed": gs.map_embed,
                                               "ld_json": seo.gym_ld_json(request, gs), "plans": Plan.objects.filter(active=True).order_by("price"),
-                                              "trainers": Trainer.objects.filter(active=True)[:6]})
+                                              "trainers": Trainer.objects.filter(active=True)[:6], "stats": stats,
+                                              "week": week if classes else None, "faq": extras.faq_items(request.lang)[:5],
+                                              "click_on": click.enabled()})
 
 
 @require_POST
