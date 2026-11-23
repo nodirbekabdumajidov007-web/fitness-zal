@@ -169,13 +169,18 @@
     old.parentNode.replaceChild(row, old);
   }
   function setReactions(id, list) { var row = byId(id); if (row) renderChips(row.querySelector('.m-rx'), list); }
-  function markDeleted(row) {
-    var b = row.querySelector('.m-bubble');
-    b.querySelectorAll('.m-photo,.m-voice,.m-text,.m-quote,.m-tick,.m-edited').forEach(function (x) { x.remove(); });
-    if (!b.querySelector('.m-del')) b.insertBefore(el('i', 'm-del', d.tDeleted), b.querySelector('.m-meta'));
-    b.classList.remove('photo-only');
-    var rx = row.querySelector('.m-rx'); if (rx) { rx.textContent = ''; rx.hidden = true; }
-    var hov = row.querySelector('.m-hov'); if (hov) hov.remove();
+  function markDeleted(row) {  // a deleted message disappears for everyone (no "deleted" placeholder)
+    if (typeof vWrap !== 'undefined' && vWrap && row.contains(vWrap)) vStop();
+    row.classList.add('m-gone');
+    setTimeout(function () {
+      row.remove();
+      log.querySelectorAll('.m-new,.m-day').forEach(function (c) {  // a "new" divider or day chip left with no message after it goes too
+        var n = c.nextElementSibling;
+        if (c.classList.contains('m-day')) while (n && n.classList.contains('m-new')) n = n.nextElementSibling;
+        if (!n || !n.classList.contains('m-row')) c.remove();
+      });
+      regroup();
+    }, reduce ? 0 : 220);
   }
   function applyReads(upto) {
     if (!direct || !upto) return;
@@ -520,46 +525,92 @@
       }).catch(function () { say('!', true); }).then(function () { sending = false; form.classList.remove('sending'); body.focus(); });
     });
   }
-  // ---- voice notes: record with the microphone (MediaRecorder), play with our own small player
+  // ---- voice notes: record with the microphone (MediaRecorder) and its real loudness curve; play with our own player
+  // (waveform you can tap to jump, 1x / 1.5x / 2x speed)
   function fmtSecs(s) { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
   function svgNode(cls, path) {
     var s = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('class', cls); s.setAttribute('aria-hidden', 'true');
     var p = document.createElementNS('http://www.w3.org/2000/svg', 'path'); p.setAttribute('d', path); s.appendChild(p); return s;
   }
+  var SPEEDS = [1, 1.5, 2], vSpeed = 1;
+  try { vSpeed = parseFloat(localStorage.getItem('fz-vspeed')) || 1; if (SPEEDS.indexOf(vSpeed) < 0) vSpeed = 1; } catch (e) {}
+  function speedLabel(v) { return (v === 1.5 ? '1,5' : String(v)) + '×'; }
   function voiceEl(m) {
     var w = el('div', 'm-voice'); w.dataset.src = m.voice; w.dataset.secs = m.voice_secs || 0;
     var btn = el('button', 'm-vplay'); btn.type = 'button'; btn.setAttribute('aria-label', d.tVoice || '');
     btn.appendChild(svgNode('v-play', 'M8 5v14l11-7z')); btn.appendChild(svgNode('v-pause', 'M7 5h3.5v14H7zM13.5 5H17v14h-3.5z'));
-    var bar = el('div', 'm-vbar'); bar.appendChild(el('i'));
-    w.appendChild(btn); w.appendChild(bar); w.appendChild(el('span', 'm-vtime num', fmtSecs(m.voice_secs)));
+    var wave = el('div', 'm-vwave'); wave.setAttribute('aria-hidden', 'true');
+    (m.voice_wave || '3456545434565454').split('').forEach(function (c) { var i = el('i'); i.style.setProperty('--v', c); wave.appendChild(i); });
+    var side = el('div', 'm-vside');
+    var sp = el('button', 'm-vspeed num', speedLabel(vSpeed)); sp.type = 'button';
+    side.appendChild(el('span', 'm-vtime num', fmtSecs(m.voice_secs))); side.appendChild(sp);
+    w.appendChild(btn); w.appendChild(wave); w.appendChild(side);
     return w;
   }
   var vAudio = null, vWrap = null;
-  function vReset(w) { w.classList.remove('playing'); var i = w.querySelector('.m-vbar i'); if (i) i.style.width = '0'; var t = w.querySelector('.m-vtime'); if (t) t.textContent = fmtSecs(+w.dataset.secs); }
+  function vPaint(w, frac) {
+    var bars = w.querySelectorAll('.m-vwave i'), n = Math.round(frac * bars.length);
+    for (var k = 0; k < bars.length; k++) bars[k].classList.toggle('on', k < n);
+  }
+  function vReset(w) { w.classList.remove('playing'); vPaint(w, 0); var t = w.querySelector('.m-vtime'); if (t) t.textContent = fmtSecs(+w.dataset.secs); }
   function vStop() { if (vAudio) vAudio.pause(); if (vWrap) vReset(vWrap); vAudio = vWrap = null; }
+  function vPlay(w, frac) {
+    if (vWrap !== w) {
+      vStop();
+      var a = new Audio(w.dataset.src), secs = +w.dataset.secs || 1;
+      vAudio = a; vWrap = w; a.playbackRate = vSpeed;
+      a.addEventListener('timeupdate', function () {
+        vPaint(w, Math.min(1, a.currentTime / secs));
+        var t = w.querySelector('.m-vtime'); if (t) t.textContent = fmtSecs(secs - a.currentTime);
+      });
+      a.addEventListener('play', function () { w.classList.add('playing'); });
+      a.addEventListener('pause', function () { w.classList.remove('playing'); });
+      a.addEventListener('ended', vStop);
+      a.addEventListener('error', function () { vStop(); say(d.tVoiceBad || '!', true); });
+    }
+    if (frac != null) { try { vAudio.currentTime = frac * (+w.dataset.secs || 1); } catch (e) {} vPaint(w, frac); }
+    vAudio.playbackRate = vSpeed;
+    vAudio.play().catch(vStop);
+  }
   log.addEventListener('click', function (e) {
-    var b = e.target.closest ? e.target.closest('.m-vplay') : null; if (!b) return;
+    if (!e.target.closest) return;
+    var sp = e.target.closest('.m-vspeed');
+    if (sp) {
+      vSpeed = SPEEDS[(SPEEDS.indexOf(vSpeed) + 1) % SPEEDS.length];
+      try { localStorage.setItem('fz-vspeed', vSpeed); } catch (err) {}
+      log.querySelectorAll('.m-vspeed').forEach(function (b) { b.textContent = speedLabel(vSpeed); });
+      if (vAudio) vAudio.playbackRate = vSpeed;
+      return;
+    }
+    var wave = e.target.closest('.m-vwave');
+    if (wave) {  // tap on the waveform: jump there and play
+      var r = wave.getBoundingClientRect();
+      vPlay(wave.parentNode, Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)));
+      return;
+    }
+    var b = e.target.closest('.m-vplay'); if (!b) return;
     var w = b.parentNode;
-    if (vWrap === w) { if (vAudio.paused) vAudio.play().catch(vStop); else vAudio.pause(); return; }
-    vStop();
-    var a = new Audio(w.dataset.src), secs = +w.dataset.secs || 1;
-    vAudio = a; vWrap = w;
-    a.addEventListener('timeupdate', function () {
-      var i = w.querySelector('.m-vbar i'); if (i) i.style.width = Math.min(100, a.currentTime / secs * 100) + '%';
-      var t = w.querySelector('.m-vtime'); if (t) t.textContent = fmtSecs(secs - a.currentTime);
-    });
-    a.addEventListener('play', function () { w.classList.add('playing'); });
-    a.addEventListener('pause', function () { w.classList.remove('playing'); });
-    a.addEventListener('ended', vStop);
-    a.addEventListener('error', function () { vStop(); say(d.tVoiceBad || '!', true); });
-    a.play().catch(vStop);
+    if (vWrap === w && !vAudio.paused) { vAudio.pause(); return; }
+    vPlay(w, null);
   });
+  log.querySelectorAll('.m-vspeed').forEach(function (b) { b.textContent = speedLabel(vSpeed); });
 
-  var recBox = document.getElementById('chat-rec'), recT = document.getElementById('chat-rec-t'), rec = null, VOICE_MAX = 120;
+  var recBox = document.getElementById('chat-rec'), recT = document.getElementById('chat-rec-t'), recWave = document.getElementById('chat-rec-wave'), rec = null, VOICE_MAX = 120;
   function recFinish(cancel) { if (!rec) return; rec.cancel = cancel; if (rec.mr.state !== 'inactive') rec.mr.stop(); }
-  function sendVoice(blob, secs) {
+  function waveString(levels) {  // 40 bars, 1..9, scaled to the loudest moment
+    var N = 40, out = '';
+    if (!levels.length) return '';
+    var max = Math.max.apply(null, levels) || 1;
+    for (var k = 0; k < N; k++) {
+      var a = Math.floor(k * levels.length / N), b = Math.max(a + 1, Math.floor((k + 1) * levels.length / N)), peak = 0;
+      for (var j = a; j < b && j < levels.length; j++) peak = Math.max(peak, levels[j]);
+      out += String(Math.max(1, Math.min(9, Math.round(peak / max * 9))));
+    }
+    return out;
+  }
+  function sendVoice(blob, secs, wave) {
     var ext = /ogg/.test(blob.type) ? '.ogg' : (/mp4|aac/.test(blob.type) ? '.m4a' : '.webm');
-    var fd = new FormData(); fd.append('body', ''); fd.append('voice', blob, 'voice' + ext); fd.append('voice_secs', secs);
+    var fd = new FormData(); fd.append('body', ''); fd.append('voice', blob, 'voice' + ext); fd.append('voice_secs', secs); fd.append('voice_wave', wave || '');
     if (ctx && ctx.mode === 'reply') fd.append('reply_to', ctx.id);
     sending = true; form.classList.add('sending');
     post(d.send, fd).then(function (j) {
@@ -571,26 +622,41 @@
     if (rec || sending) return;
     if (!navigator.mediaDevices || !window.MediaRecorder) { say(d.tVoiceNo || '!', true); return; }
     say('', true); say('');
+    vStop();
     navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
       var types = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', 'audio/mp4'];
       var mt = types.filter(function (t) { return MediaRecorder.isTypeSupported(t); })[0] || '';
-      var mr = mt ? new MediaRecorder(stream, { mimeType: mt }) : new MediaRecorder(stream), chunks = [];
+      var mr = mt ? new MediaRecorder(stream, { mimeType: mt }) : new MediaRecorder(stream), chunks = [], levels = [];
       rec = { mr: mr, t0: Date.now(), cancel: false };
+      // loudness: an analyser on the same stream, sampled ~12 times a second (also drives the live bars)
+      var AC = window.AudioContext || window.webkitAudioContext, actx = null, an = null, buf = null;
+      try { actx = new AC(); an = actx.createAnalyser(); an.fftSize = 512; actx.createMediaStreamSource(stream).connect(an); buf = new Uint8Array(an.fftSize); } catch (e) { actx = null; an = null; }
+      if (recWave) { recWave.textContent = ''; for (var k = 0; k < 28; k++) recWave.appendChild(el('i')); }
       mr.addEventListener('dataavailable', function (ev) { if (ev.data && ev.data.size) chunks.push(ev.data); });
       mr.addEventListener('stop', function () {
         stream.getTracks().forEach(function (t) { t.stop(); });
+        if (actx) try { actx.close(); } catch (e) {}
         clearInterval(rec.timer); form.classList.remove('recording'); recBox.hidden = true;
         var r = rec; rec = null;
         if (r.cancel || !chunks.length) return;
         var secs = Math.max(1, Math.round((Date.now() - r.t0) / 1000));
-        sendVoice(new Blob(chunks, { type: mr.mimeType || mt || 'audio/webm' }), secs);
+        sendVoice(new Blob(chunks, { type: mr.mimeType || mt || 'audio/webm' }), secs, waveString(levels));
       });
       mr.start();
       form.classList.add('recording'); recBox.hidden = false; recT.textContent = '0:00';
       rec.timer = setInterval(function () {
         var s = (Date.now() - rec.t0) / 1000; recT.textContent = fmtSecs(s);
+        if (an) {
+          an.getByteTimeDomainData(buf);
+          var sum = 0; for (var j = 0; j < buf.length; j++) { var v = (buf[j] - 128) / 128; sum += v * v; }
+          var lvl = Math.sqrt(sum / buf.length); levels.push(lvl);
+          if (recWave && recWave.firstChild) {  // newest bar on the right
+            recWave.appendChild(recWave.firstChild);
+            recWave.lastChild.style.setProperty('--v', Math.max(1, Math.min(9, Math.round(lvl * 30))));
+          }
+        }
         if (s >= VOICE_MAX) recFinish(false);
-      }, 250);
+      }, 80);
     }).catch(function () { say(d.tVoiceNo || '!', true); });
   }
   if (mic && form) {
@@ -658,7 +724,7 @@
         setStats(j.stats);
         if (pinBar && 'pin' in j) setPin(j.pin);
         if (j.typing && j.typing.length) showTyping(j.typing.join(', '));
-        (j.deleted || []).forEach(function (id) { var row = byId(id); if (row && !row.querySelector('.m-del')) markDeleted(row); });
+        (j.deleted || []).forEach(function (id) { var row = byId(id); if (row && !row.classList.contains('m-gone')) markDeleted(row); });
       })
       .catch(function () {})
       .then(function () { busy = false; });
@@ -691,7 +757,7 @@
       else if (j.t === 'reaction') setReactions(j.id, j.reactions);
       else if (j.t === 'edit') replaceRow(j.m);
       else if (j.t === 'pin') setPin(j.pin);
-      else if (j.t === 'deleted') { var row = byId(j.id); if (row && !row.querySelector('.m-del')) markDeleted(row); }
+      else if (j.t === 'deleted') { var row = byId(j.id); if (row && !row.classList.contains('m-gone')) markDeleted(row); }
     };
     ws.onclose = function (e) {
       wsOk = false;

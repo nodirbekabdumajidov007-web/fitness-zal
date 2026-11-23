@@ -119,7 +119,7 @@ class DirectChatTests(ChatBase):
         self.assertEqual(self.ca.post(f"/chat/message/{mid}/delete/", **FETCH).json(), {"ok": True})
         page = self.cb.get(f"/chat/{room.pk}/").content.decode()
         self.assertNotIn("xato yozdim", page)  # the text is no longer sent to anyone
-        self.assertEqual(self.cb.get(f"/chat/{room.pk}/poll/?after=0").json()["messages"][0]["body"], "")
+        self.assertEqual(self.cb.get(f"/chat/{room.pk}/poll/?after=0").json()["messages"], [])  # a deleted message is not sent at all
 
 
 class PrivacyAndBlockingTests(ChatBase):

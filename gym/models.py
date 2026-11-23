@@ -1033,6 +1033,7 @@ class ChatMessage(models.Model):
     image = models.FileField("Rasm", upload_to="chat/%Y/%m/", blank=True, validators=[validate_image])
     voice = models.FileField("Ovozli xabar", upload_to="chat/voice/%Y/%m/", blank=True)
     voice_secs = models.PositiveSmallIntegerField("Ovoz davomiyligi (soniya)", default=0)
+    voice_wave = models.CharField("Ovoz to'lqini", max_length=64, blank=True)  # loudness bars 1-9, measured while recording
     deleted = models.BooleanField("O'chirilgan", default=False)
     created = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan")
     reply_to = models.ForeignKey("self", null=True, blank=True, on_delete=models.SET_NULL, related_name="replies", verbose_name="Javob")

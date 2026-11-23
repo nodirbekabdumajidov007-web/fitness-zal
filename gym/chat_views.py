@@ -127,7 +127,7 @@ def room_view(request, pk):
     u = request.user
     chat.touch(u)
     now = time.time()
-    msgs = list(reversed(list(chat.with_related(room.messages).order_by("-id")[:chat.PAGE])))
+    msgs = list(reversed(list(chat.with_related(room.messages.filter(deleted=False)).order_by("-id")[:chat.PAGE])))  # deleted messages simply vanish
     last_id = msgs[-1].id if msgs else 0
     seen_row = ChatRead.objects.filter(user=u, room=room).first()
     divider = chat.first_unread(room, u, msgs, seen_row.last_id if seen_row else None)
@@ -142,7 +142,7 @@ def room_view(request, pk):
         "other_name": chat.display_name(other) if other else "", "other_initials": chat.initials(other) if other else "",
         "other_hue": chat.hue(other) if other else 0, "blocked": bool(other and chat.blocked_between(u, other)),
         "i_blocked": bool(other and ChatBlock.objects.filter(blocker=u, blocked=other).exists()),
-        "has_more": bool(msgs) and room.messages.filter(id__lt=msgs[0].id).exists(), "first_id": msgs[0].id if msgs else 0,
+        "has_more": bool(msgs) and room.messages.filter(id__lt=msgs[0].id, deleted=False).exists(), "first_id": msgs[0].id if msgs else 0,
         "muted": chat.is_muted(u, room), "stats": chat.room_stats(room), "pin": chat.pin_payload(room), "can_pin": room.kind == "room" and staff_mode(request),
         "now": now, "reactions": chat.REACTIONS, "edit_minutes": int(chat.EDIT_WINDOW.total_seconds() // 60),
     })
@@ -165,7 +165,7 @@ def start_direct(request, uid):
 def send(request, pk):
     room = get_room(request, pk)
     image = voice = None
-    voice_secs = 0
+    voice_secs, voice_wave = 0, ""
     if request.content_type == "application/json":
         body, reply_to = jdata(request).get("body", ""), to_int(jdata(request).get("reply_to"))
         body = body if isinstance(body, str) else ""
@@ -173,7 +173,8 @@ def send(request, pk):
         body, reply_to = request.POST.get("body", ""), to_int(request.POST.get("reply_to"))
         image = request.FILES.get("image")
         voice, voice_secs = request.FILES.get("voice"), to_int(request.POST.get("voice_secs"))
-    msg, err = chat.post_message(request.user, room, body, image, reply_to or None, voice, voice_secs)
+        voice_wave = request.POST.get("voice_wave", "")[:64]
+    msg, err = chat.post_message(request.user, room, body, image, reply_to or None, voice, voice_secs, voice_wave if voice else "")
     chat.touch(request.user)
     if msg:
         announce(room.pk, {"type": "chat.new", "id": msg.id})  # open sockets in this room get it instantly
@@ -213,7 +214,7 @@ def poll(request, pk):
     except (TypeError, ValueError, OverflowError, OSError):
         since = None
     read_to = chat.read_upto(room, u)
-    msgs = list(chat.with_related(room.messages).filter(id__gt=after).order_by("id")[:100])
+    msgs = list(chat.with_related(room.messages).filter(id__gt=after, deleted=False).order_by("id")[:100])
     last = msgs[-1].id if msgs else after
     if msgs:
         chat.mark_read(u, room, last)
@@ -240,13 +241,13 @@ def history(request, pk):
     """Older messages (infinite scroll up). With `target`, everything down to that message (at most HISTORY_JUMP) for jump-to-message."""
     room = get_room(request, pk)
     before, target = to_int(request.GET.get("before")), to_int(request.GET.get("target"))
-    qs = chat.with_related(room.messages).filter(id__lt=before) if before else chat.with_related(room.messages).none()
+    qs = chat.with_related(room.messages).filter(id__lt=before, deleted=False) if before else chat.with_related(room.messages).none()
     if target and target < before:
         rows = list(qs.filter(id__gte=target).order_by("-id")[:HISTORY_JUMP])
     else:
         rows = list(qs.order_by("-id")[:HISTORY_PAGE])
     rows.reverse()
-    more = bool(rows) and room.messages.filter(id__lt=rows[0].id).exists()
+    more = bool(rows) and room.messages.filter(id__lt=rows[0].id, deleted=False).exists()
     return JsonResponse({"messages": chat.serialize_many(rows, request.user, chat.read_upto(room, request.user)), "has_more": more})
 
 

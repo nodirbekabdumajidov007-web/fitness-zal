@@ -70,3 +70,25 @@ class VoiceChatTests(TestCase):
         msg.refresh_from_db()
         self.assertFalse(msg.voice)
         self.assertEqual(self.cb.get(f"/chat/voice/{msg.pk}/").status_code, 404)
+
+    def test_waveform_is_kept_only_when_well_formed(self):
+        r = self.ca.post(f"/chat/{self.room.pk}/send/", {"body": "", "voice": SimpleUploadedFile("v.webm", WEBM), "voice_secs": 3,
+                                                          "voice_wave": "1234567898765432"}, **FETCH)
+        self.assertEqual(r.json()["message"]["voice_wave"], "1234567898765432")
+        h = self.cb.get(f"/chat/{self.room.pk}/").content.decode()
+        self.assertIn('class="m-vwave"', h)
+        self.assertIn("--v:9", h)
+        r = self.ca.post(f"/chat/{self.room.pk}/send/", {"body": "", "voice": SimpleUploadedFile("v.webm", WEBM), "voice_secs": 3,
+                                                          "voice_wave": "<script>"}, **FETCH)
+        self.assertEqual(r.json()["message"]["voice_wave"], "")
+
+    def test_deleted_messages_vanish_instead_of_showing_a_placeholder(self):
+        keep = self.ca.post(f"/chat/{self.room.pk}/send/", {"body": "qoladi"}, **FETCH).json()["message"]
+        gone = self.ca.post(f"/chat/{self.room.pk}/send/", {"body": "yashirin matn"}, **FETCH).json()["message"]
+        self.ca.post(f"/chat/message/{gone['id']}/delete/", **FETCH)
+        h = self.cb.get(f"/chat/{self.room.pk}/").content.decode()
+        self.assertIn(f'data-id="{keep["id"]}"', h)
+        self.assertNotIn(f'data-id="{gone["id"]}"', h)
+        self.assertNotIn('class="m-del"', h)
+        j = self.cb.get(f"/chat/{self.room.pk}/poll/?after={keep['id'] - 1}", **FETCH).json()
+        self.assertEqual([m["id"] for m in j["messages"]], [keep["id"]])

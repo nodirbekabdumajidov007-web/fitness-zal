@@ -215,7 +215,7 @@ def push_direct(msg):
 
 
 # ---- posting / editing ------------------------------------------------------------------------------------------------
-def post_message(user, room, body, image=None, reply_to_id=None, voice=None, voice_secs=0):
+def post_message(user, room, body, image=None, reply_to_id=None, voice=None, voice_secs=0, voice_wave=""):
     """Returns (message, error_key). A message needs text, a photo, or both. `message.masked` tells that private data was hidden."""
     if user.chat_banned:
         return None, "chat_banned"
@@ -262,6 +262,7 @@ def post_message(user, room, body, image=None, reply_to_id=None, voice=None, voi
         voice.seek(0)
         msg.voice.save("voice" + ext, voice, save=False)  # our own name: the client's is never trusted
         msg.voice_secs = max(1, min(int(voice_secs or 0), 180))
+        msg.voice_wave = voice_wave if re.fullmatch(r"[1-9]{8,64}", voice_wave or "") else ""
     msg.save()
     msg.masked = masked
     msg.new_mentions = sync_mentions(msg, find_mentions(room, user, body))
@@ -395,6 +396,7 @@ def serialize(msg, viewer, read_to=0, ctx=None):
             "hue": hue(msg.sender), "body": msg.body if alive else "", "deleted": msg.deleted,
             "image": f"/chat/photo/{msg.id}/" if (alive and msg.image) else "",
             "voice": f"/chat/voice/{msg.id}/" if (alive and msg.voice) else "", "voice_secs": msg.voice_secs if (alive and msg.voice) else 0,
+            "voice_wave": msg.voice_wave if (alive and msg.voice) else "",
             "ts": int(msg.created.timestamp()), "time": local.strftime("%H:%M"), "date": local.strftime("%d.%m.%Y"), "day": local.date().isoformat(),
             "read": mine and msg.id <= read_to, "can_delete": mine and alive, "can_report": (not mine) and alive,
             "can_edit": can_edit(msg, viewer), "edited": bool(msg.edited_at) and alive,

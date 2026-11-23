@@ -487,3 +487,21 @@ dialog{border-radius:22px}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .m-name{color:hsl(var(--h,210) 70% 72%)}}
 /* sidebar group captions were 10px */
 .sb-cap,.sb-cap .sb-fold{font-size:11.5px}
+
+/* chat: a deleted message fades and folds away */
+.m-row.m-gone{opacity:0;transform:scale(.96);transition:opacity .2s,transform .2s}
+
+/* chat voice notes v2: real loudness waveform (tap to jump), speed switch, live bars while recording */
+.m-voice{min-width:230px;gap:10px}
+.m-vwave{flex:1;display:flex;align-items:center;gap:2px;height:30px;cursor:pointer;min-width:120px}
+.m-vwave i{flex:1;max-width:4px;min-width:2px;border-radius:2px;background:currentColor;opacity:.35;height:calc(14% + var(--v,3) * 9.5%);transition:opacity .12s}
+.m-vwave i.on{opacity:1}
+.m-row:not(.mine) .m-vwave i.on{background:var(--accent)}
+.m-vside{display:grid;justify-items:end;gap:2px;flex:none}
+.m-vspeed{border:0;border-radius:99px;padding:1px 7px;font:700 .7rem/1.5 var(--body);cursor:pointer;background:rgba(127,127,127,.22);color:inherit}
+.m-vspeed:hover{background:rgba(127,127,127,.35)}
+.m-voice .m-vtime{font-size:.8rem;min-width:0}
+.m-rec-wave{display:flex;align-items:center;gap:2px;height:26px;flex:1;min-width:0;overflow:hidden;color:#e5322d}
+.m-rec-wave i{flex:1;max-width:3px;min-width:2px;border-radius:2px;background:currentColor;height:calc(10% + var(--v,1) * 10%);transition:height .08s}
+.m-rec .m-rec-hint{flex:none;max-width:40%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.8rem}
+@media (max-width:480px){.m-rec .m-rec-hint{display:none}}

@@ -440,7 +440,7 @@ class PrivacyMaskTests(FeatureBase):
 
 
 class PayloadShapeTests(FeatureBase):
-    KEYS = {"id", "mine", "sender", "name", "initials", "hue", "body", "deleted", "image", "voice", "voice_secs", "ts", "time", "date", "day", "read", "can_delete",
+    KEYS = {"id", "mine", "sender", "name", "initials", "hue", "body", "deleted", "image", "voice", "voice_secs", "voice_wave", "ts", "time", "date", "day", "read", "can_delete",
             "can_report", "can_edit", "edited", "reply", "reactions", "mentions", "mentioned_me"}
 
     def test_message_shape_is_stable(self):
