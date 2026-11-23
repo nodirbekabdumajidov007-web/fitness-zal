@@ -6,7 +6,13 @@
   <a href="{% url 'shop' %}"{% if not cat %} aria-current="true"{% endif %}>{% t 'all' %}</a>
   {% for c in categories %}<a href="?cat={{ c.pk }}{% if q %}&amp;q={{ q|urlencode }}{% endif %}"{% if cat == c.pk|stringformat:"s" %} aria-current="true"{% endif %}>{{ c.name }}</a>{% endfor %}
 </div>
-<form method="get" class="inline"><label for="q">{% t 'search' %}<input id="q" name="q" value="{{ q }}"></label>{% if cat %}<input type="hidden" name="cat" value="{{ cat }}">{% endif %}<button class="btn" type="submit">{% t 'search' %}</button></form>
+<form method="get" class="inline"><label for="q">{% t 'search' %}<input id="q" name="q" value="{{ q }}"></label>{% if cat %}<input type="hidden" name="cat" value="{{ cat }}">{% endif %}<button class="btn" type="submit">{% t 'search' %}</button>
+  <label class="shop-sort">{% t 'sort_by' %}<select name="sort" data-autosubmit>
+    <option value=""{% if not sort %} selected{% endif %}>{% t 'sort_default' %}</option>
+    <option value="cheap"{% if sort == 'cheap' %} selected{% endif %}>{% t 'sort_cheap' %}</option>
+    <option value="dear"{% if sort == 'dear' %} selected{% endif %}>{% t 'sort_dear' %}</option>
+    <option value="new"{% if sort == 'new' %} selected{% endif %}>{% t 'sort_new' %}</option>
+  </select></label></form>
 <div class="grid g4">
   {% for p in products %}
   {% include "gym/_prodcard.html" %}

@@ -338,6 +338,11 @@ class Plan(models.Model):
         """How long one purchase lasts: `days` for day passes, else 30 days per month."""
         return self.days or 30 * self.months
 
+    @property
+    def per_day(self):
+        """Price of one day of the plan, rounded to 100 so'm (shown as «≈ 13 300 so'm / kun» on longer plans)."""
+        return round(self.price / max(1, self.duration_days) / 100) * 100
+
 
 class Membership(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="memberships", verbose_name="A'zo")

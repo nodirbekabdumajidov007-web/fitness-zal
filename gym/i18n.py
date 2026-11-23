@@ -1083,6 +1083,14 @@ about_pay_click||Saytda — Click orqali, darhol faollashadi||На сайте �
 about_pay_cash||Zalda — naqd pul bilan||В зале — наличными||At the gym — in cash
 about_pay_gift||Sovg'a sertifikati bilan||Подарочным сертификатом||With a gift certificate
 about_all_q||Barcha savollar||Все вопросы||All questions
+share||Ulashish||Поделиться||Share
+link_copied||Havola nusxalandi||Ссылка скопирована||Link copied
+sort_by||Saralash||Сортировка||Sort
+sort_default||Odatiy||По умолчанию||Default
+sort_cheap||Avval arzonlari||Сначала дешёвые||Cheapest first
+sort_dear||Avval qimmatlari||Сначала дорогие||Most expensive first
+sort_new||Yangilari||Новинки||Newest
+per_day||kun||день||day
 asst_rate||Juda ko'p savol yuborildi. Bir daqiqadan keyin qayta urinib ko'ring.||Слишком много вопросов. Попробуйте через минуту.||Too many questions. Try again in a minute.
 asst_suggest||Shuni so'rab ko'ring:||Попробуйте спросить:||Try asking:
 cal_txt_title||Matn bilan yozish||Записать текстом||Type it in

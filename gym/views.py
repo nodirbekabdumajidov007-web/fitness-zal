@@ -979,9 +979,13 @@ def shop(request):
     if q:
         qs = qs.filter(name__icontains=q)
     from django.core.paginator import Paginator
-    page = Paginator(qs.order_by("category__order", "id"), SHOP_PAGE_SIZE).get_page(request.GET.get("page"))
-    keep = urllib.parse.urlencode({k: v for k, v in (("cat", cat or ""), ("q", q)) if v})  # the pager links keep the filters
-    return render(request, "gym/shop.html", {"products": page, "page": page, "pages": page_window(page), "keep": keep and keep + "&",
+    sort = request.GET.get("sort", "")
+    order = {"cheap": ("price", "id"), "dear": ("-price", "id"), "new": ("-id",)}.get(sort)
+    if not order:
+        sort, order = "", ("category__order", "id")
+    page = Paginator(qs.order_by(*order), SHOP_PAGE_SIZE).get_page(request.GET.get("page"))
+    keep = urllib.parse.urlencode({k: v for k, v in (("cat", cat or ""), ("q", q), ("sort", sort)) if v})  # the pager links keep the filters
+    return render(request, "gym/shop.html", {"sort": sort, "products": page, "page": page, "pages": page_window(page), "keep": keep and keep + "&",
                                              "categories": Category.objects.all(), "cat": cat or "", "q": q,
                                              "popular": popular_ids(), "fav": fav_ids(request), "fav_count": len(fav_ids(request)), **cart_context(request)})
 

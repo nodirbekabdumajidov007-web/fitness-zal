@@ -16,6 +16,7 @@
     {% if p.description %}<p class="buybox-desc">{{ p.description }}</p>{% endif %}
     <div class="buybox-row">{% with qty=in_cart|get_item:p.pk big=True %}{% include "gym/_qty.html" %}{% endwith %}
       <a class="buybox-cart" href="{% url 'cart' %}">{% icon 'cart' %} {% t 'cart' %} →</a></div>
+    <div class="share-row">{% with title=p.name %}{% include "gym/_share.html" %}{% endwith %}</div>
     <ul class="buybox-perks">
       <li><i>{% icon 'dumbbell' %}</i>{% t 'dlv_pickup_sub' %}</li>
       {% if gs.delivery_on %}<li><i>{% icon 'truck' %}</i>{% t 'dlv_courier' %} · {{ gs.delivery_area }}</li>{% endif %}

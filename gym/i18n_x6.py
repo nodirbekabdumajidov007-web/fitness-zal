@@ -394,4 +394,12 @@ about_pay_click||Sitede — Click ile, hemen aktif olur||Сайтта — Click 
 about_pay_cash||Salonda — nakit||Залда — накталай||Дар толор — бо пули нақд
 about_pay_gift||Hediye çekiyle||Белек сертификаты менен||Бо сертификати тӯҳфа
 about_all_q||Tüm sorular||Бардык суроолор||Ҳамаи саволҳо
+share||Paylaş||Бөлүшүү||Мубодила
+link_copied||Bağlantı kopyalandı||Шилтеме көчүрүлдү||Истинод нусха шуд
+sort_by||Sırala||Иреттөө||Тартиб
+sort_default||Varsayılan||Демейки||Пешфарз
+sort_cheap||Önce ucuzlar||Адегенде арзандары||Аввал арзонҳо
+sort_dear||Önce pahalılar||Адегенде кымбаттары||Аввал гаронҳо
+sort_new||En yeniler||Жаңылары||Навҳо
+per_day||gün||күн||рӯз
 """

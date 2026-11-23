@@ -167,6 +167,21 @@ document.addEventListener('DOMContentLoaded', function () {
   if (ls) ls.addEventListener('change', function () { location.href = '/lang/' + ls.value + '/?next=' + encodeURIComponent(location.pathname + location.search); });
   document.querySelectorAll('[data-print]').forEach(function (b) { b.addEventListener('click', function () { window.print(); }); });
 
+  // a select that applies itself (shop sorting)
+  document.querySelectorAll('select[data-autosubmit]').forEach(function (s) { s.addEventListener('change', function () { if (s.form) s.form.submit(); }); });
+
+  // share buttons: the phone's share sheet (Telegram, WhatsApp...) where it exists, otherwise the link is copied
+  document.querySelectorAll('[data-share]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var url = b.getAttribute('data-share-url') || location.href, title = b.getAttribute('data-share-title') || document.title;
+      var label = b.querySelector('span') || b;
+      var done = function () { var old = label.textContent; label.textContent = b.getAttribute('data-done'); b.classList.add('done'); setTimeout(function () { label.textContent = old; b.classList.remove('done'); }, 1800); };
+      if (navigator.share) { navigator.share({ title: title, url: url }).catch(function () {}); return; }
+      if (navigator.clipboard) navigator.clipboard.writeText(url).then(done, function () {});
+      else { var t = document.createElement('textarea'); t.value = url; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); done(); } catch (e) {} t.remove(); }
+    });
+  });
+
   // copy-to-clipboard buttons (falls back to selecting the text)
   document.querySelectorAll('[data-copy]').forEach(function (b) {
     b.addEventListener('click', function () {

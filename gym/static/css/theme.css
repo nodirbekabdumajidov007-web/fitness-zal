@@ -533,3 +533,14 @@ dialog{border-radius:22px}
 .about-list>b{display:flex;align-items:center;gap:8px}.about-list>b .ico{color:var(--accent);width:20px;height:20px}
 .about-list ul{margin:10px 0 0;padding-left:18px;display:grid;gap:6px;color:var(--muted);font-size:.92rem;line-height:1.45}
 .about-faq .faq{display:grid;gap:8px}
+
+/* share button, shop sorting, per-day price */
+.share-row{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
+.share-btn{display:inline-flex;align-items:center;gap:8px}
+.share-btn .ico{width:18px;height:18px}
+.share-btn.done{border-color:var(--good);color:var(--good)}
+.shop-sort{display:inline-flex;align-items:center;gap:8px;margin-left:auto;font-size:.9rem;color:var(--muted);white-space:nowrap}
+.shop-sort select{width:auto;min-width:150px}
+@media (max-width:640px){.shop-sort{margin-left:0;width:100%}.shop-sort select{flex:1}}
+.per-day{margin-top:2px;font-size:.86rem;color:var(--muted)}
+.per-day b{color:var(--ink);font-weight:700}

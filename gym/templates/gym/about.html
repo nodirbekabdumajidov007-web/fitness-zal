@@ -6,6 +6,7 @@
   <span class="eyebrow">Fitnes Zal</span>
   <h1>{% t 'about_title' %}</h1>
   {% if gs.about_text %}<div class="about-text">{{ gs.about_text|linebreaks }}</div>{% else %}<p class="muted">{% t 'about_empty' %}</p>{% endif %}
+  <div class="share-row">{% with title="Fitnes Zal" %}{% include "gym/_share.html" %}{% endwith %}</div>
 </section>
 
 {% if stats.members or stats.trainers or stats.classes %}

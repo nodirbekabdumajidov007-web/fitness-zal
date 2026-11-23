@@ -11,6 +11,7 @@
     <div class="eyebrow">{% if p.days %}{% t 'days_n' n=p.days %}{% else %}{% t 'months_n' n=p.months %}{% endif %}</div>
     <h3>{% plan_name p %}</h3>
     <div class="price num">{{ p.price|money }} <small>{% t 'price_unit' %}</small></div>
+    {% if p.duration_days > 1 %}<div class="per-day">≈ <b class="num">{{ p.per_day|money }}</b> {% t 'price_unit' %} / {% t 'per_day' %}</div>{% endif %}
     <ul class="perks">{% plan_perks p as perks %}{% for x in perks %}<li>{{ x }}</li>{% endfor %}</ul>
     <fieldset class="paytiles{% if pay_tiles|length == 1 %} single{% endif %}"><legend>{% t 'pay_method' %}</legend>
       {% for x in pay_tiles %}<label class="ptile {{ x.brand }}">
