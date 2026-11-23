@@ -5,7 +5,6 @@ cal_f_limit||En fazla 200 kendi yiyeceğinizi saklayabilirsiniz||200гө чей�
 cal_my||Yiyeceklerim||Менин тамактарым||Хӯрокҳои ман
 cal_my_empty||Henüz kendi yiyeceğiniz yok. Arama bir şey bulamazsa ekleyin.||Азырынча өз тамагыңыз жок. Издөө таппаса, кошуңуз.||Ҳоло хӯроки худатон нест. Агар ҷустуҷӯ чизеро наёбад, илова кунед.
 cal_edit||Düzenle||Түзөтүү||Таҳрир
-cal_quick||Hızlı ekle (kaydedilmez)||Тез кошуу (сакталбайт)||Зуд илова кардан (захира намешавад)
 cal_quick_hint||Yalnızca bir ad ve girdiğiniz miktarın kalorisi. Bir sonraki sefer için saklanmaz.||Аты жана киргизген санга ылайык калория гана. Кийинки жолу үчүн сакталбайт.||Танҳо ном ва калорияи миқдори ворид кардаатон. Барои дафъаи оянда нигоҳ дошта намешавад.
 cal_confirm_del||Bu yiyecek silinsin mi?||Бул тамак өчүрүлсүнбү?||Ин хӯрок нест карда шавад?
 tl_save||Sonucu kaydet||Жыйынтыкты сактоо||Захира кардани натиҷа
@@ -79,16 +78,11 @@ cancel_late_hint||Başlangıçtan en geç {hours} saat önce iptal edin||Баш�
 wl_join||Bekleme listesine katıl||Күтүү тизмесине кошулуу||Ба рӯйхати интизорӣ ворид шудан
 wl_leave||Bekleme listesinden ayrıl||Күтүү тизмесинен чыгуу||Аз рӯйхати интизорӣ баромадан
 wl_pos||Bekleme listesi: #{n}||Күтүү тизмеси: #{n}||Рӯйхати интизорӣ: №{n}
-wl_waiting_n||Bekleyen: {n}||Күткөндөр: {n}||Мунтазир: {n}
 wl_joined||Bekleme listesindesiniz: #{n}. Yer boşaldığında otomatik olarak kaydedileceksiniz.||Күтүү тизмесиндесиз: #{n}. Орун бошогондо автоматтык түрдө жазыласыз.||Шумо дар рӯйхати интизорӣ ҳастед: №{n}. Вақте ҷой холӣ шавад, худкор сабт мешавед.
 wl_left||Bekleme listesinden ayrıldınız.||Күтүү тизмесинен чыктыңыз.||Шумо аз рӯйхати интизорӣ баромадед.
 wl_seats||Yer var: doğrudan yer ayırtın.||Орун бар: түз жазылыңыз.||Ҷой ҳаст: бевосита ном нависед.
 wl_booked_title||Sıra sizde: yer ayrıldı||Кезек сизде: орун брондолду||Навбати шумо: ҷой сабт шуд
 wl_booked_body||«{name}», {date} saat {time}. Dersler sayfasından iptal edebilirsiniz.||«{name}», {date} саат {time}. Сабактар бетинен жокко чыгара аласыз.||«{name}», {date} соати {time}. Дар саҳифаи «Машғулиятҳо» бекор карда метавонед.
-dc_title||Bugünkü dersler: kim geldi||Бүгүнкү сабактар: ким келди||Машғулиятҳои имрӯз: кӣ омад
-dc_came||Geldi||Келди||Омад
-dc_noshow||No-show||No-show||No-show
-dc_not_started||Ders henüz başlamadı||Сабак азырынча башталган жок||Машғулият ҳанӯз оғоз нашудааст
 cal_title||Takvime ekle||Календарга кошуу||Ба тақвим илова кардан
 cal_help||Kişisel bağlantıya abone olun, ayırttığınız dersler telefonunuzun takviminde görünsün. Bağlantıyı paylaşmayın.||Жеке шилтемеге жазылыңыз, брондогон сабактар телефонуңуздун календарында көрүнөт. Шилтемени бөлүшпөңүз.||Ба пайванди шахсӣ обуна шавед, машғулиятҳои бронкардаатон дар тақвими телефон пайдо мешаванд. Пайвандро ба каси дигар надиҳед.
 cal_reset||Bağlantıyı sıfırla (eskisi çalışmaz)||Шилтемени баштапкы абалга келтирүү (эскиси иштебей калат)||Барқарор кардани пайванд (пайванди кӯҳна кор намекунад)
@@ -102,7 +96,7 @@ tr_rate_only_trained||Yalnızca bu antrenörle çalışan veya dersine katılan 
 tr_rate_bad||Puan 1 ile 5 arasında olmalı.||Баа 1ден 5ке чейин болушу керек.||Баҳо бояд аз 1 то 5 бошад.
 tr_rate_not_allowed||Puan vermek için bu antrenörle tamamlanmış bir seans veya ders gerekir.||Баа берүү үчүн бул машыктыруучу менен аякталган сеанс же сабак болушу керек.||Барои баҳо додан бо ин мураббӣ сеанс ё машғулияти анҷомёфта лозим аст.
 tr_rate_ok||Teşekkürler! Puanınız kaydedildi.||Рахмат! Бааңыз сакталды.||Ташаккур! Баҳои шумо захира шуд.
-wk_streak||Haftalık seri (haftada 2+ ziyaret)||Жумалык серия (жумасына 2+ визит)||Силсилаи ҳафтаина (ҳафтае 2+ ташриф)
+wk_streak||Haftalık seri||Жумалык серия||Силсилаи ҳафтаина
 wk_this||Bu hafta: {done} / {need}||Бул жума: {done} / {need}||Ин ҳафта: {done} / {need}
 board_on||Aylık liderlik tablosundasınız (ad ve soyadın baş harfi gösterilir).||Сиз айлык лидерборддосуз (аты жана фамилиянын биринчи тамгасы көрсөтүлөт).||Шумо дар ҷадвали пешсафони моҳона ҳастед (ном ва ҳарфи аввали насаб нишон дода мешавад).
 board_off||Liderlik tablosu isteğe bağlıdır: katılana kadar gizli kalırsınız.||Лидерборд ыктыярдуу: кошулмайынча жашыруун каласыз.||Ҷадвали пешсафон ихтиёрӣ аст: то ҳамроҳ нашавед, пинҳон мемонед.
@@ -174,7 +168,6 @@ trainers_empty_sub||Henüz aktif antrenör yok. Yine de grup dersi programına b
 rv_empty_title||Henüz yorum yok||Азырынча пикир жок||Ҳоло фикр нест
 rv_empty_sub||Düşüncelerinizi paylaşan ilk kişi olun: formu kullanın.||Ойлоруңузду биринчи бөлүшүңүз: форманы колдонуңуз.||Аввалин шуда фикри худро мубодила кунед: аз шакл истифода баред.
 rv_write_btn||Yorum bırak||Пикир калтыруу||Фикр гузоштан
-rv_avg_inline||Ortalama puan||Орточо баа||Баҳои миёна
 home_final_title||Bugün antrenmana başla||Бүгүн машыга баштаңыз||Имрӯз машқро оғоз кунед
 choose_plan||Bir üyelik seçin||Абонемент тандаңыз||Абонемент интихоб кунед
 classes_schedule||Ders programı||Сабактардын графиги||Ҷадвали машғулиятҳо
@@ -215,7 +208,6 @@ pwa_push_disabled||Bu cihazda kapalı||Бул түзмөктө өчүк||Дар 
 pwa_push_denied||Bildirimler engellendi: tarayıcı ayarlarından izin verin.||Билдирмелер бөгөттөлгөн: браузер жөндөөлөрүнөн уруксат бериңиз.||Огоҳиномаҳо масдуд шудаанд: дар танзимоти браузер иҷозат диҳед.
 pwa_push_unsupported||Bu tarayıcı push bildirimlerini desteklemiyor (iPhone'da önce uygulamayı ana ekrana ekleyin).||Бул браузер push билдирмелерин колдобойт (iPhone'до адегенде тиркемени башкы экранга кошуңуз).||Ин браузер push-огоҳиномаҳоро дастгирӣ намекунад (дар iPhone аввал барнома ба экрани асосӣ илова кунед).
 pwa_push_err||Bir şeyler ters gitti: tekrar deneyin.||Бир нерсе туура эмес болду: кайра аракет кылыңыз.||Чизе нодуруст рафт: дубора кӯшиш кунед.
-offline_card||Üye kartım (QR)||Мүчө картам (QR)||Корти аъзогии ман (QR)
 ftr_title||Fitness takibi||Фитнес трекер||Трекери фитнес
 ftr_sub||Kilo, vücut ölçüleri, antrenmanlar ve hedefler tek yerde. Verilerinizi yalnızca siz görürsünüz.||Салмак, дене өлчөмдөрү, машыгуулар жана максаттар бир жерде. Маалыматыңызды сиз гана көрөсүз.||Вазн, андозаҳои бадан, машқҳо ва ҳадафҳо дар як ҷо. Маълумоти шуморо танҳо худи шумо мебинед.
 ftr_weight||Kilo||Салмак||Вазн

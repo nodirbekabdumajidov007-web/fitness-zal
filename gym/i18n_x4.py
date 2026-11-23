@@ -49,7 +49,6 @@ cal_sub||Yediklerinizi kaydedin: günlük hedefiniz ve kalan miktar hemen görü
 cal_target||Günlük hedef||Күнүмдүк максат||Ҳадафи рӯзона
 cal_how_profile||Kilo, boy, yaş ve hedefinize göre hesaplandı||Салмак, бой, жаш жана максатыңыз боюнча эсептелди||Аз рӯи вазн, қад, синну сол ва ҳадафи шумо ҳисоб шуд
 cal_how_default||Yaklaşık bir hedef. Daha kesin olması için profilinize doğum tarihi ve hedef, ölçümlere de kilo ve boy ekleyin.||Болжолдуу максат. Тактыгы үчүн профилге туулган күн жана максат, өлчөмдөргө салмак менен бойду кошуңуз.||Ҳадафи тахминӣ. Барои дақиқтар шудан санаи таваллуд ва ҳадафро ба профил, вазн ва қадро ба андозаҳо илова кунед.
-cal_eaten||Yenen||Жегенде||Хӯрда шуд
 cal_left||Kalan||Калды||Боқимонда
 cal_over||Hedefi aştı||Максаттан ашты||Аз ҳадаф зиёд
 cal_kcal||kcal||ккал||ккал
@@ -64,7 +63,6 @@ meal_dinner||Akşam yemeği||Кечки тамак||Хӯроки шом
 meal_snack||Ara öğün||Жеңил тамак||Газак
 cal_plan_of||plan: {n} kcal||план: {n} ккал||нақша: {n} ккал
 cal_advice||Günün kalanını nasıl dağıtmalı||Күндүн калганын кантип бөлүштүрүү||Боқимондаи рӯзро чӣ тавр тақсим кардан
-cal_advice_line||{meal}: yaklaşık {n} kcal||{meal}: болжол менен {n} ккал||{meal}: тақрибан {n} ккал
 cal_add||Takvime indir||Календарга жүктөө||Ба тақвим зеркашӣ кардан
 cal_pick||Listeden seçin||Тизмеден тандаңыз||Аз рӯйхат интихоб кунед
 cal_search_ph||Herhangi bir yiyecek yazın (pilav, samsa, burger, kahve, pizza...)||Каалаган тамакты териңиз (палоо, самса, бургер, кофе, пицца...)||Ҳар хӯрокро нависед (палав, самбӯса, бургер, қаҳва, питса...)
@@ -73,7 +71,6 @@ cal_meal||Öğün||Тамактануу||Хӯрок
 cal_custom||Hızlı ekle: listede yok, adı ve kaloriyi kendim yazacağım||Тез кошуу: тизмеде жок, атын жана калорияны өзүм жазам||Зуд илова кардан: дар рӯйхат нест, ном ва калорияро худам менависам
 cal_name||Ad||Аты||Ном
 cal_kcal_total||Kalori (tüm porsiyon)||Калория (бүт порция)||Калория (тамоми порсия)
-cal_preview||100 g başına: {k} kcal · {p} protein · {f} yağ · {c} karbonhidrat||100 г үчүн: {k} ккал · {p} протеин · {f} май · {c} углевод||Барои 100 г: {k} ккал · {p} сафеда · {f} чарбу · {c} карбогидрат
 cal_save||Ekle||Кошуу||Илова кардан
 cal_today||Bugün||Бүгүн||Имрӯз
 cal_empty||Bu gün için henüz kayıt yok. İlk öğününüzü ekleyin.||Бул күнгө азырынча жазуу жок. Биринчи тамагыңызды кошуңуз.||Барои ин рӯз ҳоло сабт нест. Хӯроки аввалини илова кунед.
@@ -82,12 +79,6 @@ cal_bad_food||Bir ad ve geçerli sayılar girin||Ат жана жарактуу 
 cal_added||Yiyecek eklendi||Тамак кошулду||Хӯрок илова шуд
 cal_remove||Kaldır||Өчүрүү||Бардоштан
 cal_note||Değerler yaklaşıktır. Sağlık sorunları veya özel diyetler için doktora danışın.||Маанилер болжолдуу. Ден соолук көйгөйлөрү же атайын диета үчүн дарыгерден сураңыз.||Арзишҳо тахминӣ ҳастанд. Барои мушкилоти саломатӣ ё парҳези махсус аз духтур пурсед.
-ann_more||devamını oku||улантуусун окуу||бештар хондан
-ann_less||daha az göster||азыраак көрсөтүү||камтар нишон додан
-ann_empty||Henüz duyuru yok||Азырынча жарыя жок||Ҳоло эълон нест
-ft_hours||Saatler||Убакыт||Соатҳо
-ft_tg||Telegram||Telegram||Telegram
-pay_soon_tile||yakında||жакында||ба қарибӣ
 pay_cash_sub||Resepsiyonda ödeyin||Кабыл алууда төлөңүз||Дар қабулгоҳ пардохт кунед
 pay_online_sub||Çevrimiçi ödeme||Онлайн төлөм||Пардохти онлайн
 pay_card_sub||Karta havale||Картага которуу||Интиқол ба корт
@@ -153,10 +144,8 @@ ai_goal_general||Genel fitness||Жалпы фитнес||Фитнеси умум
 ai_equip||Ekipman||Шайман||Таҷҳизот
 ai_equip_gym||Salonda (makineler ve halter)||Залда (тренажёрлор жана штанга)||Дар толор (тренажёрҳо ва штанга)
 ai_equip_home||Evde (vücut ağırlığı veya dumbbell)||Үйдө (дене салмагы же гантель)||Дар хона (вазни бадан ё гантел)
-asst_unknown||Buna tam bir cevap bulamadım. Aşağıdaki sorulardan birini deneyin veya bir antrenöre sorun.||Буга так жооп таба албадым. Төмөнкү суроолордун бирин сынаңыз же машыктыруучудан сураңыз.||Ба ин ҷавоби дақиқ наёфтам. Яке аз саволҳои зеринро санҷед ё аз мураббӣ пурсед.
 asst_login||Bu, kendi hesabınızdaki bir bilgi: lütfen önce giriş yapın.||Бул өз аккаунтуңуздагы маалымат: адегенде кириңиз.||Ин маълумот аз аккаунти худи шумост: лутфан аввал ворид шавед.
 asst_rate||Çok fazla soru. Bir dakika sonra tekrar deneyin.||Өтө көп суроо. Бир мүнөттөн кийин кайра аракет кылыңыз.||Саволҳо аз ҳад зиёд. Баъди як дақиқа дубора кӯшиш кунед.
-asst_suggest||Şunu sormayı deneyin:||Мындай суроону сынап көрүңүз:||Чунин пурсида бинед:
 cal_txt_title||Yazarak ekleyin||Жазып кошуңуз||Бо навиштан илова кунед
 cal_txt_ph||Örneğin: 2 samsa ve çay, 200 g pilav, 3 yumurta||Мисалы: 2 самса жана чай, 200 г палоо, 3 жумуртка||Масалан: 2 самбӯса ва чой, 200 г палав, 3 тухм
 cal_txt_btn||Tanı||Таануу||Шинохтан
@@ -205,7 +194,6 @@ tl_neck||Boyun (cm)||Моюн (см)||Гардан (см)
 tl_waist||Bel (cm)||Бел (см)||Камар (см)
 tl_hip||Kalça (cm)||Жамбаш (см)||Рон (см)
 tl_lean||Yağsız kütle||Майсыз масса||Массаи бечарбу
-tl_ideal||İdeal kilo (Devine ±%10)||Идеалдуу салмак (Devine ±10%)||Вазни идеалӣ (Devine ±10%)
 tl_bf_bad||Ölçümler tutarsız: bel ve boyun ölçülerini tekrar kontrol edin.||Өлчөмдөр дал келбейт: бел менен моюнду кайра текшериңиз.||Андозаҳо мувофиқат намекунанд: камар ва ганданро дубора санҷед.
 tl_bf_help||Santimetre cinsinden: boyun Adem elmasının altında, bel göbek hizasında, kalça en geniş noktada. Kaba bir tahmindir.||Сантиметр менен: моюн жутуучунун астында, бел киндик деңгээлинде, жамбаш эң кенен жеринде. Болжолдуу баа.||Бо сантиметр: гардан дар зери ҳалқум, камар дар сатҳи нофи, рон дар ҷои бевсеътарин. Баҳои тахминӣ.
 tl_bf_c1||Zorunlu yağ (çok düşük)||Негизги май (өтө аз)||Чарбуи ҳатмӣ (хеле кам)

@@ -13,7 +13,6 @@ nav_trainers||Antrenörler||Машыктыруучулар||Мураббиён
 nav_progress||Sonuçlarım||Жыйынтыктарым||Натиҷаҳои ман
 nav_reviews||Yorumlar||Пикирлер||Фикрҳо
 nav_profile||Profil||Профиль||Профил
-nav_desk||Resepsiyon||Кабыл алуу||Қабулгоҳ
 nav_admin||Yönetim paneli||Башкаруу панели||Панели идора
 login||Giriş yap||Кирүү||Ворид шудан
 register||Kayıt ol||Катталуу||Сабти ном
@@ -83,19 +82,14 @@ demo_note||Ödeme yöntemleri test modunda: gerçek bir ödeme geçidi bağlı d
 perk_all||Tüm alanlar||Бардык зоналар||Ҳамаи минтақаҳо
 perk_save||200.000 UZS tasarruf||200 000 UZS үнөмдөө||200 000 UZS сарфа
 perk_consult||Antrenör danışmanlığı||Машыктыруучунун кеңеши||Машварати мураббӣ
-perk_locker||Kişisel dolap||Жеке шкаф||Шкафи шахсӣ
-perk_sauna||Sauna||Сауна||Сауна
-perk_vip||VIP alan||VIP зона||Минтақаи VIP
 plan_d1||1 günlük||1 күндүк||1 рӯза
 plan_m1||1 aylık||1 айлык||1 моҳа
 plan_m3||3 aylık||3 айлык||3 моҳа
 plan_vip||VIP 1 aylık||VIP 1 айлык||VIP 1 моҳа
 freeze||Üyeliği dondur||Абонементти тоңдуруу||Абонементро яхбандӣ кардан
-freeze_help||Bir kez, en fazla {max} gün. Bitiş tarihiniz aynı gün sayısı kadar ileri kayar.||Бир жолу, {max} күнгө чейин. Бүтүү күнүңүз ошончо күнгө жылат.||Як маротиба, то {max} рӯз. Санаи анҷоми шумо ба ҳамон қадар рӯз ба пеш мегузарад.
 freeze_do||Dondur||Тоңдуруу||Яхбандӣ кардан
 freeze_days||Gün||Күн||Рӯз
 freeze_ok||Üyelik donduruldu: {until} tarihinde geri dönüyorsunuz.||Абонемент тоңдурулду: {until} күнү кайтасыз.||Абонемент яхбандӣ шуд: шумо дар {until} бармегардед.
-freeze_fail||Dondurulamadı (zaten kullanıldı veya üyelik yok).||Тоңдурулган жок (мурун колдонулган же абонемент жок).||Яхбандӣ нашуд (аллакай истифода шудааст ё абонемент нест).
 frozen_until||Şu tarihe kadar donduruldu:||Чейин тоңдурулган:||То ин сана яхбандӣ шудааст:
 shop||Mağaza||Дүкөн||Мағоза
 all||Tümü||Баары||Ҳама
@@ -151,7 +145,6 @@ weekday_4||Cuma||Жума||Ҷумъа
 weekday_5||Cumartesi||Ишемби||Шанбе
 weekday_6||Pazar||Жекшемби||Якшанбе
 progress||İlerlemem||Менин жыйынтыгым||Пешрафти ман
-progress_help||Kilonuzu ve boyunuzu girin, grafik kendiliğinden çizilir.||Салмагыңыз менен бойуңузду жазыңыз, график өзү тартылат.||Вазн ва қади худро қайд кунед, диаграмма худ кашида мешавад.
 weight||Kilo (kg)||Салмак (кг)||Вазн (кг)
 height||Boy (cm)||Бой (см)||Қад (см)
 note||Not||Эскертүү||Эзоҳ
@@ -181,20 +174,15 @@ cur_pass||Mevcut şifre||Учурдагы сырсөз||Рамзи ҷорӣ
 new_pass||Yeni şifre||Жаңы сырсөз||Рамзи нав
 err_wrong_pass||Mevcut şifre yanlış||Учурдагы сырсөз туура эмес||Рамзи ҷорӣ нодуруст аст
 desk||Resepsiyon||Кабыл алуу||Қабулгоҳ
-desk_find||Üye bul (telefon, ad veya FZ numarası)||Мүчөнү табуу (телефон, аты же FZ номери)||Ёфтани аъзо (телефон, ном ё рақами FZ)
 desk_checkin||Giriş kaydet||Кирүүнү белгилөө||Воридшавиро қайд кардан
 desk_sell||Nakit sat||Накталай сатуу||Бо нақд фурӯхтан
-desk_pending||Onay bekleyen ödemeler||Ырастоону күткөн төлөмдөр||Пардохтҳои мунтазири тасдиқ
-desk_orders||Teslim edilecek siparişler||Тапшырыла турган заказдар||Фармоишҳои супоридашаванда
 confirm||Onayla||Ырастоо||Тасдиқ кардан
 hand_over||Teslim edildi||Тапшырылды||Супорида шуд
 block||Engelle||Бөгөттөө||Масдуд кардан
 unblock||Engeli kaldır||Бөгөттөн чыгаруу||Масдудиятро бардоштан
 visits_today||Bugünkü ziyaretler||Бүгүнкү визиттер||Ташрифҳои имрӯз
 active_members||Aktif üyeler||Активдүү мүчөлөр||Аъзоёни фаъол
-done_ok||Tamam.||Даяр.||Тайёр.
 rating_avg||Ortalama puan||Орточо баа||Баҳои миёна
-footer_demo||Bu proje örnek veriyle çalışır.||Бул долбоор үлгү маалыматтар менен иштейт.||Ин лоиҳа бо маълумоти намунавӣ кор мекунад.
 no_results||Hiçbir şey bulunamadı||Эчтеке табылган жок||Ҳеҷ чиз ёфт нашуд
 forgot||Şifrenizi mi unuttunuz?||Сырсөздү унутуп калдыңызбы?||Рамзро фаромӯш кардед?
 forgot_help||Telefon numaranızı girin, size bir kod gönderelim.||Телефон номериңизди киргизиңиз, биз сизге код жөнөтөбүз.||Рақами телефонатонро ворид кунед, мо ба шумо рамз мефиристем.
@@ -238,15 +226,8 @@ done_mark||Tamamlandı||Аткарылды||Иҷро шуд
 no_plan||Antrenörünüz henüz bir plan belirlemedi. Resepsiyondan sorun.||Машыктыруучуңуз азырынча план түзө элек. Кабыл алуудан сураңыз.||Мураббии шумо ҳанӯз нақша тартиб надодааст. Дар қабулгоҳ пурсед.
 today_ex||Bugün: {done} / {total} egzersiz||Бүгүн: {done} / {total} көнүгүү||Имрӯз: {done} / {total} машқ
 rest_day||Bugün dinlenme günü||Бүгүн эс алуу күнү||Имрӯз рӯзи истироҳат
-offline_title||Çevrimdışısınız||Интернет жок||Шумо оффлайн ҳастед
-offline_text||Bağlantı geri geldiğinde sayfa tekrar çalışır.||Байланыш кайтканда барак кайра иштейт.||Пас аз барқарор шудани алоқа саҳифа боз кор мекунад.
 retry||Tekrar dene||Кайра аракет кылуу||Дубора кӯшиш кунед
 scan||QR tarayıcı||QR сканер||Скенери QR
-scan_start||Kamerayı başlat||Камераны иштетүү||Оғози камера
-scan_manual||Kodu yazın veya tarayıcı kullanın||Кодду териңиз же сканерди колдонуңуз||Рамзро ворид кунед ё скенер истифода баред
-scan_help||USB tarayıcı kodu bu alana yazar. Kamera yalnızca Chrome ve Edge'de çalışır.||USB сканер кодду ушул талаага жазат. Камера Chrome жана Edge'де гана иштейт.||Скенери USB рамзро ба ин майдон ворид мекунад. Камера танҳо дар Chrome ва Edge кор мекунад.
-scan_err||Sunucuya ulaşılamıyor||Серверге жетүү мүмкүн эмес||Ба сервер дастрасӣ нест
-scan_nocam||Bu tarayıcıda kamerayla tarama kullanılamıyor. Kodu elle yazın.||Бул браузерде камера менен сканерлөө жеткиликсиз. Кодду кол менен териңиз.||Дар ин браузер скенкунии камера дастнорас аст. Рамзро дастӣ ворид кунед.
 scan_bad||Geçersiz kod||Жараксыз код||Рамзи нодуруст
 scan_ok||Giriş kaydedildi||Кирүү катталды||Воридшавӣ сабт шуд
 invite||Arkadaşını davet et||Досуңду чакыр||Дӯстатонро даъват кунед

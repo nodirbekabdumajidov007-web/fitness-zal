@@ -13,7 +13,6 @@ nav_trainers||Murabbiylar||Тренеры||Trainers
 nav_progress||Natijalarim||Мои результаты||Progress
 nav_reviews||Fikrlar||Отзывы||Reviews
 nav_profile||Profil||Профиль||Profile
-nav_desk||Qabulxona||Ресепшен||Front desk
 nav_admin||Admin panel||Админ-панель||Admin panel
 login||Kirish||Войти||Sign in
 register||Ro'yxatdan o'tish||Регистрация||Sign up
@@ -83,19 +82,14 @@ demo_note||To'lov usullari sinov rejimida: haqiqiy to'lov tizimi ulanmagan.||С�
 perk_all||Barcha zonalar||Все зоны||All zones
 perk_save||200 000 so'm tejaysiz||Экономия 200 000 сум||Save 200,000 UZS
 perk_consult||Murabbiy konsultatsiyasi||Консультация тренера||Trainer consultation
-perk_locker||Shaxsiy shkaf||Личный шкафчик||Personal locker
-perk_sauna||Sauna||Сауна||Sauna
-perk_vip||VIP zona||VIP-зона||VIP zone
 plan_d1||1 kunlik||1 день||1 day
 plan_m1||1 oylik||1 месяц||1 month
 plan_m3||3 oylik||3 месяца||3 months
 plan_vip||VIP 1 oylik||VIP 1 месяц||VIP 1 month
 freeze||Abonementni muzlatish||Заморозка абонемента||Freeze membership
-freeze_help||Bir marta, {max} kungacha. Muddat shuncha kunga uzayadi.||Один раз, до {max} дн. Срок продлится на столько же дней.||Once, up to {max} days. Your end date moves by the same number of days.
 freeze_do||Muzlatish||Заморозить||Freeze
 freeze_days||Kunlar||Дни||Days
 freeze_ok||Abonement muzlatildi: {until} kuni qaytasiz.||Абонемент заморожен: вы вернётесь {until}.||Membership frozen: you are back on {until}.
-freeze_fail||Muzlatib bo'lmadi (allaqachon ishlatilgan yoki abonement yo'q).||Не удалось заморозить (уже использовано или нет абонемента).||Could not freeze (already used, or no membership).
 frozen_until||Muzlatish tugaydi:||Заморозка до:||Frozen until:
 shop||Do'kon||Магазин||Shop
 all||Hammasi||Все||All
@@ -151,7 +145,6 @@ weekday_4||Juma||Пятница||Friday
 weekday_5||Shanba||Суббота||Saturday
 weekday_6||Yakshanba||Воскресенье||Sunday
 progress||Natijalarim||Мои результаты||My progress
-progress_help||Vazn va bo'yingizni yozib boring, grafik o'zi chiziladi.||Записывайте вес и рост, график построится сам.||Log your weight and height and the chart draws itself.
 weight||Vazn (kg)||Вес (кг)||Weight (kg)
 height||Bo'y (sm)||Рост (см)||Height (cm)
 note||Izoh||Заметка||Note
@@ -181,20 +174,15 @@ cur_pass||Joriy parol||Текущий пароль||Current password
 new_pass||Yangi parol||Новый пароль||New password
 err_wrong_pass||Joriy parol noto'g'ri||Текущий пароль неверный||Current password is wrong
 desk||Qabulxona||Ресепшен||Front desk
-desk_find||A'zoni qidirish (telefon, ism yoki FZ-raqam)||Поиск клиента (телефон, имя или FZ-номер)||Find a member (phone, name or FZ number)
 desk_checkin||Kirishni belgilash||Отметить вход||Check in
 desk_sell||Naqd sotish||Продать за наличные||Sell for cash
-desk_pending||Tasdiq kutayotgan to'lovlar||Платежи на подтверждение||Payments awaiting confirmation
-desk_orders||Berilishi kerak buyurtmalar||Заказы к выдаче||Orders to hand over
 confirm||Tasdiqlash||Подтвердить||Confirm
 hand_over||Berildi||Выдано||Handed over
 block||Bloklash||Заблокировать||Block
 unblock||Blokdan chiqarish||Разблокировать||Unblock
 visits_today||Bugungi tashriflar||Визитов сегодня||Visits today
 active_members||Faol a'zolar||Активных клиентов||Active members
-done_ok||Bajarildi.||Готово.||Done.
 rating_avg||O'rtacha baho||Средняя оценка||Average rating
-footer_demo||Bu sinov ma'lumotlari bilan ishlaydigan loyiha.||Проект работает на тестовых данных.||This project runs on sample data.
 no_results||Hech narsa topilmadi||Ничего не найдено||Nothing found
 forgot||Parolni unutdingizmi?||Забыли пароль?||Forgot your password?
 forgot_help||Telefon raqamingizni kiriting, SMS orqali kod yuboramiz.||Введите номер телефона, мы отправим код по SMS.||Enter your phone number and we'll text you a code.
@@ -238,15 +226,8 @@ done_mark||Bajarildi||Сделано||Done
 no_plan||Hozircha murabbiy sizga reja bermagan. Qabulxonada so'rang.||Тренер пока не составил вам план. Спросите на ресепшене.||Your trainer hasn't set a plan yet. Ask at the front desk.
 today_ex||Bugun: {done} / {total} mashq||Сегодня: {done} / {total} упражнений||Today: {done} / {total} exercises
 rest_day||Bugun dam olish kuni||Сегодня день отдыха||Rest day today
-offline_title||Internet yo'q||Нет интернета||You're offline
-offline_text||Aloqa tiklangach sahifa o'zi ochiladi.||Страница откроется, когда появится связь.||The page will work again once you're back online.
 retry||Qayta urinish||Повторить||Try again
 scan||QR skaner||QR-сканер||QR scanner
-scan_start||Kamerani yoqish||Включить камеру||Start camera
-scan_manual||Kodni qo'lda kiriting yoki skanerdan o'tkazing||Введите код вручную или считайте сканером||Type the code or use a scanner
-scan_help||USB skaner kodni shu maydonga yozadi. Telefon kamerasi faqat Chrome va Edge'da ishlaydi.||USB-сканер вводит код в это поле. Камера работает только в Chrome и Edge.||A USB scanner types the code into this field. The camera works in Chrome and Edge only.
-scan_err||Server bilan aloqa yo'q||Нет связи с сервером||Can't reach the server
-scan_nocam||Bu brauzerda kamera orqali skanerlash yo'q. Kodni qo'lda kiriting.||В этом браузере нет сканирования камерой. Введите код вручную.||Camera scanning isn't available in this browser. Type the code instead.
 scan_bad||Kod noto'g'ri||Неверный код||Invalid code
 scan_ok||Kirish belgilandi||Вход отмечен||Check-in recorded
 invite||Do'stni taklif qiling||Пригласите друга||Invite a friend
@@ -271,7 +252,6 @@ tg_linked||{name}, hisobingiz ulandi. Eslatmalarni shu yerda olasiz. /status, /s
 tg_unlinked||Telegram uzildi.||Telegram отключён.||Telegram unlinked.
 tg_status_active||Abonementingiz {date} gacha faol ({days} kun qoldi).||Абонемент активен до {date} (осталось {days} дн.).||Your membership is active until {date} ({days} days left).
 tg_status_none||Hozir faol abonementingiz yo'q.||Сейчас нет активного абонемента.||You have no active membership right now.
-tg_expiring||Abonementingiz {date} da tugaydi ({days} kun qoldi). Uzaytirib qo'ying.||Абонемент заканчивается {date} (осталось {days} дн.). Продлите заранее.||Your membership ends on {date} ({days} days left). Renew in advance.
 tg_class_tomorrow||Ertaga {time} da "{name}" mashg'ulotiga bron qilgansiz.||Завтра в {time} у вас запись на «{name}».||Tomorrow at {time} you're booked for "{name}".
 tg_pt_confirmed||Shaxsiy mashg'ulot tasdiqlandi: {trainer}, {time}.||Персональная тренировка подтверждена: {trainer}, {time}.||Personal training confirmed: {trainer}, {time}.
 tg_pt_cancelled||Shaxsiy mashg'ulot bekor qilindi: {trainer}.||Персональная тренировка отменена: {trainer}.||Personal training cancelled: {trainer}.
@@ -300,54 +280,28 @@ pay_now||To'lash||Оплатить||Pay now
 no_card_note||Hozir karta ulanmagan. Zalda naqd to'lang yoki administrator bilan bog'laning.||Карта сейчас не подключена. Оплатите наличными в зале или свяжитесь с администратором.||No card is connected right now. Pay cash at the gym or contact the admin.
 report_sent||To'lov haqida xabaringiz yuborildi. To'lov tasdiqlangach abonement/buyurtma faollashadi.||Сообщение об оплате отправлено. После подтверждения платежа абонемент/заказ активируется.||Payment notice sent. Your membership/order activates once the payment is confirmed.
 err_last4||Kartaning oxirgi 4 raqamini yozing||Введите последние 4 цифры карты||Enter the last 4 digits of the card
-proof_yes||To'ladim degan||Сообщил(а) об оплате||Says paid
-proof_no||Hali xabar yo'q||Пока без сообщения||Not reported yet
-confirm_money||Pul kartaga tushganini ko'rdingizmi?||Вы видите поступление на карту?||Did you see the money arrive?
 reject||Rad etish||Отклонить||Reject
 pending_card_note||Karta o'tkazmasi tugallanmagan yoki tasdiq kutmoqda. To'lovlar bo'limiga o'ting.||Перевод на карту не завершён или ждёт подтверждения. Откройте раздел «Платежи».||Your card transfer is unfinished or awaiting confirmation. Open Payments.
 tg_payment_ok||To'lov tasdiqlandi: {amount} so'm ({ref}). Rahmat!||Платёж подтверждён: {amount} сум ({ref}). Спасибо!||Payment confirmed: {amount} UZS ({ref}). Thank you!
 tg_payment_rejected||To'lov ({ref}) rad etildi yoki bekor qilindi. Savol bo'lsa qabulxonaga murojaat qiling.||Платёж ({ref}) отклонён или отменён. По вопросам обратитесь на ресепшен.||Payment ({ref}) was rejected or cancelled. Ask the front desk if you have questions.
-nav_training||Mashq darslari||Видеоуроки||Lessons
 training||Mashq darslari||Уроки тренировок||Training lessons
-training_help||Har kun uchun mashg'ulotlar: video, qanday bajarilishi va maslahatlar.||Тренировки на каждый день: видео, техника выполнения и советы.||Workouts for every day: video, how to do them, and tips.
-all_types||Barcha turlar||Все типы||All types
 level||Daraja||Уровень||Level
 level_beginner||Boshlang'ich||Начальный||Beginner
 level_intermediate||O'rta||Средний||Intermediate
 level_advanced||Yuqori||Продвинутый||Advanced
 watch||Video||Видео||Video
 every_day||Har kuni||Каждый день||Every day
-how_to||Qanday bajariladi||Как выполнять||How to do it
 muscles||Ishlaydigan mushaklar||Какие мышцы работают||Muscles worked
 equipment||Jihoz||Инвентарь||Equipment
 tips||Xatolar va maslahatlar||Ошибки и советы||Mistakes and tips
-open_video||Videoni ochish||Открыть видео||Open video
-no_video||Bu dars uchun video hali qo'shilmagan. Qadamlarni o'qing yoki murabbiydan so'rang.||Видео к этому уроку пока нет. Прочитайте шаги или спросите тренера.||No video for this lesson yet. Read the steps or ask a trainer.
 related||Shu turdagi boshqa darslar||Другие уроки этого типа||More lessons of this type
-safety_note||Mashqni boshlashdan oldin qizdiring. Og'riq sezsangiz to'xtang. Sog'lig'ingizda muammo bo'lsa, avval shifokor yoki murabbiy bilan maslahatlashing.||Перед тренировкой разомнитесь. При боли прекратите. Если есть проблемы со здоровьем, сначала посоветуйтесь с врачом или тренером.||Warm up first. Stop if you feel pain. If you have health issues, check with a doctor or trainer before you start.
-vip_get||VIP sotib olish||Купить VIP||Get VIP
-vip_extend||VIP ni uzaytirish||Продлить VIP||Extend VIP
-vip_locked||Faqat VIP uchun||Только для VIP||VIP only
-vip_unlock_text||Bu darsni ko'rish uchun VIP obuna oling. Narxi oyiga atigi 50 000 so'm.||Чтобы открыть этот урок, оформите VIP. Всего 50 000 сум в месяц.||Get VIP to open this lesson. Just 50,000 UZS a month.
-vip_tag||Maxsus darslar, do'kon chegirmasi va ikki baravar ball.||Эксклюзивные уроки, скидка в магазине и двойные баллы.||Exclusive lessons, shop discount and double points.
-vip_active||VIP faol||VIP активен||VIP active
-vip_via_plan||VIP imkoniyatlari VIP abonementingiz bilan berilgan.||VIP-возможности даны вашим VIP-абонементом.||Your VIP-plan membership already includes VIP perks.
 vip_perks||VIP imkoniyatlari||Возможности VIP||VIP perks
-vip_perk_videos||{n} ta maxsus dars: haftalik dasturlar, ovqatlanish, yog' yoqish||{n} эксклюзивных уроков: недельные программы, питание, жиросжигание||{n} exclusive lessons: weekly programs, nutrition, fat burning
-vip_perk_discount||Do'kondagi har bir xariddan {pct}% chegirma||Скидка {pct}% на каждую покупку в магазине||{pct}% off every shop purchase
-vip_perk_points||Ball ikki baravar: reytingda tezroq ko'tarilasiz||Баллы x2: быстрее поднимаетесь в рейтинге||Double points: climb the leaderboard faster
-vip_perk_badge||Profilingizda VIP belgisi||Значок VIP в профиле||A VIP badge on your profile
-vip_days_note||Muddat: {days} kun. Qayta sotib olsangiz, kunlar ustiga qo'shiladi.||Срок: {days} дн. При повторной покупке дни суммируются.||Duration: {days} days. Buying again adds days on top.
-vip_ok||VIP faollashdi. Xush kelibsiz!||VIP активирован. Добро пожаловать!||VIP activated. Welcome!
-vip_pending||VIP to'lovi tasdiq kutmoqda. Tasdiqlangach faollashadi.||Оплата VIP ожидает подтверждения. После подтверждения VIP включится.||Your VIP payment awaits confirmation. VIP starts once it's confirmed.
 kind_vip||VIP obuna||VIP-подписка||VIP pass
 chat||Chat||Чат||Chat
 chat_rules||A'zolar bilan yozishing. Hurmat bilan muomala qiling: haqorat, spam va telefon raqam so'rash taqiqlanadi. Shikoyat qilingan xabarlarni xodimlar ko'rib chiqadi.||Общайтесь с участниками. Будьте вежливы: оскорбления, спам и выпрашивание номеров запрещены. Жалобы на сообщения рассматривают сотрудники.||Chat with other members. Be respectful: no insults, spam or asking for phone numbers. Staff review reported messages.
 chat_banned_notice||Siz chatda yozishdan chetlatilgansiz. Administrator bilan bog'laning.||Вам запрещено писать в чат. Свяжитесь с администратором.||You are not allowed to post in chat. Contact the admin.
 room_general||Umumiy xona||Общая комната||General room
-room_vip||VIP xona||VIP-комната||VIP room
 room_general_help||Hamma a'zolar uchun ochiq suhbat||Открытый чат для всех участников||An open chat for every member
-room_vip_help||Faqat VIP a'zolar uchun yopiq suhbat||Закрытый чат только для VIP||A private chat for VIP members only
 chat_vip_only||Bu xona faqat VIP a'zolar uchun.||Эта комната только для VIP.||This room is for VIP members only.
 chat_people||A'zoni topish||Найти участника||Find a member
 chat_search||Ism yoki a'zo raqami||Имя или номер клиента||Name or member number
@@ -374,59 +328,17 @@ chat_forbidden||Bu xonaga ruxsat yo'q.||Нет доступа к этой ком
 chat_empty||Xabar bo'sh.||Сообщение пустое.||The message is empty.
 chat_long||Xabar juda uzun (eng ko'pi 1000 belgi).||Сообщение слишком длинное (максимум 1000 символов).||The message is too long (1000 characters max).
 chat_blocked||Bu a'zoga yozib bo'lmaydi.||Этому участнику писать нельзя.||You can't message this member.
-vip_videos||VIP videolar||VIP-видео||VIP videos
-vip_perk_chat||VIP xona: faqat VIP a'zolar uchun yopiq chat||VIP-комната: закрытый чат только для VIP||VIP room: a private chat for VIP members only
 min_short||daq||мин||min
 popular||Ommabop||Хит||Popular
 low_stock||Kam qoldi||Мало осталось||Almost gone
-vip_shop_note||VIP sifatida har bir xariddan {pct}% chegirma olasiz, u savatda avtomatik hisoblanadi.||Как VIP вы получаете скидку {pct}% на каждую покупку, она считается в корзине автоматически.||As VIP you get {pct}% off every purchase; it is applied in the cart automatically.
-vip_price_hint||VIP a'zolar uchun {pct}% arzonroq →||Для VIP на {pct}% дешевле →||{pct}% cheaper for VIP members →
 related_products||O'xshash mahsulotlar||Похожие товары||Related products
-free_pt_note||Sizda shu oy {n} ta bepul shaxsiy konsultatsiya bor: keyingi so'rovingiz bepul bo'ladi.||У вас в этом месяце {n} бесплатная консультация: следующий запрос будет бесплатным.||You have {n} free consultation(s) this month: your next request is free.
-vip_free||VIP bepul||VIP бесплатно||VIP free
 trainer_open||Batafsil||Подробнее||Details
 trainer_classes||Olib boradigan mashg'ulotlari||Ведёт занятия||Group classes
-vip_tag2||Ko'proq imkoniyat, ko'proq natija: maxsus darslar, ajratilgan joylar, bepul konsultatsiya va mehmon olib kelish.||Больше возможностей, больше результата: эксклюзивные уроки, места за вами, бесплатная консультация и гость.||More access, better results: exclusive lessons, reserved spots, a free consultation and a guest pass.
-vip_card||VIP kartasi||VIP-карта||VIP card
-vip_not_active||Faol emas||Не активна||Not active
-vip_guest_left||Mehmon taklifnomalari (shu oy)||Гостевые приглашения (этот месяц)||Guest passes (this month)
-vip_pt_left||Bepul konsultatsiyalar (shu oy)||Бесплатные консультации (этот месяц)||Free consultations (this month)
-vip_seats||Har mashg'ulotda siz uchun ajratilgan joylar||Мест за вами в каждом занятии||Seats held for you in each class
-perk_t_videos||Maxsus video darslar||Эксклюзивные видеоуроки||Exclusive video lessons
-perk_t_seats||Ajratilgan joylar||Места за вами||Reserved spots
-vip_perk_seats||Har bir guruh mashg'ulotida {n} ta joy faqat VIP uchun: mashg'ulot to'lib qolsa ham joy topasiz.||В каждом групповом занятии {n} места только для VIP: место найдётся, даже когда всё занято.||{n} spots in every group class are kept for VIP, so you get in even when it fills up.
-perk_t_pt||Bepul konsultatsiya||Бесплатная консультация||Free consultation
-vip_perk_pt||Oyiga {n} ta shaxsiy mashg'ulot (konsultatsiya) murabbiy bilan bepul.||{n} персональная консультация с тренером в месяц бесплатно.||{n} free one-to-one consultation with a trainer every month.
-perk_t_guest||Mehmon olib keling||Приводите гостя||Bring a guest
-vip_perk_guest||Oyiga {n} ta mehmon taklifnomasi: do'stingiz bir kun bepul shug'ullanadi.||{n} гостевое приглашение в месяц: друг тренируется день бесплатно.||{n} guest pass a month: a friend trains free for a day.
-perk_t_discount||Do'kon chegirmasi||Скидка в магазине||Shop discount
-perk_t_points||Ikki baravar ball||Двойные баллы||Double points
-perk_t_badge||VIP belgisi||Значок VIP||VIP badge
-guest_invite||Mehmon taklifnomasi||Гостевое приглашение||Guest pass
-guest_help||Mehmon ismini va kelish kunini yozing. Mehmon qabulxonada QR kod yoki 8 belgili kodni ko'rsatadi; taklifnoma faqat shu kuni bir marta ishlaydi.||Укажите имя гостя и дату. Гость показывает на ресепшене QR-код или 8-значный код; приглашение действует один раз и только в этот день.||Enter the guest's name and the day. The guest shows the QR or 8-character code at the desk; it works once, on that day only.
 guest_name||Mehmon ismi||Имя гостя||Guest name
 guest_create||Taklifnoma yaratish||Создать приглашение||Create pass
-guest_limit||Shu oydagi taklifnomalar tugadi. Keyingi oy yana beriladi.||Приглашения на этот месяц закончились. В следующем месяце будут новые.||This month's passes are used up. New ones come next month.
-guest_mine||Mening taklifnomalarim||Мои приглашения||My guest passes
-guest_used_tag||Ishlatilgan||Использовано||Used
-guest_valid||Amal qiladi||Действует||Valid
-guest_host||Taklif qilgan||Пригласил(а)||Invited by
-guest_rules||Mehmon shaxsini tasdiqlovchi hujjat bilan kelishi kerak. Zal qoidalari mehmonlarga ham taalluqli.||Гостю нужен документ, удостоверяющий личность. Правила зала действуют и для гостей.||The guest needs an ID. Gym rules apply to guests too.
 guest||mehmon||гость||guest
-guest_ok||Mehmon kirishi belgilandi||Вход гостя отмечен||Guest checked in
 guest_used||Bu taklifnoma allaqachon ishlatilgan||Это приглашение уже использовано||This pass was already used
-guest_wrong_day||Taklifnoma boshqa kun uchun||Приглашение на другой день||This pass is for another day
-guest_name_bad||Mehmon ismini yozing (2-60 belgi)||Введите имя гостя (2-60 символов)||Enter the guest's name (2-60 characters)
-guest_date_bad||Sana bugundan 30 kun ichida bo'lsin||Дата должна быть в течение 30 дней||Pick a date within the next 30 days
-guests_today||Bugungi mehmonlar||Гости сегодня||Today's guests
-vip_only_action||Bu faqat VIP a'zolar uchun||Это только для VIP||This is for VIP members only
-vip_seats_note||Siz VIP: har mashg'ulotda siz uchun qo'shimcha joylar ajratilgan.||Вы VIP: в каждом занятии за вами дополнительные места.||You're VIP: extra spots are held for you in every class.
-vip_seats_hint||Har mashg'ulotda bir nechta joy VIP a'zolar uchun ajratilgan. VIP haqida →||В каждом занятии несколько мест закреплено за VIP. О VIP →||A few spots in every class are kept for VIP members. About VIP →
 pt_sent_free||So'rov yuborildi. Bu oyning bepul VIP konsultatsiyasi ishlatildi.||Запрос отправлен. Использована бесплатная VIP-консультация этого месяца.||Request sent. This month's free VIP consultation was used.
-vip_how||Qanday ishlaydi||Как это работает||How it works
-vip_how_1||To'lov usulini tanlab VIP sotib olasiz (karta, naqd yoki Click).||Выбираете способ оплаты и покупаете VIP (карта, наличные или Click).||Choose a payment method and buy VIP (card, cash or Click).
-vip_how_2||To'lov tasdiqlangach VIP darhol yoqiladi va 30 kun amal qiladi.||После подтверждения оплаты VIP включается сразу и действует 30 дней.||Once the payment is confirmed, VIP starts right away and lasts 30 days.
-vip_how_3||Qayta sotib olsangiz, kunlar tugash sanasiga qo'shiladi: hech narsa yo'qolmaydi.||При продлении дни добавляются к дате окончания: ничего не теряется.||Renew any time: the days are added to your end date, nothing is lost.
 chat_rooms||Xonalar||Комнаты||Rooms
 chat_no_dm||Hali shaxsiy suhbat yo'q. Pastda a'zoni topib yozing.||Личных переписок пока нет. Найдите участника ниже и напишите.||No private chats yet. Find a member below and say hi.
 chat_photo||Rasm||Фото||Photo
@@ -462,25 +374,12 @@ add_phone_title||Telefon raqamingiz||Ваш номер телефона||Your ph
 add_phone_help||Kirish kodi shu raqamga SMS orqali yuboriladi.||Код для входа придёт на этот номер по SMS.||Your sign-in code will be texted to this number.
 admin_login||Administrator kirishi||Вход администратора||Administrator sign-in
 start_now||Boshlash||Начать||Get started
-days_short||kun||дн.||days
-from_price||Oyiga||В месяц||Per month
-home_vip_title||Keyingi darajangiz||Ваш следующий уровень||Your next level
-scroll_more||Pastga||Вниз||Scroll down
-ticker_1||Kuch||Сила||Strength
-ticker_2||Intizom||Дисциплина||Discipline
-ticker_3||Natija||Результат||Results
-ticker_4||Har kuni||Каждый день||Every day
 stat_members||faol a'zo||активных клиентов||active members
 stat_classes||haftalik mashg'ulot||занятий в неделю||weekly classes
-stat_lessons||video dars||видеоуроков||video lessons
-feat_training||Video darslar||Видеоуроки||Video lessons
-feat_training_sub||Har kunlik mashqlar: qanday bajarish, qaysi mushak ishlaydi.||Тренировки на каждый день: техника и какие мышцы работают.||Daily workouts: how to do them and which muscles work.
 feat_classes_sub||Guruh mashg'ulotlariga bir bosishda yoziling.||Запись на групповые занятия в одно касание.||Book a group class in one tap.
 feat_shop_sub||Suv, protein, energetik: zalda tayyor turadi.||Вода, протеин, энергетики: ждут вас в зале.||Water, protein, energy drinks: ready at the gym.
 feat_card_sub||QR karta bilan kirish: navbat yo'q.||Вход по QR-карте: без очереди.||Walk in with your QR card: no queue.
 home_plans_title||O'zingizga mos abonement||Абонемент под вас||A membership that fits you
-home_trainers_title||Sizni kim olib boradi||Кто вас поведёт||Who will coach you
-final_cta||Bugun boshlang. Ertaga farqni ko'rasiz.||Начните сегодня. Завтра увидите разницу.||Start today. See the difference tomorrow.
 login_as||Kim bo'lib kirasiz||Войти как||Sign in as
 role_member||A'zo||Клиент||Member
 role_trainer||Murabbiy||Тренер||Trainer
@@ -535,16 +434,10 @@ tools_female||Ayol||Женщина||Female
 tools_age||Yosh||Возраст||Age
 tools_height||Bo'y||Рост||Height
 tools_activity||Faollik||Активность||Activity
-act_1||Kam harakat (ofis)||Минимальная (офис)||Sedentary (desk job)
-act_2||Haftasiga 1–3 mashg'ulot||1–3 тренировки в неделю||1–3 workouts a week
-act_3||Haftasiga 3–5 mashg'ulot||3–5 тренировок в неделю||3–5 workouts a week
-act_4||Har kuni mashg'ulot||Каждый день||Every day
-act_5||Juda faol (sportchi)||Очень активный (спортсмен)||Very active (athlete)
 tools_goal||Maqsad||Цель||Goal
 goal_lose||Ozish||Похудеть||Lose
 goal_keep||Saqlash||Держать||Keep
 goal_gain||Massa||Набрать||Gain
-bmi_help||18.5–25 oralig'i sog'lom vazn hisoblanadi.||18,5–25 — здоровый вес.||18.5–25 is a healthy weight.
 bmi_under||Vazn kam||Недостаток веса||Underweight
 bmi_normal||Normal||Норма||Normal
 bmi_over||Ortiqcha vazn||Избыточный вес||Overweight
@@ -561,8 +454,6 @@ tools_orm_help||bir martalik maksimum (taxminan)||разовый максиму�
 tools_train_min||Bugungi mashg'ulot (daqiqa)||Тренировка сегодня (мин)||Training today (min)
 tools_liters||litr kuniga||литров в день||litres a day
 tools_hr||Puls zonalari||Пульсовые зоны||Heart-rate zones
-tools_rest_hr||Tinch holatdagi puls||Пульс в покое||Resting heart rate
-tools_hr_help||Karvonen usuli: maksimal puls = 220 − yosh.||Метод Карвонена: максимум = 220 − возраст.||Karvonen method: max HR = 220 − age.
 zone_1||1 · Tiklanish||1 · Восстановление||1 · Recovery
 zone_2||2 · Yog' yoqish||2 · Жиросжигание||2 · Fat burn
 zone_3||3 · Chidamlilik||3 · Выносливость||3 · Endurance
@@ -575,9 +466,7 @@ record_new||Yangi rekord! Tabriklaymiz!||Новый рекорд! Поздрав
 record_saved||Natija saqlandi||Результат сохранён||Result saved
 record_bad||Mashq, og'irlik (0–500 kg) va takror (1–30) to'g'ri bo'lsin||Проверьте упражнение, вес (0–500) и повторы (1–30)||Check the lift, weight (0–500 kg) and reps (1–30)
 records_entries||ta yozuv||записей||entries
-records_none||Hali yozuv yo'q||Записей пока нет||No entries yet
 records_history||Oxirgi natijalar||Последние результаты||Recent results
-desk_find_ph||Ism, telefon, FZ-0001 yoki QR kod…||Имя, телефон, FZ-0001 или QR-код…||Name, phone, FZ-0001 or QR code…
 desk_all_clear||Hammasi bajarilgan, kutayotgan ish yo'q||Всё сделано, ничего не ждёт||All done, nothing is waiting
 perk_pay||Naqd, karta o'tkazmasi yoki Click bilan to'lash||Оплата наличными, переводом на карту или Click||Pay in cash, by card transfer or Click
 activity||Faollik (12 hafta)||Активность (12 недель)||Activity (12 weeks)
@@ -617,11 +506,6 @@ workout_all_done||Bugungi mashq to'liq bajarildi! Zo'r! 💪||Сегодняшн
 chat_typing||{name} yozmoqda||{name} печатает||{name} is typing
 find_route||Zalga yo'l||Маршрут до зала||Route to the gym
 maps||xaritalar||Карты||Maps
-crowd_now||Hozir zal||Сейчас в зале||Right now
-crowd_calm||bo'sh||свободно||quiet
-crowd_mid||o'rtacha||средне||moderate
-crowd_busy||gavjum||многолюдно||busy
-crowd_help||Oxirgi 2 soatda kelganlar soni bo'yicha||По числу посетителей за последние 2 часа||Based on check-ins in the last 2 hours
 qr_2d||Skanerlash uchun||Для сканирования||To scan
 qr_3d||3D ko'rinish||3D-вид||3D view
 qr_theme||Rang||Цвет||Colour
@@ -673,8 +557,6 @@ dlv_call||Qo'ng'iroq||Позвонить||Call
 dlv_approx||Masofa va vaqt taxminiy||Расстояние и время приблизительные||Distance and time are approximate
 delivery_off||Hozircha yetkazib berish yo'q, zaldan olib keting||Доставка сейчас недоступна, заберите в зале||Delivery is off for now; please pick up at the gym
 st_shipping||Yo'lda||В пути||On the way
-ship_do||Yo'lga chiqdi||Отправлен||Out for delivery
-delivered_do||Yetkazildi||Доставлен||Delivered
 track||Buyurtma holati||Статус заказа||Order status
 trk_accepted||Qabul qilindi||Принят||Accepted
 trk_shipping||Kuryer yo'lda||Курьер в пути||Courier on the way
@@ -682,7 +564,6 @@ trk_delivered||Yetkazildi||Доставлен||Delivered
 trk_picked||Olib ketildi||Получен||Picked up
 tg_order_shipping||🛵 Buyurtmangiz #{n} yo'lga chiqdi! Kuryer tez orada yetib boradi.||🛵 Ваш заказ #{n} в пути! Курьер скоро будет.||🛵 Your order #{n} is on the way! The courier will be there soon.
 apple_soon||Apple (iCloud) bilan kirish tez orada||Вход через Apple (iCloud) скоро||Sign in with Apple (iCloud) coming soon
-social_soon||Google va Apple (iCloud) bilan kirish tez orada||Вход через Google и Apple (iCloud) скоро||Google and Apple (iCloud) sign-in coming soon
 apple_off||Apple bilan kirish sozlanmagan||Вход через Apple не настроен||Sign in with Apple is not set up
 err_apple||Apple akkauntini tekshirib bo'lmadi||Не удалось проверить аккаунт Apple||Could not verify the Apple account
 step_choose||Tanlov||Выбор||Choice
@@ -697,13 +578,9 @@ review_write||Fikr qoldiring||Оставьте отзыв||Leave a review
 review_edit||Fikringizni o'zgartirish||Изменить отзыв||Edit your review
 review_ph||Zal, murabbiylar, jihozlar haqida yozing…||Напишите о зале, тренерах, оборудовании…||Tell us about the gym, trainers, equipment…
 review_login||Fikr yozish uchun avval kiring.||Чтобы оставить отзыв, войдите.||Sign in to leave a review.
-review_first||Birinchi bo'lib fikr qoldiring!||Оставьте отзыв первым!||Be the first to leave a review!
 or_continue||yoki davom eting||или продолжите через||or continue with
-google_soon||Google bilan kirish tez orada||Вход через Google скоро||Google sign-in coming soon
 welcome_back||Qaytganingizdan xursandmiz||С возвращением||Welcome back
 join_us||Jamoaga qo'shiling||Присоединяйтесь||Join the team
-move_mouse||Sichqonchani qimirlatib ko'ring ✦||Подвигайте мышкой ✦||Move your mouse ✦
-deleted_ok||Tayyor||Готово||Done
 sms_login_note||Kirishda telefoningizga SMS kod keladi||При входе на телефон придёт SMS-код||You'll get an SMS code on your phone when signing in
 inbox||Xabarlar||Сообщения||Inbox
 inbox_sub||Zal ma'muriyati va tizimdan kelgan shaxsiy xabarlaringiz||Личные сообщения от администрации зала и системы||Personal messages from the gym team and the system
@@ -743,13 +620,10 @@ ft_members||A'zolar uchun||Для клиентов||For members
 ft_contact||Aloqa||Контакты||Contact
 ft_rights||Barcha huquqlar himoyalangan||Все права защищены||All rights reserved
 ft_made||Kuch · Intizom · Natija||Сила · Дисциплина · Результат||Strength · Discipline · Results
-ft_top||Yuqoriga||Наверх||Back to top
 tk_title||Kirish cheki||Чек входа||Entry receipt
 tk_date||Sana va vaqt||Дата и время||Date & time
 tk_member||A'zo||Клиент||Member
-tk_host||Taklif qilgan||Пригласил||Invited by
 tk_plan||Abonement||Абонемент||Membership
-tk_guest_pass||mehmon chiptasi||гостевой пропуск||guest pass
 tk_valid||Amal qiladi||Действует до||Valid until
 tk_days_left||kun qoldi||дн. осталось||days left
 tk_month_visits||Shu oy tashriflar||Визитов в этом месяце||Visits this month
@@ -763,10 +637,6 @@ tk_wish||Mashg'ulotingiz samarali o'tsin! 💪||Продуктивной тре�
 tk_help||Abonementni qabulxonada uzaytirish mumkin.||Продлить абонемент можно на ресепшене.||The membership can be renewed at the front desk.
 tk_help_blocked||Akkaunt bloklangan: sababini zal rahbariyatidan aniqlang.||Аккаунт заблокирован: уточните причину у руководства зала.||The account is blocked: ask the gym management why.
 tk_staff||Qabul qildi||Принял||Checked by
-tk_today||ta kirish bugun||входов сегодня||check-ins today
-tk_recent||Oxirgi skanerlar||Последние сканы||Recent scans
-tk_wait||A'zo kartasidagi QR kodni skanerlang — kirish cheki shu yerda chiqadi.||Отсканируйте QR-код карты — чек входа появится здесь.||Scan the member card QR code and the entry receipt prints here.
-tk_print||Chekni chop etish||Печать чека||Print receipt
 caps_on||Caps Lock yoqilgan — parol katta harflar bilan yozilyapti||Включён Caps Lock — пароль вводится заглавными||Caps Lock is on, the password is being typed in capitals
 remember_me||Meni eslab qol||Запомнить меня||Remember me
 trust_encrypted||Parollar shifrlangan holda saqlanadi||Пароли хранятся в зашифрованном виде||Passwords are stored encrypted
@@ -777,11 +647,6 @@ last_seen||Oldingi kirish: {when}. Bu siz bo'lmasangiz, parolni almashtiring.||�
 ai_coach||Murabbiy yordamchi||Помощник-тренер||Coach assistant
 ai_coach_sub||Mashq, ovqatlanish va zal haqida savol bering||Спросите о тренировках, питании и зале||Ask about training, nutrition and the gym
 ai_sub||Zal, abonement, mashq texnikasi va ovqatlanish bo'yicha tezkor javoblar. Kirgan bo'lsangiz, abonementingiz va kaloriyangizni ham aytib beradi. Haftalik mashq rejasini ham tuzadi.||Быстрые ответы о зале, абонементах, технике и питании. Если вы вошли, назовёт срок абонемента и ваши калории. Составит и недельный план тренировок.||Quick answers about the gym, memberships, technique and nutrition. When you are signed in it can tell your membership expiry and calories. It also builds a weekly workout plan.
-ai_home_title||Murabbiy yordamchi doim yoningizda||Помощник-тренер всегда рядом||A coach assistant always at hand
-ai_home_1||Texnika va mashq bo'yicha savollarga javob||Ответы о технике и упражнениях||Answers on technique and exercises
-ai_home_2||Maqsadingizga mos haftalik reja||Недельный план под вашу цель||A weekly plan built for your goal
-ai_home_3||Kun-u tun, o'zbek, rus va ingliz tilida||Круглосуточно, на узбекском, русском и английском||Day and night, in Uzbek, Russian and English
-ai_try||Sinab ko'rish||Попробовать||Try it
 ai_login||Reja tuzish va suhbatni saqlash uchun kiring.||Войдите, чтобы составлять план и сохранять переписку.||Sign in to build a plan and keep your conversation.
 ai_chat_title||Yordamchi bilan suhbat||Чат с помощником||Chat with the assistant
 ai_clear||Suhbatni tozalash||Очистить чат||Clear chat
@@ -871,7 +736,6 @@ cal_sub||Nima yeganingizni yozing: kunlik me'yor va qolgan kaloriya darrov ko'ri
 cal_target||Kunlik me'yor||Норма на день||Daily target
 cal_how_profile||Vazn, bo'y, yosh va maqsadingiz bo'yicha hisoblandi||Рассчитано по весу, росту, возрасту и цели||Worked out from your weight, height, age and goal
 cal_how_default||Taxminiy me'yor. Aniqroq bo'lishi uchun profilda tug'ilgan kun va maqsadni, jismoniy ko'rsatkichlarda vazn va bo'yni kiriting.||Примерная норма. Для точности укажите в профиле дату рождения и цель, а в замерах вес и рост.||A rough target. For a precise one add your birth date and goal in the profile, and weight and height in measurements.
-cal_eaten||Yeyildi||Съедено||Eaten
 cal_left||Qoldi||Осталось||Left
 cal_over||Me'yordan oshdi||Сверх нормы||Over target
 cal_kcal||kkal||ккал||kcal
@@ -886,7 +750,6 @@ meal_dinner||Kechki ovqat||Ужин||Dinner
 meal_snack||Perekus||Перекус||Snack
 cal_plan_of||reja: {n} kkal||план: {n} ккал||plan: {n} kcal
 cal_advice||Qolgan kunni qanday taqsimlash||Как распределить остаток дня||How to spread the rest of the day
-cal_advice_line||{meal}: taxminan {n} kkal||{meal}: примерно {n} ккал||{meal}: about {n} kcal
 cal_add||Ovqat qo'shish||Добавить еду||Add food
 cal_pick||Ro'yxatdan tanlang||Выберите из списка||Pick from the list
 cal_search_ph||Istalgan ovqat nomini yozing (osh, somsa, burger, кофе, pizza...)||Введите любую еду (плов, самса, бургер, кофе, pizza...)||Type any food (plov, samsa, burger, coffee, pizza...)
@@ -895,7 +758,6 @@ cal_meal||Ovqat vaqti||Приём пищи||Meal
 cal_custom||Tezkor qo'shish: ro'yxatda yo'q, nom va kaloriyani o'zim yozaman||Быстро: нет в списке, введу название и калории||Quick add: not in the list, I will type a name and calories
 cal_name||Nomi||Название||Name
 cal_kcal_total||Kaloriya (butun porsiya)||Калории (вся порция)||Calories (whole portion)
-cal_preview||100 g da: {k} kkal · {p} oqsil · {f} yog' · {c} uglevod||На 100 г: {k} ккал · {p} белка · {f} жира · {c} углеводов||Per 100 g: {k} kcal · {p} protein · {f} fat · {c} carbs
 cal_save||Qo'shish||Добавить||Add
 cal_today||Bugun||Сегодня||Today
 cal_empty||Bu kunga hali hech narsa yozilmagan. Birinchi ovqatni qo'shing.||За этот день пока ничего нет. Добавьте первую еду.||Nothing logged for this day yet. Add your first meal.
@@ -904,12 +766,6 @@ cal_bad_food||Nomi va to'g'ri raqamlarni kiriting||Укажите названи
 cal_added||Ovqat qo'shildi||Еда добавлена||Food added
 cal_remove||O'chirish||Убрать||Remove
 cal_note||Qiymatlar taxminiy. Kasallik yoki maxsus parhez bo'lsa, shifokor bilan maslahatlashing.||Значения примерные. При болезнях и особой диете проконсультируйтесь с врачом.||Values are approximate. For medical conditions or special diets, ask a doctor.
-ann_more||batafsil||подробнее||read more
-ann_less||yopish||свернуть||show less
-ann_empty||Hozircha e'lonlar yo'q||Пока нет объявлений||No announcements yet
-ft_hours||Ish vaqti||Часы работы||Hours
-ft_tg||Telegram||Telegram||Telegram
-pay_soon_tile||tez orada||скоро||soon
 pay_cash_sub||Qabulxonada to'laysiz||Оплата на ресепшене||Pay at the front desk
 pay_online_sub||Onlayn to'lov||Онлайн-оплата||Online payment
 pay_card_sub||Kartaga o'tkazma||Перевод на карту||Card transfer
@@ -975,7 +831,6 @@ ai_goal_general||Umumiy fitnes||Общая форма||General fitness
 ai_equip||Jihoz||Инвентарь||Equipment
 ai_equip_gym||Zalda (trenajyor va shtanga)||В зале (тренажёры и штанга)||At the gym (machines and barbell)
 ai_equip_home||Uyda (jihozsiz yoki gantel)||Дома (без инвентаря или гантели)||At home (bodyweight or dumbbells)
-asst_unknown||Bu savolga aniq javob topa olmadim. Quyidagilardan birini so'rab ko'ring yoki murabbiydan so'rang.||Не нашёл точного ответа на этот вопрос. Попробуйте один из вариантов ниже или спросите тренера.||I could not find an exact answer to that. Try one of the questions below or ask a trainer.
 asst_login||Bu ma'lumot sizning hisobingizga tegishli: avval tizimga kiring.||Это информация вашего аккаунта: сначала войдите в систему.||That is information from your own account: please sign in first.
 ai_attach||Rasm biriktirish||Прикрепить фото||Attach a photo
 ai_img_err||Rasm .jpg, .png yoki .webp bo'lsin va 4 MB dan oshmasin.||Фото должно быть .jpg, .png или .webp, не больше 4 МБ.||The photo must be .jpg, .png or .webp and up to 4 MB.
@@ -1092,7 +947,6 @@ sort_dear||Avval qimmatlari||Сначала дорогие||Most expensive first
 sort_new||Yangilari||Новинки||Newest
 per_day||kun||день||day
 asst_rate||Juda ko'p savol yuborildi. Bir daqiqadan keyin qayta urinib ko'ring.||Слишком много вопросов. Попробуйте через минуту.||Too many questions. Try again in a minute.
-asst_suggest||Shuni so'rab ko'ring:||Попробуйте спросить:||Try asking:
 cal_txt_title||Matn bilan yozish||Записать текстом||Type it in
 cal_txt_ph||Masalan: 2 ta somsa va choy, 200 g osh, 3 tuxum||Например: 2 самсы и чай, 200 г плова, 3 яйца||For example: 2 samsas and tea, 200 g plov, 3 eggs
 cal_txt_btn||Aniqlash||Распознать||Recognize
@@ -1141,7 +995,6 @@ tl_neck||Bo'yin (sm)||Шея (см)||Neck (cm)
 tl_waist||Bel (sm)||Талия (см)||Waist (cm)
 tl_hip||Son (sm)||Бёдра (см)||Hips (cm)
 tl_lean||Yog'siz massa||Сухая масса||Lean mass
-tl_ideal||Ideal vazn (Devine ±10%)||Идеальный вес (Девайн ±10%)||Ideal weight (Devine ±10%)
 tl_bf_bad||O'lchamlar mantiqqa to'g'ri kelmaydi: belni va bo'yinni qayta tekshiring.||Замеры не сходятся: проверьте талию и шею.||The measurements do not add up: re-check waist and neck.
 tl_bf_help||Santimetrda: bo'yin adam olmasi ostida, bel kindik sathida, ayollarda son eng keng joyida. Taxminiy natija.||В сантиметрах: шея под кадыком, талия на уровне пупка, бёдра по самому широкому месту. Результат приблизительный.||In centimetres: neck below the Adam's apple, waist at the navel, hips at the widest point. A rough estimate.
 tl_bf_c1||Muhim yog' (juda past)||Критически низкий||Essential fat (very low)
@@ -1193,7 +1046,6 @@ cal_f_limit||Shaxsiy ovqatlar 200 tadan oshmasin||Своих продуктов 
 cal_my||Mening ovqatlarim||Моя еда||My foods
 cal_my_empty||Hali o'z ovqatingiz yo'q. Qidiruvda topilmasa, o'zingiz qo'shing.||Своей еды пока нет. Если не нашли в поиске, добавьте.||No own foods yet. If search does not find something, add it.
 cal_edit||Tahrirlash||Изменить||Edit
-cal_quick||Tezkor qo'shish (saqlamasdan)||Быстро добавить (без сохранения)||Quick add (not saved)
 cal_quick_hint||Faqat nom va kiritgan miqdoringiz uchun kaloriya. Keyingi safar uchun saqlanmaydi.||Только название и калории на введённое количество. На будущее не сохраняется.||Just a name and the calories for the amount you entered. It is not kept for next time.
 cal_confirm_del||Ovqat o'chirilsinmi?||Удалить еду?||Delete this food?
 tl_save||Natijani saqlash||Сохранить результат||Save result
@@ -1267,16 +1119,11 @@ cancel_late_hint||Bekor qilish: boshlanishidan {hours} soat oldingacha||Отме
 wl_join||Navbatga turish||Встать в очередь||Join waitlist
 wl_leave||Navbatdan chiqish||Выйти из очереди||Leave waitlist
 wl_pos||Navbat: {n}-o'rin||Очередь: место {n}||Waitlist: #{n}
-wl_waiting_n||Navbatda: {n}||В очереди: {n}||Waiting: {n}
 wl_joined||Navbatga turdingiz: {n}-o'rin. Joy bo'shasa avtomatik yozilasiz.||Вы в очереди: место {n}. При освобождении места запишем автоматически.||You are on the waitlist: #{n}. You will be booked automatically when a seat frees up.
 wl_left||Navbatdan chiqdingiz.||Вы вышли из очереди.||You left the waitlist.
 wl_seats||Joy bor: to'g'ridan-to'g'ri bron qiling.||Есть места: запишитесь напрямую.||There are seats: book directly.
 wl_booked_title||Navbat yetdi: joy sizga bron qilindi||Ваша очередь: место забронировано||Your turn: a seat was booked
 wl_booked_body||«{name}», {date} soat {time}. Bekor qilmoqchi bo'lsangiz, «Mashg'ulotlar» sahifasidan qiling.||«{name}», {date} в {time}. Отменить можно на странице «Занятия».||«{name}», {date} at {time}. You can cancel on the Classes page.
-dc_title||Bugungi mashg'ulotlar: kim keldi||Сегодняшние занятия: кто пришёл||Today's classes: who came
-dc_came||Keldi||Пришёл||Came
-dc_noshow||Kelmadi||Не пришёл||No-show
-dc_not_started||Mashg'ulot hali boshlanmagan||Занятие ещё не началось||The class has not started yet
 cal_title||Kalendarga qo'shish||Добавить в календарь||Add to calendar
 cal_help||Shaxsiy havolaga obuna bo'ling: bron qilingan mashg'ulotlar telefoningiz kalendarida o'zi paydo bo'ladi. Havolani hech kimga bermang.||Подпишитесь на личную ссылку: записанные занятия появятся в календаре телефона сами. Не делитесь ссылкой.||Subscribe to your personal link and booked classes appear in your phone calendar. Do not share the link.
 cal_reset||Havolani yangilash (eskisi ishlamaydi)||Обновить ссылку (старая перестанет работать)||Reset link (the old one stops working)
@@ -1291,7 +1138,7 @@ tr_rate_only_trained||Faqat shu murabbiy bilan mashq qilgan yoki uning darsiga k
 tr_rate_bad||Baho 1 dan 5 gacha bo'lishi kerak.||Оценка должна быть от 1 до 5.||The rating must be from 1 to 5.
 tr_rate_not_allowed||Baholash uchun murabbiy bilan shaxsiy mashg'ulot yoki uning darsiga kelgan bo'lishingiz kerak.||Чтобы оценить, нужно позаниматься с тренером или прийти на его занятие.||To rate, you need a completed session or class with this trainer.
 tr_rate_ok||Rahmat! Bahoyingiz saqlandi.||Спасибо! Оценка сохранена.||Thanks! Your rating was saved.
-wk_streak||Haftalik seriya (haftasiga 2+ tashrif)||Недельная серия (2+ визита в неделю)||Weekly streak (2+ visits a week)
+wk_streak||Haftalik seriya||Недельная серия||Weekly streak
 wk_this||Shu hafta: {done} / {need}||Эта неделя: {done} / {need}||This week: {done} / {need}
 board_on||Siz oylik reytingdasiz (faqat ism va familiya bosh harfi ko'rinadi).||Вы в месячном рейтинге (видны имя и первая буква фамилии).||You are on the monthly leaderboard (first name and last initial shown).
 board_off||Reyting ixtiyoriy: qo'shilmaguningizcha siz ko'rinmaysiz.||Рейтинг добровольный: пока не вступите, вас не видно.||The leaderboard is opt-in: you stay hidden until you join.
@@ -1363,7 +1210,6 @@ trainers_empty_sub||Hozircha faol murabbiy yo'q. Guruh mashg'ulotlari jadvalini 
 rv_empty_title||Hali fikrlar yo'q||Отзывов пока нет||No reviews yet
 rv_empty_sub||Birinchi bo'lib fikr qoldiring — pastdagi shaklga yozing.||Оставьте первый отзыв — заполните форму рядом.||Be the first to share your thoughts — use the form.
 rv_write_btn||Fikr qoldirish||Оставить отзыв||Leave a review
-rv_avg_inline||O'rtacha baho||Средняя оценка||Average rating
 home_final_title||Mashqni bugun boshlang||Начните тренировки сегодня||Start training today
 choose_plan||Abonement tanlash||Выбрать абонемент||Choose a membership
 classes_schedule||Mashg'ulotlar jadvali||Расписание занятий||Class schedule
@@ -1404,7 +1250,6 @@ pwa_push_disabled||Bu qurilmada o'chiq||Выключены на этом уст�
 pwa_push_denied||Brauzer bildirishnomalarni bloklagan: brauzer sozlamalaridan ruxsat bering.||Браузер заблокировал уведомления: разрешите их в настройках браузера.||Notifications are blocked: allow them in your browser settings.
 pwa_push_unsupported||Bu brauzer push-bildirishnomalarni qo'llamaydi (iPhone'da avval ilovani bosh ekranga qo'shing).||Этот браузер не поддерживает push (на iPhone сначала добавьте приложение на главный экран).||This browser does not support push (on iPhone, add the app to your home screen first).
 pwa_push_err||Xatolik: qayta urinib ko'ring.||Ошибка: попробуйте ещё раз.||Something went wrong: try again.
-offline_card||A'zo kartam (QR)||Моя карта (QR)||My member card (QR)
 ftr_title||Fitnes treker||Фитнес-трекер||Fitness tracker
 ftr_sub||Vazn, tana o'lchamlari, mashg'ulotlar va maqsadlaringiz bir joyda. Ma'lumotlar faqat sizga ko'rinadi.||Вес, замеры тела, тренировки и цели в одном месте. Данные видны только вам.||Weight, body measurements, workouts and goals in one place. Only you can see your data.
 ftr_weight||Vazn||Вес||Weight
@@ -1684,7 +1529,6 @@ app_tr2||«Play Protect bloklandi» yoki «xavfli ilova» chiqsa: «Batafsil» �
 app_tr3||«Ilova o'rnatilmadi» chiqsa: telefoningizdagi eski Fitnes Zal ilovasini o'chirib, qaytadan o'rnating.||Если «Приложение не установлено»: удалите старое приложение Fitnes Zal и установите заново.||If it says “App not installed”: remove any older Fitnes Zal app and install again.
 ex_video||Video||Видео||Video
 app_tr4||Birinchi ochilishda sayt 30–60 soniya yuklanishi mumkin: server uyqudan uyg'onadi. Kuting, keyingi safar tez ochiladi.||При первом запуске сайт может грузиться 30–60 секунд: сервер просыпается. Подождите, дальше откроется быстро.||The first launch can take 30–60 seconds while the server wakes up; after that it opens fast.
-scan_session||Sessiya tugagan: sahifani yangilab, admin sifatida qayta kiring||Сессия истекла: обновите страницу и войдите снова как администратор||Session ended: reload the page and sign in again as admin
 """
 
 LANGS = ("uz", "ru", "en", "tr", "ky", "tg")

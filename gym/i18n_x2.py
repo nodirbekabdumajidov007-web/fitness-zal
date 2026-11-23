@@ -9,7 +9,6 @@ tg_linked||{name}, hesabınız bağlandı. Hatırlatmalar buraya gelecek. /statu
 tg_unlinked||Telegram bağlantısı kaldırıldı.||Telegram ажыратылды.||Telegram ҷудо карда шуд.
 tg_status_active||Üyeliğiniz {date} tarihine kadar aktif ({days} gün kaldı).||Абонементиңиз {date} чейин активдүү ({days} күн калды).||Абонементи шумо то {date} фаъол аст ({days} рӯз монд).
 tg_status_none||Şu anda aktif bir üyeliğiniz yok.||Азыр активдүү абонементиңиз жок.||Ҳоло абонементи фаъол надоред.
-tg_expiring||Üyeliğiniz {date} tarihinde bitiyor ({days} gün kaldı). Önceden yenileyin.||Абонементиңиз {date} бүтөт ({days} күн калды). Алдын ала узартыңыз.||Абонементи шумо дар {date} тамом мешавад ({days} рӯз монд). Пешакӣ тамдид кунед.
 tg_class_tomorrow||Yarın saat {time}'de "{name}" dersine kayıtlısınız.||Эртең саат {time}до «{name}» сабагына жазылгансыз.||Фардо соати {time} шумо ба «{name}» сабт шудаед.
 tg_pt_confirmed||Kişisel antrenman onaylandı: {trainer}, {time}.||Жеке машыгуу ырасталды: {trainer}, {time}.||Машқи шахсӣ тасдиқ шуд: {trainer}, {time}.
 tg_pt_cancelled||Kişisel antrenman iptal edildi: {trainer}.||Жеке машыгуу жокко чыгарылды: {trainer}.||Машқи шахсӣ бекор шуд: {trainer}.
@@ -38,54 +37,28 @@ pay_now||Şimdi öde||Азыр төлөө||Ҳозир пардохт карда�
 no_card_note||Şu anda bağlı bir kart yok. Salonda nakit ödeyin veya yönetici ile iletişime geçin.||Азыр туташтырылган карта жок. Залда накталай төлөңүз же администратор менен байланышыңыз.||Ҳоло корти пайваст нест. Дар толор нақд пардохт кунед ё бо администратор тамос гиред.
 report_sent||Ödeme bildirimi gönderildi. Ödeme onaylandığında üyeliğiniz/siparişiniz etkinleşir.||Төлөм билдирүүсү жөнөтүлдү. Төлөм ырасталганда абонемент/заказ иштей баштайт.||Огоҳиномаи пардохт фиристода шуд. Пас аз тасдиқи пардохт абонемент/фармоиш фаъол мешавад.
 err_last4||Kartın son 4 hanesini girin||Картанын акыркы 4 санын киргизиңиз||4 рақами охири кортро ворид кунед
-proof_yes||Ödendi diyor||Төлөдү дейт||Мегӯяд пардохт шуд
-proof_no||Henüz bildirilmedi||Азырынча билдирилген жок||Ҳанӯз хабар дода нашудааст
-confirm_money||Paranın geldiğini gördünüz mü?||Акчанын келгенин көрдүңүзбү?||Оё воридшавии пулро дидед?
 reject||Reddet||Четке кагуу||Рад кардан
 pending_card_note||Karta havaleniz tamamlanmamış veya onay bekliyor. Ödemeler sayfasını açın.||Картага которууңуз аякталган эмес же ырастоону күтүүдө. Төлөмдөр бетин ачыңыз.||Интиқол ба корти шумо анҷом наёфтааст ё мунтазири тасдиқ аст. Саҳифаи пардохтҳоро кушоед.
 tg_payment_ok||Ödeme onaylandı: {amount} UZS ({ref}). Teşekkürler!||Төлөм ырасталды: {amount} UZS ({ref}). Рахмат!||Пардохт тасдиқ шуд: {amount} UZS ({ref}). Ташаккур!
 tg_payment_rejected||Ödeme ({ref}) reddedildi veya iptal edildi. Sorularınız için resepsiyona başvurun.||Төлөм ({ref}) четке кагылды же жокко чыгарылды. Суроолоруңуз болсо, кабыл алууга кайрылыңыз.||Пардохт ({ref}) рад ё бекор шуд. Агар савол дошта бошед, ба қабулгоҳ муроҷиат кунед.
-nav_training||Dersler||Сабактар||Дарсҳо
 training||Antrenman dersleri||Машыгуу сабактары||Дарсҳои машқ
-training_help||Her gün için antrenmanlar: video, nasıl yapılır ve ipuçları.||Ар бир күнгө машыгуулар: видео, кантип аткарылат жана кеңештер.||Машқҳо барои ҳар рӯз: видео, тарзи иҷро ва маслиҳатҳо.
-all_types||Tüm türler||Бардык түрлөр||Ҳамаи навъҳо
 level||Seviye||Деңгээл||Дараҷа
 level_beginner||Başlangıç||Баштапкы||Навомӯз
 level_intermediate||Orta||Орто||Миёна
 level_advanced||İleri||Жогорку||Пешрафта
 watch||Video||Видео||Видео
 every_day||Her gün||Күн сайын||Ҳар рӯз
-how_to||Nasıl yapılır||Кантип аткарылат||Тарзи иҷро
 muscles||Çalışan kaslar||Иштеген булчуңдар||Мушакҳои кордиҳанда
 equipment||Ekipman||Шайман||Таҷҳизот
 tips||Hatalar ve ipuçları||Каталар жана кеңештер||Хатогиҳо ва маслиҳатҳо
-open_video||Videoyu aç||Видеону ачуу||Кушодани видео
-no_video||Bu ders için henüz video yok. Adımları okuyun veya antrenöre sorun.||Бул сабакка азырынча видео жок. Кадамдарды окуңуз же машыктыруучудан сураңыз.||Барои ин дарс ҳанӯз видео нест. Қадамҳоро хонед ё аз мураббӣ пурсед.
 related||Bu türden diğer dersler||Ушул түрдөгү башка сабактар||Дарсҳои дигари ҳамин навъ
-safety_note||Önce ısının. Ağrı hissederseniz durun. Sağlık sorununuz varsa başlamadan önce doktora veya antrenöre danışın.||Адегенде ысыңыз. Оору сезсеңиз токтоңуз. Ден соолукка байланыштуу көйгөй болсо, баштоодон мурун дарыгер же машыктыруучу менен кеңешиңиз.||Аввал гарм шавед. Агар дард ҳис кунед, қатъ кунед. Агар мушкили саломатӣ дошта бошед, пеш аз оғоз бо духтур ё мураббӣ маслиҳат кунед.
-vip_get||VIP al||VIP алуу||VIP гирифтан
-vip_extend||VIP'i uzat||VIPти узартуу||VIP-ро тамдид кардан
-vip_locked||Yalnızca VIP||VIP үчүн гана||Танҳо барои VIP
-vip_unlock_text||Bu dersi açmak için VIP alın. Ayda sadece 50.000 UZS.||Бул сабакты ачуу үчүн VIP алыңыз. Айына болгону 50 000 UZS.||Барои кушодани ин дарс VIP гиред. Моҳе танҳо 50 000 UZS.
-vip_tag||Özel dersler, mağaza indirimi ve çift puan.||Өзгөчө сабактар, дүкөндө арзандатуу жана эки эсе упай.||Дарсҳои махсус, тахфиф дар мағоза ва холи дучанд.
-vip_active||VIP aktif||VIP активдүү||VIP фаъол аст
-vip_via_plan||VIP üyeliğiniz zaten VIP ayrıcalıklarını içerir.||VIP абонементиңизде VIP артыкчылыктары мурунтан эле бар.||Абонементи VIP-и шумо аллакай имтиёзҳои VIP-ро дар бар мегирад.
 vip_perks||VIP ayrıcalıkları||VIP артыкчылыктары||Имтиёзҳои VIP
-vip_perk_videos||{n} özel ders: haftalık programlar, beslenme, yağ yakımı||{n} өзгөчө сабак: жумалык программалар, тамактануу, май күйгүзүү||{n} дарси махсус: барномаҳои ҳафтаина, ғизо, сӯзондани чарбӣ
-vip_perk_discount||Her mağaza alışverişinde %{pct} indirim||Дүкөндөгү ар бир сатып алууда {pct}% арзандатуу||{pct}% тахфиф ба ҳар харид дар мағоза
-vip_perk_points||Çift puan: liderlik tablosunda daha hızlı yüksel||Эки эсе упай: лидерборддо тезирээк көтөрүлүңүз||Холи дучанд: дар ҷадвали пешсафон зудтар боло равед
-vip_perk_badge||Profilinizde VIP rozeti||Профилиңизде VIP белгиси||Нишони VIP дар профили шумо
-vip_days_note||Süre: {days} gün. Tekrar alırsanız günler üzerine eklenir.||Узактыгы: {days} күн. Кайра алсаңыз, күндөр үстүнө кошулат.||Давомнокӣ: {days} рӯз. Агар дубора гиред, рӯзҳо болои он илова мешаванд.
-vip_ok||VIP etkinleştirildi. Hoş geldiniz!||VIP иштетилди. Кош келиңиз!||VIP фаъол шуд. Хуш омадед!
-vip_pending||VIP ödemeniz onay bekliyor. Onaylandığında VIP başlar.||VIP төлөмүңүз ырастоону күтүүдө. Ырасталганда VIP башталат.||Пардохти VIP-и шумо мунтазири тасдиқ аст. Пас аз тасдиқ VIP оғоз мешавад.
 kind_vip||VIP kartı||VIP өтмөк||Гузарномаи VIP
 chat||Sohbet||Чат||Чат
 chat_rules||Diğer üyelerle sohbet edin. Saygılı olun: hakaret, spam veya telefon numarası istemek yok. Personel bildirilen mesajları inceler.||Башка мүчөлөр менен баарлашыңыз. Сыйлуу болуңуз: мазактоо, спам же телефон номерин суроо жок. Персонал даттанылган билдирүүлөрдү карайт.||Бо аъзоёни дигар сӯҳбат кунед. Бо эҳтиром бошед: таҳқир, спам ё пурсидани рақами телефон мумкин нест. Кормандон паёмҳои шикоятшударо месанҷанд.
 chat_banned_notice||Sohbette mesaj yazma izniniz yok. Yönetici ile iletişime geçin.||Чатка жазууга уруксатыңыз жок. Администратор менен байланышыңыз.||Ба шумо навиштан дар чат иҷозат нест. Бо администратор тамос гиред.
 room_general||Genel oda||Жалпы бөлмө||Ҳуҷраи умумӣ
-room_vip||VIP odası||VIP бөлмөсү||Ҳуҷраи VIP
 room_general_help||Her üye için açık bir sohbet||Ар бир мүчөгө ачык чат||Чати кушода барои ҳар аъзо
-room_vip_help||Yalnızca VIP üyelere özel sohbet||Тек VIP мүчөлөргө жабык чат||Чати хусусӣ танҳо барои аъзоёни VIP
 chat_vip_only||Bu oda yalnızca VIP üyeler içindir.||Бул бөлмө VIP мүчөлөр үчүн гана.||Ин ҳуҷра танҳо барои аъзоёни VIP аст.
 chat_people||Üye bul||Мүчөнү табуу||Ёфтани аъзо
 chat_search||Ad veya üye numarası||Аты же мүчө номери||Ном ё рақами аъзо
@@ -112,59 +85,17 @@ chat_forbidden||Bu odaya erişim yok.||Бул бөлмөгө кирүүгө бо
 chat_empty||Mesaj boş.||Билдирүү бош.||Паём холӣ аст.
 chat_long||Mesaj çok uzun (en fazla 1000 karakter).||Билдирүү өтө узун (эң көбү 1000 белги).||Паём аз ҳад дароз аст (ҳадди аксар 1000 аломат).
 chat_blocked||Bu üyeye mesaj gönderemezsiniz.||Бул мүчөгө жаза албайсыз.||Ба ин аъзо навишта наметавонед.
-vip_videos||VIP videolar||VIP видеолор||Видеоҳои VIP
-vip_perk_chat||VIP odası: yalnızca VIP üyelere özel sohbet||VIP бөлмөсү: тек VIP мүчөлөргө жабык чат||Ҳуҷраи VIP: чати хусусӣ танҳо барои аъзоёни VIP
 min_short||dk||мүн||дақ
 popular||Popüler||Популярдуу||Машҳур
 low_stock||Az kaldı||Аз калды||Кам монд
-vip_shop_note||VIP olarak her alışverişte %{pct} indirim alırsınız; sepette otomatik uygulanır.||VIP катары ар бир сатып алууда {pct}% арзандатуу аласыз; ал себетте автоматтык түрдө колдонулат.||Ҳамчун VIP шумо ба ҳар харид {pct}% тахфиф мегиред; он дар сабад худкор татбиқ мешавад.
-vip_price_hint||VIP üyeler için %{pct} daha ucuz →||VIP мүчөлөр үчүн {pct}% арзаныраак →||Барои аъзоёни VIP {pct}% арзонтар →
 related_products||İlgili ürünler||Тектеш буюмдар||Маҳсулоти монанд
-free_pt_note||Bu ay {n} ücretsiz danışmanlık hakkınız var: sonraki isteğiniz ücretsiz.||Бул айда {n} акысыз кеңешиңиз бар: кийинки өтүнүчүңүз акысыз.||Шумо дар ин моҳ {n} машварати ройгон доред: дархости оянда ройгон аст.
-vip_free||VIP ücretsiz||VIP акысыз||VIP ройгон
 trainer_open||Detaylar||Толугураак||Муфассал
 trainer_classes||Grup dersleri||Топтук сабактар||Машғулиятҳои гурӯҳӣ
-vip_tag2||Daha fazla erişim, daha iyi sonuç: özel dersler, ayrılmış yerler, ücretsiz danışmanlık ve misafir davetiyesi.||Көбүрөөк мүмкүнчүлүк, жакшыраак жыйынтык: өзгөчө сабактар, камдалган орундар, акысыз кеңеш жана конок чакыруусу.||Дастрасии бештар, натиҷаи беҳтар: дарсҳои махсус, ҷойҳои захирашуда, машварати ройгон ва даъватномаи меҳмон.
-vip_card||VIP kart||VIP карта||Корти VIP
-vip_not_active||Aktif değil||Активдүү эмес||Фаъол нест
-vip_guest_left||Misafir davetiyeleri (bu ay)||Коноктук чакыруулар (бул ай)||Даъватномаҳои меҳмон (ин моҳ)
-vip_pt_left||Ücretsiz danışmanlıklar (bu ay)||Акысыз кеңештер (бул ай)||Машваратҳои ройгон (ин моҳ)
-vip_seats||Her derste sizin için ayrılan yerler||Ар бир сабакта сиз үчүн камдалган орундар||Ҷойҳои барои шумо дар ҳар машғулият захирашуда
-perk_t_videos||Özel video dersler||Өзгөчө видео сабактар||Дарсҳои видеоии махсус
-perk_t_seats||Ayrılmış yerler||Камдалган орундар||Ҷойҳои захирашуда
-vip_perk_seats||Her grup dersinde {n} yer VIP'ler için ayrılır; ders dolsa bile girersiniz.||Ар бир топтук сабакта {n} орун VIP үчүн сакталат, сабак толсо да киресиз.||Дар ҳар машғулияти гурӯҳӣ {n} ҷой барои VIP нигоҳ дошта мешавад, ҳатто агар машғулият пур шавад ҳам ворид мешавед.
-perk_t_pt||Ücretsiz danışmanlık||Акысыз кеңеш||Машварати ройгон
-vip_perk_pt||Her ay antrenörle {n} ücretsiz birebir danışmanlık.||Ар айда машыктыруучу менен {n} акысыз жекече кеңеш.||Ҳар моҳ {n} машварати ройгони шахсӣ бо мураббӣ.
-perk_t_guest||Misafir getir||Конок алып келүү||Меҳмон овардан
-vip_perk_guest||Ayda {n} misafir davetiyesi: arkadaşınız bir gün ücretsiz antrenman yapar.||Айына {n} конок чакыруусу: досуңуз бир күн акысыз машыгат.||Дар як моҳ {n} даъватномаи меҳмон: дӯстатон як рӯз ройгон машқ мекунад.
-perk_t_discount||Mağaza indirimi||Дүкөндөгү арзандатуу||Тахфиф дар мағоза
-perk_t_points||Çift puan||Эки эсе упай||Холи дучанд
-perk_t_badge||VIP rozeti||VIP белгиси||Нишони VIP
-guest_invite||Misafir davetiyesi||Конок чакыруусу||Даъватномаи меҳмон
-guest_help||Misafirin adını ve günü girin. Misafir resepsiyonda QR'ı veya 8 karakterlik kodu gösterir; yalnızca o gün, bir kez geçerlidir.||Коноктун атын жана күндү киргизиңиз. Конок кабыл алууда QR же 8 белгилүү кодду көрсөтөт; ал бир жолу гана жана ошол күнү гана иштейт.||Номи меҳмон ва рӯзро ворид кунед. Меҳмон QR ё рамзи 8-аломатиро дар қабулгоҳ нишон медиҳад; он як маротиба ва танҳо дар ҳамон рӯз амал мекунад.
 guest_name||Misafir adı||Коноктун аты||Номи меҳмон
 guest_create||Davetiye oluştur||Чакыруу түзүү||Эҷоди даъватнома
-guest_limit||Bu ayki davetiyeler bitti. Yenileri gelecek ay verilir.||Бул айдагы чакыруулар түгөндү. Жаңылары кийинки айда берилет.||Даъватномаҳои ин моҳ тамом шуданд. Навҳо моҳи оянда дода мешаванд.
-guest_mine||Misafir davetiyelerim||Менин конок чакыруууларым||Даъватномаҳои меҳмони ман
-guest_used_tag||Kullanıldı||Колдонулду||Истифода шуд
-guest_valid||Geçerli||Жарактуу||Эътибор дорад
-guest_host||Davet eden||Чакырган||Даъваткунанда
-guest_rules||Misafirin kimliği olmalı. Salon kuralları misafirler için de geçerlidir.||Конокто күбөлүк болушу керек. Зал эрежелери коноктор үчүн да жарактуу.||Меҳмон бояд ҳуҷҷати шахсӣ дошта бошад. Қоидаҳои толор барои меҳмонон низ амал мекунанд.
 guest||misafir||конок||меҳмон
-guest_ok||Misafir girişi kaydedildi||Конок кирди||Воридшавии меҳмон қайд шуд
 guest_used||Bu davetiye daha önce kullanıldı||Бул чакыруу мурун колдонулган||Ин даъватнома қаблан истифода шудааст
-guest_wrong_day||Bu davetiye başka bir gün için||Бул чакыруу башка күнгө||Ин даъватнома барои рӯзи дигар аст
-guest_name_bad||Misafirin adını girin (2-60 karakter)||Коноктун атын киргизиңиз (2-60 белги)||Номи меҳмонро ворид кунед (2-60 аломат)
-guest_date_bad||Önümüzdeki 30 gün içinde bir tarih seçin||Алдыдагы 30 күндүн ичинен дата тандаңыз||Санаеро дар доираи 30 рӯзи оянда интихоб кунед
-guests_today||Bugünün misafirleri||Бүгүнкү коноктор||Меҳмонони имрӯз
-vip_only_action||Bu yalnızca VIP üyeler içindir||Бул VIP мүчөлөр үчүн гана||Ин танҳо барои аъзоёни VIP аст
-vip_seats_note||VIP'siniz: her derste sizin için ek yerler ayrılır.||Сиз VIPсиз: ар бир сабакта сиз үчүн кошумча орундар сакталат.||Шумо VIP ҳастед: дар ҳар машғулият барои шумо ҷойҳои иловагӣ нигоҳ дошта мешавад.
-vip_seats_hint||Her derste birkaç yer VIP üyeler için ayrılır. VIP hakkında →||Ар бир сабакта бир нече орун VIP мүчөлөр үчүн сакталат. VIP жөнүндө →||Дар ҳар машғулият якчанд ҷой барои аъзоёни VIP нигоҳ дошта мешавад. Дар бораи VIP →
 pt_sent_free||İstek gönderildi. Bu ayki ücretsiz VIP danışmanlığı kullanıldı.||Өтүнүч жөнөтүлдү. Бул айдагы акысыз VIP кеңеши колдонулду.||Дархост фиристода шуд. Машварати ройгони VIP-и ин моҳ истифода шуд.
-vip_how||Nasıl çalışır||Кантип иштейт||Чӣ тавр кор мекунад
-vip_how_1||Bir ödeme yöntemi seçin ve VIP satın alın (kart, nakit veya Click).||Төлөм ыкмасын тандап, VIP сатып алыңыз (карта, накталай же Click).||Усули пардохтро интихоб карда, VIP харед (корт, нақд ё Click).
-vip_how_2||Ödeme onaylanınca VIP hemen başlar ve 30 gün sürer.||Төлөм ырасталгандан кийин VIP дароо башталып, 30 күнгө созулат.||Пас аз тасдиқи пардохт VIP фавран оғоз мешавад ва 30 рӯз давом мекунад.
-vip_how_3||İstediğiniz zaman yenileyin: günler bitiş tarihinize eklenir, hiçbir şey kaybolmaz.||Каалаган убакта узартыңыз: күндөр бүтүү күнүңүзгө кошулат, эч нерсе жоголбойт.||Дар ҳар вақт тамдид кунед: рӯзҳо ба санаи анҷом илова мешаванд, ҳеҷ чиз гум намешавад.
 chat_rooms||Odalar||Бөлмөлөр||Ҳуҷраҳо
 chat_no_dm||Henüz özel sohbet yok. Aşağıdan bir üye bulun ve merhaba deyin.||Азырынча жеке чат жок. Төмөндөн мүчө тапып, салам айтыңыз.||Ҳоло чати шахсӣ нест. Дар поён аъзоеро ёфта, салом диҳед.
 chat_photo||Fotoğraf||Сүрөт||Акс
@@ -200,25 +131,12 @@ add_phone_title||Telefon numaranız||Телефон номериңиз||Рақа
 add_phone_help||Giriş kodunuz bu numaraya SMS ile gönderilecek.||Кирүү кодуңуз ушул номерге SMS менен жөнөтүлөт.||Рамзи воридшавии шумо бо SMS ба ин рақам фиристода мешавад.
 admin_login||Yönetici girişi||Администратор кирүүсү||Воридшавии администратор
 start_now||Başla||Баштоо||Оғоз кардан
-days_short||gün||күн||рӯз
-from_price||Aylık||Айына||Дар як моҳ
-home_vip_title||Bir sonraki seviyeniz||Кийинки деңгээлиңиз||Дараҷаи оянда
-scroll_more||Aşağı kaydırın||Ылдый жылдырыңыз||Ба поён ҳаракат кунед
-ticker_1||Güç||Күч||Қувват
-ticker_2||Disiplin||Тартип||Интизом
-ticker_3||Sonuç||Жыйынтык||Натиҷа
-ticker_4||Her gün||Күн сайын||Ҳар рӯз
 stat_members||aktif üye||активдүү мүчө||аъзои фаъол
 stat_classes||haftalık ders||жумалык сабак||машғулияти ҳафтаина
-stat_lessons||video ders||видео сабак||дарси видеоӣ
-feat_training||Video dersler||Видео сабактар||Дарсҳои видеоӣ
-feat_training_sub||Günlük antrenmanlar: nasıl yapılır ve hangi kaslar çalışır.||Күнүмдүк машыгуулар: кантип аткарылат жана кайсы булчуңдар иштейт.||Машқҳои рӯзона: тарзи иҷро ва кадом мушакҳо кор мекунанд.
 feat_classes_sub||Grup dersine tek dokunuşla yer ayırtın.||Топтук сабакка бир басуу менен жазылыңыз.||Ба машғулияти гурӯҳӣ бо як пахш ном нависед.
 feat_shop_sub||Su, protein, enerji içecekleri: salonda hazır.||Суу, протеин, энергетикалык суусундуктар: залда даяр.||Об, протеин, нӯшокиҳои энергетикӣ: дар толор омода.
 feat_card_sub||QR kartınızla girin: sıra yok.||QR картаңыз менен кириңиз: кезек жок.||Бо корти QR ворид шавед: навбат нест.
 home_plans_title||Size uygun bir üyelik||Сизге ылайыктуу абонемент||Абонементе, ки ба шумо мувофиқ аст
-home_trainers_title||Sizi kim çalıştıracak||Сизди ким машыктырат||Кӣ шуморо машқ медиҳад
-final_cta||Bugün başla. Yarın farkı gör.||Бүгүн баштаңыз. Эртең айырмасын көрөсүз.||Имрӯз оғоз кунед. Фардо фарқро мебинед.
 login_as||Şu olarak giriş yap||Катары кирүү||Ворид шудан ҳамчун
 role_member||Üye||Мүчө||Аъзо
 role_trainer||Antrenör||Машыктыруучу||Мураббӣ

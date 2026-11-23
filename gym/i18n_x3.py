@@ -13,16 +13,10 @@ tools_female||Kadın||Аял||Зан
 tools_age||Yaş||Жаш||Синну сол
 tools_height||Boy||Бой||Қад
 tools_activity||Aktivite||Активдүүлүк||Фаъолият
-act_1||Hareketsiz (masa başı iş)||Аз кыймылдуу (кеңсе иши)||Камҳаракат (кори мизӣ)
-act_2||Haftada 1–3 antrenman||Жумасына 1–3 машыгуу||Ҳафтае 1–3 машқ
-act_3||Haftada 3–5 antrenman||Жумасына 3–5 машыгуу||Ҳафтае 3–5 машқ
-act_4||Her gün||Күн сайын||Ҳар рӯз
-act_5||Çok aktif (sporcu)||Өтө активдүү (спортчу)||Хеле фаъол (варзишгар)
 tools_goal||Hedef||Максат||Ҳадаф
 goal_lose||Vermek||Арыктоо||Кам кардан
 goal_keep||Korumak||Сактоо||Нигоҳ доштан
 goal_gain||Almak||Алуу||Зиёд кардан
-bmi_help||18,5–25 sağlıklı kilodur.||18,5–25 — дени сак салмак.||18,5–25 вазни солим аст.
 bmi_under||Zayıf||Салмак жетишсиз||Вазни кам
 bmi_normal||Normal||Нормалдуу||Муқаррарӣ
 bmi_over||Fazla kilolu||Ашыкча салмак||Вазни зиёд
@@ -39,8 +33,6 @@ tools_orm_help||tahmini tek tekrar maksimumu||болжолдонгон бир к
 tools_train_min||Bugünkü antrenman (dk)||Бүгүнкү машыгуу (мүн)||Машқи имрӯза (дақ)
 tools_liters||günde litre||күнүнө литр||дар як рӯз литр
 tools_hr||Nabız bölgeleri||Пульс зоналары||Минтақаҳои набз
-tools_rest_hr||İstirahat nabzı||Эс алуудагы пульс||Набзи истироҳат
-tools_hr_help||Karvonen yöntemi: maks. nabız = 220 − yaş.||Карвонен ыкмасы: макс. пульс = 220 − жаш.||Усули Карвонен: набзи максималӣ = 220 − синну сол.
 zone_1||1 · Toparlanma||1 · Калыбына келүү||1 · Барқароршавӣ
 zone_2||2 · Yağ yakımı||2 · Май күйгүзүү||2 · Сӯзондани чарбӣ
 zone_3||3 · Dayanıklılık||3 · Чыдамкайлык||3 · Истодагарӣ
@@ -53,9 +45,7 @@ record_new||Yeni kişisel rekor! Tebrikler!||Жаңы жеке рекорд! К�
 record_saved||Sonuç kaydedildi||Жыйынтык сакталды||Натиҷа захира шуд
 record_bad||Hareketi, ağırlığı (0–500 kg) ve tekrarı (1–30) kontrol edin||Көнүгүүнү, салмакты (0–500 кг) жана кайталоону (1–30) текшериңиз||Машқ, вазн (0–500 кг) ва такрорро (1–30) санҷед
 records_entries||kayıt||жазуу||сабт
-records_none||Henüz kayıt yok||Азырынча жазуу жок||Ҳоло сабт нест
 records_history||Son sonuçlar||Акыркы жыйынтыктар||Натиҷаҳои охирин
-desk_find_ph||Ad, telefon, FZ-0001 veya QR kodu…||Аты, телефон, FZ-0001 же QR код…||Ном, телефон, FZ-0001 ё рамзи QR…
 desk_all_clear||Hepsi tamam, bekleyen yok||Баары даяр, күткөн эч нерсе жок||Ҳама тайёр, чизи мунтазир нест
 perk_pay||Nakit, karta havale veya Click ile öde||Накталай, картага которуу же Click менен төлөңүз||Бо нақд, интиқол ба корт ё Click пардохт кунед
 activity||Aktivite (12 hafta)||Активдүүлүк (12 жума)||Фаъолият (12 ҳафта)
@@ -95,11 +85,6 @@ workout_all_done||Bugünkü antrenman tamam! Harikasın! 💪||Бүгүнкү м
 chat_typing||{name} yazıyor||{name} жазууда||{name} менависад
 find_route||Salona yol tarifi||Залга жол||Роҳ ба толор
 maps||Haritalar||Карталар||Харитаҳо
-crowd_now||Şu anda||Азыр||Ҳозир
-crowd_calm||sakin||тынч||ором
-crowd_mid||orta||орто||миёна
-crowd_busy||yoğun||элдүү||серодам
-crowd_help||Son 2 saatteki girişlere göre||Акыркы 2 саатдагы кирүүлөр боюнча||Аз рӯи воридшавиҳои 2 соати охир
 qr_2d||Taramak için||Сканерлөө үчүн||Барои скен кардан
 qr_3d||3D görünüm||3D көрүнүш||Намуди 3D
 qr_theme||Renk||Түс||Ранг
@@ -121,8 +106,6 @@ dlv_fee||Teslimat||Жеткирүү||Расонидан
 err_address||Lütfen teslimat adresinin tamamını girin||Жеткирүү дарегин толук киргизиңиз||Лутфан суроғаи пурраи расониданро ворид кунед
 delivery_off||Teslimat şimdilik kapalı; lütfen salondan alın||Жеткирүү азырынча өчүк; залдан алып кетиңиз||Расонидан ҳоло хомӯш аст; лутфан аз толор гиред
 st_shipping||Yolda||Жолдо||Дар роҳ
-ship_do||Teslimata çıktı||Жеткирүүгө чыкты||Барои расонидан баромад
-delivered_do||Teslim edildi||Жеткирилди||Расонида шуд
 track||Sipariş durumu||Заказдын абалы||Ҳолати фармоиш
 trk_accepted||Kabul edildi||Кабыл алынды||Қабул шуд
 trk_shipping||Kurye yolda||Курьер жолдо||Курер дар роҳ аст
@@ -130,7 +113,6 @@ trk_delivered||Teslim edildi||Жеткирилди||Расонида шуд
 trk_picked||Teslim alındı||Алып кетилди||Гирифта шуд
 tg_order_shipping||🛵 #{n} numaralı siparişiniz yolda! Kurye yakında orada olacak.||🛵 #{n} заказыңыз жолдо! Курьер жакында жетет.||🛵 Фармоиши №{n} дар роҳ аст! Курер ба қарибӣ мерасад.
 apple_soon||Apple (iCloud) ile giriş yakında||Apple (iCloud) менен кирүү жакында||Воридшавӣ тавассути Apple (iCloud) ба қарибӣ
-social_soon||Google ve Apple (iCloud) ile giriş yakında||Google жана Apple (iCloud) менен кирүү жакында||Воридшавӣ тавассути Google ва Apple (iCloud) ба қарибӣ
 apple_off||Apple ile giriş ayarlanmamış||Apple менен кирүү жөндөлгөн эмес||Воридшавӣ тавассути Apple танзим нашудааст
 err_apple||Apple hesabı doğrulanamadı||Apple аккаунту текшерилген жок||Аккаунти Apple тасдиқ нашуд
 step_choose||Seçim||Тандоо||Интихоб
@@ -145,13 +127,9 @@ review_write||Yorum bırakın||Пикир калтыруу||Фикр гузор�
 review_edit||Yorumunuzu düzenleyin||Пикириңизди түзөтүү||Фикри худро таҳрир кунед
 review_ph||Salon, antrenörler, ekipman hakkında bize anlatın…||Зал, машыктыруучулар, шайман жөнүндө айтып бериңиз…||Дар бораи толор, мураббиён, таҷҳизот ба мо нависед…
 review_login||Yorum bırakmak için giriş yapın.||Пикир калтыруу үчүн кириңиз.||Барои гузоштани фикр ворид шавед.
-review_first||İlk yorumu siz bırakın!||Биринчи пикирди сиз калтырыңыз!||Аввалин фикрро шумо гузоред!
 or_continue||veya şununla devam edin||же мына булар менен улантыңыз||ё бо инҳо идома диҳед
-google_soon||Google ile giriş yakında||Google менен кирүү жакында||Воридшавӣ тавассути Google ба қарибӣ
 welcome_back||Tekrar hoş geldiniz||Кайра кош келиңиз||Боз хуш омадед
 join_us||Ekibe katılın||Командага кошулуңуз||Ба даста ҳамроҳ шавед
-move_mouse||Farenizi hareket ettirin ✦||Чычканды жылдырыңыз ✦||Мушро ҳаракат диҳед ✦
-deleted_ok||Tamam||Даяр||Тайёр
 sms_login_note||Giriş yaparken telefonunuza bir SMS kodu gelir||Кирүүдө телефонуңузга SMS код келет||Ҳангоми воридшавӣ ба телефони шумо рамзи SMS меояд
 inbox||Gelen kutusu||Кабарлар||Қуттии паёмҳо
 inbox_sub||Salon ekibinden ve sistemden kişisel mesajlar||Зал командасынан жана системадан жеке билдирүүлөр||Паёмҳои шахсӣ аз дастаи толор ва система
@@ -191,13 +169,10 @@ ft_members||Üyeler için||Мүчөлөр үчүн||Барои аъзоён
 ft_contact||İletişim||Байланыш||Тамос
 ft_rights||Tüm hakları saklıdır||Бардык укуктар корголгон||Ҳамаи ҳуқуқҳо ҳифз шудаанд
 ft_made||Güç · Disiplin · Sonuç||Күч · Тартип · Жыйынтык||Қувват · Интизом · Натиҷа
-ft_top||Başa dön||Жогору||Ба боло
 tk_title||Giriş makbuzu||Кирүү чеги||Квитансияи воридшавӣ
 tk_date||Tarih ve saat||Дата жана убакыт||Сана ва вақт
 tk_member||Üye||Мүчө||Аъзо
-tk_host||Davet eden||Чакырган||Даъваткунанда
 tk_plan||Üyelik||Абонемент||Абонемент
-tk_guest_pass||misafir davetiyesi||конок чакыруусу||даъватномаи меҳмон
 tk_valid||Geçerlilik:||Жарактуулук мөөнөтү:||Эътибор то:
 tk_days_left||gün kaldı||күн калды||рӯз монд
 tk_month_visits||Bu ayki ziyaretler||Ушул айдагы визиттер||Ташрифҳои ин моҳ
@@ -211,10 +186,6 @@ tk_wish||İyi antrenmanlar! 💪||Жакшы машыгыңыз! 💪||Машқ�
 tk_help||Üyelik resepsiyonda yenilenebilir.||Абонементти кабыл алууда узартса болот.||Абонементро дар қабулгоҳ тамдид кардан мумкин аст.
 tk_help_blocked||Hesap engelli: nedenini salon yönetiminden sorun.||Аккаунт бөгөттөлгөн: себебин зал башкармалыгынан сураңыз.||Аккаунт масдуд аст: сабабашро аз идораи толор пурсед.
 tk_staff||Kontrol eden||Текшерген||Санҷидагар
-tk_today||bugünkü girişler||бүгүнкү кирүүлөр||воридшавиҳои имрӯз
-tk_recent||Son taramalar||Акыркы сканерлөөлөр||Скенҳои охирин
-tk_wait||Üye kartının QR kodunu tarayın, giriş makbuzu burada yazdırılır.||Мүчө картасынын QR кодун сканерлеңиз, кирүү чеги ушул жерде басылат.||QR-коди корти аъзоро скен кунед, квитансияи воридшавӣ дар ин ҷо чоп мешавад.
-tk_print||Makbuzu yazdır||Чекти басып чыгаруу||Чопи квитансия
 caps_on||Caps Lock açık, şifre büyük harflerle yazılıyor||Caps Lock күйүк, сырсөз баш тамгалар менен терилүүдө||Caps Lock фаъол аст, рамз бо ҳарфҳои калон ворид мешавад
 remember_me||Beni hatırla||Мени эстеп кал||Маро дар хотир нигоҳ дор
 trust_encrypted||Şifreler şifrelenmiş olarak saklanır||Сырсөздөр шифрленген түрдө сакталат||Рамзҳо дар шакли рамзгузорӣшуда нигоҳ дошта мешаванд
@@ -225,11 +196,6 @@ last_seen||Önceki giriş: {when}. Siz değilseniz şifrenizi değiştirin.||М�
 ai_coach||Antrenör asistanı||Машыктыруучу жардамчысы||Ёвари мураббӣ
 ai_coach_sub||Antrenman, beslenme ve salon hakkında sorun||Машыгуу, тамактануу жана зал жөнүндө сураңыз||Дар бораи машқ, ғизо ва толор пурсед
 ai_sub||Salon, üyelikler, teknik ve beslenme hakkında hızlı cevaplar. Giriş yaptığınızda üyeliğinizin bitiş tarihini ve kalorilerinizi söyleyebilir. Haftalık antrenman planı da hazırlar.||Зал, абонементтер, техника жана тамактануу боюнча тез жооптор. Кирсеңиз, абонементиңиздин мөөнөтүн жана калорияңызды айта алат. Жумалык машыгуу планын да түзөт.||Ҷавобҳои зуд дар бораи толор, абонементҳо, техника ва ғизо. Вақте ворид шавед, муҳлати абонемент ва калорияатонро гуфта метавонад. Нақшаи машқи ҳафтаинаро низ месозад.
-ai_home_title||Her zaman yanınızda bir antrenör asistanı||Дайыма жаныңыздагы машыктыруучу жардамчысы||Ёвари мураббӣ ҳамеша дар паҳлӯи шумо
-ai_home_1||Teknik ve egzersizler hakkında cevaplar||Техника жана көнүгүүлөр боюнча жооптор||Ҷавобҳо дар бораи техника ва машқҳо
-ai_home_2||Hedefinize göre hazırlanan haftalık plan||Максатыңызга ылайык түзүлгөн жумалык план||Нақшаи ҳафтаина мувофиқи ҳадафи шумо
-ai_home_3||Gece gündüz; Özbekçe, Rusça, İngilizce, Türkçe, Kırgızca ve Tacikçe||Түнү-күнү; өзбек, орус, англис, түрк, кыргыз жана тажик тилдеринде||Шабу рӯз; бо забонҳои ӯзбекӣ, русӣ, англисӣ, туркӣ, қирғизӣ ва тоҷикӣ
-ai_try||Deneyin||Сынап көрүңүз||Санҷед
 ai_login||Plan oluşturmak ve sohbetinizi saklamak için giriş yapın.||План түзүү жана сүйлөшүүңүздү сактоо үчүн кириңиз.||Барои сохтани нақша ва нигоҳ доштани сӯҳбат ворид шавед.
 ai_chat_title||Asistanla sohbet||Жардамчы менен баарлашуу||Сӯҳбат бо ёвар
 ai_clear||Sohbeti temizle||Чатты тазалоо||Тоза кардани чат

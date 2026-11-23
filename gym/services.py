@@ -67,11 +67,6 @@ def add_membership(user, plan):
     return m
 
 
-def month_start():
-    now = timezone.localtime()
-    return now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-
-
 def seats_left(gym_class, date):
     return max(0, gym_class.capacity - gym_class.bookings.filter(date=date).count())
 
